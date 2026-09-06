@@ -62,3 +62,4 @@ if __name__ == "__main__":
         print(f"  Annualized Volatility: {stats['annualized_volatility']:.1%}")
         print(f"  Sharpe Ratio:          {stats['sharpe_ratio']:.2f}")
         print(f"  Max Drawdown:          {stats['max_drawdown']:.1%}")
+    
