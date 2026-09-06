@@ -53,8 +53,10 @@ def extract_concept(facts: dict, concept: str, unit: str = "USD", taxonomy: str 
     try:
         entries = facts["facts"][taxonomy][concept]["units"][unit]
     except KeyError:
-        return pd.DataFrame(columns=["end_date", "filed_date", "value"])
-
+        empty = pd.DataFrame(columns=["end_date", "filed_date", "value"])
+        empty["end_date"] = pd.to_datetime(empty["end_date"])
+        empty["filed_date"] = pd.to_datetime(empty["filed_date"])
+        return empty
     records = [
         {"end_date": e["end"], "filed_date": e["filed"], "value": e["val"]}
         for e in entries
@@ -71,26 +73,52 @@ def extract_concept(facts: dict, concept: str, unit: str = "USD", taxonomy: str 
 
 def get_shares_outstanding(facts: dict) -> pd.DataFrame:
     """
-    Get shares outstanding, trying the common us-gaap tag first,
-    falling back to the dei taxonomy tag if the first isn't available.
-    """
-    shares = extract_concept(facts, "CommonStockSharesOutstanding", unit="shares")
-    if shares.empty:
-        shares = extract_concept(facts, "EntityCommonStockSharesOutstanding", unit="shares", taxonomy="dei")
-    return shares
+    Get shares outstanding by combining both the us-gaap and dei tags,
+    rather than treating one as a strict fallback for the other. Some
+    companies populate one tag far more consistently than the other, so
+    taking the union of both sources (keeping the most recently filed
+    value for any overlapping dates) gives materially better coverage
+    than trying one tag and only falling back if it's completely empty.
 
+    Rows with a non-positive share count are dropped as invalid data —
+    a company can never legitimately report zero or negative shares
+    outstanding, so such values reflect a filing/tagging error rather
+    than a real state.
+    """
+    gaap_shares = extract_concept(facts, "CommonStockSharesOutstanding", unit="shares")
+    dei_shares = extract_concept(facts, "EntityCommonStockSharesOutstanding", unit="shares", taxonomy="dei")
+
+    combined = pd.concat([gaap_shares, dei_shares], ignore_index=True)
+    if combined.empty:
+        return combined
+
+    combined = combined[combined["value"] > 0]
+
+    combined = combined.sort_values("filed_date").drop_duplicates(subset="end_date", keep="last")
+    combined = combined.sort_values("end_date").reset_index(drop=True)
+
+    return combined
 
 def get_stockholders_equity(facts: dict) -> pd.DataFrame:
     """
-    Get stockholders' equity, trying the standard tag first, falling back
-    to the "including noncontrolling interest" variant used by companies
-    with partially-owned subsidiaries (common among large industrials and
-    consumer conglomerates).
+    Get stockholders' equity by combining the standard tag and the
+    "including noncontrolling interest" variant, rather than treating
+    one as a strict fallback for the other. Some companies (e.g. those
+    with partially-owned subsidiaries) populate the NCI-inclusive tag
+    far more consistently than the standard tag, so taking the union of
+    both gives materially better coverage.
     """
-    equity = extract_concept(facts, "StockholdersEquity")
-    if equity.empty:
-        equity = extract_concept(facts, "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest")
-    return equity
+    standard = extract_concept(facts, "StockholdersEquity")
+    including_nci = extract_concept(facts, "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest")
+
+    combined = pd.concat([standard, including_nci], ignore_index=True)
+    if combined.empty:
+        return combined
+
+    combined = combined.sort_values("filed_date").drop_duplicates(subset="end_date", keep="last")
+    combined = combined.sort_values("end_date").reset_index(drop=True)
+
+    return combined
 
 
 def get_book_value_per_share(ticker: str) -> pd.DataFrame:
