@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from src.factors import load_prices, calculate_momentum
 from src.portfolio import build_portfolio
+from src.risk import summarize_risk
 
 
 def calculate_monthly_returns(prices: pd.DataFrame) -> pd.DataFrame:
@@ -51,11 +52,13 @@ if __name__ == "__main__":
     print(f"Benchmark total return: {benchmark_cum.iloc[-1]:.1%}")
 
     plt.figure(figsize=(10, 5))
-    plt.plot(strategy_cum.index, strategy_cum.values, label="Momentum Strategy")
-    plt.plot(benchmark_cum.index, benchmark_cum.values, label="Equal-Weight Benchmark")
-    plt.title("Cumulative Return: Momentum Strategy vs Benchmark")
-    plt.ylabel("Cumulative Return")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig("results/backtest_equity_curve.png")
-    print("\nChart saved to results/backtest_equity_curve.png")
+    strategy_stats = summarize_risk(strategy_returns, "Momentum Strategy")
+    benchmark_stats = summarize_risk(benchmark_returns, "Equal-Weight Benchmark")
+
+    print("\n--- Risk-Adjusted Comparison ---")
+    for stats in [strategy_stats, benchmark_stats]:
+        print(f"\n{stats['label']}:")
+        print(f"  Annualized Return:     {stats['annualized_return']:.1%}")
+        print(f"  Annualized Volatility: {stats['annualized_volatility']:.1%}")
+        print(f"  Sharpe Ratio:          {stats['sharpe_ratio']:.2f}")
+        print(f"  Max Drawdown:          {stats['max_drawdown']:.1%}")
