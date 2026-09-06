@@ -35,18 +35,23 @@ def get_company_facts(ticker: str) -> dict:
     return response.json()
 
 
-def extract_concept(facts: dict, concept: str, unit: str = "USD") -> pd.DataFrame:
+def extract_concept(facts: dict, concept: str, unit: str = "USD", taxonomy: str = "us-gaap") -> pd.DataFrame:
     """
-    Extract a single XBRL concept (e.g. StockholdersEquity) as a clean DataFrame
-    with columns: end_date, filed_date, value.
+    Extract a single XBRL concept as a clean DataFrame with columns:
+    end_date, filed_date, value.
 
-    Some reporting periods get refiled/restated and appear more than once in
-    the raw data. We keep only the most recently filed version of each period
-    (removing the older duplicate), then sort by the actual reporting period
-    date so the results read in correct chronological order.
+    Different companies sometimes report the same underlying figure under
+    different XBRL tags or taxonomies. If the requested concept isn't found,
+    an empty DataFrame is returned rather than raising an error, so callers
+    can try a fallback tag.
+
+    Some reporting periods get refiled/restated and appear more than once
+    in the raw data. We keep only the most recently filed version of each
+    period, then sort by the actual reporting period date so results read
+    in correct chronological order.
     """
     try:
-        entries = facts["facts"]["us-gaap"][concept]["units"][unit]
+        entries = facts["facts"][taxonomy][concept]["units"][unit]
     except KeyError:
         return pd.DataFrame(columns=["end_date", "filed_date", "value"])
 
@@ -58,23 +63,109 @@ def extract_concept(facts: dict, concept: str, unit: str = "USD") -> pd.DataFram
     df["end_date"] = pd.to_datetime(df["end_date"])
     df["filed_date"] = pd.to_datetime(df["filed_date"])
 
-    # Remove duplicate periods, keeping the most recently filed version of each
     df = df.sort_values("filed_date").drop_duplicates(subset="end_date", keep="last")
-
-    # Now sort by the actual reporting period so results are in correct order
     df = df.sort_values("end_date").reset_index(drop=True)
 
     return df
 
 
-if __name__ == "__main__":
-    facts = get_company_facts("AAPL")
-
-    equity = extract_concept(facts, "StockholdersEquity")
+def get_shares_outstanding(facts: dict) -> pd.DataFrame:
+    """
+    Get shares outstanding, trying the common us-gaap tag first,
+    falling back to the dei taxonomy tag if the first isn't available.
+    """
     shares = extract_concept(facts, "CommonStockSharesOutstanding", unit="shares")
+    if shares.empty:
+        shares = extract_concept(facts, "EntityCommonStockSharesOutstanding", unit="shares", taxonomy="dei")
+    return shares
 
-    print("Stockholders Equity — most recent 3:")
-    print(equity.tail(3))
 
-    print("\nShares Outstanding — most recent 3:")
-    print(shares.tail(3))
+def get_stockholders_equity(facts: dict) -> pd.DataFrame:
+    """
+    Get stockholders' equity, trying the standard tag first, falling back
+    to the "including noncontrolling interest" variant used by companies
+    with partially-owned subsidiaries (common among large industrials and
+    consumer conglomerates).
+    """
+    equity = extract_concept(facts, "StockholdersEquity")
+    if equity.empty:
+        equity = extract_concept(facts, "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest")
+    return equity
+
+
+def get_book_value_per_share(ticker: str) -> pd.DataFrame:
+    """
+    Compute historical book value per share for a ticker by combining
+    stockholders' equity and shares outstanding from SEC filings.
+
+    Equity and shares outstanding are sometimes reported as of slightly
+    different dates within the same reporting period (e.g. shares
+    outstanding reported as of a filing's cover-page date, a few weeks
+    after the fiscal quarter-end used for equity). An exact-date match
+    would silently miss these pairs, so we match each equity date to the
+    nearest available shares date within a 45-day tolerance window instead.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: end_date, filed_date, book_value_per_share
+    """
+    facts = get_company_facts(ticker)
+    equity = get_stockholders_equity(facts)
+    shares = get_shares_outstanding(facts)
+
+    if equity.empty or shares.empty:
+        return pd.DataFrame(columns=["end_date", "filed_date", "book_value_per_share"])
+
+    equity = equity.sort_values("end_date")
+    shares = shares.sort_values("end_date").rename(
+        columns={"value": "shares_value", "filed_date": "shares_filed_date"}
+    )
+
+    merged = pd.merge_asof(
+        equity, shares,
+        on="end_date",
+        direction="nearest",
+        tolerance=pd.Timedelta(days=45)
+    )
+    merged = merged.dropna(subset=["shares_value"])
+
+    merged["book_value_per_share"] = merged["value"] / merged["shares_value"]
+    merged["filed_date"] = merged[["filed_date", "shares_filed_date"]].max(axis=1)
+
+    return merged[["end_date", "filed_date", "book_value_per_share"]]
+
+
+def get_book_value_for_universe(tickers: list[str]) -> dict:
+    """
+    Fetch book value per share history for multiple tickers.
+
+    Returns
+    -------
+    dict
+        {ticker: DataFrame} — one book-value-per-share DataFrame per ticker.
+        Tickers that fail to fetch (e.g. missing EDGAR data) are skipped,
+        with a warning printed rather than halting the whole run.
+    """
+    results = {}
+    for ticker in tickers:
+        try:
+            bvps = get_book_value_per_share(ticker)
+            results[ticker] = bvps
+            print(f"{ticker}: {len(bvps)} book value data points")
+        except Exception as e:
+            print(f"{ticker}: FAILED — {e}")
+    return results
+
+
+if __name__ == "__main__":
+    UNIVERSE = [
+        "AAPL", "MSFT", "JPM", "JNJ", "XOM",
+        "PG", "KO", "WMT", "HD", "UNH",
+        "CAT", "V", "DIS", "NEE", "LIN",
+        "LMT", "RTX"
+    ]
+
+    all_bvps = get_book_value_for_universe(UNIVERSE)
+
+    print(f"\nSuccessfully fetched: {len(all_bvps)} of {len(UNIVERSE)} tickers")
