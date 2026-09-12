@@ -2,7 +2,7 @@
 
 *Does buying recent winners actually beat just holding everything? I built this to find out, properly.*
 
-> **Status:** This is a living document. It reflects what I know as of Version 0.4 — momentum and value factors both fully tested, along with a combined version of the two, plus one robustness check (portfolio concentration). Further robustness testing (a different sample period, trading costs, a bigger universe) is the next stage.
+> **Status:** This is a living document. It reflects what I know as of Version 0.4 — momentum and value factors both fully tested, along with a combined version of the two, plus two robustness checks (portfolio concentration, and a two-period split). The period-split check in particular changed how I'd state the overall conclusion — see below. A closing synthesis tying everything together is the next stage.
 
 ---
 
@@ -141,6 +141,32 @@ This didn't turn out to be a clean "yes, diversification was the whole story" re
 
 The bottom line I'm taking from this: **the benchmark still wins on a risk-adjusted basis at both 5 and 8 holdings (Sharpe 0.81 either way)**, so that core conclusion holds up under this particular stress test rather than falling apart. But the *reason* each strategy underperforms isn't one single story — concentration genuinely explains part of momentum's problem, but it doesn't explain Value's the same way. I'd rather report that nuance honestly than force everything into one tidy explanation that only actually fits one of the three strategies.
 
+## A second robustness check: does the benchmark win in every period, or just on average?
+
+The concentration check above still evaluated everything over the same single 4-year window (2021-2024). That leaves an open question: is "the benchmark wins on a risk-adjusted basis" a genuinely stable conclusion, or could it be an average of some periods where an active strategy actually did better, offset by others where it did worse? To check, I split the same 4-year window into two halves — 2021-2022 and 2023-2024 — and reran all three strategies plus the benchmark independently in each half, back at the original top-5 concentration.
+
+I want to be precise about what this test is and isn't. It's not an out-of-sample test in the machine-learning sense — none of these strategies have parameters that get "fit" to data, so there's nothing to overfit. What it actually checks is simpler and still meaningful: does the full-period conclusion hold up consistently within each sub-period on its own, or does it depend on which stretch of time you happen to be looking at?
+
+**2021-2022:**
+
+| Metric | Momentum | Value | Combined | Benchmark |
+|---|---|---|---|---|
+| Sharpe ratio | 0.25 | **0.64** | 0.10 | 0.59 |
+| Max drawdown | -14.8% | -14.5% | -14.3% | -13.4% |
+
+**2023-2024:**
+
+| Metric | Momentum | Value | Combined | Benchmark |
+|---|---|---|---|---|
+| Sharpe ratio | 0.92 | 0.88 | **1.35** | 1.12 |
+| Max drawdown | -7.5% | -11.2% | **-6.2%** | -6.3% |
+
+This is the most interesting result in the whole project, and it changes how I'd state the overall conclusion. **The "benchmark always wins" finding doesn't actually hold up once you look within each period separately.** In 2021-2022, Value beat the benchmark on Sharpe (0.64 vs 0.59) — the first time any active strategy anywhere in this project beat the benchmark on a risk-adjusted basis. In 2023-2024, Combined beat the benchmark by an even larger margin (1.35 vs 1.12), and also posted a better max drawdown than the benchmark (-6.2% vs -6.3%).
+
+What happened is that two *different* strategies each won in their own period, and averaging both periods together into one 4-year number washed both wins out, because no single strategy won consistently across the whole window. I think there's a real, economically sensible explanation for this rather than it just being noise: 2021-2022 included the 2022 rate-hike environment, a period where value-style investing has historically tended to do relatively well and momentum/growth-style investing has tended to struggle — which is exactly the pattern I saw. 2023-2024 included the AI-driven mega-cap rally, where momentum recovered and Combined — benefiting from both factors performing reasonably in that stretch — produced the best risk-adjusted result of anything tested in this entire project.
+
+So the more accurate conclusion isn't "passive beats active, full stop" — it's that **factor performance here looks genuinely regime-dependent**, and a single average over one 4-year window that happened to contain two quite different regimes back-to-back can hide real, meaningful wins that occurred within each regime on its own. That's a more honest and more useful finding than the simpler one I had before this check, and it's a good example of why I think it's worth actually running robustness checks rather than stopping at the first clean-looking number.
+
 ## Where this falls short (and I want to be upfront about it)
 
 - **Only 17 stocks.** That's a small, hand-picked group, not the actual S&P 500. A bigger universe might behave differently.
@@ -148,7 +174,7 @@ The bottom line I'm taking from this: **the benchmark still wins on a risk-adjus
 - **No trading costs.** Rebalancing every month in real life isn't free. I haven't modeled that yet on any of the three strategies, so this comparison is a bit optimistic across the board.
 - **Risk-free rate is a flat guess.** I used a constant 2% for the Sharpe ratio instead of pulling actual historical rates for each period.
 - **A couple of fundamentals gaps remain unresolved.** V is excluded entirely; HD and DIS have real, partially-understood coverage gaps. None of this changes the overall conclusion, but it's worth being upfront that the Value and Combined results aren't built on perfectly complete data.
-- **Only one concentration alternative tested so far.** I checked top-8 against top-5, but haven't tried other portfolio sizes, other rebalancing frequencies, a different sample period, or an out-of-sample split yet. I'm also being deliberately careful here not to just keep trying different settings until something looks better — that would defeat the point of testing honestly, so any further parameter changes need their own clear justification, not just curiosity about whether they'd help the numbers.
+- **Only two robustness checks done so far, and both are fairly coarse.** I've tested one alternative concentration (top-8) and one two-way period split (2021-2022 vs 2023-2024), but haven't tried other portfolio sizes, other rebalancing frequencies, or a proper rolling/expanding-window test across more than two periods. Two periods is enough to show the full-period result isn't the whole story, but not enough to characterize exactly how regime-dependent these strategies really are. I'm also being deliberately careful not to just keep trying different settings until something looks better — that would defeat the point of testing honestly, so any further changes need their own clear justification, not just curiosity about whether they'd help the numbers.
 
 ## What I used
 
@@ -175,8 +201,8 @@ quant-equity-research/
 
 ## What's next
 
-- **More robustness testing:** trading costs, a bigger universe, different rebalancing frequencies, and testing on a period I haven't looked at yet or an out-of-sample split — while being careful not to just keep tweaking parameters until something looks better, which would defeat the whole point of testing honestly.
-- **A full end-of-project writeup** tying the momentum, value, combined, and robustness findings together into one coherent piece, alongside the code itself.
+- **A full end-of-project writeup** tying the momentum, value, combined, concentration, and period-split findings together into one coherent piece, alongside the code itself — this is the immediate next step.
+- **Further robustness testing, if I come back to this:** trading costs, a bigger universe, different rebalancing frequencies, and a finer-grained rolling-window test across more than two periods, to get a clearer picture of exactly how regime-dependent these strategies are, not just that they are. As always, being careful not to just keep tweaking parameters until something looks better.
 - **Eventually:** a real interactive dashboard, once there's a result worth showing off.
 
 ---
