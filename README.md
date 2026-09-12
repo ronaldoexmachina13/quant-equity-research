@@ -2,7 +2,7 @@
 
 *Does buying recent winners actually beat just holding everything? I built this to find out, properly.*
 
-> **Status:** This is a living document. It reflects what I know as of Version 0.4 — momentum and value factors both fully tested, along with a combined version of the two. Robustness testing (trading costs, a bigger universe, other time periods) is the next stage.
+> **Status:** This is a living document. It reflects what I know as of Version 0.4 — momentum and value factors both fully tested, along with a combined version of the two, plus one robustness check (portfolio concentration). Further robustness testing (a different sample period, trading costs, a bigger universe) is the next stage.
 
 ---
 
@@ -121,6 +121,26 @@ Combining momentum and value didn't produce the best of both worlds — it lande
 
 The overall honest conclusion: **none of the three active strategies I built beat simply owning the whole 17-stock universe, once risk is accounted for**, in this specific universe and time period. That's consistent with a real, well-documented pattern in the wider academic literature — concentrated factor strategies often struggle to beat diversified passive exposure once volatility is priced in properly, especially over short windows and in small, correlated universes like this one. I don't take this as the project "failing" — I take it as the actual answer to the question I set out to test, reported the way I found it, which is the whole point of doing this properly instead of just looking for a result that sounds good.
 
+## A quick robustness check: does concentration matter?
+
+Before treating the result above as final, I wanted to stress-test one specific assumption: my momentum hypothesis for *why* the active strategies underperformed was that holding only 5 of 17 stocks gives up diversification benefit without being compensated for it. If that's really the mechanism, then holding *more* stocks should help. So I reran all three strategies exactly the same way, just holding the top 8 instead of the top 5, and compared.
+
+| Metric | Momentum (5 → 8) | Value (5 → 8) | Combined (5 → 8) |
+|---|---|---|---|
+| Sharpe ratio | 0.56 → 0.65 | 0.75 → 0.55 | 0.64 → 0.68 |
+| Annualized volatility | 14.8% → 14.2% | 18.5% → 15.5% | 14.9% → 13.3% |
+| Max drawdown | -14.8% → -14.9% | -14.5% → -14.2% | -14.3% → -11.6% |
+
+This didn't turn out to be a clean "yes, diversification was the whole story" result, and I think that's actually more useful than if it had been.
+
+**Momentum got better**, in the direction my original hypothesis predicted — lower volatility, higher Sharpe. That's consistent with concentration having genuinely hurt it.
+
+**Value got worse**, which surprised me — its Sharpe actually *dropped* (0.75 to 0.55), even though its volatility also fell. That means the return it was earning fell by more than the risk did once I diluted it from 5 names to 8. My read on this: Value's edge in this specific universe seems to be concentrated in its very best few picks — spreading into a few more, less-cheap stocks watered down the signal itself, not just its risk profile. That's a different effect than simple diversification, and it means my original "5 of 17 forgoes diversification" explanation from the momentum section doesn't fully apply to Value the same way.
+
+**Combined improved the most**, and interestingly — its Sharpe (0.68) became the best of the three active strategies at either concentration level, and its max drawdown (-11.6%) actually beat the benchmark's (-13.4%) — the first time any active strategy in this project has beaten the benchmark on any risk metric at all.
+
+The bottom line I'm taking from this: **the benchmark still wins on a risk-adjusted basis at both 5 and 8 holdings (Sharpe 0.81 either way)**, so that core conclusion holds up under this particular stress test rather than falling apart. But the *reason* each strategy underperforms isn't one single story — concentration genuinely explains part of momentum's problem, but it doesn't explain Value's the same way. I'd rather report that nuance honestly than force everything into one tidy explanation that only actually fits one of the three strategies.
+
 ## Where this falls short (and I want to be upfront about it)
 
 - **Only 17 stocks.** That's a small, hand-picked group, not the actual S&P 500. A bigger universe might behave differently.
@@ -128,6 +148,7 @@ The overall honest conclusion: **none of the three active strategies I built bea
 - **No trading costs.** Rebalancing every month in real life isn't free. I haven't modeled that yet on any of the three strategies, so this comparison is a bit optimistic across the board.
 - **Risk-free rate is a flat guess.** I used a constant 2% for the Sharpe ratio instead of pulling actual historical rates for each period.
 - **A couple of fundamentals gaps remain unresolved.** V is excluded entirely; HD and DIS have real, partially-understood coverage gaps. None of this changes the overall conclusion, but it's worth being upfront that the Value and Combined results aren't built on perfectly complete data.
+- **Only one concentration alternative tested so far.** I checked top-8 against top-5, but haven't tried other portfolio sizes, other rebalancing frequencies, a different sample period, or an out-of-sample split yet. I'm also being deliberately careful here not to just keep trying different settings until something looks better — that would defeat the point of testing honestly, so any further parameter changes need their own clear justification, not just curiosity about whether they'd help the numbers.
 
 ## What I used
 
@@ -154,8 +175,8 @@ quant-equity-research/
 
 ## What's next
 
-- **Robustness testing:** trading costs, a bigger universe, different rebalancing frequencies, testing on a period I haven't looked at yet, and checking whether a different portfolio concentration (top 3 or top 8 instead of top 5) changes anything — while being careful not to just keep tweaking parameters until something looks better, which would defeat the whole point of testing honestly.
-- **A full end-of-project writeup** tying the momentum, value, and combined findings together into one coherent piece, alongside the code itself.
+- **More robustness testing:** trading costs, a bigger universe, different rebalancing frequencies, and testing on a period I haven't looked at yet or an out-of-sample split — while being careful not to just keep tweaking parameters until something looks better, which would defeat the whole point of testing honestly.
+- **A full end-of-project writeup** tying the momentum, value, combined, and robustness findings together into one coherent piece, alongside the code itself.
 - **Eventually:** a real interactive dashboard, once there's a result worth showing off.
 
 ---
