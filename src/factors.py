@@ -84,6 +84,70 @@ def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.
     value_score = -pb_ratio
     return value_score
 
+def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate a Value factor score from Price-to-Book ratio.
+
+    Low P/B is attractive for Value (a cheap stock relative to its book
+    equity) -- the opposite ranking direction from momentum, where high
+    score wins. We return the NEGATIVE of P/B as the score: the stock
+    with the lowest P/B has the highest (least negative) score, and is
+    correctly selected as a top-N pick by build_portfolio().
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Wide-format adjusted close prices (Date index, tickers as columns).
+    book_value : pd.DataFrame
+        Wide-format book value per share (Date index, tickers as columns),
+        as returned by database.load_book_value().
+
+    Returns
+    -------
+    pd.DataFrame
+        Value scores (negative P/B), same shape/index convention as
+        calculate_momentum()'s output.
+    """
+    monthly_prices = prices.resample("ME").last()
+    pb_ratio = monthly_prices / book_value
+    value_score = -pb_ratio
+    return value_score
+
+
+def calculate_combined_score(momentum: pd.DataFrame, value_score: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combine momentum and value into a single score via cross-sectional
+    z-scoring, then averaging.
+
+    Momentum (small returns, e.g. -0.3 to 0.8) and Value (negative P/B,
+    e.g. -1 to -90) live on very different scales. Averaging the raw
+    scores directly would let Value's much larger magnitude dominate the
+    combination almost entirely, silently producing a Value-only result
+    labeled as "combined." Standardizing each factor within each date
+    (subtracting that date's cross-sectional mean, dividing by that
+    date's cross-sectional std) puts both factors on equal footing
+    before combining.
+
+    A ticker missing either factor on a given date is excluded from
+    that date's combined score (NaN propagates), consistent with how
+    build_portfolio() already handles missing scores.
+
+    Parameters
+    ----------
+    momentum : pd.DataFrame
+        Output of calculate_momentum().
+    value_score : pd.DataFrame
+        Output of calculate_value_score().
+
+    Returns
+    -------
+    pd.DataFrame
+        Combined z-scored momentum + value, same shape/index convention.
+    """
+    momentum_z = momentum.sub(momentum.mean(axis=1), axis=0).div(momentum.std(axis=1), axis=0)
+    value_z = value_score.sub(value_score.mean(axis=1), axis=0).div(value_score.std(axis=1), axis=0)
+    return (momentum_z + value_z) / 2
+
 
 if __name__ == "__main__":
     prices = load_prices()
