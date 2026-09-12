@@ -54,6 +54,37 @@ def calculate_momentum(prices: pd.DataFrame, lookback_months: int = 12, skip_mon
     return momentum
 
 
+def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate a Value factor score from Price-to-Book ratio.
+
+    Low P/B is attractive for Value (a cheap stock relative to its book
+    equity) -- the opposite ranking direction from momentum, where high
+    score wins. To reuse build_portfolio()'s existing top-N selection
+    logic unchanged, we return the NEGATIVE of P/B as the score: the
+    stock with the lowest P/B has the highest (least negative) score,
+    and is correctly selected as a top-N pick.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Wide-format adjusted close prices (Date index, tickers as columns).
+    book_value : pd.DataFrame
+        Wide-format book value per share (Date index, tickers as columns),
+        as returned by database.load_book_value().
+
+    Returns
+    -------
+    pd.DataFrame
+        Value scores (negative P/B), same shape/index convention as
+        calculate_momentum()'s output.
+    """
+    monthly_prices = prices.resample("ME").last()
+    pb_ratio = monthly_prices / book_value
+    value_score = -pb_ratio
+    return value_score
+
+
 if __name__ == "__main__":
     prices = load_prices()
     print(f"Loaded prices: {prices.shape[0]} dates x {prices.shape[1]} tickers")
