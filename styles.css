@@ -214,7 +214,6 @@ header p code {
 .nav-card .nc-arrow { margin-top: 1rem; font-size: 0.85rem; color: var(--value); font-weight: 600; }
 
 .mini-stats { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
-.mini-stat { }
 .mini-stat .ms-value { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); }
 .mini-stat .ms-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
 

@@ -49,14 +49,9 @@ def get_price_history_multi(tickers: list[str], start_date: str, end_date: str) 
 
 
 if __name__ == "__main__":
-    universe = [
-        "AAPL", "MSFT", "JPM", "JNJ", "XOM",
-        "PG", "KO", "WMT", "HD", "UNH",
-        "CAT", "V", "DIS", "NEE", "LIN",
-        "LMT", "RTX"
-    ]
+    from config import UNIVERSE
 
-    df = get_price_history_multi(universe, "2024-01-01", "2024-02-01")
+    df = get_price_history_multi(UNIVERSE, "2024-01-01", "2024-02-01")
     print(df.head())
     print(f"\nShape: {df.shape}")
     print(f"Tickers returned: {list(df.columns)}")

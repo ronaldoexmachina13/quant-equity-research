@@ -305,13 +305,13 @@ def build_pb_ratios(prices: pd.DataFrame, tickers: list[str], max_gap_months: in
 
 
 if __name__ == "__main__":
-    UNIVERSE = [
-        "AAPL", "MSFT", "JPM", "JNJ", "XOM",
-        "PG", "KO", "WMT", "HD", "UNH",
-        "CAT", "V", "DIS", "NEE", "LIN",
-        "LMT", "RTX"
-    ]
+    from config import UNIVERSE
 
     all_bvps = get_book_value_for_universe(UNIVERSE)
 
     print(f"\nSuccessfully fetched: {len(all_bvps)} of {len(UNIVERSE)} tickers")
+
+from src.fundamentals import get_book_value_per_share
+
+v_data = get_book_value_per_share("V")
+print(v_data)
