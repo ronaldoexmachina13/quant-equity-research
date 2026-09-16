@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stock Analysis — Quant Equity Research</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <span class="brand">Quant Equity Research</span>
+    <a href="index.html">Index</a>
+    <a href="strategies.html">Strategy Analysis</a>
+    <a href="stocks.html" class="active">Stock Analysis</a>
+    <a href="portfolio.html">Portfolio Timeline</a>
+  </nav>
+
+  <header>
+    <h1>The 17-stock universe</h1>
+    <p>Fixed, sector-diversified, selected independent of past performance. Every number below is computed directly from the project's own SQLite database — current price and 12-1 momentum from the <code>prices</code> table, Price-to-Book from the <code>book_value</code> table, and each strategy's selection count from actually re-running the backtest logic month by month.</p>
+  </header>
+
+  <div class="panel">
+    <h2>Reading these cards</h2>
+    <p class="definition-body">Each card shows the stock's most recent momentum score and Price-to-Book ratio, plus how many of the 48 backtested months (2021&ndash;2024) each strategy actually held that stock. A stock selected by Value in 48/48 months was the cheapest-by-book-value pick in <i>every single month</i> of the backtest &mdash; a much stronger and more literal statement than a single point-in-time ratio can convey on its own.</p>
+  </div>
+
+  <div class="stock-grid" id="stockGrid"></div>
+
+  <footer>
+    Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a>
+  </footer>
+
+</div>
+
+<script>
+const STOCKS = [
+  {"ticker": "AAPL", "name": "Apple", "sector": "Technology", "latest_price": 250.38, "latest_momentum_12_1": 0.239, "latest_pb": 66.46, "momentum_months_selected": 17, "value_months_selected": 0, "combined_months_selected": 13, "total_months_evaluated": 48},
+  {"ticker": "CAT", "name": "Caterpillar", "sector": "Industrials", "latest_price": 355.44, "latest_momentum_12_1": 0.396, "latest_pb": 8.84, "momentum_months_selected": 27, "value_months_selected": 0, "combined_months_selected": 28, "total_months_evaluated": 48},
+  {"ticker": "DIS", "name": "Walt Disney", "sector": "Consumer Discretionary", "latest_price": 108.75, "latest_momentum_12_1": 0.307, "latest_pb": 1.96, "momentum_months_selected": 11, "value_months_selected": 39, "combined_months_selected": 12, "total_months_evaluated": 48},
+  {"ticker": "HD", "name": "Home Depot", "sector": "Consumer Discretionary", "latest_price": 371.88, "latest_momentum_12_1": 0.269, "latest_pb": 63.82, "momentum_months_selected": 6, "value_months_selected": 0, "combined_months_selected": 0, "total_months_evaluated": 48},
+  {"ticker": "JNJ", "name": "Johnson & Johnson", "sector": "Healthcare", "latest_price": 136.88, "latest_momentum_12_1": 0.020, "latest_pb": 4.70, "momentum_months_selected": 1, "value_months_selected": 0, "combined_months_selected": 2, "total_months_evaluated": 48},
+  {"ticker": "JPM", "name": "JPMorgan Chase", "sector": "Financials", "latest_price": 231.08, "latest_momentum_12_1": 0.503, "latest_pb": 1.88, "momentum_months_selected": 30, "value_months_selected": 48, "combined_months_selected": 31, "total_months_evaluated": 48},
+  {"ticker": "KO", "name": "Coca-Cola", "sector": "Consumer Staples", "latest_price": 59.46, "latest_momentum_12_1": 0.121, "latest_pb": 9.10, "momentum_months_selected": 8, "value_months_selected": 0, "combined_months_selected": 4, "total_months_evaluated": 48},
+  {"ticker": "LIN", "name": "Linde", "sector": "Materials", "latest_price": 408.09, "latest_momentum_12_1": 0.133, "latest_pb": 4.79, "momentum_months_selected": 20, "value_months_selected": 8, "combined_months_selected": 26, "total_months_evaluated": 48},
+  {"ticker": "LMT", "name": "Lockheed Martin", "sector": "Aerospace & Defense", "latest_price": 461.18, "latest_momentum_12_1": 0.191, "latest_pb": 15.18, "momentum_months_selected": 12, "value_months_selected": 0, "combined_months_selected": 10, "total_months_evaluated": 48},
+  {"ticker": "MSFT", "name": "Microsoft", "sector": "Technology", "latest_price": 419.06, "latest_momentum_12_1": 0.135, "latest_pb": 10.83, "momentum_months_selected": 25, "value_months_selected": 0, "combined_months_selected": 21, "total_months_evaluated": 48},
+  {"ticker": "NEE", "name": "NextEra Energy", "sector": "Utilities", "latest_price": 68.10, "latest_momentum_12_1": 0.333, "latest_pb": 2.80, "momentum_months_selected": 5, "value_months_selected": 12, "combined_months_selected": 7, "total_months_evaluated": 48},
+  {"ticker": "PG", "name": "Procter & Gamble", "sector": "Consumer Staples", "latest_price": 159.24, "latest_momentum_12_1": 0.254, "latest_pb": 7.19, "momentum_months_selected": 1, "value_months_selected": 0, "combined_months_selected": 2, "total_months_evaluated": 48},
+  {"ticker": "RTX", "name": "RTX Corporation", "sector": "Aerospace & Defense", "latest_price": 111.90, "latest_momentum_12_1": 0.482, "latest_pb": 2.44, "momentum_months_selected": 19, "value_months_selected": 48, "combined_months_selected": 22, "total_months_evaluated": 48},
+  {"ticker": "UNH", "name": "UnitedHealth Group", "sector": "Healthcare", "latest_price": 488.98, "latest_momentum_12_1": 0.173, "latest_pb": 4.52, "momentum_months_selected": 16, "value_months_selected": 0, "combined_months_selected": 16, "total_months_evaluated": 48},
+  {"ticker": "V", "name": "Visa", "sector": "Financials", "latest_price": 311.22, "latest_momentum_12_1": 0.219, "latest_pb": null, "momentum_months_selected": 4, "value_months_selected": 0, "combined_months_selected": 0, "total_months_evaluated": 48},
+  {"ticker": "WMT", "name": "Walmart", "sector": "Consumer Staples", "latest_price": 89.14, "latest_momentum_12_1": 0.777, "latest_pb": 7.60, "momentum_months_selected": 13, "value_months_selected": 38, "combined_months_selected": 20, "total_months_evaluated": 48},
+  {"ticker": "XOM", "name": "Exxon Mobil", "sector": "Energy", "latest_price": 100.01, "latest_momentum_12_1": 0.220, "latest_pb": 1.59, "momentum_months_selected": 25, "value_months_selected": 47, "combined_months_selected": 26, "total_months_evaluated": 48}
+];
+
+const COLORS = { momentum: "#5b6b8c", value: "#1baf7a", combined: "#7c5cd4" };
+
+function selRow(label, count, total, color) {
+  const pct = (count / total * 100).toFixed(0);
+  return `<div class="sel-row">
+    <div class="sel-label">${label}</div>
+    <div class="sel-bar-track"><div class="sel-bar-fill" style="width:${pct}%; background:${color};"></div></div>
+    <div class="sel-count">${count}/${total}</div>
+  </div>`;
+}
+
+function renderCards() {
+  const grid = document.getElementById("stockGrid");
+  STOCKS.forEach(s => {
+    const excluded = s.latest_pb === null;
+    const card = document.createElement("div");
+    card.className = "stock-card" + (excluded ? " excluded" : "");
+
+    const pbDisplay = excluded ? "N/A" : s.latest_pb.toFixed(2) + "x";
+    const momDisplay = (s.latest_momentum_12_1 * 100).toFixed(1) + "%";
+
+    card.innerHTML = `
+      <div class="top-row">
+        <span class="symbol">${s.ticker}</span>
+        <span class="price">$${s.latest_price.toFixed(2)}</span>
+      </div>
+      <div class="name">${s.name}</div>
+      <span class="sector">${s.sector}</span>
+      <div class="metrics">
+        <div class="metric">
+          <div class="m-label">12-1 Momentum</div>
+          <div class="m-value">${momDisplay}</div>
+        </div>
+        <div class="metric">
+          <div class="m-label">Price / Book</div>
+          <div class="m-value">${pbDisplay}</div>
+        </div>
+      </div>
+      <div class="selection">
+        ${selRow("Momentum", s.momentum_months_selected, s.total_months_evaluated, COLORS.momentum)}
+        ${selRow("Value", s.value_months_selected, s.total_months_evaluated, COLORS.value)}
+        ${selRow("Combined", s.combined_months_selected, s.total_months_evaluated, COLORS.combined)}
+      </div>
+      ${excluded ? '<div class="excluded-note">Excluded from Value/Combined — insufficient book value data (multi-class share structure)</div>' : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+renderCards();
+</script>
+</body>
+</html>
