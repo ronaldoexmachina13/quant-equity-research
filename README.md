@@ -176,6 +176,17 @@ So the more accurate conclusion isn't "passive beats active, full stop" — it's
 - **A couple of fundamentals gaps remain unresolved.** V is excluded entirely; HD and DIS have real, partially-understood coverage gaps. None of this changes the overall conclusion, but it's worth being upfront that the Value and Combined results aren't built on perfectly complete data.
 - **Only two robustness checks done so far, and both are fairly coarse.** I've tested one alternative concentration (top-8) and one two-way period split (2021-2022 vs 2023-2024), but haven't tried other portfolio sizes, other rebalancing frequencies, or a proper rolling/expanding-window test across more than two periods. Two periods is enough to show the full-period result isn't the whole story, but not enough to characterize exactly how regime-dependent these strategies really are. I'm also being deliberately careful not to just keep trying different settings until something looks better — that would defeat the point of testing honestly, so any further changes need their own clear justification, not just curiosity about whether they'd help the numbers.
 
+## Interactive Dashboard
+
+Alongside the Python/SQL research pipeline, I built a 4-page interactive dashboard (`index.html`, `strategies.html`, `stocks.html`, `portfolio.html`, styled by `styles.css`) to make the results explorable rather than static. It's plain HTML/CSS/JavaScript with Chart.js for charting — no framework, no build step, just open the files in a browser.
+
+- **Index** — headline finding, key stats, and navigation into the rest of the site.
+- **Strategy Analysis** — toggle between Momentum, Value, Combined, and Benchmark; switch the chart between Total Return, Annualized Return, Sharpe Ratio, and Volatility; a regime-split bar chart (2021–2022 vs 2023–2024); and three color-coded analysis lenses (Quant Research, Wealth Management, Risk) per strategy. A separate tab explains the Sharpe ratio itself and shows the same regime data as an interactive 3D surface, with hover tooltips on each measured point.
+- **Stock Analysis** — all 17 tickers with real momentum and Price-to-Book figures, and how often each was actually selected by each strategy across the 48-month backtest.
+- **Portfolio Timeline** — month-by-month holdings for any strategy and year, with each holding's actual contribution to that month's return.
+
+**One honest limitation, by design:** the dashboard can't query the SQLite database live from a browser (that's a client-side restriction, not a shortcut I took), so the JavaScript in each page holds the real, already-computed backtest numbers as static data objects. If the underlying analysis changes, those objects need manual updates to stay in sync — this dashboard is a presentation layer on top of the research, not a live application connected to it.
+
 ## What I used
 
 Python (pandas, NumPy, matplotlib, yfinance, requests), SQLite, the SEC's public EDGAR API, Git/GitHub, VS Code.
@@ -184,18 +195,24 @@ Python (pandas, NumPy, matplotlib, yfinance, requests), SQLite, the SEC's public
 
 ```
 quant-equity-research/
-├── database/            # SQLite database (generated, not committed)
+├── database/              # SQLite database (generated, not committed)
 ├── src/
-│   ├── data_loader.py   # pulls price data from Yahoo Finance
-│   ├── database.py      # saves/reads prices and book value from SQLite
-│   ├── factors.py       # builds the momentum, value, and combined signals
-│   ├── fundamentals.py  # pulls and cleans SEC EDGAR fundamentals for the value factor
-│   ├── portfolio.py     # ranks stocks, builds the portfolio
-│   ├── backtest.py      # simulates returns, compares vs benchmark
-│   └── risk.py          # Sharpe ratio, volatility, drawdown
-├── results/             # saved charts
-├── run_data_pipeline.py # fetches + stores price data end to end
-├── check_data.py        # sanity-checks the stored data
+│   ├── data_loader.py     # pulls price data from Yahoo Finance
+│   ├── database.py        # saves/reads prices and book value from SQLite
+│   ├── factors.py         # builds the momentum, value, and combined signals
+│   ├── fundamentals.py    # pulls and cleans SEC EDGAR fundamentals for the value factor
+│   ├── portfolio.py       # ranks stocks, builds the portfolio
+│   ├── backtest.py        # simulates returns, compares vs benchmark
+│   └── risk.py            # Sharpe ratio, volatility, drawdown
+├── results/                # saved charts, including the terrain PNG
+├── index.html              # dashboard: landing page
+├── strategies.html         # dashboard: strategy comparison + Sharpe ratio explainer
+├── stocks.html             # dashboard: per-stock momentum/value/selection data
+├── portfolio.html          # dashboard: month-by-month holdings timeline
+├── styles.css               # shared dashboard stylesheet
+├── make_terrain.py         # regenerates the 3D Sharpe terrain PNG
+├── run_data_pipeline.py   # fetches + stores price data end to end
+├── check_data.py          # sanity-checks the stored data
 └── requirements.txt
 ```
 
@@ -203,7 +220,7 @@ quant-equity-research/
 
 - **A full end-of-project writeup** tying the momentum, value, combined, concentration, and period-split findings together into one coherent piece, alongside the code itself — this is the immediate next step.
 - **Further robustness testing, if I come back to this:** trading costs, a bigger universe, different rebalancing frequencies, and a finer-grained rolling-window test across more than two periods, to get a clearer picture of exactly how regime-dependent these strategies are, not just that they are. As always, being careful not to just keep tweaking parameters until something looks better.
-- **Eventually:** a real interactive dashboard, once there's a result worth showing off.
+- **Polish and extend the dashboard, if warranted:** it currently covers everything above at a level appropriate for a first project — further additions (e.g. more chart types) aren't planned unless they'd add genuine analytical value rather than just visual complexity.
 
 ---
 
