@@ -8,7 +8,7 @@ worked out by hand, with no database or network involved.
 import pandas as pd
 import pytest
 
-from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio
+from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff
 
 
 def test_annualized_return_constant_monthly_return():
@@ -74,3 +74,33 @@ def test_max_drawdown_always_non_positive():
     always_up = pd.Series([0.01, 0.02, 0.01, 0.03, 0.01])
     assert max_drawdown(always_up) <= 0
     assert max_drawdown(always_up) == pytest.approx(0.0, abs=1e-9)
+
+
+def test_bootstrap_sharpe_diff_detects_real_advantage():
+    """
+    A strategy with a large, consistent advantage over a benchmark
+    should produce a confidence interval that excludes zero -- the
+    bootstrap should correctly detect a real difference when one exists.
+    """
+    rng = pd.Series([0.01, 0.02, -0.01, 0.03, 0.01, 0.02, 0.00, 0.02, 0.01, 0.03,
+                      0.02, 0.01, 0.03, 0.02, 0.01, 0.02, 0.03, 0.01, 0.02, 0.03,
+                      0.02, 0.01, 0.03, 0.02, 0.01, 0.02, 0.03, 0.02, 0.01, 0.03,
+                      0.02, 0.01, 0.02, 0.03, 0.02, 0.01, 0.03, 0.02, 0.01, 0.02,
+                      0.03, 0.02, 0.01, 0.03, 0.02, 0.01, 0.02, 0.03])
+    benchmark = pd.Series([0.001, -0.001] * (len(rng) // 2))
+    result = bootstrap_sharpe_diff(rng, benchmark, n_sims=2000, seed=1)
+    assert result["significant"] is True
+    assert result["lower"] > 0
+
+
+def test_bootstrap_sharpe_diff_no_false_positive_on_identical_series():
+    """
+    Comparing a return series against an exact copy of itself must never
+    show a significant difference -- there is, by construction, no
+    difference to detect.
+    """
+    returns = pd.Series([0.01, -0.02, 0.03, 0.00, 0.02, -0.01, 0.01, 0.02,
+                          -0.03, 0.01, 0.02, 0.00] * 4)
+    result = bootstrap_sharpe_diff(returns, returns.copy(), n_sims=1000, seed=2)
+    assert result["significant"] is False
+    assert result["point_diff"] == 0

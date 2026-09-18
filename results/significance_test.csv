@@ -1,0 +1,10 @@
+period,strategy,strategy_sharpe,benchmark_sharpe,sharpe_diff,ci_90_lower,ci_90_upper,significant_at_90pct
+Full period (2021-2024),Momentum,0.555,0.81,-0.255,-0.838,0.27,False
+Full period (2021-2024),Value,0.752,0.81,-0.059,-0.551,0.481,False
+Full period (2021-2024),Combined,0.642,0.81,-0.169,-0.745,0.337,False
+2021-2022,Momentum,0.25,0.59,-0.34,-1.198,0.308,False
+2021-2022,Value,0.635,0.59,0.045,-0.633,0.879,False
+2021-2022,Combined,0.102,0.59,-0.489,-1.327,0.1,False
+2023-2024,Momentum,0.916,1.115,-0.199,-1.181,0.642,False
+2023-2024,Value,0.878,1.115,-0.237,-1.03,0.512,False
+2023-2024,Combined,1.348,1.115,0.232,-0.817,1.107,False
