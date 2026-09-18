@@ -1,5 +1,8 @@
+import json
+
 import pandas as pd
 
+from config import UNIVERSE
 from src.factors import (
     load_prices,
     calculate_momentum,
@@ -64,7 +67,8 @@ def compare_within_period(strategy_returns: dict, benchmark_returns: pd.Series, 
     results.append(summarize_risk(sliced_benchmark, "Benchmark"))
 
     df = pd.DataFrame(results).set_index("label")
-    return df[["annualized_return", "annualized_volatility", "sharpe_ratio", "max_drawdown"]]
+    return df[["total_return", "annualized_return", "annualized_volatility", "sharpe_ratio", "max_drawdown"]]
+
 
 def backtest_all_strategies(scores: dict, monthly_returns: pd.DataFrame, top_n: int) -> tuple[dict, pd.DatetimeIndex]:
     """
@@ -107,20 +111,32 @@ if __name__ == "__main__":
     print(f"Comparison period: {common_dates.min().date()} to {common_dates.max().date()} "
           f"({len(common_dates)} months, common to all strategies)\n")
 
+    # Facts about the backtest itself (universe size, date range, month
+    # count) that index.html's summary stats need but that don't live in
+    # any of the per-strategy CSVs -- saved here, once, at the source,
+    # rather than left for a human to count and type in by hand.
+    metadata = {
+        "n_stocks": len(UNIVERSE),
+        "n_months": len(common_dates),
+        "start_date": str(common_dates.min().date()),
+        "end_date": str(common_dates.max().date()),
+    }
+    with open("results/backtest_metadata.json", "w") as f:
+        json.dump(metadata, f, indent=2)
+
     results = []
     for name, r in strategy_returns.items():
         results.append(summarize_risk(r.loc[common_dates], name))
     results.append(summarize_risk(benchmark_returns, "Benchmark"))
 
     summary_df = pd.DataFrame(results).set_index("label")
-    summary_df = summary_df[["annualized_return", "annualized_volatility", "sharpe_ratio", "max_drawdown"]]
+    summary_df = summary_df[["total_return", "annualized_return", "annualized_volatility", "sharpe_ratio", "max_drawdown"]]
 
     print(summary_df.round(3))
 
     summary_df.to_csv("results/strategy_comparison_full_period.csv")
     print("\nSaved to results/strategy_comparison_full_period.csv")
 
-    
     strategy_returns_common = {name: r.loc[common_dates] for name, r in strategy_returns.items()}
 
     print("\n\n--- 2021-2022 ---")
@@ -133,7 +149,6 @@ if __name__ == "__main__":
     print(period_2.round(3))
     period_2.to_csv("results/strategy_comparison_2023_2024.csv")
 
-    
     print("\n\n=== Concentration check: top-5 vs top-8 ===")
 
     returns_top8, common_dates_8 = backtest_all_strategies(scores, monthly_returns, top_n=8)

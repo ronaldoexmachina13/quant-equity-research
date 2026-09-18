@@ -4,11 +4,20 @@ import pandas as pd
 TRADING_PERIODS_PER_YEAR = 12  # we're working in monthly returns
 
 
+def total_return(returns: pd.Series) -> float:
+    """
+    Compound return over the whole period, uncompounded to a yearly rate.
+    E.g. 0.477 means the strategy grew by 47.7% from start to end of the
+    period, regardless of how many months that took.
+    """
+    return (1 + returns).prod() - 1
+
+
 def annualized_return(returns: pd.Series) -> float:
     """Compound monthly returns into an annualized rate."""
-    total_return = (1 + returns).prod()
+    compounded = (1 + returns).prod()
     n_years = len(returns) / TRADING_PERIODS_PER_YEAR
-    return total_return ** (1 / n_years) - 1
+    return compounded ** (1 / n_years) - 1
 
 
 def annualized_volatility(returns: pd.Series) -> float:
@@ -36,9 +45,33 @@ def max_drawdown(returns: pd.Series) -> float:
     return drawdown.min()
 
 
+def rolling_volatility(returns: pd.Series, window: int = 12) -> pd.Series:
+    """
+    Trailing N-month annualized volatility, recomputed at every point.
+    The first (window - 1) entries are NaN -- there isn't enough history
+    yet to compute a trailing window there.
+    """
+    return returns.rolling(window).std() * np.sqrt(TRADING_PERIODS_PER_YEAR)
+
+
+def rolling_sharpe(returns: pd.Series, window: int = 12, risk_free_rate: float = 0.02) -> pd.Series:
+    """
+    Trailing N-month Sharpe ratio, recomputed at every point. When the
+    window is exactly 12 months, the "annualized return" for that window
+    is simply the window's own compounded return (12 months = 1 year,
+    so no further annualization is needed) -- this only generalizes
+    correctly for window=12; a different window size would need a
+    different exponent.
+    """
+    rolling_compounded = returns.rolling(window).apply(lambda r: (1 + r).prod() - 1, raw=True)
+    vol = rolling_volatility(returns, window)
+    return (rolling_compounded - risk_free_rate) / vol
+
+
 def summarize_risk(returns: pd.Series, label: str) -> dict:
     return {
         "label": label,
+        "total_return": total_return(returns),
         "annualized_return": annualized_return(returns),
         "annualized_volatility": annualized_volatility(returns),
         "sharpe_ratio": sharpe_ratio(returns),
