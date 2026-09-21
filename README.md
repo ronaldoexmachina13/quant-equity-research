@@ -1,5 +1,7 @@
 # Quantitative Equity Strategy Research & Backtesting Framework
 
+### [**→ View the live interactive dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/)
+
 *Does buying recent winners actually beat just holding everything? I built this to find out, properly.*
 
 > **Status:** This is a living document. It reflects what I know as of Version 0.4: momentum and value factors both fully tested, along with a combined version of the two, plus two robustness checks (portfolio concentration, and a two-period split). The period-split check in particular changed how I'd state the overall conclusion, see below. Since then, I've also made the entire project reproducible end-to-end (see "Reproducing this project end-to-end" below), added statistical significance testing, and modeled transaction costs. Every finding below reflects all three of those additions, not the earlier, less rigorous version of the analysis.
