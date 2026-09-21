@@ -225,12 +225,89 @@ def update_stocks_html(path: str, computed: dict):
 
     print(f"Updated {path}: {len(updated)} tickers refreshed (name/sector preserved from the file)")
 
+
+def build_significance_rows(path: str = "results/significance_test.csv") -> list:
+    """
+    Read the significance test CSV into a list of plain dicts, formatted
+    for display (percentages/ratios rounded, booleans kept as real
+    Python bools so they serialize as JS true/false, not the string
+    "True"/"False" that a naive CSV-to-string conversion would produce).
+    """
+    df = pd.read_csv(path)
+    rows = []
+    for _, r in df.iterrows():
+        rows.append({
+            "period": r["period"],
+            "strategy": r["strategy"],
+            "strategy_sharpe": round(float(r["strategy_sharpe"]), 2),
+            "benchmark_sharpe": round(float(r["benchmark_sharpe"]), 2),
+            "sharpe_diff": round(float(r["sharpe_diff"]), 2),
+            "ci_lower": round(float(r["ci_90_lower"]), 2),
+            "ci_upper": round(float(r["ci_90_upper"]), 2),
+            "significant": bool(r["significant_at_90pct"]),
+        })
+    return rows
+
+
+def build_cost_rows(path: str = "results/transaction_cost_impact.csv") -> list:
+    """Read the transaction cost CSV into a list of plain dicts, formatted for display."""
+    df = pd.read_csv(path)
+    rows = []
+    for _, r in df.iterrows():
+        rows.append({
+            "strategy": r["strategy"],
+            "avg_turnover": pct(float(r["avg_monthly_turnover"])),
+            "gross_sharpe": round(float(r["gross_sharpe"]), 2),
+            "net_sharpe": round(float(r["net_sharpe"]), 2),
+            "gross_total_return": pct(float(r["gross_total_return"])),
+            "net_total_return": pct(float(r["net_total_return"])),
+        })
+    return rows
+
+
+def update_robustness_data(path: str, significance_rows: list, cost_rows: list):
+    """
+    Inject the significance-test and transaction-cost results into
+    strategies.html as two JS consts, SIGNIFICANCE_DATA and COST_DATA,
+    for the Robustness tab to render as tables.
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    sig_json = json.dumps(significance_rows, separators=(",", ":"))
+    cost_json = json.dumps(cost_rows, separators=(",", ":"))
+
+    new_sig_line = f"const SIGNIFICANCE_DATA = {sig_json};"
+    new_cost_line = f"const COST_DATA = {cost_json};"
+
+    sig_pattern = re.compile(r"const SIGNIFICANCE_DATA = \[.*?\];", re.DOTALL)
+    cost_pattern = re.compile(r"const COST_DATA = \[.*?\];", re.DOTALL)
+
+    if not sig_pattern.search(html) or not cost_pattern.search(html):
+        raise ValueError(
+            "Could not find 'const SIGNIFICANCE_DATA' or 'const COST_DATA' placeholders in "
+            f"{path}. Add the Robustness tab markup (Step B) before running this."
+        )
+
+    html = sig_pattern.sub(lambda m: new_sig_line, html, count=1)
+    html = cost_pattern.sub(lambda m: new_cost_line, html, count=1)
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    print(f"Updated {path}: SIGNIFICANCE_DATA ({len(significance_rows)} rows), COST_DATA ({len(cost_rows)} rows)")
+
+
 if __name__ == "__main__":
     full = load_period("results/strategy_comparison_full_period.csv")
     p1 = load_period("results/strategy_comparison_2021_2022.csv")
     p2 = load_period("results/strategy_comparison_2023_2024.csv")
 
     update_strategies_html("strategies.html", full, p1, p2)
+
+    significance_rows = build_significance_rows()
+    cost_rows = build_cost_rows()
+    update_robustness_data("strategies.html", significance_rows, cost_rows)
 
     with open("results/backtest_metadata.json") as f:
         metadata = json.load(f)
