@@ -31,6 +31,47 @@ def calculate_benchmark_returns(returns: pd.DataFrame) -> pd.Series:
 def calculate_cumulative(returns: pd.Series) -> pd.Series:
     return (1 + returns).cumprod() - 1
 
+def calculate_turnover(weights: pd.DataFrame) -> pd.Series:
+    """
+    Fraction of the portfolio actually traded each month.
+
+    For every month except the first, this is half the sum of absolute
+    weight changes from the prior month -- using half, not the full sum,
+    avoids double-counting, since selling 20% of the book and buying a
+    different 20% is one 20% re-positioning, not 40% of trading.
+
+    The very first month is a special case: there's no prior portfolio
+    to compare against, since the strategy is starting from cash, not
+    rebalancing an existing position. That means the ENTIRE portfolio
+    is pure buying with no offsetting sells, so its turnover is the
+    full invested weight, not half of it.
+    """
+    prior = weights.shift(1)
+    diff = (weights - prior.fillna(0)).abs().sum(axis=1)
+    turnover = 0.5 * diff
+    first_valid = weights.index[0]
+    turnover.loc[first_valid] = weights.loc[first_valid].sum()
+    return turnover
+
+
+def apply_transaction_costs(returns: pd.Series, turnover: pd.Series, cost_bps: float = 10) -> pd.Series:
+    """
+    Deduct a flat transaction cost from each month's return, proportional
+    to how much of the portfolio was actually traded that month.
+
+    cost_bps is a ONE-WAY cost in basis points (default 10 = 0.10%) --
+    a standard, slightly conservative assumption for large, liquid US
+    equities like this project's universe: mostly bid-ask spread, with
+    negligible commission at today's near-zero equity brokerage rates.
+    Turnover already represents a symmetric buy+sell re-positioning
+    (except the special first-month case), so the cost is applied
+    twice per unit of turnover -- once for the selling leg, once for
+    the buying leg.
+    """
+    cost_rate = cost_bps / 10000
+    cost_drag = turnover * cost_rate * 2
+    return returns - cost_drag
+
 
 if __name__ == "__main__":
     prices = load_prices()
