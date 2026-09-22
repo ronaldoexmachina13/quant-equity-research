@@ -217,7 +217,7 @@ Alongside the Python/SQL research pipeline, I built a 4-page interactive dashboa
 
 ## What I used
 
-Python (pandas, NumPy, matplotlib, yfinance, requests), SQLite, the SEC's public EDGAR API, Git/GitHub, VS Code, pytest.
+Python (pandas, NumPy, matplotlib, yfinance, requests), SQLite — including a standalone SQL analytical layer in sql/ that independently reproduces momentum/value construction, turnover, and regime-split performance, cross-checked against the Python pipeline — the SEC's public EDGAR API, Git/GitHub, VS Code, pytest.
 
 ## Reproducing this project end-to-end
 
@@ -245,6 +245,7 @@ One thing worth knowing: SEC EDGAR and Yahoo Finance data update continuously, s
 quant-equity-research/
 ├── config.py                        # single source of truth for the stock universe and date range
 ├── database/                        # SQLite database (generated, not committed)
+├── sql/                             # standalone SQL analytical queries (schema, factor construction, turnover/regime), cross-checked against src/
 ├── src/
 │   ├── data_loader.py               # pulls price data from Yahoo Finance
 │   ├── database.py                  # saves/reads prices and book value from SQLite
