@@ -9,7 +9,7 @@ from src.factors import (
     calculate_value_score,
     calculate_combined_score,
 )
-from src.database import load_book_value
+from src.database import load_book_value, save_portfolio_weights, save_performance
 from src.portfolio import build_portfolio
 from src.backtest import calculate_monthly_returns, run_backtest, calculate_benchmark_returns
 from src.risk import summarize_risk
@@ -43,6 +43,26 @@ def backtest_strategy(score_df: pd.DataFrame, monthly_returns: pd.DataFrame, top
     weights = build_portfolio(score_df, top_n=top_n)
     valid_dates = weights[weights.sum(axis=1) > 0].index
     return run_backtest(weights, monthly_returns).loc[valid_dates]
+
+
+def backtest_strategy_with_weights(score_df: pd.DataFrame, monthly_returns: pd.DataFrame, top_n: int = 5):
+    """
+    Same as backtest_strategy(), but also returns the weights DataFrame
+    restricted to the same valid_dates. Needed so the actual month-by-month
+    holdings can be persisted to the database (see save_portfolio_weights()
+    in __main__), not just the resulting return series -- backtest_strategy()
+    itself is left unchanged since it's also used for the top-8 concentration
+    check below, which is a separate what-if scenario and isn't persisted.
+
+    Returns
+    -------
+    (pd.Series, pd.DataFrame)
+        Strategy returns, and the weights DataFrame over the same valid dates.
+    """
+    weights = build_portfolio(score_df, top_n=top_n)
+    valid_dates = weights[weights.sum(axis=1) > 0].index
+    returns = run_backtest(weights, monthly_returns).loc[valid_dates]
+    return returns, weights.loc[valid_dates]
 
 
 def compare_within_period(strategy_returns: dict, benchmark_returns: pd.Series, start: str, end: str) -> pd.DataFrame:
@@ -85,6 +105,60 @@ def backtest_all_strategies(scores: dict, monthly_returns: pd.DataFrame, top_n: 
     return returns, common
 
 
+def build_weights_long_df(strategy_weights: dict, common_dates: pd.DatetimeIndex) -> pd.DataFrame:
+    """
+    Reshape {strategy_name: wide-format weights DataFrame} into a single
+    long-format DataFrame (date, ticker, strategy, weight), restricted to
+    common_dates and to actual holdings only (weight > 0), ready for
+    save_portfolio_weights(). Zero-weight rows are dropped deliberately --
+    storing "0% weight" for every non-held ticker every month would make
+    the table roughly 17x larger than the strategies.html Portfolio Timeline
+    actually needs, for no analytical benefit.
+    """
+    frames = []
+    for name, weights_df in strategy_weights.items():
+        w = weights_df.loc[common_dates].reset_index()
+        w.columns = ["date"] + list(w.columns[1:])
+        w = w.melt(id_vars="date", var_name="ticker", value_name="weight")
+        w = w[w["weight"] > 0]
+        w["strategy"] = name.lower()
+        frames.append(w[["date", "ticker", "strategy", "weight"]])
+    return pd.concat(frames, ignore_index=True)
+
+
+def build_performance_long_df(strategy_returns: dict, benchmark_returns: pd.Series,
+                               common_dates: pd.DatetimeIndex) -> pd.DataFrame:
+    """
+    Reshape {strategy_name: return series} plus the benchmark return series
+    into a single long-format DataFrame (date, strategy, portfolio_value,
+    daily_return), ready for save_performance(). portfolio_value is
+    reconstructed from the return series as a cumulative-growth-of-$1 index
+    (1 + r).cumprod() -- there's no separately tracked dollar value anywhere
+    upstream, and this is the standard way to turn a return series back into
+    a value series for charting/drawdown purposes.
+    """
+    frames = []
+    for name, r in strategy_returns.items():
+        r_common = r.loc[common_dates]
+        frames.append(pd.DataFrame({
+            "date": r_common.index,
+            "strategy": name.lower(),
+            "portfolio_value": (1 + r_common).cumprod().values,
+            "daily_return": r_common.values,
+        }))
+
+    frames.append(pd.DataFrame({
+        "date": benchmark_returns.index,
+        "strategy": "benchmark",
+        "portfolio_value": (1 + benchmark_returns).cumprod().values,
+        "daily_return": benchmark_returns.values,
+    }))
+
+    df = pd.concat(frames, ignore_index=True)
+    df["date"] = df["date"].astype(str)
+    return df
+
+
 if __name__ == "__main__":
     prices = load_prices()
     book_value = load_book_value()
@@ -93,8 +167,11 @@ if __name__ == "__main__":
     scores = compute_all_scores(prices, book_value)
 
     strategy_returns = {}
+    strategy_weights = {}
     for name, score_df in scores.items():
-        strategy_returns[name] = backtest_strategy(score_df, monthly_returns, top_n=5)
+        returns, weights = backtest_strategy_with_weights(score_df, monthly_returns, top_n=5)
+        strategy_returns[name] = returns
+        strategy_weights[name] = weights
 
     # Restrict every strategy AND the benchmark to the dates where ALL
     # THREE strategies have a valid portfolio -- otherwise Value (which
@@ -148,6 +225,23 @@ if __name__ == "__main__":
     period_2 = compare_within_period(strategy_returns_common, benchmark_returns, "2023-01-01", "2024-12-31")
     print(period_2.round(3))
     period_2.to_csv("results/strategy_comparison_2023_2024.csv")
+
+    # --- Persist portfolio weights and performance to the database (Tier B) ---
+    # Only the headline top-5 run is persisted here. The top-8 concentration
+    # check further below is a separate what-if scenario -- not what the rest
+    # of the dashboard (or the SQL turnover/regime queries) report on -- so
+    # its weights and returns aren't written back to the database.
+    # Note: benchmark weights aren't persisted, only benchmark performance.
+    # calculate_benchmark_returns() doesn't expose a per-ticker weights
+    # DataFrame the way build_portfolio() does for the active strategies,
+    # and the turnover/overlap SQL queries only need momentum/value/combined
+    # holdings anyway (the benchmark isn't a "pick," it's just holding
+    # everything, so there's no turnover or overlap question to ask of it).
+    all_weights_df = build_weights_long_df(strategy_weights, common_dates)
+    save_portfolio_weights(all_weights_df)
+
+    performance_df = build_performance_long_df(strategy_returns, benchmark_returns, common_dates)
+    save_performance(performance_df)
 
     print("\n\n=== Concentration check: top-5 vs top-8 ===")
 

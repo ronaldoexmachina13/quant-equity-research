@@ -14,7 +14,8 @@ def get_connection():
 
 def create_tables():
     """
-    Create the prices and book_value tables if they do not already exist.
+    Create the prices, book_value, portfolio_weights, and performance tables
+    if they do not already exist.
     Safe to run multiple times — will not duplicate or overwrite tables.
     """
     conn = get_connection()
@@ -35,6 +36,26 @@ def create_tables():
             ticker TEXT NOT NULL,
             book_value_per_share REAL NOT NULL,
             PRIMARY KEY (date, ticker)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS portfolio_weights (
+            date TEXT NOT NULL,
+            ticker TEXT NOT NULL,
+            strategy TEXT NOT NULL,
+            weight REAL NOT NULL,
+            PRIMARY KEY (date, ticker, strategy)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS performance (
+            date TEXT NOT NULL,
+            strategy TEXT NOT NULL,
+            portfolio_value REAL NOT NULL,
+            daily_return REAL,
+            PRIMARY KEY (date, strategy)
         )
     """)
 
@@ -120,6 +141,68 @@ def save_book_value(bv_df):
     print(f"Saved {len(rows)} book value rows to the database.")
 
 
+def save_portfolio_weights(weights_df):
+    """
+    Save a long-format portfolio weights DataFrame into the
+    portfolio_weights table. Expects columns: date, ticker, strategy, weight.
+    Safe to run multiple times — existing (date, ticker, strategy) rows are
+    overwritten, not duplicated, same pattern as save_prices().
+
+    Parameters
+    ----------
+    weights_df : pd.DataFrame
+        Long-format: one row per (date, ticker, strategy), covering each of
+        momentum/value/combined/benchmark. If your backtest currently builds
+        one DataFrame per strategy, concatenate them (with a "strategy"
+        column added to each) before calling this function.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    df = weights_df.copy()
+    df["date"] = df["date"].astype(str)
+    rows = df[["date", "ticker", "strategy", "weight"]].values.tolist()
+
+    cursor.executemany("""
+        INSERT OR REPLACE INTO portfolio_weights (date, ticker, strategy, weight)
+        VALUES (?, ?, ?, ?)
+    """, rows)
+
+    conn.commit()
+    conn.close()
+    print(f"Saved {len(rows)} portfolio weight rows to the database.")
+
+
+def save_performance(performance_df):
+    """
+    Save a long-format strategy performance DataFrame into the performance
+    table. Expects columns: date, strategy, portfolio_value, daily_return.
+    Safe to run multiple times — existing (date, strategy) rows are
+    overwritten, not duplicated.
+
+    Parameters
+    ----------
+    performance_df : pd.DataFrame
+        Long-format: one row per (date, strategy), covering
+        momentum/value/combined/benchmark.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    df = performance_df.copy()
+    df["date"] = df["date"].astype(str)
+    rows = df[["date", "strategy", "portfolio_value", "daily_return"]].values.tolist()
+
+    cursor.executemany("""
+        INSERT OR REPLACE INTO performance (date, strategy, portfolio_value, daily_return)
+        VALUES (?, ?, ?, ?)
+    """, rows)
+
+    conn.commit()
+    conn.close()
+    print(f"Saved {len(rows)} performance rows to the database.")
+
+
 def load_book_value():
     """
     Load all stored book value per share from the database, reshaped into
@@ -143,4 +226,4 @@ def load_book_value():
 
 if __name__ == "__main__":
     create_tables()
-    print("Database, prices table, and book_value table created successfully.")
+    print("Database, prices, book_value, portfolio_weights, and performance tables created successfully.")
