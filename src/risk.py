@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 
 TRADING_PERIODS_PER_YEAR = 12  # we're working in monthly returns
 
@@ -202,3 +203,29 @@ def alpha(returns: pd.Series, benchmark_returns: pd.Series, risk_free_rate: floa
     rf_monthly = (1 + risk_free_rate) ** (1 / TRADING_PERIODS_PER_YEAR) - 1
     monthly_alpha = (r - rf_monthly).mean() - beta(r, b) * (b - rf_monthly).mean()
     return monthly_alpha * TRADING_PERIODS_PER_YEAR
+
+
+def alpha_regression(returns: pd.Series, benchmark_returns: pd.Series, risk_free_rate: float = 0.02) -> dict:
+    """
+    Estimate alpha and beta by OLS regression of the strategy's monthly
+    excess return on the benchmark's monthly excess return:
+
+        (r - rf) = alpha + beta * (b - rf) + error
+
+    Returns the annualized alpha (monthly intercept x 12), its t-statistic
+    and p-value, beta and R-squared. The alpha matches alpha() above; what
+    the regression adds is a standard error, so we can ask whether alpha
+    is distinguishable from zero on this sample size.
+    """
+    aligned = pd.concat([returns, benchmark_returns], axis=1).dropna()
+    rf_monthly = (1 + risk_free_rate) ** (1 / TRADING_PERIODS_PER_YEAR) - 1
+    y = aligned.iloc[:, 0] - rf_monthly
+    x = sm.add_constant(aligned.iloc[:, 1] - rf_monthly)
+    model = sm.OLS(y, x).fit()
+    return {
+        "alpha": model.params.iloc[0] * TRADING_PERIODS_PER_YEAR,
+        "alpha_tstat": model.tvalues.iloc[0],
+        "alpha_pvalue": model.pvalues.iloc[0],
+        "beta": model.params.iloc[1],
+        "r_squared": model.rsquared,
+    }

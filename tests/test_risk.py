@@ -8,7 +8,7 @@ worked out by hand, with no database or network involved.
 import pandas as pd
 import pytest
 
-from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha
+from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha, alpha_regression
 
 
 def test_annualized_return_constant_monthly_return():
@@ -115,6 +115,7 @@ def test_downside_deviation_known_case():
     returns = pd.Series([0.03, -0.02, 0.01, -0.04])
     assert downside_deviation(returns, target_annual=0.0) == pytest.approx(0.077460, rel=1e-4)
 
+
 def test_sortino_undefined_when_no_downside():
     """
     If every month beats the target there is no downside deviation, so
@@ -122,6 +123,7 @@ def test_sortino_undefined_when_no_downside():
     """
     returns = pd.Series([0.02] * 12)
     assert pd.isna(sortino_ratio(returns))
+
 
 def test_sortino_ignores_upside_volatility():
     """
@@ -134,6 +136,7 @@ def test_sortino_ignores_upside_volatility():
     assert downside_deviation(steady) == pytest.approx(downside_deviation(big_upside), rel=1e-9)
     assert sortino_ratio(big_upside) > sortino_ratio(steady)
 
+
 def test_beta_and_alpha_exact_multiple_of_benchmark():
     """
     A strategy that is exactly 2x the benchmark every month must have
@@ -145,17 +148,6 @@ def test_beta_and_alpha_exact_multiple_of_benchmark():
     assert beta(strat, bench) == pytest.approx(2.0, rel=1e-9)
     assert alpha(strat, bench, risk_free_rate=0.0) == pytest.approx(0.0, abs=1e-12)
 
-def test_alpha_captures_constant_outperformance():
-    """
-    A strategy that moves one-for-one with the benchmark (beta = 1) but
-    earns an extra 0.5% every month should show alpha of 0.5% x 12 = 6%
-    a year. With beta = 1 the risk-free rate cancels out, so the answer
-    holds at the default 2% rate as well.
-    """
-    bench = pd.Series([0.01, -0.005, 0.015, 0.0, 0.02, -0.01])
-    strat = bench + 0.005
-    assert beta(strat, bench) == pytest.approx(1.0, rel=1e-9)
-    assert alpha(strat, bench) == pytest.approx(0.06, rel=1e-9) 
 
 def test_alpha_captures_constant_outperformance():
     """
@@ -168,3 +160,20 @@ def test_alpha_captures_constant_outperformance():
     strat = bench + 0.005
     assert beta(strat, bench) == pytest.approx(1.0, rel=1e-9)
     assert alpha(strat, bench) == pytest.approx(0.06, rel=1e-9)
+
+
+def test_alpha_regression_matches_alpha_and_detects_real_outperformance():
+    """
+    The regression intercept must equal Jensen's alpha from alpha(), since
+    both are the same OLS estimate. And a strategy that beats a beta-1.1
+    version of the benchmark by 0.5% every month, with only small noise,
+    should show a large, clearly significant alpha t-statistic.
+    """
+    bench = pd.Series([0.01, -0.005, 0.015, 0.0, 0.02, -0.01, 0.012, -0.004, 0.008, 0.003, -0.012, 0.018])
+    noise = pd.Series([0.001, -0.001, 0.0005, -0.0005, 0.0, 0.0008, -0.0008, 0.0003, -0.0003, 0.0006, -0.0006, 0.0])
+    strat = 1.1 * bench + 0.005 + noise
+    result = alpha_regression(strat, bench)
+    assert result["alpha"] == pytest.approx(alpha(strat, bench), rel=1e-9)
+    assert result["beta"] == pytest.approx(beta(strat, bench), rel=1e-9)
+    assert result["alpha_tstat"] > 3
+    assert result["alpha_pvalue"] < 0.01
