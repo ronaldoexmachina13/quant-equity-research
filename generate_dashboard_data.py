@@ -53,6 +53,8 @@ def build_metrics_block(full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame) 
     ann_p2 = [round_half_up(float(p2.loc[s, "annualized_return"]) * 100, 1) for s in ORDER]
     vol_p1 = [round_half_up(float(p1.loc[s, "annualized_volatility"]) * 100, 1) for s in ORDER]
     vol_p2 = [round_half_up(float(p2.loc[s, "annualized_volatility"]) * 100, 1) for s in ORDER]
+    alpha_p1 = [round_half_up(float(p1.loc[s, "alpha"]) * 100, 1) + 0.0 for s in ORDER]
+    alpha_p2 = [round_half_up(float(p2.loc[s, "alpha"]) * 100, 1) + 0.0 for s in ORDER]
 
     return f"""const METRICS = {{
   sharpe: {{ label: "Sharpe Ratio", suffix: "", max: 1.6, step: 0.2,
@@ -64,7 +66,9 @@ def build_metrics_block(full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame) 
   ann: {{ label: "Annualized Return", suffix: "%", max: 25, step: 5,
     p1: {ann_p1}, p2: {ann_p2} }},
   vol: {{ label: "Annualized Volatility", suffix: "%", max: 25, step: 5,
-    p1: {vol_p1}, p2: {vol_p2} }}
+    p1: {vol_p1}, p2: {vol_p2} }},
+  alpha: {{ label: "Alpha vs Benchmark", suffix: "%", min: -8, max: 8, step: 2,
+    p1: {alpha_p1}, p2: {alpha_p2} }}
 }};"""
 
 
@@ -76,7 +80,11 @@ def build_stats_line(row: pd.Series) -> str:
     sharpe = num(row["sharpe_ratio"])
     sortino = num(row["sortino_ratio"])
     dd = pct(row["max_drawdown"])
-    return f'stats: {{ total: "{total}", ann: "{ann}", vol: "{vol}", sharpe: "{sharpe}", sortino: "{sortino}", dd: "{dd}" }}'
+    beta = num(row["beta"])
+    # Tiny negative values (e.g. the benchmark's own alpha, -1e-17) would
+    # otherwise display as "-0.0%"; treat anything below 0.05% as zero.
+    alpha = pct(0.0 if abs(row["alpha"]) < 0.0005 else row["alpha"])
+    return f'stats: {{ total: "{total}", ann: "{ann}", vol: "{vol}", sharpe: "{sharpe}", sortino: "{sortino}", dd: "{dd}", beta: "{beta}", alpha: "{alpha}" }}'
 
 
 def update_strategies_html(path: str, full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame):
