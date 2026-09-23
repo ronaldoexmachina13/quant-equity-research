@@ -120,7 +120,7 @@ def update_index_html(path: str, full: pd.DataFrame, metadata: dict):
         html = f.read()
 
     n_stocks = str(metadata["n_stocks"])
-    n_strategies = str(len(ORDER))  # same 4 strategies used everywhere else
+        n_strategies = str(len([s for s in ORDER if s != "Benchmark"]))  # active strategies only; the benchmark is the control
     n_months = str(metadata["n_months"])
     benchmark_sharpe = num(full.loc["Benchmark", "sharpe_ratio"])
 
