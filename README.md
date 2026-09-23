@@ -19,8 +19,8 @@
 - **Full period:** the benchmark has the highest Sharpe ratio (0.81, against 0.56 for Momentum, 0.75 for Value and 0.64 for Combined). Value earned a higher total return (80.7% vs 67.7%), but with materially higher volatility (18.5% vs 14.6%).
 - **Sub-periods:** Value led the benchmark on Sharpe in 2021–2022 (0.64 vs 0.59) and Combined led in 2023–2024 (1.35 vs 1.12). The full-period average conceals this regime pattern.
 - **Downside risk:** on the Sortino ratio, which counts only downside volatility, the ranking is unchanged over the full period (benchmark 1.42 first). Value's 2021–2022 lead becomes a tie (1.08 vs 1.08) because more of its volatility was on the downside; Combined's 2023–2024 lead widens (2.79 vs 1.88).
-- **Exposure versus selection:** Value's beta to the universe was 1.09, so part of its higher return came from greater exposure; its remaining alpha (+1.4% a year) turns negative (-2.9%) with 8 holdings instead of 5. Combined's 2023–2024 lead came with a beta of 0.91 and an alpha of +5.1%. None of these alphas has been tested for significance.
-- **Significance:** none of the nine strategy-versus-benchmark Sharpe differences is statistically significant (paired bootstrap, 90% confidence intervals all include zero). The regime pattern is a hypothesis, not an established edge.
+- **Exposure versus selection:** Value's beta to the universe was 1.09, so part of its higher return came from greater exposure; its remaining alpha (+1.4% a year) turns negative (-2.9%) with 8 holdings instead of 5. Combined's 2023–2024 lead came with a beta of 0.91 and an alpha of +5.1%. None of the nine alphas is statistically significant (OLS regression; largest |t| = 1.13, against roughly 1.65 needed at the 90% level).
+- **Significance:** none of the nine strategy-versus-benchmark Sharpe differences is statistically significant (paired bootstrap, 90% confidence intervals all include zero), and an independent test on alpha reaches the same conclusion. The regime pattern is a hypothesis, not an established edge.
 - **Trading costs:** at 10 bps one-way, Value (4.2% monthly turnover) is almost unaffected; Momentum and Combined (22–23% turnover) each lose about 0.04 of Sharpe.
 - **Portfolio construction:** Combined shared on average 4.5 of its 5 holdings with Momentum and only 2.0 with Value, so in practice it behaved as a momentum portfolio with a slight value tilt.
 
@@ -198,6 +198,16 @@ The more accurate conclusion is therefore not "passive beats active, full stop" 
 
 I tested this formally. Using a paired bootstrap (5,000 resamples per comparison, 90% confidence interval; see `test_significance.py`), none of the nine strategy-versus-benchmark comparisons, full period or either sub-period, is statistically significant. That includes the two results highlighted above: Value's 2021–2022 lead (Sharpe 0.64 vs 0.59, 90% CI on the difference: [-0.63, +0.88]) and Combined's 2023–2024 lead (1.35 vs 1.12, CI: [-0.82, +1.11]). Both intervals comfortably include zero.
 
+The alphas were tested the same way, with an OLS regression of each strategy's monthly excess return on the benchmark's (`alpha_regression()` in `src/risk.py`, results in `results/alpha_significance.csv`). None of the nine is significant at the 90% level:
+
+| Alpha (annual), t-stat | Momentum | Value | Combined |
+|---|---|---|---|
+| Full period | -1.7%, t = -0.42 | +1.4%, t = 0.28 | -0.5%, t = -0.13 |
+| 2021–2022 | -3.7%, t = -0.61 | +2.8%, t = 0.37 | -6.3%, t = -1.13 |
+| 2023–2024 | -0.4%, t = -0.07 | -0.7%, t = -0.11 | +5.1%, t = 0.91 |
+
+The benchmark explains roughly 70–78% of each strategy's monthly variation (R²), and the remaining stock-specific noise from holding only five names is large relative to the alphas. Because a t-statistic grows with the square root of the sample length, Combined's 2023–2024 alpha would need about 7 years of data at the same strength to reach significance, and Value's full-period alpha well over a century. Two independent methods, the Sharpe bootstrap and the alpha regression, therefore agree that no strategy is distinguishable from the benchmark on this sample.
+
 So the regime story (Value leading during the 2022 hiking cycle, Combined leading during the 2023–2024 rally) is economically sensible and worth treating as a hypothesis, but it is not statistically confirmed. Twenty-four monthly observations per period are not enough to separate a regime effect from noise. It is a pattern worth testing on a longer history or a larger universe, not something to act on.
 
 ## Adding transaction costs
@@ -224,7 +234,7 @@ This does not change the core conclusion. The benchmark's 0.81 Sharpe still exce
 - **Flat risk-free rate.** Sharpe ratios use a constant 2% rather than period-specific Treasury bill yields. Bill yields averaged roughly 1% over 2021–2022 and roughly 5% over 2023–2024, so this understates first-period Sharpe ratios and overstates second-period ones. Comparisons within a period are much less affected than the levels.
 - **Unresolved fundamentals gaps.** V is excluded: two raw filings exist from 2009–2010, but both are a decade too stale for the 2020–2024 window under the 6-month forward-fill cap. Visa's multi-class share structure most likely explains why so little exists under the standard XBRL tags. HD and DIS have partially understood coverage gaps. None of this changes the overall conclusion, but the Value and Combined results do not rest on complete data.
 - **Coarse robustness testing.** One alternative concentration (top 8) and one two-way period split have been tested; other portfolio sizes, rebalancing frequencies and rolling-window tests have not. Two periods are enough to show that the full-period result is not the whole story, but not enough to characterize how regime-dependent these strategies are. Further changes need their own justification rather than being tried until the numbers improve, which would amount to data mining.
-- **No result is statistically significant.** Every strategy-versus-benchmark Sharpe gap, full period and both sub-periods, has a 90% bootstrap confidence interval that includes zero. The regime story is economically plausible but not statistically confirmed. See `test_significance.py` and the period-split section above.
+- **No result is statistically significant.** Every strategy-versus-benchmark Sharpe gap, full period and both sub-periods, has a 90% bootstrap confidence interval that includes zero, and no alpha has a regression t-statistic above 1.13. The regime story is economically plausible but not statistically confirmed. See `test_significance.py` and the period-split section above.
 - **Simple transaction-cost model.** A flat 10 bps one-way cost is a reasonable starting point for a liquid large-cap universe, but real costs vary by name, trade size and market conditions, none of which is modeled. The benchmark's own (much smaller) rebalancing turnover is also not cost-modeled.
 
 ## Interactive Dashboard
@@ -240,7 +250,7 @@ Alongside the Python/SQL pipeline, a 4-page interactive dashboard (`index.html`,
 
 ## What I used
 
-Python (pandas, NumPy, matplotlib, yfinance, requests); SQLite, including a standalone SQL analytical layer in `sql/` that independently reproduces momentum and value construction, turnover and regime-split performance, cross-checked against the Python pipeline; the SEC's public EDGAR API; Git and GitHub; VS Code; pytest.
+Python (pandas, NumPy, statsmodels, matplotlib, yfinance, requests); SQLite, including a standalone SQL analytical layer in `sql/` that independently reproduces momentum and value construction, turnover and regime-split performance, cross-checked against the Python pipeline; the SEC's public EDGAR API; Git and GitHub; VS Code; pytest.
 
 ## Reproducing this project end-to-end
 
@@ -250,7 +260,7 @@ All tables, holdings, per-stock contributions and rolling metrics on the dashboa
 python run_data_pipeline.py            # prices, via yfinance
 python run_fundamentals_pipeline.py    # book value, via SEC EDGAR (point-in-time correct)
 python run_strategy_comparison.py      # backtests Momentum/Value/Combined/Benchmark, saves results/*.csv
-python test_significance.py            # bootstrap CI on every strategy-vs-benchmark Sharpe difference
+python test_significance.py            # bootstrap CI on every Sharpe difference, and OLS alpha t-statistics
 python test_transaction_costs.py       # gross vs net-of-cost returns, given 10bps and each strategy's actual turnover
 python generate_portfolio_timeline.py  # month-by-month holdings, contributions, rolling Sharpe/volatility
 python generate_stocks_data.py         # per-stock latest price/momentum/P-B and selection counts
@@ -276,7 +286,7 @@ quant-equity-research/
 │   ├── fundamentals.py              # pulls and cleans SEC EDGAR fundamentals for the value factor
 │   ├── portfolio.py                 # ranks stocks, builds the portfolio
 │   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover and transaction costs
-│   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha, volatility, drawdown, rolling metrics, bootstrap significance testing
+│   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha (incl. OLS regression), volatility, drawdown, rolling metrics, bootstrap testing
 ├── tests/
 │   ├── test_factors.py              # unit tests for momentum/value/combined and portfolio construction
 │   ├── test_risk.py                 # unit tests for the risk metrics, checked against hand-worked cases
@@ -291,7 +301,7 @@ quant-equity-research/
 ├── run_data_pipeline.py             # fetches + stores price data end to end
 ├── run_fundamentals_pipeline.py     # fetches + stores book value end to end
 ├── run_strategy_comparison.py       # backtests all strategies, saves results/*.csv
-├── test_significance.py             # bootstrap confidence intervals on every strategy-vs-benchmark Sharpe gap
+├── test_significance.py             # bootstrap Sharpe confidence intervals and OLS alpha significance tests
 ├── test_transaction_costs.py        # turnover and cost-adjusted returns for each active strategy
 ├── generate_portfolio_timeline.py   # computes month-by-month holdings/contributions/rolling metrics
 ├── generate_stocks_data.py          # computes per-stock latest figures and selection counts
@@ -306,7 +316,8 @@ quant-equity-research/
 - **Completed: transaction costs.** A flat 10 bps one-way cost applied to actual monthly turnover (`test_transaction_costs.py`) affects the strategies unevenly: Value is almost untouched, while Momentum's and Combined's gaps to the benchmark widen. Results are in `results/transaction_cost_impact.csv`.
 - **Completed: Sortino ratio.** Added to `src/risk.py` with unit tests and reported in every results table and on the dashboard.
 - **Completed: beta and alpha.** Measured against the equal-weight benchmark, with unit tests, in every results table and on the dashboard.
-- **Alpha significance.** Estimate alpha by regression (statsmodels) and report its t-statistic, so the alpha figures carry the same significance discipline as the Sharpe comparisons.
+- **Completed: alpha significance.** OLS regression with statsmodels; no alpha is significant (largest |t| = 1.13). Results are in `results/alpha_significance.csv`.
+- **Out-of-sample test (in progress).** Run the unchanged strategy rules on January 2025 to August 2026 data, pre-registered in `OUT_OF_SAMPLE_PLAN.md` before the new data was downloaded.
 - **Further risk metrics:** Value at Risk and Expected Shortfall (CVaR), and hit rate.
 - **Combined factor construction.** Rank on book-to-price, or on cross-sectional ranks instead of raw P/B z-scores, to test whether Combined's momentum tilt comes from the skew in P/B.
 - **Period-specific risk-free rate.** Replace the flat 2% with monthly Treasury bill yields.
