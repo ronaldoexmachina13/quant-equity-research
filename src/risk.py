@@ -167,3 +167,29 @@ def sortino_ratio(returns: pd.Series, risk_free_rate: float = 0.02) -> float:
     if downside == 0:
         return np.nan
     return (annualized_return(returns) - risk_free_rate) / downside
+
+def beta(returns: pd.Series, benchmark_returns: pd.Series) -> float:
+    """
+    Sensitivity of a strategy to its benchmark: covariance of the two
+    monthly return series divided by the benchmark's variance (the slope
+    of a regression of strategy returns on benchmark returns). Series are
+    aligned on date first, so only months present in both are used.
+    """
+    aligned = pd.concat([returns, benchmark_returns], axis=1).dropna()
+    r, b = aligned.iloc[:, 0], aligned.iloc[:, 1]
+    return r.cov(b) / b.var()
+
+
+def alpha(returns: pd.Series, benchmark_returns: pd.Series, risk_free_rate: float = 0.02) -> float:
+    """
+    Annualized Jensen's alpha: the average monthly excess return not
+    explained by beta times the benchmark's excess return, multiplied by
+    12. Uses arithmetic monthly means, the standard convention for a
+    regression intercept, so it is not directly comparable to the
+    compounded annualized returns elsewhere in this module.
+    """
+    aligned = pd.concat([returns, benchmark_returns], axis=1).dropna()
+    r, b = aligned.iloc[:, 0], aligned.iloc[:, 1]
+    rf_monthly = (1 + risk_free_rate) ** (1 / TRADING_PERIODS_PER_YEAR) - 1
+    monthly_alpha = (r - rf_monthly).mean() - beta(r, b) * (b - rf_monthly).mean()
+    return monthly_alpha * TRADING_PERIODS_PER_YEAR

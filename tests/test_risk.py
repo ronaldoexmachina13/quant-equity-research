@@ -8,7 +8,7 @@ worked out by hand, with no database or network involved.
 import pandas as pd
 import pytest
 
-from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio
+from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha
 
 
 def test_annualized_return_constant_monthly_return():
@@ -133,3 +133,38 @@ def test_sortino_ignores_upside_volatility():
     big_upside = pd.Series([0.05, -0.02, 0.05, -0.02, 0.05, 0.05] * 2)
     assert downside_deviation(steady) == pytest.approx(downside_deviation(big_upside), rel=1e-9)
     assert sortino_ratio(big_upside) > sortino_ratio(steady)
+
+def test_beta_and_alpha_exact_multiple_of_benchmark():
+    """
+    A strategy that is exactly 2x the benchmark every month must have
+    beta = 2. With a 0% risk-free rate, beta explains all of its return,
+    so alpha must be 0.
+    """
+    bench = pd.Series([0.01, -0.005, 0.015, 0.0, 0.02, -0.01])
+    strat = 2 * bench
+    assert beta(strat, bench) == pytest.approx(2.0, rel=1e-9)
+    assert alpha(strat, bench, risk_free_rate=0.0) == pytest.approx(0.0, abs=1e-12)
+
+def test_alpha_captures_constant_outperformance():
+    """
+    A strategy that moves one-for-one with the benchmark (beta = 1) but
+    earns an extra 0.5% every month should show alpha of 0.5% x 12 = 6%
+    a year. With beta = 1 the risk-free rate cancels out, so the answer
+    holds at the default 2% rate as well.
+    """
+    bench = pd.Series([0.01, -0.005, 0.015, 0.0, 0.02, -0.01])
+    strat = bench + 0.005
+    assert beta(strat, bench) == pytest.approx(1.0, rel=1e-9)
+    assert alpha(strat, bench) == pytest.approx(0.06, rel=1e-9) 
+
+def test_alpha_captures_constant_outperformance():
+    """
+    A strategy that moves one-for-one with the benchmark (beta = 1) but
+    earns an extra 0.5% every month should show alpha of 0.5% x 12 = 6%
+    a year. With beta = 1 the risk-free rate cancels out, so the answer
+    holds at the default 2% rate as well.
+    """
+    bench = pd.Series([0.01, -0.005, 0.015, 0.0, 0.02, -0.01])
+    strat = bench + 0.005
+    assert beta(strat, bench) == pytest.approx(1.0, rel=1e-9)
+    assert alpha(strat, bench) == pytest.approx(0.06, rel=1e-9)
