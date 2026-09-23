@@ -4,7 +4,7 @@ from src.factors import load_prices, calculate_momentum, calculate_value_score, 
 from src.database import load_book_value
 from src.portfolio import build_portfolio
 from src.backtest import calculate_monthly_returns, run_backtest, calculate_benchmark_returns
-from src.risk import bootstrap_sharpe_diff, sharpe_ratio
+from src.risk import bootstrap_sharpe_diff, sharpe_ratio, alpha_regression
 
 
 def compute_all_scores(prices: pd.DataFrame, book_value: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -46,6 +46,7 @@ if __name__ == "__main__":
     }
 
     results = []
+    alpha_results = []
     for period_name, (start, end) in periods.items():
         bench_slice = benchmark_returns.loc[start:end]
         bench_sharpe = sharpe_ratio(bench_slice)
@@ -70,6 +71,27 @@ if __name__ == "__main__":
                   f"Sharpe {strat_sharpe:.2f} vs {bench_sharpe:.2f} | "
                   f"diff {res['point_diff']:+.2f}, 90% CI [{res['lower']:+.2f}, {res['upper']:+.2f}] | {sig_label}")
 
+            # Alpha significance: OLS of the strategy's monthly excess return
+            # on the benchmark's. |t| above roughly 1.65 is significant at the
+            # 10% level (two-sided), matching the 90% bar used for Sharpe above.
+            reg = alpha_regression(strat_slice, bench_slice)
+            alpha_results.append({
+                "period": period_name,
+                "strategy": strat_name,
+                "alpha": round(reg["alpha"], 4),
+                "alpha_tstat": round(reg["alpha_tstat"], 2),
+                "alpha_pvalue": round(reg["alpha_pvalue"], 3),
+                "beta": round(reg["beta"], 3),
+                "r_squared": round(reg["r_squared"], 3),
+                "significant_at_90pct": bool(reg["alpha_pvalue"] < 0.10),
+            })
+
     results_df = pd.DataFrame(results)
     results_df.to_csv("results/significance_test.csv", index=False)
     print("\nSaved to results/significance_test.csv")
+
+    alpha_df = pd.DataFrame(alpha_results)
+    print("\nAlpha regression (annualized alpha, t-stat, p-value):")
+    print(alpha_df.to_string(index=False))
+    alpha_df.to_csv("results/alpha_significance.csv", index=False)
+    print("\nSaved to results/alpha_significance.csv")
