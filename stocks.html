@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Stock Analysis — Quant Equity Research</title>
+<title>Stock Analysis | Quant Equity Research</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,12 +18,12 @@
 
   <header>
     <h1>The 17-stock universe</h1>
-    <p>Fixed, sector-diversified, selected independent of past performance. Every number below is computed directly from the project's own SQLite database — current price and 12-1 momentum from the <code>prices</code> table, Price-to-Book from the <code>book_value</code> table, and each strategy's selection count from actually re-running the backtest logic month by month.</p>
+    <p>A fixed, sector-diversified universe of large-cap US stocks, chosen on current size and liquidity rather than past returns. Because the list was drawn from companies that exist today, it carries a mild survivorship bias, discussed in the README's limitations. Every figure below comes from the project's SQLite database: current price and 12-1 momentum from the <code>prices</code> table, Price-to-Book from the <code>book_value</code> table, and each strategy's selection count from re-running the backtest logic month by month.</p>
   </header>
 
   <div class="panel">
     <h2>Reading these cards</h2>
-    <p class="definition-body">Each card shows the stock's most recent momentum score and Price-to-Book ratio, plus how many of the 48 backtested months (2021&ndash;2024) each strategy actually held that stock. A stock selected by Value in 48/48 months was the cheapest-by-book-value pick in <i>every single month</i> of the backtest &mdash; a much stronger and more literal statement than a single point-in-time ratio can convey on its own.</p>
+    <p class="definition-body">Each card shows the stock's latest 12-1 momentum score and Price-to-Book ratio, and how many of the 48 backtested months (2021&ndash;2024) each strategy held it. A count of 48/48 for Value means the stock ranked among the five cheapest by book value in <i>every</i> month of the backtest, which says more about the persistence of its valuation than a single ratio can. The ratios shown are the latest readings, while selection counts reflect each month's point-in-time ranking, so a stock can look expensive today and still have been a frequent Value holding (WMT is an example).</p>
   </div>
 
   <div class="stock-grid" id="stockGrid"></div>
@@ -98,7 +98,7 @@ function renderCards() {
         ${selRow("Value", s.value_months_selected, s.total_months_evaluated, COLORS.value)}
         ${selRow("Combined", s.combined_months_selected, s.total_months_evaluated, COLORS.combined)}
       </div>
-      ${excluded ? '<div class="excluded-note">Excluded from Value/Combined — insufficient book value data (multi-class share structure)</div>' : ''}
+      ${excluded ? '<div class="excluded-note">Excluded from Value and Combined: insufficient book value data (multi-class share structure)</div>' : ''}
     `;
     grid.appendChild(card);
   });
