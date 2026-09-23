@@ -133,7 +133,14 @@ def bootstrap_sharpe_diff(returns_a: pd.Series, returns_b: pd.Series, risk_free_
     }
 
 
-def summarize_risk(returns: pd.Series, label: str) -> dict:
+def summarize_risk(returns: pd.Series, label: str, benchmark_returns: pd.Series = None) -> dict:
+    """
+    Standard risk summary for one return series. Beta and alpha need a
+    benchmark to compare against, so they are only calculated when
+    benchmark_returns is passed in; otherwise they are NaN. Existing
+    callers that pass only (returns, label) are unaffected.
+    """
+    has_benchmark = benchmark_returns is not None
     return {
         "label": label,
         "total_return": total_return(returns),
@@ -142,6 +149,8 @@ def summarize_risk(returns: pd.Series, label: str) -> dict:
         "sharpe_ratio": sharpe_ratio(returns),
         "sortino_ratio": sortino_ratio(returns),
         "max_drawdown": max_drawdown(returns),
+        "beta": beta(returns, benchmark_returns) if has_benchmark else np.nan,
+        "alpha": alpha(returns, benchmark_returns) if has_benchmark else np.nan,
     }
 
 def downside_deviation(returns: pd.Series, target_annual: float = 0.02) -> float:

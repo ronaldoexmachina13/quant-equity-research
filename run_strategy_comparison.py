@@ -78,16 +78,17 @@ def compare_within_period(strategy_returns: dict, benchmark_returns: pd.Series, 
     subset of the exact same full-period backtest, not a separate signal
     computed with different history.
     """
+    sliced_benchmark = benchmark_returns.loc[start:end]
+
     results = []
     for name, r in strategy_returns.items():
         sliced = r.loc[start:end]
-        results.append(summarize_risk(sliced, name))
+        results.append(summarize_risk(sliced, name, benchmark_returns=sliced_benchmark))
 
-    sliced_benchmark = benchmark_returns.loc[start:end]
-    results.append(summarize_risk(sliced_benchmark, "Benchmark"))
+    results.append(summarize_risk(sliced_benchmark, "Benchmark", benchmark_returns=sliced_benchmark))
 
     df = pd.DataFrame(results).set_index("label")
-    return df[["total_return", "annualized_return", "annualized_volatility", "sharpe_ratio", "sortino_ratio", "max_drawdown"]]
+    return df[["total_return", "annualized_return", "annualized_volatility", "sharpe_ratio", "sortino_ratio", "max_drawdown", "beta", "alpha"]]
 
 
 def backtest_all_strategies(scores: dict, monthly_returns: pd.DataFrame, top_n: int) -> tuple[dict, pd.DatetimeIndex]:
@@ -203,11 +204,11 @@ if __name__ == "__main__":
 
     results = []
     for name, r in strategy_returns.items():
-        results.append(summarize_risk(r.loc[common_dates], name))
-    results.append(summarize_risk(benchmark_returns, "Benchmark"))
+        results.append(summarize_risk(r.loc[common_dates], name, benchmark_returns=benchmark_returns))
+    results.append(summarize_risk(benchmark_returns, "Benchmark", benchmark_returns=benchmark_returns))
 
     summary_df = pd.DataFrame(results).set_index("label")
-    summary_df = summary_df[["total_return", "annualized_return", "annualized_volatility", "sharpe_ratio", "sortino_ratio", "max_drawdown"]]
+    summary_df = summary_df[["total_return", "annualized_return", "annualized_volatility", "sharpe_ratio", "sortino_ratio", "max_drawdown", "beta", "alpha"]]
 
     print(summary_df.round(3))
 
@@ -250,13 +251,13 @@ if __name__ == "__main__":
 
     concentration_rows = []
     for name in ["Momentum", "Value", "Combined"]:
-        concentration_rows.append(summarize_risk(strategy_returns[name].loc[common_dates], f"{name} (top-5)"))
-        concentration_rows.append(summarize_risk(returns_top8[name].loc[common_dates_8], f"{name} (top-8)"))
-    concentration_rows.append(summarize_risk(benchmark_returns, "Benchmark (top-5 dates)"))
-    concentration_rows.append(summarize_risk(benchmark_top8, "Benchmark (top-8 dates)"))
+        concentration_rows.append(summarize_risk(strategy_returns[name].loc[common_dates], f"{name} (top-5)", benchmark_returns=benchmark_returns))
+        concentration_rows.append(summarize_risk(returns_top8[name].loc[common_dates_8], f"{name} (top-8)", benchmark_returns=benchmark_top8))
+    concentration_rows.append(summarize_risk(benchmark_returns, "Benchmark (top-5 dates)", benchmark_returns=benchmark_returns))
+    concentration_rows.append(summarize_risk(benchmark_top8, "Benchmark (top-8 dates)", benchmark_returns=benchmark_top8))
 
     concentration_df = pd.DataFrame(concentration_rows).set_index("label")
-    concentration_df = concentration_df[["annualized_return", "annualized_volatility", "sharpe_ratio", "sortino_ratio", "max_drawdown"]]
+    concentration_df = concentration_df[["annualized_return", "annualized_volatility", "sharpe_ratio", "sortino_ratio", "max_drawdown", "beta", "alpha"]]
     print(concentration_df.round(3))
 
     concentration_df.to_csv("results/strategy_comparison_concentration.csv")
