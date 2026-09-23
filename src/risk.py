@@ -140,6 +140,7 @@ def summarize_risk(returns: pd.Series, label: str) -> dict:
         "annualized_return": annualized_return(returns),
         "annualized_volatility": annualized_volatility(returns),
         "sharpe_ratio": sharpe_ratio(returns),
+        "sortino_ratio": sortino_ratio(returns),
         "max_drawdown": max_drawdown(returns),
     }
 
