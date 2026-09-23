@@ -4,7 +4,7 @@
 
 *Can simple momentum and value strategies beat an equal-weight benchmark on a risk-adjusted basis?*
 
-> **Status:** Version 0.4. Momentum, value and a combined factor are fully tested, with two robustness checks (portfolio concentration and a two-period split), bootstrap significance testing and transaction-cost modeling. The pipeline is reproducible end to end (see "Reproducing this project end-to-end").
+> **Status:** Version 0.4. Momentum, value and a combined factor are fully tested, with two robustness checks (portfolio concentration and a two-period split), bootstrap significance testing, transaction-cost modeling and a Sortino ratio alongside Sharpe. The pipeline is reproducible end to end (see "Reproducing this project end-to-end").
 
 ---
 
@@ -18,6 +18,7 @@
 
 - **Full period:** the benchmark has the highest Sharpe ratio (0.81, against 0.56 for Momentum, 0.75 for Value and 0.64 for Combined). Value earned a higher total return (80.7% vs 67.7%), but with materially higher volatility (18.5% vs 14.6%).
 - **Sub-periods:** Value led the benchmark on Sharpe in 2021–2022 (0.64 vs 0.59) and Combined led in 2023–2024 (1.35 vs 1.12). The full-period average conceals this regime pattern.
+- **Downside risk:** on the Sortino ratio, which counts only downside volatility, the ranking is unchanged over the full period (benchmark 1.42 first). Value's 2021–2022 lead becomes a tie (1.08 vs 1.08) because more of its volatility was on the downside; Combined's 2023–2024 lead widens (2.79 vs 1.88).
 - **Significance:** none of the nine strategy-versus-benchmark Sharpe differences is statistically significant (paired bootstrap, 90% confidence intervals all include zero). The regime pattern is a hypothesis, not an established edge.
 - **Trading costs:** at 10 bps one-way, Value (4.2% monthly turnover) is almost unaffected; Momentum and Combined (22–23% turnover) each lose about 0.04 of Sharpe.
 - **Portfolio construction:** Combined shared on average 4.5 of its 5 holdings with Momentum and only 2.0 with Value, so in practice it behaved as a momentum portfolio with a slight value tilt.
@@ -127,13 +128,14 @@ The benchmark is the same for all three: all 17 stocks in equal weight, every mo
 | Annualized return | 10.2% | 15.9% | 11.6% | 13.8% |
 | Annualized volatility | 14.8% | 18.5% | 14.9% | 14.6% |
 | Sharpe ratio | 0.56 | 0.75 | 0.64 | **0.81** |
+| Sortino ratio | 0.98 | 1.26 | 1.19 | **1.42** |
 | Max drawdown | -14.8% | -14.5% | -14.3% | -13.4% |
 
-*(Sharpe ratio is annualized return in excess of a flat 2% risk-free rate, divided by annualized volatility: it measures whether the return compensated for the risk taken.)*
+*(Sharpe ratio is annualized return in excess of a flat 2% risk-free rate, divided by annualized volatility: it measures whether the return compensated for the risk taken. The Sortino ratio uses the same numerator but divides by downside deviation, the volatility of monthly returns below the risk-free rate, so upside swings are not penalized.)*
 
 ### What I make of this
 
-Value beat the benchmark on raw return, 15.9% annualized against 13.8%, but with noticeably more volatility (18.5% against 14.6%). Once return is divided by risk, its Sharpe ratio (0.75) still falls short of the benchmark's (0.81). I tested whether this gap, or any Sharpe difference in the project, is statistically distinguishable from noise using a paired bootstrap (5,000 resamples, 90% confidence interval; see `test_significance.py`). None is: every strategy-versus-benchmark interval, full period and both sub-periods, includes zero. The accurate statement is not "Value beat the benchmark" but "Value's point estimate was higher on return and lower on Sharpe, and neither gap can be distinguished from chance on a sample this size."
+Value beat the benchmark on raw return, 15.9% annualized against 13.8%, but with noticeably more volatility (18.5% against 14.6%). Once return is divided by risk, its Sharpe ratio (0.75) still falls short of the benchmark's (0.81). The Sortino ratio shows the extra volatility was not just larger gains: Value's downside deviation was 11.0%, against about 8.1–8.3% for the other three portfolios. I tested whether this gap, or any Sharpe difference in the project, is statistically distinguishable from noise using a paired bootstrap (5,000 resamples, 90% confidence interval; see `test_significance.py`). None is: every strategy-versus-benchmark interval, full period and both sub-periods, includes zero. The accurate statement is not "Value beat the benchmark" but "Value's point estimate was higher on return and lower on Sharpe, and neither gap can be distinguished from chance on a sample this size."
 
 Combining momentum and value did not produce the best of both. Combined's Sharpe (0.64) landed between the two, closer to Momentum's. The holdings explain why. Across all 48 months, Combined shared on average 4.5 of its 5 names with Momentum and only 2.0 with Value, even though Momentum and Value themselves overlapped on just 1.9. The blend was effectively a momentum portfolio with a slight value tilt. My working explanation is the shape of the P/B distribution: a few very expensive stocks (Apple and Home Depot currently trade above 60x book) inflate the cross-sectional standard deviation, so the z-scores of the cheaper names sit close together and barely separate them, leaving momentum to decide the ranking. Ranking on book-to-price, or on cross-sectional ranks rather than raw z-scores, would test this; I have not done so yet.
 
@@ -146,6 +148,7 @@ My explanation for the momentum result was that holding 5 of 17 stocks gives up 
 | Metric | Momentum (5 → 8) | Value (5 → 8) | Combined (5 → 8) |
 |---|---|---|---|
 | Sharpe ratio | 0.56 → 0.65 | 0.75 → 0.55 | 0.64 → 0.68 |
+| Sortino ratio | 0.98 → 1.20 | 1.26 → 0.88 | 1.19 → 1.26 |
 | Annualized volatility | 14.8% → 14.2% | 18.5% → 15.5% | 14.9% → 13.3% |
 | Max drawdown | -14.8% → -14.9% | -14.5% → -14.2% | -14.3% → -11.6% |
 
@@ -170,6 +173,7 @@ This is not an out-of-sample test in the machine-learning sense. None of these s
 | Metric | Momentum | Value | Combined | Benchmark |
 |---|---|---|---|---|
 | Sharpe ratio | 0.25 | **0.64** | 0.10 | 0.59 |
+| Sortino ratio | 0.46 | **1.08** | 0.18 | **1.08** |
 | Max drawdown | -14.8% | -14.5% | -14.3% | -13.4% |
 
 **2023-2024:**
@@ -177,9 +181,10 @@ This is not an out-of-sample test in the machine-learning sense. None of these s
 | Metric | Momentum | Value | Combined | Benchmark |
 |---|---|---|---|---|
 | Sharpe ratio | 0.92 | 0.88 | **1.35** | 1.12 |
+| Sortino ratio | 1.57 | 1.49 | **2.79** | 1.88 |
 | Max drawdown | -7.5% | -11.2% | **-6.2%** | -6.3% |
 
-This is the most interesting result in the project, and it changes how the overall conclusion should be stated. **The benchmark does not lead in each period separately.** In 2021–2022, Value led the benchmark on Sharpe (0.64 vs 0.59). In 2023–2024, Combined led by a wider margin (1.35 vs 1.12), with a marginally shallower drawdown (-6.2% vs -6.3%).
+This is the most interesting result in the project, and it changes how the overall conclusion should be stated. **The benchmark does not lead in each period separately.** In 2021–2022, Value led the benchmark on Sharpe (0.64 vs 0.59), but on Sortino the two are tied (1.08 vs 1.08): more of Value's volatility was on the downside, so its lead does not survive a downside-only measure of risk. In 2023–2024, Combined led by a wider margin (1.35 vs 1.12 on Sharpe, 2.79 vs 1.88 on Sortino), with a marginally shallower drawdown (-6.2% vs -6.3%).
 
 Two *different* strategies each led in their own period, and averaging the two periods erased both leads because no single strategy led throughout. There is a plausible economic explanation. 2021–2022 included the 2022 rate-hiking cycle, an environment in which value has historically tended to do relatively well and momentum and growth have tended to struggle, which matches what happened here. 2023–2024 included the AI-driven mega-cap rally, in which momentum recovered and Combined, holding mostly momentum names plus one or two value names, produced the highest risk-adjusted result in the project.
 
@@ -197,7 +202,7 @@ Every result above assumes rebalancing is free. In practice every trade has a co
 
 | Strategy | Avg. monthly turnover | Sharpe (gross → net) | Total return (gross → net) |
 |---|---|---|---|
-| Momentum | 22.9% | 0.56 → 0.51 | 47.7% → 44.5% |
+| Momentum | 22.9% | 0.56 → 0.52 | 47.7% → 44.5% |
 | Value | 4.2% | 0.75 → 0.75 | 80.7% → 80.0% |
 | Combined | 22.1% | 0.64 → 0.60 | 55.0% → 51.7% |
 
@@ -221,7 +226,7 @@ This does not change the core conclusion. The benchmark's 0.81 Sharpe still exce
 Alongside the Python/SQL pipeline, a 4-page interactive dashboard (`index.html`, `strategies.html`, `stocks.html`, `portfolio.html`, styled by `styles.css`) makes the results explorable. It is plain HTML, CSS and JavaScript with Chart.js for charting: no framework and no build step.
 
 - **Index:** headline finding, key statistics and navigation.
-- **Strategy Analysis:** toggle between Momentum, Value, Combined and Benchmark; switch the regime-split chart (2021–2022 vs 2023–2024) between Total Return, Annualized Return, Sharpe Ratio and Volatility; read three analysis views (Quant Research, Wealth Management, Risk) for each strategy. A Sharpe tab explains the ratio and shows the same regime data as a 3D surface, captioned as a visual illustration only (strategies and periods are discrete categories, not a continuous space), with hover tooltips giving the exact Sharpe at each of the 8 measured points. A Robustness tab shows the significance tests and transaction-cost results.
+- **Strategy Analysis:** toggle between Momentum, Value, Combined and Benchmark; switch the regime-split chart (2021–2022 vs 2023–2024) between Total Return, Annualized Return, Sharpe Ratio, Sortino Ratio and Volatility; read three analysis views (Quant Research, Wealth Management, Risk) for each strategy. A Sharpe tab explains the ratio and shows the same regime data as a 3D surface, captioned as a visual illustration only (strategies and periods are discrete categories, not a continuous space), with hover tooltips giving the exact Sharpe at each of the 8 measured points. A Robustness tab shows the significance tests and transaction-cost results.
 - **Stock Analysis:** all 17 tickers with current momentum and Price-to-Book figures, and how often each strategy held each stock across the 48-month backtest.
 - **Portfolio Timeline:** month-by-month holdings for any strategy and year, with each holding's contribution to that month's return, plus rolling 12-month Sharpe ratio and volatility.
 
@@ -265,7 +270,7 @@ quant-equity-research/
 │   ├── fundamentals.py              # pulls and cleans SEC EDGAR fundamentals for the value factor
 │   ├── portfolio.py                 # ranks stocks, builds the portfolio
 │   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover and transaction costs
-│   └── risk.py                      # Sharpe ratio, volatility, drawdown, rolling metrics, bootstrap significance testing
+│   └── risk.py                      # Sharpe and Sortino ratios, volatility, drawdown, rolling metrics, bootstrap significance testing
 ├── tests/
 │   ├── test_factors.py              # unit tests for momentum/value/combined and portfolio construction
 │   ├── test_risk.py                 # unit tests for the risk metrics, checked against hand-worked cases
@@ -293,6 +298,8 @@ quant-equity-research/
 
 - **Completed: statistical significance testing.** A paired bootstrap (`test_significance.py`, 5,000 resamples per comparison, 90% confidence interval) shows that none of the strategy-versus-benchmark comparisons is distinguishable from noise, full period or either sub-period. Results are in `results/significance_test.csv`. This is the most important caveat on every finding in this README.
 - **Completed: transaction costs.** A flat 10 bps one-way cost applied to actual monthly turnover (`test_transaction_costs.py`) affects the strategies unevenly: Value is almost untouched, while Momentum's and Combined's gaps to the benchmark widen. Results are in `results/transaction_cost_impact.csv`.
+- **Completed: Sortino ratio.** Added to `src/risk.py` with unit tests and reported in every results table and on the dashboard.
+- **Further risk metrics:** beta and alpha against the benchmark, Value at Risk and Expected Shortfall (CVaR), and hit rate.
 - **Combined factor construction.** Rank on book-to-price, or on cross-sectional ranks instead of raw P/B z-scores, to test whether Combined's momentum tilt comes from the skew in P/B.
 - **Period-specific risk-free rate.** Replace the flat 2% with monthly Treasury bill yields.
 - **Further robustness testing:** a larger universe, alternative rebalancing frequencies and a rolling-window test across more than two periods, to measure how regime-dependent these strategies are rather than only showing that they are. Any change needs a stated reason in advance, not a search for better numbers.
