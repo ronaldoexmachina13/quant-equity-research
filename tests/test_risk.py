@@ -8,7 +8,7 @@ worked out by hand, with no database or network involved.
 import pandas as pd
 import pytest
 
-from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff
+from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio
 
 
 def test_annualized_return_constant_monthly_return():
@@ -104,3 +104,32 @@ def test_bootstrap_sharpe_diff_no_false_positive_on_identical_series():
     result = bootstrap_sharpe_diff(returns, returns.copy(), n_sims=1000, seed=2)
     assert result["significant"] is False
     assert result["point_diff"] == 0
+
+
+def test_downside_deviation_known_case():
+    """
+    With a 0% target, shortfalls are 0, -0.02, 0, -0.04. Squares sum to
+    0.002; averaged over all 4 months (not just the 2 losing ones) gives
+    0.0005; sqrt = 0.022361; annualized * sqrt(12) = 0.077460.
+    """
+    returns = pd.Series([0.03, -0.02, 0.01, -0.04])
+    assert downside_deviation(returns, target_annual=0.0) == pytest.approx(0.077460, rel=1e-4)
+
+def test_sortino_undefined_when_no_downside():
+    """
+    If every month beats the target there is no downside deviation, so
+    the ratio is undefined and should return NaN rather than divide by zero.
+    """
+    returns = pd.Series([0.02] * 12)
+    assert pd.isna(sortino_ratio(returns))
+
+def test_sortino_ignores_upside_volatility():
+    """
+    Two series with identical losing months, but one has much larger
+    winning months. Sharpe penalizes the bigger upside swings; Sortino
+    should not, so the more volatile-upside series scores higher on Sortino.
+    """
+    steady = pd.Series([0.01, -0.02, 0.01, -0.02, 0.01, 0.01] * 2)
+    big_upside = pd.Series([0.05, -0.02, 0.05, -0.02, 0.05, 0.05] * 2)
+    assert downside_deviation(steady) == pytest.approx(downside_deviation(big_upside), rel=1e-9)
+    assert sortino_ratio(big_upside) > sortino_ratio(steady)

@@ -142,3 +142,27 @@ def summarize_risk(returns: pd.Series, label: str) -> dict:
         "sharpe_ratio": sharpe_ratio(returns),
         "max_drawdown": max_drawdown(returns),
     }
+
+def downside_deviation(returns: pd.Series, target_annual: float = 0.02) -> float:
+    """
+    Annualized downside deviation: the volatility of returns *below* a
+    target, ignoring returns above it. Months above the target count as
+    zero shortfall but still count in the average (the standard
+    Sortino-Price definition); averaging only over losing months would
+    overstate downside risk.
+    """
+    target_monthly = (1 + target_annual) ** (1 / TRADING_PERIODS_PER_YEAR) - 1
+    shortfall = np.minimum(returns - target_monthly, 0)
+    return np.sqrt((shortfall ** 2).mean()) * np.sqrt(TRADING_PERIODS_PER_YEAR)
+
+
+def sortino_ratio(returns: pd.Series, risk_free_rate: float = 0.02) -> float:
+    """
+    Like Sharpe, but divides excess return by downside deviation instead
+    of total volatility, so upside swings are not penalized. Returns NaN
+    if the series never falls below the target (ratio undefined).
+    """
+    downside = downside_deviation(returns, target_annual=risk_free_rate)
+    if downside == 0:
+        return np.nan
+    return (annualized_return(returns) - risk_free_rate) / downside
