@@ -6,7 +6,9 @@
 <link rel="stylesheet" href="styles.css">
 <style>
   .tab-btn.active { background: var(--text-primary); color: var(--bg); }
-  .metric-toggle { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .metric-toggle { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  .chart-legend { display: flex; gap: 1.1rem; margin: -0.25rem 0 0.75rem; font-size: 0.78rem; color: var(--text-secondary); }
+  .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.4rem; vertical-align: middle; }
   .metric-btn {
     background: #0a0e1a;
     border: 1px solid var(--panel-border);
@@ -200,8 +202,10 @@
           <button class="metric-btn" data-metric="total">Total Return</button>
           <button class="metric-btn" data-metric="ann">Ann. Return</button>
           <button class="metric-btn active" data-metric="sharpe">Sharpe Ratio</button>
+          <button class="metric-btn" data-metric="sortino">Sortino Ratio</button>
           <button class="metric-btn" data-metric="vol">Volatility</button>
         </div>
+        <div class="chart-legend"><span><i style="background:#1baf7a"></i>2021&ndash;2022</span><span><i style="background:#eb6834"></i>2023&ndash;2024</span></div>
         <div class="chart-wrap"><canvas id="sharpeChart"></canvas></div>
         <div id="clickDetail" style="display:none; margin-top:1rem; padding:0.9rem 1rem; background:#0a0e1a; border-radius:10px; font-size:0.85rem; color:var(--text-secondary);"></div>
       </div>
@@ -238,7 +242,7 @@
       <div class="formula-box">Sharpe = (Annualized Return − Risk-Free Rate) / Annualized Volatility
 
 where, from monthly data:
-  Annualized Return     = mean(monthly returns) × 12
+  Annualized Return     = (product of (1 + monthly return))^(12 / months) − 1
   Annualized Volatility = std(monthly returns) × √12</div>
       <p class="caption" style="margin-top:-0.6rem;">This project uses a flat 2% annual risk-free rate rather than period-specific Treasury bill yields. Bill yields averaged roughly 1% over 2021&ndash;2022 and roughly 5% over 2023&ndash;2024, so the flat rate understates Sharpe ratios in the first period and overstates them in the second. Comparisons within a period are affected far less than the levels.</p>
 
@@ -252,7 +256,7 @@ where, from monthly data:
       </table>
 
       <div class="section-label">A known limitation</div>
-      <p class="definition-body">Sharpe treats upside and downside volatility identically: a strategy with big <i>positive</i> monthly swings gets penalized the same as one with big <i>negative</i> swings, even though most investors are concerned mainly with the downside. The Sortino ratio addresses this by penalizing only downside deviation. Sharpe remains the baseline metric here, but it should be read alongside drawdown and other risk measures.</p>
+      <p class="definition-body">Sharpe treats upside and downside volatility identically: a strategy with big <i>positive</i> monthly swings gets penalized the same as one with big <i>negative</i> swings, even though most investors are concerned mainly with the downside. The Sortino ratio addresses this by penalizing only downside deviation, and it is available as a chart option on the Strategies tab. Sharpe remains the baseline metric here, but it should be read alongside Sortino, drawdown and other risk measures.</p>
     </div>
 
     <div class="panel">
@@ -319,6 +323,8 @@ const LABELS = ["Momentum", "Value", "Combined", "Benchmark"];
 const METRICS = {
   sharpe: { label: "Sharpe Ratio", suffix: "", max: 1.6, step: 0.2,
     p1: [0.25, 0.64, 0.1, 0.59], p2: [0.92, 0.88, 1.35, 1.12] },
+  sortino: { label: "Sortino Ratio", suffix: "", max: 3.0, step: 0.5,
+    p1: [0.46, 1.08, 0.18, 1.08], p2: [1.57, 1.49, 2.79, 1.88] },
   total: { label: "Total Return", suffix: "%", max: 50, step: 10,
     p1: [12.4, 32.0, 7.4, 25.2], p2: [31.4, 36.9, 44.2, 33.9] },
   ann: { label: "Annualized Return", suffix: "%", max: 25, step: 5,
@@ -337,32 +343,32 @@ const DATA = {
     color: "#5b6b8c",
     title: "Momentum",
     body: "Assumes <b>recent winners keep winning</b>. Each month it ranks all 17 stocks by trailing 12-month return, skipping the most recent month to avoid short-term reversal, and holds the top 5 in equal weight.",
-    stats: { total: "47.7%", ann: "10.2%", vol: "14.8%", sharpe: "0.56", dd: "-14.8%" }
+    stats: { total: "47.7%", ann: "10.2%", vol: "14.8%", sharpe: "0.56", sortino: "0.98", dd: "-14.8%" }
   },
   value: {
     color: "#1baf7a",
     title: "Value",
     body: "Assumes <b>cheap stocks are mispriced</b> and will rerate upward. Each month it ranks the stocks by Price-to-Book and holds the 5 <i>cheapest</i> (lowest P/B) in equal weight, the opposite ranking direction to momentum.",
-    stats: { total: "80.7%", ann: "15.9%", vol: "18.5%", sharpe: "0.75", dd: "-14.5%" }
+    stats: { total: "80.7%", ann: "15.9%", vol: "18.5%", sharpe: "0.75", sortino: "1.26", dd: "-14.5%" }
   },
   combined: {
     color: "#7c5cd4",
     title: "Combined",
     body: "Blends both signals into one ranking. Momentum and P/B sit on different numeric scales, so each is <b>z-scored</b> (standardized within each month) before the two are averaged, putting the factors on an equal nominal footing.",
-    stats: { total: "55.0%", ann: "11.6%", vol: "14.9%", sharpe: "0.64", dd: "-14.3%" }
+    stats: { total: "55.0%", ann: "11.6%", vol: "14.9%", sharpe: "0.64", sortino: "1.19", dd: "-14.3%" }
   },
   benchmark: {
     color: "#e8c547",
     title: "Benchmark",
     body: "The <b>passive control</b>. Holds all 17 stocks in equal weight every month, with no ranking or selection. An active strategy has to beat this to justify its added complexity and turnover.",
-    stats: { total: "67.7%", ann: "13.8%", vol: "14.6%", sharpe: "0.81", dd: "-13.4%" }
+    stats: { total: "67.7%", ann: "13.8%", vol: "14.6%", sharpe: "0.81", sortino: "1.42", dd: "-13.4%" }
   }
 };
 
 const FINDINGS = {
-  all: "<b>The full-period average hides a regime pattern.</b> Over 2021&ndash;2024 the benchmark has the highest Sharpe ratio, the lowest volatility and the shallowest drawdown, although Value earned a higher total return (80.7% vs 67.7%) by taking more risk. Split the window in two and Value leads the benchmark on Sharpe in 2021&ndash;2022, while Combined leads in 2023&ndash;2024. Neither lead is statistically significant (see Robustness).",
+  all: "<b>The full-period average hides a regime pattern.</b> Over 2021&ndash;2024 the benchmark has the highest Sharpe ratio, the lowest volatility and the shallowest drawdown, although Value earned a higher total return (80.7% vs 67.7%) by taking more risk. Split the window in two and Value leads the benchmark on Sharpe in 2021&ndash;2022, while Combined leads in 2023&ndash;2024. Neither lead is statistically significant (see Robustness), and Value's lead disappears on the Sortino ratio.",
   momentum: "Momentum's weakest stretch was 2021&ndash;2022 (Sharpe 0.25, total return 12.4%), as the 2022 rate-hiking cycle repriced the growth-tilted winners a trailing-return signal tends to hold. It recovered in 2023&ndash;2024 (Sharpe 0.92, total return 31.4%) during the mega-cap rally, though it still trailed the benchmark's 1.12.",
-  value: "Value <b>led the benchmark</b> on Sharpe in 2021&ndash;2022 (0.64 vs 0.59) on a 32.0% total return, the first active lead in the project. In 2023&ndash;2024 the order reversed: Value's Sharpe of 0.88 fell behind the benchmark's 1.12.",
+  value: "Value <b>led the benchmark</b> on Sharpe in 2021&ndash;2022 (0.64 vs 0.59) on a 32.0% total return, the first active lead in the project. On the Sortino ratio, which counts only downside volatility, that lead disappears (1.08 vs 1.08). In 2023&ndash;2024 the order reversed: Value's Sharpe of 0.88 fell behind the benchmark's 1.12.",
   combined: "Combined produced the <b>highest sub-period Sharpe in the project</b> in 2023&ndash;2024: 1.35 on a 44.2% total return, ahead of the benchmark on return and marginally on drawdown (-6.2% vs -6.3%). In 2021&ndash;2022 it inherited Momentum's weakness (Sharpe 0.10, total return 7.4%).",
   benchmark: "The benchmark's total return rose from 25.2% in 2021&ndash;2022 to 33.9% in 2023&ndash;2024. Even a passive allocation is regime-dependent rather than a fixed baseline."
 };
@@ -381,7 +387,7 @@ const ANALYSIS = {
   value: {
     quant: "Value's 2021&ndash;2022 Sharpe of 0.64 exceeds the benchmark's 0.59 by 0.045, a modest lead earned with both higher return and higher risk: a 32.0% total return at 20.3% annualized volatility, against the benchmark's 25.2% and 16.8%. The bootstrap interval on that difference runs from -0.63 to +0.88, wide enough that the lead could be noise. The more informative evidence is selection persistence. JPM and RTX ranked among the five cheapest stocks by book value in all 48 months, XOM in 47, and turnover averaged only about 4% a month, so in this universe Value behaves close to a static basket of financials, energy and defense names rather than a dynamic factor. Its result therefore depends heavily on a handful of stocks and sectors. The US large-cap value premium was weak or negative for much of 2007&ndash;2020; one favorable 24-month window is consistent with a revival after rate normalization, but does not show that it is durable.",
     wealth: "Rising rates compress the present value of distant cash flows the most. The duration logic that hurts long-dated bonds also hurts richly valued growth equities, whose worth rests on earnings many years out. Cheap, cash-generative companies have shorter equity duration, so they held up better as the 2022 hiking cycle repriced the market. The behavioral difficulty with value is that its edge tends to appear in environments, rising rates and risk-off sentiment, that make clients most anxious. The advisory task is keeping a value allocation sized and held through its long flat periods (much of 2007&ndash;2020) so that it is still in the portfolio when a regime like 2021&ndash;2022 arrives.",
-    risk: "Value had the highest annualized volatility of any strategy in both regimes, 20.3% in 2021&ndash;2022 and 17.1% in 2023&ndash;2024, against the benchmark's 16.8% and 12.3%, so its 2021&ndash;2022 Sharpe lead was earned on a higher risk base. The extra volatility did not come with better downside protection: its -14.5% drawdown in the first period was in line with the other concentrated portfolios, and its -11.2% in the second was the deepest of the four. Because Sharpe treats upside and downside volatility alike, a Sortino ratio would show whether the additional volatility came from larger gains, larger losses, or both, which are materially different risk profiles."
+    risk: "Value had the highest annualized volatility of any strategy in both regimes, 20.3% in 2021&ndash;2022 and 17.1% in 2023&ndash;2024, against the benchmark's 16.8% and 12.3%, so its 2021&ndash;2022 Sharpe lead was earned on a higher risk base. The extra volatility did not come with better downside protection: its -14.5% drawdown in the first period was in line with the other concentrated portfolios, and its -11.2% in the second was the deepest of the four. The Sortino ratio, which counts only downside volatility, shows where the extra risk sat: Value's downside deviation over the full period was 11.0%, against about 8.1&ndash;8.3% for the other three, so its higher volatility came with materially more downside, not just larger gains. In 2021&ndash;2022 its volatility was also more downside-heavy than the benchmark's, which is why its Sharpe lead (0.64 vs 0.59) becomes a tie on Sortino (1.08 vs 1.08)."
   },
   combined: {
     quant: "Combined's split, a Sharpe of 1.35 in 2023&ndash;2024 against 0.10 in 2021&ndash;2022, is best explained by its holdings. Across the 48 months, Combined shared on average 4.5 of its 5 names with Momentum but only 2.0 with Value, even though Momentum and Value themselves overlapped on just 1.9. The blend behaved as a momentum portfolio with a slight value tilt rather than a 50/50 mix, which is why its 2021&ndash;2022 Sharpe (0.10) resembles Momentum's (0.25) far more than Value's (0.64). A likely cause is the P/B distribution: a few very expensive stocks (AAPL and HD currently trade above 60x book) inflate the cross-sectional standard deviation, so the z-scores of the cheaper names sit close together and do little to separate them, leaving momentum to decide the ranking. Ranking on book-to-price, or on cross-sectional ranks instead of raw z-scores, would test whether a more balanced blend changes the result.",
@@ -499,7 +505,7 @@ function renderDefinition(key) {
   const s = d.stats;
   const items = [
     ["Total return", s.total], ["Ann. return", s.ann], ["Ann. volatility", s.vol],
-    ["Sharpe ratio", s.sharpe], ["Max drawdown", s.dd]
+    ["Sharpe ratio", s.sharpe], ["Sortino ratio", s.sortino], ["Max drawdown", s.dd]
   ];
   items.forEach(([label, value]) => {
     const card = document.createElement("div");
@@ -629,7 +635,7 @@ function buildTerrainHotspots() {
 buildTerrainHotspots();
 
 const SIGNIFICANCE_DATA = [{"period":"Full period (2021-2024)","strategy":"Momentum","strategy_sharpe":0.56,"benchmark_sharpe":0.81,"sharpe_diff":-0.26,"ci_lower":-0.84,"ci_upper":0.27,"significant":false},{"period":"Full period (2021-2024)","strategy":"Value","strategy_sharpe":0.75,"benchmark_sharpe":0.81,"sharpe_diff":-0.06,"ci_lower":-0.55,"ci_upper":0.48,"significant":false},{"period":"Full period (2021-2024)","strategy":"Combined","strategy_sharpe":0.64,"benchmark_sharpe":0.81,"sharpe_diff":-0.17,"ci_lower":-0.75,"ci_upper":0.34,"significant":false},{"period":"2021-2022","strategy":"Momentum","strategy_sharpe":0.25,"benchmark_sharpe":0.59,"sharpe_diff":-0.34,"ci_lower":-1.2,"ci_upper":0.31,"significant":false},{"period":"2021-2022","strategy":"Value","strategy_sharpe":0.64,"benchmark_sharpe":0.59,"sharpe_diff":0.05,"ci_lower":-0.63,"ci_upper":0.88,"significant":false},{"period":"2021-2022","strategy":"Combined","strategy_sharpe":0.1,"benchmark_sharpe":0.59,"sharpe_diff":-0.49,"ci_lower":-1.33,"ci_upper":0.1,"significant":false},{"period":"2023-2024","strategy":"Momentum","strategy_sharpe":0.92,"benchmark_sharpe":1.12,"sharpe_diff":-0.2,"ci_lower":-1.18,"ci_upper":0.64,"significant":false},{"period":"2023-2024","strategy":"Value","strategy_sharpe":0.88,"benchmark_sharpe":1.12,"sharpe_diff":-0.24,"ci_lower":-1.03,"ci_upper":0.51,"significant":false},{"period":"2023-2024","strategy":"Combined","strategy_sharpe":1.35,"benchmark_sharpe":1.12,"sharpe_diff":0.23,"ci_lower":-0.82,"ci_upper":1.11,"significant":false}];
-const COST_DATA = [{"strategy":"Momentum","avg_turnover":"22.9%","gross_sharpe":0.56,"net_sharpe":0.51,"gross_total_return":"47.7%","net_total_return":"44.5%"},{"strategy":"Value","avg_turnover":"4.2%","gross_sharpe":0.75,"net_sharpe":0.75,"gross_total_return":"80.7%","net_total_return":"80.0%"},{"strategy":"Combined","avg_turnover":"22.1%","gross_sharpe":0.64,"net_sharpe":0.6,"gross_total_return":"55.0%","net_total_return":"51.7%"}];
+const COST_DATA = [{"strategy":"Momentum","avg_turnover":"22.9%","gross_sharpe":0.56,"net_sharpe":0.52,"gross_total_return":"47.7%","net_total_return":"44.5%"},{"strategy":"Value","avg_turnover":"4.2%","gross_sharpe":0.75,"net_sharpe":0.75,"gross_total_return":"80.7%","net_total_return":"80.0%"},{"strategy":"Combined","avg_turnover":"22.1%","gross_sharpe":0.64,"net_sharpe":0.6,"gross_total_return":"55.0%","net_total_return":"51.7%"}];
 
 function renderSignificanceTable() {
   const tbody = document.getElementById("significanceTableBody");

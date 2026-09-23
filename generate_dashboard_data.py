@@ -45,6 +45,8 @@ def build_metrics_block(full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame) 
     """
     sharpe_p1 = [round_half_up(float(p1.loc[s, "sharpe_ratio"]), 2) for s in ORDER]
     sharpe_p2 = [round_half_up(float(p2.loc[s, "sharpe_ratio"]), 2) for s in ORDER]
+    sortino_p1 = [round_half_up(float(p1.loc[s, "sortino_ratio"]), 2) for s in ORDER]
+    sortino_p2 = [round_half_up(float(p2.loc[s, "sortino_ratio"]), 2) for s in ORDER]
     total_p1 = [round_half_up(float(p1.loc[s, "total_return"]) * 100, 1) for s in ORDER]
     total_p2 = [round_half_up(float(p2.loc[s, "total_return"]) * 100, 1) for s in ORDER]
     ann_p1 = [round_half_up(float(p1.loc[s, "annualized_return"]) * 100, 1) for s in ORDER]
@@ -55,6 +57,8 @@ def build_metrics_block(full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame) 
     return f"""const METRICS = {{
   sharpe: {{ label: "Sharpe Ratio", suffix: "", max: 1.6, step: 0.2,
     p1: {sharpe_p1}, p2: {sharpe_p2} }},
+  sortino: {{ label: "Sortino Ratio", suffix: "", max: 3.0, step: 0.5,
+    p1: {sortino_p1}, p2: {sortino_p2} }},
   total: {{ label: "Total Return", suffix: "%", max: 50, step: 10,
     p1: {total_p1}, p2: {total_p2} }},
   ann: {{ label: "Annualized Return", suffix: "%", max: 25, step: 5,
@@ -70,8 +74,9 @@ def build_stats_line(row: pd.Series) -> str:
     ann = pct(row["annualized_return"])
     vol = pct(row["annualized_volatility"])
     sharpe = num(row["sharpe_ratio"])
+    sortino = num(row["sortino_ratio"])
     dd = pct(row["max_drawdown"])
-    return f'stats: {{ total: "{total}", ann: "{ann}", vol: "{vol}", sharpe: "{sharpe}", dd: "{dd}" }}'
+    return f'stats: {{ total: "{total}", ann: "{ann}", vol: "{vol}", sharpe: "{sharpe}", sortino: "{sortino}", dd: "{dd}" }}'
 
 
 def update_strategies_html(path: str, full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame):
@@ -120,7 +125,7 @@ def update_index_html(path: str, full: pd.DataFrame, metadata: dict):
         html = f.read()
 
     n_stocks = str(metadata["n_stocks"])
-        n_strategies = str(len([s for s in ORDER if s != "Benchmark"]))  # active strategies only; the benchmark is the control
+    n_strategies = str(len([s for s in ORDER if s != "Benchmark"]))  # active strategies only; the benchmark is the control
     n_months = str(metadata["n_months"])
     benchmark_sharpe = num(full.loc["Benchmark", "sharpe_ratio"])
 
@@ -239,11 +244,11 @@ def build_significance_rows(path: str = "results/significance_test.csv") -> list
         rows.append({
             "period": r["period"],
             "strategy": r["strategy"],
-            "strategy_sharpe": round(float(r["strategy_sharpe"]), 2),
-            "benchmark_sharpe": round(float(r["benchmark_sharpe"]), 2),
-            "sharpe_diff": round(float(r["sharpe_diff"]), 2),
-            "ci_lower": round(float(r["ci_90_lower"]), 2),
-            "ci_upper": round(float(r["ci_90_upper"]), 2),
+            "strategy_sharpe": round_half_up(float(r["strategy_sharpe"]), 2),
+            "benchmark_sharpe": round_half_up(float(r["benchmark_sharpe"]), 2),
+            "sharpe_diff": round_half_up(float(r["sharpe_diff"]), 2),
+            "ci_lower": round_half_up(float(r["ci_90_lower"]), 2),
+            "ci_upper": round_half_up(float(r["ci_90_upper"]), 2),
             "significant": bool(r["significant_at_90pct"]),
         })
     return rows
@@ -257,8 +262,8 @@ def build_cost_rows(path: str = "results/transaction_cost_impact.csv") -> list:
         rows.append({
             "strategy": r["strategy"],
             "avg_turnover": pct(float(r["avg_monthly_turnover"])),
-            "gross_sharpe": round(float(r["gross_sharpe"]), 2),
-            "net_sharpe": round(float(r["net_sharpe"]), 2),
+            "gross_sharpe": round_half_up(float(r["gross_sharpe"]), 2),
+            "net_sharpe": round_half_up(float(r["net_sharpe"]), 2),
             "gross_total_return": pct(float(r["gross_total_return"])),
             "net_total_return": pct(float(r["net_total_return"])),
         })
