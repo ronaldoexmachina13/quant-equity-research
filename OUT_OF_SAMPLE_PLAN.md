@@ -60,3 +60,13 @@ For each strategy and the benchmark over the out-of-sample period: total and ann
 - The in-sample results for Value and Combined will be recomputed with the corrected signal. The README will show both the original and corrected figures, so the effect of the bug stays visible. Momentum and the benchmark do not change.
 - The alpha figures quoted in "How the results will be read" (Combined 2023–2024 alpha +5.1%, Value full-period alpha +1.4%) come from the uncorrected signal. The reading rules keep the same form but apply to the **corrected** in-sample findings: each finding is supported only if the out-of-sample alpha has the same sign as the corrected in-sample alpha. If a corrected in-sample alpha is zero or negative, the README will say that there is no in-sample finding left for that strategy to confirm.
 - Nothing else in this plan changes.
+
+## Amendment 2 (24 September 2026): missing final trading day of the in-sample data
+
+**Recorded after the 2025–2026 data was downloaded, but before any out-of-sample result was computed.** The Git history shows that no out-of-sample output exists at the commit that adds this amendment.
+
+**What was found.** Re-running the unchanged in-sample scripts on the extended database changed a few in-sample figures slightly. Comparing the new database with a snapshot taken before the download traced every difference to one month. The original download used `END_DATE = "2024-12-31"`, and yfinance treats the end date as exclusive, so the last trading day of the sample, 31 December 2024, was never fetched. The in-sample "December 2024" return was therefore measured to the close of 30 December. All other prices matched the snapshot to within 0.0001%, and all book values matched exactly.
+
+**Effect.** Only the December 2024 monthly return changes, by up to 1.5 percentage points for a single stock (XOM). No signal or holding changes, because the December 2024 portfolio was formed from November data. Headline full-period figures move by about 0.01 in Sharpe ratio (for example Value 0.85 to 0.86, benchmark 0.81 to 0.815). The 2021–2022 figures do not change. No conclusion changes: every Sharpe difference and every alpha remains statistically insignificant.
+
+**Treatment.** The corrected data is used, because the missing day was a data error rather than a feature of the strategy. The in-sample results, README and dashboard are regenerated from it, and the pre-correction figures remain in the Git history. The out-of-sample test uses the extended data as downloaded, with no further changes. The reading rules in Amendment 1 apply unchanged: each finding is supported only if its out-of-sample alpha has the same sign as the corrected in-sample alpha.

@@ -18,7 +18,7 @@ UNIVERSE = [
 
 # Backtest date range for price history.
 START_DATE = "2020-01-01"
-END_DATE = "2024-12-31"
+END_DATE = "2026-09-01"  # yfinance end date is exclusive, so this fetches through 31 Aug 2026
 
 # Evaluation windows (pre-registered in OUT_OF_SAMPLE_PLAN.md).
 # Every existing results file is computed on the IN-SAMPLE window only,
