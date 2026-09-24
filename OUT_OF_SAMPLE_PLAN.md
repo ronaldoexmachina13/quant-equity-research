@@ -42,3 +42,21 @@ For each strategy and the benchmark over the out-of-sample period: total and ann
 1. The strategy rules above will not be changed in response to the out-of-sample results.
 2. The out-of-sample results will be published whether they support, contradict or fail to resolve the in-sample findings.
 3. The out-of-sample period will be shown separately in the README and on the dashboard, labelled as out of sample.
+
+---
+
+## Amendment 1 (24 September 2026): look-ahead fix in the Value signal
+
+**Recorded before any data after 31 December 2024 was downloaded.** The commit that fixes the bug and the commit that adds this amendment both come before the data-extension commit, and the Git history shows that order.
+
+**What was wrong.** The backtest applies the weights dated month *t* to the return earned during month *t* (from the month *t−1* close to the month *t* close). The Value signal dated month *t* used the month *t* closing price in its P/B ratio, so each rebalance relied on a price the portfolio could not have known when it traded. That is a one-month look-ahead. Momentum was not affected, because its skip-month convention already uses the month *t−1* price. Combined was affected through its Value component.
+
+**The fix.** The Value score is lagged by one month (`shift(1)` in `calculate_value_score`), so the score dated *t* uses P/B at the end of month *t−1*. A unit test (`test_calculate_value_score_uses_previous_month_price`) now fails if this timing regresses.
+
+**Why this is not a rule change.** The strategy definition is the same: lowest P/B ranks highest, with the same universe, data source, fill limit, portfolio size, weighting, rebalance frequency, costs and benchmark. The fix makes the code do what the frozen rules above already describe, a signal that could have been traded at the time. It was found during a code review for the out-of-sample extension, not in response to any out-of-sample result.
+
+**Effect on this plan.**
+
+- The in-sample results for Value and Combined will be recomputed with the corrected signal. The README will show both the original and corrected figures, so the effect of the bug stays visible. Momentum and the benchmark do not change.
+- The alpha figures quoted in "How the results will be read" (Combined 2023–2024 alpha +5.1%, Value full-period alpha +1.4%) come from the uncorrected signal. The reading rules keep the same form but apply to the **corrected** in-sample findings: each finding is supported only if the out-of-sample alpha has the same sign as the corrected in-sample alpha. If a corrected in-sample alpha is zero or negative, the README will say that there is no in-sample finding left for that strategy to confirm.
+- Nothing else in this plan changes.
