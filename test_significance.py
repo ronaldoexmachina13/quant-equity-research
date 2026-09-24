@@ -64,11 +64,11 @@ if __name__ == "__main__":
             results.append({
                 "period": period_name,
                 "strategy": strat_name,
-                "strategy_sharpe": round(strat_sharpe, 3),
-                "benchmark_sharpe": round(bench_sharpe, 3),
-                "sharpe_diff": round(res["point_diff"], 3),
-                "ci_90_lower": round(res["lower"], 3),
-                "ci_90_upper": round(res["upper"], 3),
+                "strategy_sharpe": strat_sharpe,
+                "benchmark_sharpe": bench_sharpe,
+                "sharpe_diff": res["point_diff"],
+                "ci_90_lower": res["lower"],
+                "ci_90_upper": res["upper"],
                 "significant_at_90pct": res["significant"],
             })
 

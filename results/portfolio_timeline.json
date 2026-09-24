@@ -2289,28 +2289,28 @@
       "2024-12": [
         {
           "ticker": "WMT",
-          "return": -1.87,
-          "contribution": -0.37
+          "return": -2.11,
+          "contribution": -0.42
         },
         {
           "ticker": "JPM",
-          "return": -4.16,
-          "contribution": -0.83
+          "return": -4.01,
+          "contribution": -0.8
         },
         {
           "ticker": "RTX",
-          "return": -5.43,
-          "contribution": -1.09
+          "return": -5.02,
+          "contribution": -1.0
         },
         {
           "ticker": "NEE",
-          "return": -8.78,
-          "contribution": -1.76
+          "return": -8.87,
+          "contribution": -1.77
         },
         {
           "ticker": "CAT",
-          "return": -10.61,
-          "contribution": -2.12
+          "return": -10.67,
+          "contribution": -2.13
         }
       ]
     },
@@ -3587,28 +3587,28 @@
       "2024-12": [
         {
           "ticker": "JPM",
-          "return": -4.16,
-          "contribution": -0.83
+          "return": -4.01,
+          "contribution": -0.8
         },
         {
           "ticker": "DIS",
-          "return": -5.26,
-          "contribution": -1.05
+          "return": -4.79,
+          "contribution": -0.96
         },
         {
           "ticker": "RTX",
-          "return": -5.43,
-          "contribution": -1.09
-        },
-        {
-          "ticker": "NEE",
-          "return": -8.78,
-          "contribution": -1.76
+          "return": -5.02,
+          "contribution": -1.0
         },
         {
           "ticker": "XOM",
-          "return": -10.34,
-          "contribution": -2.07
+          "return": -8.81,
+          "contribution": -1.76
+        },
+        {
+          "ticker": "NEE",
+          "return": -8.87,
+          "contribution": -1.77
         }
       ]
     },
@@ -4885,28 +4885,28 @@
       "2024-12": [
         {
           "ticker": "WMT",
-          "return": -1.87,
-          "contribution": -0.37
+          "return": -2.11,
+          "contribution": -0.42
         },
         {
           "ticker": "JPM",
-          "return": -4.16,
-          "contribution": -0.83
+          "return": -4.01,
+          "contribution": -0.8
         },
         {
           "ticker": "RTX",
-          "return": -5.43,
-          "contribution": -1.09
+          "return": -5.02,
+          "contribution": -1.0
         },
         {
           "ticker": "NEE",
-          "return": -8.78,
-          "contribution": -1.76
+          "return": -8.87,
+          "contribution": -1.77
         },
         {
           "ticker": "CAT",
-          "return": -10.61,
-          "contribution": -2.12
+          "return": -10.67,
+          "contribution": -2.13
         }
       ]
     }
@@ -5196,10 +5196,10 @@
         "volatility": 13.06
       },
       "2024-12": {
-        "return": -6.17,
-        "cumulative": 47.67,
+        "return": -6.14,
+        "cumulative": 47.72,
         "sharpe": 0.99,
-        "volatility": 15.47
+        "volatility": 15.45
       }
     },
     "value": {
@@ -5486,10 +5486,10 @@
         "volatility": 13.35
       },
       "2024-12": {
-        "return": -6.8,
-        "cumulative": 88.7,
-        "sharpe": 1.76,
-        "volatility": 16.63
+        "return": -6.3,
+        "cumulative": 89.7,
+        "sharpe": 1.83,
+        "volatility": 16.34
       }
     },
     "combined": {
@@ -5776,10 +5776,10 @@
         "volatility": 12.59
       },
       "2024-12": {
-        "return": -6.17,
-        "cumulative": 55.91,
-        "sharpe": 1.39,
-        "volatility": 15.32
+        "return": -6.14,
+        "cumulative": 55.97,
+        "sharpe": 1.4,
+        "volatility": 15.3
       }
     }
   }

@@ -1,10 +1,10 @@
 period,strategy,alpha,alpha_tstat,alpha_pvalue,beta,r_squared,significant_at_90pct
-Full period (2021-2024),Momentum,-0.0166,-0.42,0.676,0.873,0.736,False
-Full period (2021-2024),Value,0.0278,0.59,0.557,1.06,0.745,False
-Full period (2021-2024),Combined,-0.004,-0.1,0.92,0.882,0.744,False
+Full period (2021-2024),Momentum,-0.017,-0.43,0.67,0.874,0.736,False
+Full period (2021-2024),Value,0.0289,0.62,0.54,1.057,0.744,False
+Full period (2021-2024),Combined,-0.0043,-0.11,0.913,0.883,0.744,False
 2021-2022,Momentum,-0.0367,-0.61,0.549,0.82,0.738,False
 2021-2022,Value,0.0274,0.38,0.708,1.054,0.764,False
 2021-2022,Combined,-0.0526,-0.94,0.358,0.85,0.778,False
-2023-2024,Momentum,-0.0037,-0.07,0.945,0.969,0.748,False
-2023-2024,Value,0.0273,0.43,0.671,1.071,0.713,False
-2023-2024,Combined,0.0411,0.74,0.465,0.935,0.715,False
+2023-2024,Momentum,-0.0046,-0.09,0.931,0.971,0.748,False
+2023-2024,Value,0.0301,0.47,0.64,1.062,0.709,False
+2023-2024,Combined,0.0402,0.73,0.475,0.937,0.714,False

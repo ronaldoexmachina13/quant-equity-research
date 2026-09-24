@@ -62,13 +62,13 @@ if __name__ == "__main__":
 
         results.append({
             "strategy": name,
-            "avg_monthly_turnover": round(avg_turnover, 3),
-            "gross_total_return": round(gross_stats["total_return"], 4),
-            "net_total_return": round(net_stats["total_return"], 4),
-            "gross_annualized_return": round(gross_stats["annualized_return"], 4),
-            "net_annualized_return": round(net_stats["annualized_return"], 4),
-            "gross_sharpe": round(gross_stats["sharpe_ratio"], 3),
-            "net_sharpe": round(net_stats["sharpe_ratio"], 3),
+            "avg_monthly_turnover": avg_turnover,
+            "gross_total_return": gross_stats["total_return"],
+            "net_total_return": net_stats["total_return"],
+            "gross_annualized_return": gross_stats["annualized_return"],
+            "net_annualized_return": net_stats["annualized_return"],
+            "gross_sharpe": gross_stats["sharpe_ratio"],
+            "net_sharpe": net_stats["sharpe_ratio"],
         })
 
         print(f"{name}:")
