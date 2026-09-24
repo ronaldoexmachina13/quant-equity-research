@@ -58,7 +58,27 @@ def test_calculate_value_score_lower_pb_scores_higher():
 
     value_score = calculate_value_score(prices, book_value)
 
-    assert (value_score["A"] > value_score["B"]).all()
+    # The first month has no previous month to lag from, so it is NaN by design.
+    assert (value_score["A"].iloc[1:] > value_score["B"].iloc[1:]).all()
+
+
+def test_calculate_value_score_uses_previous_month_price():
+    """
+    The value score dated month t must use P/B from the end of month t-1,
+    because the weights dated t earn the return during month t. Here the
+    price jumps from 100 to 400 at the end of month 2; the score dated
+    month 2 must still reflect the month-1 price (P/B = 100 / 50 = 2),
+    not the month-2 price the portfolio could not have known in advance.
+    """
+    dates = pd.date_range("2020-01-31", periods=3, freq="ME")
+    prices = pd.DataFrame({"A": [100, 400, 400]}, index=dates)
+    book_value = pd.DataFrame({"A": [50, 50, 50]}, index=dates)
+
+    value_score = calculate_value_score(prices, book_value)
+
+    assert pd.isna(value_score["A"].iloc[0])
+    assert value_score["A"].iloc[1] == pytest.approx(-2.0)
+    assert value_score["A"].iloc[2] == pytest.approx(-8.0)
 
 
 def test_calculate_combined_score_nan_when_either_factor_missing():

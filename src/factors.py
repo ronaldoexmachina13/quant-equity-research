@@ -60,40 +60,18 @@ def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.
 
     Low P/B is attractive for Value (a cheap stock relative to its book
     equity) -- the opposite ranking direction from momentum, where high
-    score wins. To reuse build_portfolio()'s existing top-N selection
-    logic unchanged, we return the NEGATIVE of P/B as the score: the
-    stock with the lowest P/B has the highest (least negative) score,
-    and is correctly selected as a top-N pick.
-
-    Parameters
-    ----------
-    prices : pd.DataFrame
-        Wide-format adjusted close prices (Date index, tickers as columns).
-    book_value : pd.DataFrame
-        Wide-format book value per share (Date index, tickers as columns),
-        as returned by database.load_book_value().
-
-    Returns
-    -------
-    pd.DataFrame
-        Value scores (negative P/B), same shape/index convention as
-        calculate_momentum()'s output.
-    """
-    monthly_prices = prices.resample("ME").last()
-    pb_ratio = monthly_prices / book_value
-    value_score = -pb_ratio
-    return value_score
-
-def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculate a Value factor score from Price-to-Book ratio.
-
-    Low P/B is attractive for Value (a cheap stock relative to its book
-    equity) -- the opposite ranking direction from momentum, where high
     score wins. We return the NEGATIVE of P/B as the score: the stock
     with the lowest P/B has the highest (least negative) score, and is
     correctly selected as a top-N pick by build_portfolio().
 
+    Timing: the score at month-end t uses P/B measured at the PREVIOUS
+    month-end (t-1). run_backtest() applies the weights dated t to the
+    return earned during month t (from the t-1 close to the t close), so
+    the signal must be known at t-1. Using the month-t price here would
+    select stocks with information from the end of the holding month,
+    which is look-ahead bias. Momentum already respects this through its
+    skip-month (it uses the t-1 price as its end point).
+
     Parameters
     ----------
     prices : pd.DataFrame
@@ -105,13 +83,13 @@ def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.
     Returns
     -------
     pd.DataFrame
-        Value scores (negative P/B), same shape/index convention as
-        calculate_momentum()'s output.
+        Value scores (negative P/B, lagged one month), same shape/index
+        convention as calculate_momentum()'s output.
     """
     monthly_prices = prices.resample("ME").last()
     pb_ratio = monthly_prices / book_value
     value_score = -pb_ratio
-    return value_score
+    return value_score.shift(1)
 
 
 def calculate_combined_score(momentum: pd.DataFrame, value_score: pd.DataFrame) -> pd.DataFrame:
