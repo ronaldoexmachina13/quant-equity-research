@@ -23,7 +23,12 @@
 
   <div class="panel">
     <h2>Reading these cards</h2>
-    <p class="definition-body">Each card shows the stock's latest 12-1 momentum score and Price-to-Book ratio, and how many of the 48 backtested months (2021&ndash;2024) each strategy held it. A count of 48/48 for Value means the stock ranked among the five cheapest by book value in <i>every</i> month of the backtest, which says more about the persistence of its valuation than a single ratio can. The ratios shown are the latest readings, while selection counts reflect each month's point-in-time ranking, so a stock can look expensive today and still have been a frequent Value holding (WMT is an example).</p>
+    <p class="definition-body">Each card shows the stock's latest 12-1 momentum score and Price-to-Book ratio, and how many months each strategy held it: the 48 in-sample months (2021&ndash;2024) by default, or the 20 out-of-sample months (January 2025 to August 2026) with the toggle below. A count of 48/48 for Value means the stock ranked among the five cheapest by book value in <i>every</i> month of the backtest, which says more about the persistence of its valuation than a single ratio can. The ratios shown are the latest readings, while selection counts reflect each month's point-in-time ranking, so a stock can look expensive today and still have been a frequent Value holding (WMT is an example).</p>
+  </div>
+
+  <div class="year-toggle" id="selPeriodToggle" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:0 0 1.1rem;">
+    <button class="metric-btn active" data-period="is">Selection counts: 2021&ndash;2024 (in sample)</button>
+    <button class="metric-btn" data-period="oos" style="border-style:dashed; border-color:var(--benchmark);">Jan 2025&ndash;Aug 2026 (out of sample)</button>
   </div>
 
   <div class="stock-grid" id="stockGrid"></div>
@@ -36,23 +41,23 @@
 
 <script>
 const STOCKS = [
-  {"ticker": "AAPL", "name": "Apple", "sector": "Technology", "latest_price": 316.85, "latest_momentum_12_1": 0.334, "latest_pb": 43.05, "momentum_months_selected": 17, "value_months_selected": 0, "combined_months_selected": 12, "total_months_evaluated": 48},
-  {"ticker": "CAT", "name": "Caterpillar", "sector": "Industrials", "latest_price": 797.47, "latest_momentum_12_1": 0.962, "latest_pb": 18.9, "momentum_months_selected": 27, "value_months_selected": 0, "combined_months_selected": 28, "total_months_evaluated": 48},
-  {"ticker": "DIS", "name": "Walt Disney", "sector": "Consumer Discretionary", "latest_price": 107.55, "latest_momentum_12_1": -0.176, "latest_pb": 1.59, "momentum_months_selected": 11, "value_months_selected": 38, "combined_months_selected": 12, "total_months_evaluated": 48},
-  {"ticker": "HD", "name": "Home Depot", "sector": "Consumer Discretionary", "latest_price": 325.43, "latest_momentum_12_1": -0.162, "latest_pb": 19.55, "momentum_months_selected": 6, "value_months_selected": 0, "combined_months_selected": 0, "total_months_evaluated": 48},
-  {"ticker": "JNJ", "name": "Johnson & Johnson", "sector": "Healthcare", "latest_price": 265.85, "latest_momentum_12_1": 0.472, "latest_pb": 7.54, "momentum_months_selected": 1, "value_months_selected": 0, "combined_months_selected": 3, "total_months_evaluated": 48},
-  {"ticker": "JPM", "name": "JPMorgan Chase", "sector": "Financials", "latest_price": 356.02, "latest_momentum_12_1": 0.189, "latest_pb": 2.53, "momentum_months_selected": 30, "value_months_selected": 48, "combined_months_selected": 32, "total_months_evaluated": 48},
-  {"ticker": "KO", "name": "Coca-Cola", "sector": "Consumer Staples", "latest_price": 88.14, "latest_momentum_12_1": 0.306, "latest_pb": 10.61, "momentum_months_selected": 8, "value_months_selected": 0, "combined_months_selected": 4, "total_months_evaluated": 48},
-  {"ticker": "LIN", "name": "Linde", "sector": "Materials", "latest_price": 487.97, "latest_momentum_12_1": 0.014, "latest_pb": 5.54, "momentum_months_selected": 20, "value_months_selected": 8, "combined_months_selected": 26, "total_months_evaluated": 48},
-  {"ticker": "LMT", "name": "Lockheed Martin", "sector": "Aerospace & Defense", "latest_price": 557.78, "latest_momentum_12_1": 0.313, "latest_pb": 14.68, "momentum_months_selected": 12, "value_months_selected": 0, "combined_months_selected": 9, "total_months_evaluated": 48},
-  {"ticker": "MSFT", "name": "Microsoft", "sector": "Technology", "latest_price": 507.29, "latest_momentum_12_1": -0.077, "latest_pb": 8.52, "momentum_months_selected": 25, "value_months_selected": 0, "combined_months_selected": 21, "total_months_evaluated": 48},
-  {"ticker": "NEE", "name": "NextEra Energy", "sector": "Utilities", "latest_price": 82.34, "latest_momentum_12_1": 0.232, "latest_pb": 2.58, "momentum_months_selected": 5, "value_months_selected": 12, "combined_months_selected": 9, "total_months_evaluated": 48},
-  {"ticker": "PG", "name": "Procter & Gamble", "sector": "Consumer Staples", "latest_price": 145.12, "latest_momentum_12_1": -0.053, "latest_pb": 6.21, "momentum_months_selected": 1, "value_months_selected": 0, "combined_months_selected": 2, "total_months_evaluated": 48},
-  {"ticker": "RTX", "name": "RTX Corporation", "sector": "Aerospace & Defense", "latest_price": 207.73, "latest_momentum_12_1": 0.373, "latest_pb": 4.11, "momentum_months_selected": 19, "value_months_selected": 48, "combined_months_selected": 21, "total_months_evaluated": 48},
-  {"ticker": "UNH", "name": "UnitedHealth Group", "sector": "Healthcare", "latest_price": 387.03, "latest_momentum_12_1": 0.373, "latest_pb": 3.35, "momentum_months_selected": 16, "value_months_selected": 0, "combined_months_selected": 16, "total_months_evaluated": 48},
-  {"ticker": "V", "name": "Visa", "sector": "Financials", "latest_price": 379.37, "latest_momentum_12_1": 0.047, "latest_pb": null, "momentum_months_selected": 4, "value_months_selected": 0, "combined_months_selected": 0, "total_months_evaluated": 48},
-  {"ticker": "WMT", "name": "Walmart", "sector": "Consumer Staples", "latest_price": 104.87, "latest_momentum_12_1": 0.154, "latest_pb": 7.96, "momentum_months_selected": 13, "value_months_selected": 39, "combined_months_selected": 19, "total_months_evaluated": 48},
-  {"ticker": "XOM", "name": "Exxon Mobil", "sector": "Energy", "latest_price": 160.95, "latest_momentum_12_1": 0.39, "latest_pb": 2.56, "momentum_months_selected": 25, "value_months_selected": 47, "combined_months_selected": 26, "total_months_evaluated": 48}
+  {"ticker": "AAPL", "name": "Apple", "sector": "Technology", "latest_price": 316.85, "latest_momentum_12_1": 0.334, "latest_pb": 43.05, "momentum_months_selected": 17, "value_months_selected": 0, "combined_months_selected": 12, "total_months_evaluated": 48, "momentum_months_selected_oos": 7, "value_months_selected_oos": 0, "combined_months_selected_oos": 0, "total_months_oos": 20},
+  {"ticker": "CAT", "name": "Caterpillar", "sector": "Industrials", "latest_price": 797.47, "latest_momentum_12_1": 0.962, "latest_pb": 18.9, "momentum_months_selected": 27, "value_months_selected": 0, "combined_months_selected": 28, "total_months_evaluated": 48, "momentum_months_selected_oos": 11, "value_months_selected_oos": 0, "combined_months_selected_oos": 10, "total_months_oos": 20},
+  {"ticker": "DIS", "name": "Walt Disney", "sector": "Consumer Discretionary", "latest_price": 107.55, "latest_momentum_12_1": -0.176, "latest_pb": 1.59, "momentum_months_selected": 11, "value_months_selected": 38, "combined_months_selected": 12, "total_months_evaluated": 48, "momentum_months_selected_oos": 3, "value_months_selected_oos": 20, "combined_months_selected_oos": 6, "total_months_oos": 20},
+  {"ticker": "HD", "name": "Home Depot", "sector": "Consumer Discretionary", "latest_price": 325.43, "latest_momentum_12_1": -0.162, "latest_pb": 19.55, "momentum_months_selected": 6, "value_months_selected": 0, "combined_months_selected": 0, "total_months_evaluated": 48, "momentum_months_selected_oos": 0, "value_months_selected_oos": 0, "combined_months_selected_oos": 0, "total_months_oos": 20},
+  {"ticker": "JNJ", "name": "Johnson & Johnson", "sector": "Healthcare", "latest_price": 265.85, "latest_momentum_12_1": 0.472, "latest_pb": 7.54, "momentum_months_selected": 1, "value_months_selected": 0, "combined_months_selected": 3, "total_months_evaluated": 48, "momentum_months_selected_oos": 10, "value_months_selected_oos": 0, "combined_months_selected_oos": 14, "total_months_oos": 20},
+  {"ticker": "JPM", "name": "JPMorgan Chase", "sector": "Financials", "latest_price": 356.02, "latest_momentum_12_1": 0.189, "latest_pb": 2.53, "momentum_months_selected": 30, "value_months_selected": 48, "combined_months_selected": 32, "total_months_evaluated": 48, "momentum_months_selected_oos": 13, "value_months_selected_oos": 20, "combined_months_selected_oos": 13, "total_months_oos": 20},
+  {"ticker": "KO", "name": "Coca-Cola", "sector": "Consumer Staples", "latest_price": 88.14, "latest_momentum_12_1": 0.306, "latest_pb": 10.61, "momentum_months_selected": 8, "value_months_selected": 0, "combined_months_selected": 4, "total_months_evaluated": 48, "momentum_months_selected_oos": 2, "value_months_selected_oos": 0, "combined_months_selected_oos": 2, "total_months_oos": 20},
+  {"ticker": "LIN", "name": "Linde", "sector": "Materials", "latest_price": 487.97, "latest_momentum_12_1": 0.014, "latest_pb": 5.54, "momentum_months_selected": 20, "value_months_selected": 8, "combined_months_selected": 26, "total_months_evaluated": 48, "momentum_months_selected_oos": 0, "value_months_selected_oos": 0, "combined_months_selected_oos": 1, "total_months_oos": 20},
+  {"ticker": "LMT", "name": "Lockheed Martin", "sector": "Aerospace & Defense", "latest_price": 557.78, "latest_momentum_12_1": 0.313, "latest_pb": 14.68, "momentum_months_selected": 12, "value_months_selected": 0, "combined_months_selected": 9, "total_months_evaluated": 48, "momentum_months_selected_oos": 2, "value_months_selected_oos": 0, "combined_months_selected_oos": 0, "total_months_oos": 20},
+  {"ticker": "MSFT", "name": "Microsoft", "sector": "Technology", "latest_price": 507.29, "latest_momentum_12_1": -0.077, "latest_pb": 8.52, "momentum_months_selected": 25, "value_months_selected": 0, "combined_months_selected": 21, "total_months_evaluated": 48, "momentum_months_selected_oos": 4, "value_months_selected_oos": 0, "combined_months_selected_oos": 4, "total_months_oos": 20},
+  {"ticker": "NEE", "name": "NextEra Energy", "sector": "Utilities", "latest_price": 82.34, "latest_momentum_12_1": 0.232, "latest_pb": 2.58, "momentum_months_selected": 5, "value_months_selected": 12, "combined_months_selected": 9, "total_months_evaluated": 48, "momentum_months_selected_oos": 7, "value_months_selected_oos": 20, "combined_months_selected_oos": 10, "total_months_oos": 20},
+  {"ticker": "PG", "name": "Procter & Gamble", "sector": "Consumer Staples", "latest_price": 145.12, "latest_momentum_12_1": -0.053, "latest_pb": 6.21, "momentum_months_selected": 1, "value_months_selected": 0, "combined_months_selected": 2, "total_months_evaluated": 48, "momentum_months_selected_oos": 0, "value_months_selected_oos": 0, "combined_months_selected_oos": 0, "total_months_oos": 20},
+  {"ticker": "RTX", "name": "RTX Corporation", "sector": "Aerospace & Defense", "latest_price": 207.73, "latest_momentum_12_1": 0.373, "latest_pb": 4.11, "momentum_months_selected": 19, "value_months_selected": 48, "combined_months_selected": 21, "total_months_evaluated": 48, "momentum_months_selected_oos": 17, "value_months_selected_oos": 5, "combined_months_selected_oos": 18, "total_months_oos": 20},
+  {"ticker": "UNH", "name": "UnitedHealth Group", "sector": "Healthcare", "latest_price": 387.03, "latest_momentum_12_1": 0.373, "latest_pb": 3.35, "momentum_months_selected": 16, "value_months_selected": 0, "combined_months_selected": 16, "total_months_evaluated": 48, "momentum_months_selected_oos": 2, "value_months_selected_oos": 15, "combined_months_selected_oos": 4, "total_months_oos": 20},
+  {"ticker": "V", "name": "Visa", "sector": "Financials", "latest_price": 379.37, "latest_momentum_12_1": 0.047, "latest_pb": null, "momentum_months_selected": 4, "value_months_selected": 0, "combined_months_selected": 0, "total_months_evaluated": 48, "momentum_months_selected_oos": 6, "value_months_selected_oos": 0, "combined_months_selected_oos": 0, "total_months_oos": 20},
+  {"ticker": "WMT", "name": "Walmart", "sector": "Consumer Staples", "latest_price": 104.87, "latest_momentum_12_1": 0.154, "latest_pb": 7.96, "momentum_months_selected": 13, "value_months_selected": 39, "combined_months_selected": 19, "total_months_evaluated": 48, "momentum_months_selected_oos": 11, "value_months_selected_oos": 0, "combined_months_selected_oos": 10, "total_months_oos": 20},
+  {"ticker": "XOM", "name": "Exxon Mobil", "sector": "Energy", "latest_price": 160.95, "latest_momentum_12_1": 0.39, "latest_pb": 2.56, "momentum_months_selected": 25, "value_months_selected": 47, "combined_months_selected": 26, "total_months_evaluated": 48, "momentum_months_selected_oos": 5, "value_months_selected_oos": 20, "combined_months_selected_oos": 8, "total_months_oos": 20}
 ];
 
 const COLORS = { momentum: "#5b6b8c", value: "#1baf7a", combined: "#7c5cd4" };
@@ -66,9 +71,17 @@ function selRow(label, count, total, color) {
   </div>`;
 }
 
+let selPeriod = "is";
+
 function renderCards() {
   const grid = document.getElementById("stockGrid");
+  grid.innerHTML = "";
+  const oos = selPeriod === "oos";
   STOCKS.forEach(s => {
+    const total = oos ? s.total_months_oos : s.total_months_evaluated;
+    const cMom = oos ? s.momentum_months_selected_oos : s.momentum_months_selected;
+    const cVal = oos ? s.value_months_selected_oos : s.value_months_selected;
+    const cCom = oos ? s.combined_months_selected_oos : s.combined_months_selected;
     const excluded = s.latest_pb === null;
     const card = document.createElement("div");
     card.className = "stock-card" + (excluded ? " excluded" : "");
@@ -94,15 +107,24 @@ function renderCards() {
         </div>
       </div>
       <div class="selection">
-        ${selRow("Momentum", s.momentum_months_selected, s.total_months_evaluated, COLORS.momentum)}
-        ${selRow("Value", s.value_months_selected, s.total_months_evaluated, COLORS.value)}
-        ${selRow("Combined", s.combined_months_selected, s.total_months_evaluated, COLORS.combined)}
+        ${selRow("Momentum", cMom, total, COLORS.momentum)}
+        ${selRow("Value", cVal, total, COLORS.value)}
+        ${selRow("Combined", cCom, total, COLORS.combined)}
       </div>
       ${excluded ? '<div class="excluded-note">Excluded from Value and Combined: insufficient book value data (multi-class share structure)</div>' : ''}
     `;
     grid.appendChild(card);
   });
 }
+
+document.querySelectorAll("#selPeriodToggle .metric-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#selPeriodToggle .metric-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selPeriod = btn.dataset.period;
+    renderCards();
+  });
+});
 
 renderCards();
 </script>

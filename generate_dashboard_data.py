@@ -56,19 +56,29 @@ def build_metrics_block(full: pd.DataFrame, p1: pd.DataFrame, p2: pd.DataFrame) 
     alpha_p1 = [round_half_up(float(p1.loc[s, "alpha"]) * 100, 1) + 0.0 for s in ORDER]
     alpha_p2 = [round_half_up(float(p2.loc[s, "alpha"]) * 100, 1) + 0.0 for s in ORDER]
 
+    # Third bar per strategy: the pre-registered out-of-sample period
+    # (Jan 2025 - Aug 2026), labelled as such on the page.
+    oos = pd.read_csv("results/oos_summary.csv", index_col="label")
+    sharpe_p3 = [round_half_up(float(oos.loc[s, "sharpe_ratio"]), 2) for s in ORDER]
+    sortino_p3 = [round_half_up(float(oos.loc[s, "sortino_ratio"]), 2) for s in ORDER]
+    total_p3 = [round_half_up(float(oos.loc[s, "total_return"]) * 100, 1) for s in ORDER]
+    ann_p3 = [round_half_up(float(oos.loc[s, "annualized_return"]) * 100, 1) for s in ORDER]
+    vol_p3 = [round_half_up(float(oos.loc[s, "annualized_volatility"]) * 100, 1) for s in ORDER]
+    alpha_p3 = [round_half_up(float(oos.loc[s, "alpha"]) * 100, 1) + 0.0 for s in ORDER]
+
     return f"""const METRICS = {{
-  sharpe: {{ label: "Sharpe Ratio", suffix: "", max: 1.6, step: 0.2,
-    p1: {sharpe_p1}, p2: {sharpe_p2} }},
-  sortino: {{ label: "Sortino Ratio", suffix: "", max: 3.0, step: 0.5,
-    p1: {sortino_p1}, p2: {sortino_p2} }},
+  sharpe: {{ label: "Sharpe Ratio", suffix: "", max: 2.0, step: 0.5,
+    p1: {sharpe_p1}, p2: {sharpe_p2}, p3: {sharpe_p3} }},
+  sortino: {{ label: "Sortino Ratio", suffix: "", max: 6.0, step: 1.0,
+    p1: {sortino_p1}, p2: {sortino_p2}, p3: {sortino_p3} }},
   total: {{ label: "Total Return", suffix: "%", max: 50, step: 10,
-    p1: {total_p1}, p2: {total_p2} }},
-  ann: {{ label: "Annualized Return", suffix: "%", max: 25, step: 5,
-    p1: {ann_p1}, p2: {ann_p2} }},
+    p1: {total_p1}, p2: {total_p2}, p3: {total_p3} }},
+  ann: {{ label: "Annualized Return", suffix: "%", max: 30, step: 5,
+    p1: {ann_p1}, p2: {ann_p2}, p3: {ann_p3} }},
   vol: {{ label: "Annualized Volatility", suffix: "%", max: 25, step: 5,
-    p1: {vol_p1}, p2: {vol_p2} }},
-  alpha: {{ label: "Alpha vs Benchmark", suffix: "%", min: -8, max: 8, step: 2,
-    p1: {alpha_p1}, p2: {alpha_p2} }}
+    p1: {vol_p1}, p2: {vol_p2}, p3: {vol_p3} }},
+  alpha: {{ label: "Alpha vs Benchmark", suffix: "%", min: -8, max: 10, step: 2,
+    p1: {alpha_p1}, p2: {alpha_p2}, p3: {alpha_p3} }}
 }};"""
 
 
@@ -116,7 +126,7 @@ def update_strategies_html(path: str, full: pd.DataFrame, p1: pd.DataFrame, p2: 
         f.write(html)
 
     print(f"Updated {path}:")
-    print(f"  - METRICS block regenerated from {len(p1)} + {len(p2)} rows (2021-2022, 2023-2024)")
+    print(f"  - METRICS block regenerated from {len(p1)} + {len(p2)} rows (2021-2022, 2023-2024) + out-of-sample (results/oos_summary.csv)")
     for s, line in zip(ORDER, new_lines):
         print(f"  - {s}: {line}")
 
@@ -222,6 +232,10 @@ def update_stocks_html(path: str, computed: dict):
             "value_months_selected": c["value_months_selected"],
             "combined_months_selected": c["combined_months_selected"],
             "total_months_evaluated": c["total_months_evaluated"],
+            "momentum_months_selected_oos": c["momentum_months_selected_oos"],
+            "value_months_selected_oos": c["value_months_selected_oos"],
+            "combined_months_selected_oos": c["combined_months_selected_oos"],
+            "total_months_oos": c["total_months_oos"],
         })
 
     missing = set(computed.keys()) - seen

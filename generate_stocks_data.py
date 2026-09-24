@@ -37,6 +37,17 @@ def compute_stocks_data() -> dict:
             for t in tickers:
                 counts[strategy][t] += 1
 
+    # Same counts for the out-of-sample months (Jan 2025 - Aug 2026), kept
+    # separate so the page can show them without mixing the two periods.
+    with open("results/portfolio_timeline_oos.json") as f:
+        holdings_oos = json.load(f)["holdings"]
+    total_months_oos = len(holdings_oos["momentum"])
+    counts_oos = {strategy: {t: 0 for t in UNIVERSE} for strategy in ["momentum", "value", "combined"]}
+    for strategy, months in holdings_oos.items():
+        for month, tickers in months.items():
+            for t in tickers:
+                counts_oos[strategy][t] += 1
+
     latest_price_row = prices.iloc[-1]
     latest_momentum_row = momentum.iloc[-1]
     latest_pb_row = pb_ratio.iloc[-1]
@@ -52,6 +63,10 @@ def compute_stocks_data() -> dict:
             "value_months_selected": counts["value"][t],
             "combined_months_selected": counts["combined"][t],
             "total_months_evaluated": total_months,
+            "momentum_months_selected_oos": counts_oos["momentum"][t],
+            "value_months_selected_oos": counts_oos["value"][t],
+            "combined_months_selected_oos": counts_oos["combined"][t],
+            "total_months_oos": total_months_oos,
         }
     return computed
 

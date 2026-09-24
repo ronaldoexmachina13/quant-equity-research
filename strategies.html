@@ -182,7 +182,7 @@
 
   <header>
     <h1>Momentum vs Value vs Combined vs Benchmark</h1>
-    <p>An interactive summary of the backtest. Select a strategy to see its definition, backtested figures, and how its risk-adjusted performance shifted between two market regimes.</p>
+    <p>An interactive summary of the backtest. Select a strategy to see its definition, backtested figures, and how its risk-adjusted performance shifted between two market regimes and on the pre-registered out-of-sample period that followed.</p>
   </header>
 
   <div class="strategy-bar" id="tabBar">
@@ -208,7 +208,7 @@
           <button class="metric-btn" data-metric="vol">Volatility</button>
           <button class="metric-btn" data-metric="alpha">Alpha</button>
         </div>
-        <div class="chart-legend"><span><i style="background:#1baf7a"></i>2021&ndash;2022</span><span><i style="background:#eb6834"></i>2023&ndash;2024</span></div>
+        <div class="chart-legend"><span><i style="background:#1baf7a"></i>2021&ndash;2022</span><span><i style="background:#eb6834"></i>2023&ndash;2024</span><span><i style="background:#e8c547"></i>Jan 2025&ndash;Aug 2026 <b style="color:#e8c547">(out of sample, 20 months)</b></span></div>
         <div class="chart-wrap"><canvas id="sharpeChart"></canvas></div>
         <div id="clickDetail" style="display:none; margin-top:1rem; padding:0.9rem 1rem; background:#0a0e1a; border-radius:10px; font-size:0.85rem; color:var(--text-secondary);"></div>
       </div>
@@ -362,18 +362,18 @@ where, from monthly data:
 const LABELS = ["Momentum", "Value", "Combined", "Benchmark"];
 
 const METRICS = {
-  sharpe: { label: "Sharpe Ratio", suffix: "", max: 1.6, step: 0.2,
-    p1: [0.25, 0.64, 0.16, 0.59], p2: [0.92, 1.15, 1.27, 1.13] },
-  sortino: { label: "Sortino Ratio", suffix: "", max: 3.0, step: 0.5,
-    p1: [0.46, 1.09, 0.29, 1.08], p2: [1.58, 2.04, 2.59, 1.91] },
+  sharpe: { label: "Sharpe Ratio", suffix: "", max: 2.0, step: 0.5,
+    p1: [0.25, 0.64, 0.16, 0.59], p2: [0.92, 1.15, 1.27, 1.13], p3: [1.05, 1.53, 1.72, 1.89] },
+  sortino: { label: "Sortino Ratio", suffix: "", max: 6.0, step: 1.0,
+    p1: [0.46, 1.09, 0.29, 1.08], p2: [1.58, 2.04, 2.59, 1.91], p3: [1.87, 3.22, 5.01, 3.59] },
   total: { label: "Total Return", suffix: "%", max: 50, step: 10,
-    p1: [12.4, 32.2, 9.5, 25.2], p2: [31.4, 43.5, 42.4, 34.2] },
-  ann: { label: "Annualized Return", suffix: "%", max: 25, step: 5,
-    p1: [6.0, 15.0, 4.7, 11.9], p2: [14.7, 19.8, 19.3, 15.8] },
+    p1: [12.4, 32.2, 9.5, 25.2], p2: [31.4, 43.5, 42.4, 34.2], p3: [25.0, 42.2, 45.1, 35.2] },
+  ann: { label: "Annualized Return", suffix: "%", max: 30, step: 5,
+    p1: [6.0, 15.0, 4.7, 11.9], p2: [14.7, 19.8, 19.3, 15.8], p3: [14.3, 23.5, 25.0, 19.9] },
   vol: { label: "Annualized Volatility", suffix: "%", max: 25, step: 5,
-    p1: [16.0, 20.2, 16.2, 16.8], p2: [13.8, 15.5, 13.6, 12.3] },
-  alpha: { label: "Alpha vs Benchmark", suffix: "%", min: -8, max: 8, step: 2,
-    p1: [-3.7, 2.7, -5.3, 0.0], p2: [-0.5, 3.0, 4.0, 0.0] }
+    p1: [16.0, 20.2, 16.2, 16.8], p2: [13.8, 15.5, 13.6, 12.3], p3: [11.7, 14.1, 13.4, 9.5] },
+  alpha: { label: "Alpha vs Benchmark", suffix: "%", min: -8, max: 10, step: 2,
+    p1: [-3.7, 2.7, -5.3, 0.0], p2: [-0.5, 3.0, 4.0, 0.0], p3: [-0.7, 0.6, 8.1, 0.0] }
 };
 
 const DATA = {
@@ -409,7 +409,7 @@ const DATA = {
 };
 
 const FINDINGS = {
-  all: "<b>The full-period average hides a regime pattern.</b> Over 2021&ndash;2024 Value posted the highest Sharpe ratio (0.86 against the benchmark's 0.81) and the highest total return (89.7% vs 68.0%), but it also ran the highest volatility and a beta of 1.06, and the Sharpe gap is far too small to separate from noise. Split the window in two and Value edges the benchmark in 2021&ndash;2022, while Combined leads in 2023&ndash;2024. None of these leads is statistically significant (see Robustness). Value and Combined figures use the corrected, one-month-lagged value signal; the README shows the results before and after the correction.",
+  all: "<b>The full-period average hides a regime pattern.</b> Over 2021&ndash;2024 Value posted the highest Sharpe ratio (0.86 against the benchmark's 0.81) and the highest total return (89.7% vs 68.0%), but it also ran the highest volatility and a beta of 1.06, and the Sharpe gap is far too small to separate from noise. Split the window in two and Value edges the benchmark in 2021&ndash;2022, while Combined leads in 2023&ndash;2024. None of these leads is statistically significant (see Robustness). Value and Combined figures use the corrected, one-month-lagged value signal; the README shows the results before and after the correction. The gold bars show the out-of-sample period (January 2025 to August 2026), run once with the rules frozen: there the benchmark had the highest Sharpe ratio of the four (see the Out of Sample tab).",
   momentum: "Momentum's weakest stretch was 2021&ndash;2022 (Sharpe 0.25, total return 12.4%), as the 2022 rate-hiking cycle repriced the growth-tilted winners a trailing-return signal tends to hold. It recovered in 2023&ndash;2024 (Sharpe 0.92, total return 31.4%) during the mega-cap rally, though it still trailed the benchmark's 1.13.",
   value: "Value <b>edged the benchmark</b> on Sharpe in 2021&ndash;2022 (0.64 vs 0.59) on a 32.2% total return, and edged it again in 2023&ndash;2024 (1.15 vs 1.13). Over the full period Value's beta to the universe was 1.06, so part of its extra return came from higher exposure. The remaining alpha of +2.9% a year was similar in both regimes, but it turns slightly negative (-0.4%) when the strategy holds 8 stocks instead of 5. On the Sortino ratio, which counts only downside volatility, the 2021&ndash;2022 lead almost disappears (1.09 vs 1.08).",
   combined: "Combined produced the <b>highest sub-period Sharpe in the project</b> in 2023&ndash;2024: 1.27 on a 42.4% total return, ahead of the benchmark on return and marginally on drawdown (-6.1% vs -6.3%). It did so with a beta of 0.94, so on the point estimates the lead came from stock selection (alpha +4.0% a year) rather than extra exposure, although that alpha has a t-statistic of only 0.73 (see Robustness). In 2021&ndash;2022 it inherited Momentum's weakness (Sharpe 0.16, total return 9.5%).",
@@ -574,7 +574,8 @@ function buildChart() {
       labels: LABELS,
       datasets: [
         { label: "2021-2022", data: m.p1, backgroundColor: "#1baf7a", borderRadius: 4, maxBarThickness: 34 },
-        { label: "2023-2024", data: m.p2, backgroundColor: "#eb6834", borderRadius: 4, maxBarThickness: 34 }
+        { label: "2023-2024", data: m.p2, backgroundColor: "#eb6834", borderRadius: 4, maxBarThickness: 34 },
+        { label: "2025-2026 (out of sample)", data: m.p3, backgroundColor: "#e8c547", borderRadius: 4, maxBarThickness: 34 }
       ]
     },
     options: {
@@ -584,8 +585,8 @@ function buildChart() {
         if (!elements.length) return;
         const el = elements[0];
         const strategyKey = ["momentum", "value", "combined", "benchmark"][el.index];
-        const period = el.datasetIndex === 0 ? "2021-2022" : "2023-2024";
-        const val = el.datasetIndex === 0 ? m.p1[el.index] : m.p2[el.index];
+        const period = ["2021-2022", "2023-2024", "Jan 2025-Aug 2026 (out of sample)"][el.datasetIndex];
+        const val = [m.p1, m.p2, m.p3][el.datasetIndex][el.index];
         const box = document.getElementById("clickDetail");
         box.style.display = "block";
         box.innerHTML = "<b style='color:var(--text-primary)'>" + DATA[strategyKey].title + " &middot; " + period +
@@ -620,8 +621,13 @@ function updateChartHighlight(key) {
     const k = ["momentum", "value", "combined", "benchmark"][i];
     return key === "all" || key === k ? "#eb6834" : "#eb683433";
   });
+  const bg3 = LABELS.map((l, i) => {
+    const k = ["momentum", "value", "combined", "benchmark"][i];
+    return key === "all" || key === k ? "#e8c547" : "#e8c54733";
+  });
   chart.data.datasets[0].backgroundColor = bg1;
   chart.data.datasets[1].backgroundColor = bg2;
+  chart.data.datasets[2].backgroundColor = bg3;
   chart.update();
 }
 
