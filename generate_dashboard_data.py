@@ -311,6 +311,66 @@ def update_robustness_data(path: str, significance_rows: list, cost_rows: list):
     print(f"Updated {path}: SIGNIFICANCE_DATA ({len(significance_rows)} rows), COST_DATA ({len(cost_rows)} rows)")
 
 
+def signed_pct(x: float, decimals: int = 1) -> str:
+    """0.081 -> '+8.1%', -0.007 -> '-0.7%', values that round to zero -> '0.0%'"""
+    v = round_half_up(x * 100, decimals) + 0.0
+    return f"{v:+.{decimals}f}%" if v != 0 else f"{0:.{decimals}f}%"
+
+
+def build_oos_rows(path: str = "results/oos_summary.csv") -> list:
+    """
+    Read the out-of-sample summary into display-ready rows for the
+    Out of Sample tab. Rounding happens here, once, from full precision.
+    """
+    df = pd.read_csv(path, index_col="label")
+    rows = []
+    for label in ORDER:
+        r = df.loc[label]
+        is_bench = label == "Benchmark"
+        rows.append({
+            "label": label,
+            "total": pct(r["total_return"]),
+            "ann": pct(r["annualized_return"]),
+            "vol": pct(r["annualized_volatility"]),
+            "sharpe": num(r["sharpe_ratio"]),
+            "sortino": num(r["sortino_ratio"]),
+            "dd": pct(r["max_drawdown"]),
+            "beta_alpha": f"{num(r['beta'])} / {signed_pct(r['alpha'])}",
+            "tstat": "" if is_bench else num(r["alpha_tstat"]),
+            "sharpe_diff": "" if is_bench else (
+                f"{round_half_up(r['sharpe_diff_vs_benchmark'], 2):+.2f} "
+                f"[{round_half_up(r['sharpe_diff_ci_lower'], 2):+.2f}, {round_half_up(r['sharpe_diff_ci_upper'], 2):+.2f}]"),
+            "net_sharpe": "" if is_bench else num(r["net_sharpe_ratio"]),
+        })
+    return rows
+
+
+def build_oos_growth(path: str = "results/oos_monthly_returns.csv") -> dict:
+    """Growth of $1 from the end of December 2024, one point per month-end."""
+    df = pd.read_csv(path, index_col="date", parse_dates=True)
+    growth = (1 + df).cumprod()
+    dates = ["Dec 2024"] + [d.strftime("%b %Y") for d in growth.index]
+    series = {name: [1.0] + [round_half_up(v, 4) for v in growth[name]] for name in ORDER}
+    return {"dates": dates, "series": series}
+
+
+def update_oos_data(path: str, oos_rows: list, oos_growth: dict):
+    """Inject the out-of-sample results into strategies.html (OOS_DATA and OOS_GROWTH)."""
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+    data_pattern = re.compile(r"const OOS_DATA = \[.*?\];", re.DOTALL)
+    growth_pattern = re.compile(r"const OOS_GROWTH = \{.*?\};", re.DOTALL)
+    if not data_pattern.search(html) or not growth_pattern.search(html):
+        raise ValueError(f"Could not find the OOS_DATA / OOS_GROWTH placeholders in {path}.")
+    data_line = f"const OOS_DATA = {json.dumps(oos_rows, separators=(',', ':'))};"
+    growth_line = f"const OOS_GROWTH = {json.dumps(oos_growth, separators=(',', ':'))};"
+    html = data_pattern.sub(lambda m: data_line, html, count=1)
+    html = growth_pattern.sub(lambda m: growth_line, html, count=1)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"Updated {path}: OOS_DATA ({len(oos_rows)} rows), OOS_GROWTH ({len(oos_growth['dates'])} points)")
+
+
 if __name__ == "__main__":
     full = load_period("results/strategy_comparison_full_period.csv")
     p1 = load_period("results/strategy_comparison_2021_2022.csv")
@@ -321,6 +381,8 @@ if __name__ == "__main__":
     significance_rows = build_significance_rows()
     cost_rows = build_cost_rows()
     update_robustness_data("strategies.html", significance_rows, cost_rows)
+
+    update_oos_data("strategies.html", build_oos_rows(), build_oos_growth())
 
     with open("results/backtest_metadata.json") as f:
         metadata = json.load(f)
