@@ -184,7 +184,7 @@ def update_portfolio_html(path: str, timeline: dict):
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)
 
-    print(f"Updated {path}: HOLDINGS, CONTRIBUTIONS, METRICS_DATA all regenerated from results/portfolio_timeline.json")
+    print(f"Updated {path}: HOLDINGS, CONTRIBUTIONS, METRICS_DATA regenerated from results/portfolio_timeline.json and portfolio_timeline_oos.json")
 
 
 def update_stocks_html(path: str, computed: dict):
@@ -390,6 +390,15 @@ if __name__ == "__main__":
 
     with open("results/portfolio_timeline.json") as f:
         timeline = json.load(f)
+    # The Portfolio Timeline page also shows the out-of-sample months,
+    # labelled as such on the page. They are merged only for display; the
+    # in-sample file (also used for the Stock Analysis selection counts)
+    # is left unchanged.
+    with open("results/portfolio_timeline_oos.json") as f:
+        timeline_oos = json.load(f)
+    for section in ("holdings", "contributions", "metrics"):
+        for strategy, months in timeline_oos[section].items():
+            timeline[section][strategy].update(months)
     update_portfolio_html("portfolio.html", timeline)
 
     with open("results/stocks_data.json") as f:
