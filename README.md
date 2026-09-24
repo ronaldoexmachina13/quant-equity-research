@@ -124,6 +124,43 @@ With Value built, there are three different approaches to compare, all against t
 
 The benchmark is the same for all three: all 17 stocks in equal weight, every month.
 
+### Formulas
+
+Notation: $P_{i,t}$ is stock $i$'s adjusted closing price at the end of month $t$; $B_{i,t}$ is its book value per share as last filed with the SEC on or before that date (carried forward for at most 6 months); $r_{i,t} = P_{i,t} / P_{i,t-1} - 1$ is its return during month $t$. The code for each formula is named alongside it.
+
+**Momentum (12-1)**, `calculate_momentum()`: the return from 12 months ago to 1 month ago, skipping the latest month.
+
+$$\text{MOM}_{i,t} = \frac{P_{i,t-1}}{P_{i,t-12}} - 1$$
+
+**Value**, `calculate_value_score()`: minus the Price-to-Book ratio, so the cheapest stock has the highest score. It uses the price and book value known at the end of the previous month, because the portfolio chosen for month $t$ is traded before month $t$'s return occurs.
+
+$$\text{VAL}_{i,t} = -\frac{P_{i,t-1}}{B_{i,t-1}}$$
+
+**Combined**, `calculate_combined_score()`: each factor is standardized across the stocks on that date (a cross-sectional z-score), then the two are averaged with equal weight. A stock missing either factor has no combined score.
+
+$$z^{\text{MOM}}_{i,t} = \frac{\text{MOM}_{i,t} - \overline{\text{MOM}}_t}{\sigma^{\text{MOM}}_t}, \qquad z^{\text{VAL}}_{i,t} = \frac{\text{VAL}_{i,t} - \overline{\text{VAL}}_t}{\sigma^{\text{VAL}}_t}, \qquad \text{COMB}_{i,t} = \tfrac{1}{2}\left(z^{\text{MOM}}_{i,t} + z^{\text{VAL}}_{i,t}\right)$$
+
+where $\overline{X}_t$ and $\sigma^X_t$ are the mean and standard deviation of factor $X$ across all stocks with a valid value in month $t$.
+
+**Portfolio and benchmark**, `build_portfolio()`, `run_backtest()`, `calculate_benchmark_returns()`: each month the 5 highest-scoring stocks get weight $1/5$ and all others 0. The benchmark holds all $N = 17$ stocks equally.
+
+$$w_{i,t} = \begin{cases} 1/5 & \text{if stock } i \text{ is in the top 5 by score in month } t \\ 0 & \text{otherwise} \end{cases} \qquad R^{\text{strategy}}_t = \sum_i w_{i,t}\, r_{i,t}, \qquad R^{\text{bench}}_t = \frac{1}{N}\sum_i r_{i,t}$$
+
+**Transaction costs**, `calculate_turnover()`, `apply_transaction_costs()`: turnover is half the total change in weights, and 10 bps is charged on each side of every trade.
+
+$$\text{TO}_t = \tfrac{1}{2}\sum_i \lvert w_{i,t} - w_{i,t-1} \rvert, \qquad R^{\text{net}}_t = R_t - 2 \times 0.0010 \times \text{TO}_t$$
+
+**Risk and performance measures**, `src/risk.py`, with $r_f = 2\%$ a year and 12 months a year:
+
+$$\text{Sharpe} = \frac{R_{\text{ann}} - r_f}{\sigma_{\text{ann}}}, \qquad R_{\text{ann}} = \Big(\prod_t (1 + R_t)\Big)^{12/T} - 1, \qquad \sigma_{\text{ann}} = \sigma(R_t)\sqrt{12}$$
+
+$$\text{Sortino} = \frac{R_{\text{ann}} - r_f}{\text{DD}_{\text{ann}}}, \qquad \text{DD}_{\text{ann}} = \sqrt{12}\,\sqrt{\frac{1}{T}\sum_t \min\!\left(R_t - r_f^{m},\,0\right)^2}$$
+
+$$R_t - r_f^{m} = \alpha^{m} + \beta\left(R^{\text{bench}}_t - r_f^{m}\right) + \varepsilon_t, \qquad \alpha_{\text{ann}} = 12\,\alpha^{m}$$
+
+where $T$ is the number of months and $r_f^{m} = (1.02)^{1/12} - 1$ is the monthly risk-free rate. Beta and alpha come from this regression of the strategy's monthly excess return on the benchmark's (OLS in `alpha_regression()`, which also gives the t-statistic).
+
+
 ### Results
 
 | Metric | Momentum | Value | Combined | Equal-Weight Benchmark |
