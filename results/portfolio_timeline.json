@@ -348,7 +348,7 @@
       ],
       "2021-02": [
         "JPM",
-        "LIN",
+        "NEE",
         "RTX",
         "WMT",
         "XOM"
@@ -403,8 +403,8 @@
         "XOM"
       ],
       "2021-10": [
-        "DIS",
         "JPM",
+        "LIN",
         "RTX",
         "WMT",
         "XOM"
@@ -566,16 +566,16 @@
       "2023-09": [
         "DIS",
         "JPM",
-        "NEE",
         "RTX",
-        "WMT"
+        "WMT",
+        "XOM"
       ],
       "2023-10": [
         "DIS",
         "JPM",
+        "NEE",
         "RTX",
-        "WMT",
-        "XOM"
+        "WMT"
       ],
       "2023-11": [
         "DIS",
@@ -608,8 +608,8 @@
       "2024-03": [
         "DIS",
         "JPM",
-        "NEE",
         "RTX",
+        "WMT",
         "XOM"
       ],
       "2024-04": [
@@ -699,11 +699,11 @@
         "XOM"
       ],
       "2021-04": [
-        "AAPL",
         "CAT",
         "DIS",
         "JPM",
-        "LIN"
+        "LIN",
+        "NEE"
       ],
       "2021-05": [
         "AAPL",
@@ -790,10 +790,10 @@
         "XOM"
       ],
       "2022-05": [
+        "AAPL",
+        "KO",
         "PG",
-        "RTX",
         "UNH",
-        "WMT",
         "XOM"
       ],
       "2022-06": [
@@ -804,15 +804,15 @@
         "XOM"
       ],
       "2022-07": [
-        "LMT",
+        "JNJ",
         "NEE",
         "RTX",
         "UNH",
         "XOM"
       ],
       "2022-08": [
-        "KO",
         "LMT",
+        "NEE",
         "RTX",
         "UNH",
         "XOM"
@@ -874,7 +874,7 @@
         "XOM"
       ],
       "2023-05": [
-        "AAPL",
+        "JPM",
         "LIN",
         "MSFT",
         "WMT",
@@ -2359,14 +2359,14 @@
           "contribution": 1.71
         },
         {
-          "ticker": "LIN",
-          "return": -0.46,
-          "contribution": -0.09
-        },
-        {
           "ticker": "WMT",
           "return": -7.52,
           "contribution": -1.5
+        },
+        {
+          "ticker": "NEE",
+          "return": -8.66,
+          "contribution": -1.73
         }
       ],
       "2021-03": [
@@ -2565,6 +2565,11 @@
           "contribution": 1.92
         },
         {
+          "ticker": "LIN",
+          "return": 8.8,
+          "contribution": 1.76
+        },
+        {
           "ticker": "WMT",
           "return": 7.2,
           "contribution": 1.44
@@ -2578,11 +2583,6 @@
           "ticker": "RTX",
           "return": 3.37,
           "contribution": 0.67
-        },
-        {
-          "ticker": "DIS",
-          "return": -0.06,
-          "contribution": -0.01
         }
       ],
       "2021-11": [
@@ -3181,6 +3181,11 @@
       ],
       "2023-09": [
         {
+          "ticker": "XOM",
+          "return": 5.75,
+          "contribution": 1.15
+        },
+        {
           "ticker": "JPM",
           "return": -0.9,
           "contribution": -0.18
@@ -3194,11 +3199,6 @@
           "ticker": "DIS",
           "return": -3.14,
           "contribution": -0.63
-        },
-        {
-          "ticker": "NEE",
-          "return": -14.24,
-          "contribution": -2.85
         },
         {
           "ticker": "RTX",
@@ -3218,6 +3218,11 @@
           "contribution": 0.44
         },
         {
+          "ticker": "NEE",
+          "return": 1.76,
+          "contribution": 0.35
+        },
+        {
           "ticker": "DIS",
           "return": 0.67,
           "contribution": 0.13
@@ -3226,11 +3231,6 @@
           "ticker": "JPM",
           "return": -3.4,
           "contribution": -0.68
-        },
-        {
-          "ticker": "XOM",
-          "return": -9.98,
-          "contribution": -2.0
         }
       ],
       "2023-11": [
@@ -3343,11 +3343,6 @@
       ],
       "2024-03": [
         {
-          "ticker": "NEE",
-          "return": 15.8,
-          "contribution": 3.16
-        },
-        {
           "ticker": "XOM",
           "return": 11.21,
           "contribution": 2.24
@@ -3366,6 +3361,11 @@
           "ticker": "JPM",
           "return": 7.65,
           "contribution": 1.53
+        },
+        {
+          "ticker": "WMT",
+          "return": 3.01,
+          "contribution": 0.6
         }
       ],
       "2024-04": [
@@ -3696,9 +3696,9 @@
       ],
       "2021-04": [
         {
-          "ticker": "AAPL",
-          "return": 7.62,
-          "contribution": 1.52
+          "ticker": "NEE",
+          "return": 2.51,
+          "contribution": 0.5
         },
         {
           "ticker": "LIN",
@@ -4052,9 +4052,9 @@
           "contribution": 2.75
         },
         {
-          "ticker": "RTX",
-          "return": 0.82,
-          "contribution": 0.16
+          "ticker": "KO",
+          "return": -1.9,
+          "contribution": -0.38
         },
         {
           "ticker": "UNH",
@@ -4062,14 +4062,14 @@
           "contribution": -0.46
         },
         {
+          "ticker": "AAPL",
+          "return": -5.45,
+          "contribution": -1.09
+        },
+        {
           "ticker": "PG",
           "return": -7.89,
           "contribution": -1.58
-        },
-        {
-          "ticker": "WMT",
-          "return": -15.62,
-          "contribution": -3.12
         }
       ],
       "2022-06": [
@@ -4116,14 +4116,14 @@
           "contribution": 1.12
         },
         {
+          "ticker": "JNJ",
+          "return": -1.68,
+          "contribution": -0.34
+        },
+        {
           "ticker": "RTX",
           "return": -3.02,
           "contribution": -0.6
-        },
-        {
-          "ticker": "LMT",
-          "return": -3.76,
-          "contribution": -0.75
         }
       ],
       "2022-08": [
@@ -4131,6 +4131,11 @@
           "ticker": "LMT",
           "return": 2.2,
           "contribution": 0.44
+        },
+        {
+          "ticker": "NEE",
+          "return": 1.16,
+          "contribution": 0.23
         },
         {
           "ticker": "XOM",
@@ -4141,11 +4146,6 @@
           "ticker": "RTX",
           "return": -3.15,
           "contribution": -0.63
-        },
-        {
-          "ticker": "KO",
-          "return": -3.83,
-          "contribution": -0.77
         },
         {
           "ticker": "UNH",
@@ -4376,9 +4376,9 @@
           "contribution": 1.42
         },
         {
-          "ticker": "AAPL",
-          "return": 4.61,
-          "contribution": 0.92
+          "ticker": "JPM",
+          "return": -1.83,
+          "contribution": -0.37
         },
         {
           "ticker": "WMT",
@@ -5210,286 +5210,286 @@
         "volatility": null
       },
       "2021-02": {
-        "return": 7.65,
-        "cumulative": 9.02,
+        "return": 6.01,
+        "cumulative": 7.36,
         "sharpe": null,
         "volatility": null
       },
       "2021-03": {
         "return": 6.72,
-        "cumulative": 16.35,
+        "cumulative": 14.58,
         "sharpe": null,
         "volatility": null
       },
       "2021-04": {
         "return": 3.38,
-        "cumulative": 20.29,
+        "cumulative": 18.46,
         "sharpe": null,
         "volatility": null
       },
       "2021-05": {
         "return": 4.91,
-        "cumulative": 26.19,
+        "cumulative": 24.27,
         "sharpe": null,
         "volatility": null
       },
       "2021-06": {
         "return": -1.05,
-        "cumulative": 24.87,
+        "cumulative": 22.96,
         "sharpe": null,
         "volatility": null
       },
       "2021-07": {
         "return": -0.25,
-        "cumulative": 24.55,
+        "cumulative": 22.65,
         "sharpe": null,
         "volatility": null
       },
       "2021-08": {
         "return": 1.24,
-        "cumulative": 26.1,
+        "cumulative": 24.18,
         "sharpe": null,
         "volatility": null
       },
       "2021-09": {
         "return": -0.13,
-        "cumulative": 25.93,
+        "cumulative": 24.01,
         "sharpe": null,
         "volatility": null
       },
       "2021-10": {
-        "return": 4.91,
-        "cumulative": 32.11,
+        "return": 6.68,
+        "cumulative": 32.29,
         "sharpe": null,
         "volatility": null
       },
       "2021-11": {
         "return": -8.2,
-        "cumulative": 21.27,
+        "cumulative": 21.44,
         "sharpe": null,
         "volatility": null
       },
       "2021-12": {
         "return": 3.7,
-        "cumulative": 25.75,
-        "sharpe": 1.61,
-        "volatility": 14.78
+        "cumulative": 25.93,
+        "sharpe": 1.63,
+        "volatility": 14.69
       },
       "2022-01": {
         "return": 2.45,
-        "cumulative": 28.84,
-        "sharpe": 1.71,
-        "volatility": 14.76
+        "cumulative": 29.02,
+        "sharpe": 1.73,
+        "volatility": 14.67
       },
       "2022-02": {
         "return": 2.96,
-        "cumulative": 32.66,
-        "sharpe": 1.45,
-        "volatility": 13.53
+        "cumulative": 32.85,
+        "sharpe": 1.54,
+        "volatility": 14.09
       },
       "2022-03": {
         "return": 0.18,
-        "cumulative": 32.9,
-        "sharpe": 0.98,
-        "volatility": 12.43
+        "cumulative": 33.09,
+        "sharpe": 1.08,
+        "volatility": 13.12
       },
       "2022-04": {
         "return": -5.73,
-        "cumulative": 25.29,
-        "sharpe": 0.15,
-        "volatility": 13.92
+        "cumulative": 25.46,
+        "sharpe": 0.27,
+        "volatility": 14.63
       },
       "2022-05": {
         "return": 1.74,
-        "cumulative": 27.46,
-        "sharpe": -0.08,
-        "volatility": 13.14
+        "cumulative": 27.64,
+        "sharpe": 0.05,
+        "volatility": 13.93
       },
       "2022-06": {
         "return": -8.92,
-        "cumulative": 16.1,
-        "sharpe": -0.56,
-        "volatility": 15.97
+        "cumulative": 16.26,
+        "sharpe": -0.45,
+        "volatility": 16.71
       },
       "2022-07": {
         "return": 6.9,
-        "cumulative": 24.11,
-        "sharpe": -0.13,
-        "volatility": 17.62
+        "cumulative": 24.28,
+        "sharpe": -0.04,
+        "volatility": 18.22
       },
       "2022-08": {
         "return": 0.29,
-        "cumulative": 24.47,
-        "sharpe": -0.19,
-        "volatility": 17.57
+        "cumulative": 24.65,
+        "sharpe": -0.09,
+        "volatility": 18.19
       },
       "2022-09": {
         "return": -8.71,
-        "cumulative": 13.63,
-        "sharpe": -0.6,
-        "volatility": 19.63
+        "cumulative": 13.79,
+        "sharpe": -0.51,
+        "volatility": 20.25
       },
       "2022-10": {
         "return": 17.39,
-        "cumulative": 33.4,
+        "cumulative": 33.58,
         "sharpe": -0.04,
         "volatility": 26.34
       },
       "2022-11": {
         "return": 2.95,
-        "cumulative": 37.33,
+        "cumulative": 37.52,
         "sharpe": 0.46,
         "volatility": 24.71
       },
       "2022-12": {
         "return": -3.9,
-        "cumulative": 31.97,
+        "cumulative": 32.15,
         "sharpe": 0.12,
         "volatility": 25.06
       },
       "2023-01": {
         "return": 7.12,
-        "cumulative": 41.36,
+        "cumulative": 41.56,
         "sharpe": 0.3,
         "volatility": 25.85
       },
       "2023-02": {
         "return": -2.54,
-        "cumulative": 37.77,
+        "cumulative": 37.96,
         "sharpe": 0.07,
         "volatility": 25.98
       },
       "2023-03": {
         "return": -0.96,
-        "cumulative": 36.44,
+        "cumulative": 36.63,
         "sharpe": 0.03,
         "volatility": 26.03
       },
       "2023-04": {
         "return": 4.32,
-        "cumulative": 42.34,
+        "cumulative": 42.54,
         "sharpe": 0.46,
         "volatility": 25.35
       },
       "2023-05": {
         "return": -7.69,
-        "cumulative": 31.39,
+        "cumulative": 31.57,
         "sharpe": 0.04,
         "volatility": 26.88
       },
       "2023-06": {
         "return": 5.39,
-        "cumulative": 38.47,
+        "cumulative": 38.67,
         "sharpe": 0.69,
         "volatility": 25.15
       },
       "2023-07": {
         "return": 0.07,
-        "cumulative": 38.58,
+        "cumulative": 38.77,
         "sharpe": 0.39,
         "volatility": 24.53
       },
       "2023-08": {
         "return": -1.62,
-        "cumulative": 36.34,
+        "cumulative": 36.53,
         "sharpe": 0.31,
         "volatility": 24.68
       },
       "2023-09": {
-        "return": -7.26,
-        "cumulative": 26.45,
-        "sharpe": 0.39,
-        "volatility": 24.09
+        "return": -3.26,
+        "cumulative": 32.08,
+        "sharpe": 0.62,
+        "volatility": 22.88
       },
       "2023-10": {
-        "return": 0.51,
-        "cumulative": 27.09,
-        "sharpe": -0.41,
-        "volatility": 16.29
+        "return": 2.86,
+        "cumulative": 35.86,
+        "sharpe": -0.02,
+        "volatility": 15.13
       },
       "2023-11": {
         "return": 3.98,
-        "cumulative": 32.16,
-        "sharpe": -0.35,
-        "volatility": 16.55
+        "cumulative": 41.27,
+        "sharpe": 0.05,
+        "volatility": 15.36
       },
       "2023-12": {
         "return": 1.78,
-        "cumulative": 34.51,
-        "sharpe": -0.0,
-        "volatility": 16.14
+        "cumulative": 43.79,
+        "sharpe": 0.46,
+        "volatility": 14.7
       },
       "2024-01": {
         "return": 5.09,
-        "cumulative": 41.36,
-        "sharpe": -0.13,
-        "volatility": 15.31
+        "cumulative": 51.11,
+        "sharpe": 0.34,
+        "volatility": 13.86
       },
       "2024-02": {
         "return": 6.19,
-        "cumulative": 50.11,
-        "sharpe": 0.43,
-        "volatility": 16.13
+        "cumulative": 60.46,
+        "sharpe": 0.99,
+        "volatility": 14.43
       },
       "2024-03": {
-        "return": 10.62,
-        "cumulative": 66.05,
-        "sharpe": 1.05,
-        "volatility": 18.69
+        "return": 8.06,
+        "cumulative": 73.4,
+        "sharpe": 1.59,
+        "volatility": 15.62
       },
       "2024-04": {
         "return": -0.46,
-        "cumulative": 65.29,
-        "sharpe": 0.76,
-        "volatility": 18.6
+        "cumulative": 72.6,
+        "sharpe": 1.22,
+        "volatility": 15.61
       },
       "2024-05": {
         "return": 5.1,
-        "cumulative": 73.72,
-        "sharpe": 1.89,
-        "volatility": 16.0
+        "cumulative": 81.4,
+        "sharpe": 2.98,
+        "volatility": 12.05
       },
       "2024-06": {
         "return": -4.85,
-        "cumulative": 65.28,
-        "sharpe": 1.01,
-        "volatility": 17.18
+        "cumulative": 72.59,
+        "sharpe": 1.62,
+        "volatility": 13.84
       },
       "2024-07": {
         "return": 5.7,
-        "cumulative": 74.71,
-        "sharpe": 1.37,
-        "volatility": 17.56
+        "cumulative": 82.44,
+        "sharpe": 2.08,
+        "volatility": 14.16
       },
       "2024-08": {
         "return": 2.8,
-        "cumulative": 79.59,
-        "sharpe": 1.74,
-        "volatility": 17.1
+        "cumulative": 87.54,
+        "sharpe": 2.62,
+        "volatility": 13.47
       },
       "2024-09": {
         "return": 0.57,
-        "cumulative": 80.61,
-        "sharpe": 2.98,
-        "volatility": 13.72
+        "cumulative": 88.6,
+        "sharpe": 3.38,
+        "volatility": 12.09
       },
       "2024-10": {
         "return": -0.17,
-        "cumulative": 80.3,
-        "sharpe": 2.87,
-        "volatility": 13.87
+        "cumulative": 88.28,
+        "sharpe": 2.92,
+        "volatility": 12.52
       },
       "2024-11": {
         "return": 7.53,
-        "cumulative": 93.88,
-        "sharpe": 3.07,
-        "volatility": 14.57
+        "cumulative": 102.45,
+        "sharpe": 3.09,
+        "volatility": 13.35
       },
       "2024-12": {
         "return": -6.8,
-        "cumulative": 80.7,
-        "sharpe": 1.82,
-        "volatility": 17.74
+        "cumulative": 88.7,
+        "sharpe": 1.76,
+        "volatility": 16.63
       }
     },
     "combined": {
@@ -5512,272 +5512,272 @@
         "volatility": null
       },
       "2021-04": {
-        "return": 2.19,
-        "cumulative": 3.84,
+        "return": 1.16,
+        "cumulative": 2.81,
         "sharpe": null,
         "volatility": null
       },
       "2021-05": {
         "return": 1.72,
-        "cumulative": 5.63,
+        "cumulative": 4.58,
         "sharpe": null,
         "volatility": null
       },
       "2021-06": {
         "return": -4.79,
-        "cumulative": 0.57,
+        "cumulative": -0.43,
         "sharpe": null,
         "volatility": null
       },
       "2021-07": {
         "return": -2.6,
-        "cumulative": -2.04,
+        "cumulative": -3.02,
         "sharpe": null,
         "volatility": null
       },
       "2021-08": {
         "return": 0.92,
-        "cumulative": -1.15,
+        "cumulative": -2.14,
         "sharpe": null,
         "volatility": null
       },
       "2021-09": {
         "return": -0.8,
-        "cumulative": -1.94,
+        "cumulative": -2.92,
         "sharpe": null,
         "volatility": null
       },
       "2021-10": {
         "return": 5.23,
-        "cumulative": 3.18,
+        "cumulative": 2.15,
         "sharpe": null,
         "volatility": null
       },
       "2021-11": {
         "return": -4.9,
-        "cumulative": -1.87,
+        "cumulative": -2.85,
         "sharpe": null,
         "volatility": null
       },
       "2021-12": {
         "return": 5.27,
-        "cumulative": 3.3,
-        "sharpe": 0.1,
-        "volatility": 12.6
+        "cumulative": 2.27,
+        "sharpe": 0.02,
+        "volatility": 12.48
       },
       "2022-01": {
         "return": 1.5,
-        "cumulative": 4.85,
-        "sharpe": 0.58,
-        "volatility": 11.84
+        "cumulative": 3.8,
+        "sharpe": 0.49,
+        "volatility": 11.75
       },
       "2022-02": {
         "return": -2.23,
-        "cumulative": 2.51,
-        "sharpe": 0.11,
-        "volatility": 11.89
+        "cumulative": 1.49,
+        "sharpe": 0.02,
+        "volatility": 11.76
       },
       "2022-03": {
         "return": 3.64,
-        "cumulative": 6.24,
-        "sharpe": 0.21,
-        "volatility": 12.2
+        "cumulative": 5.18,
+        "sharpe": 0.12,
+        "volatility": 12.08
       },
       "2022-04": {
         "return": -4.19,
-        "cumulative": 1.79,
+        "cumulative": 0.77,
         "sharpe": -0.31,
         "volatility": 12.84
       },
       "2022-05": {
-        "return": -2.25,
-        "cumulative": -0.5,
-        "sharpe": -0.61,
-        "volatility": 12.84
+        "return": -0.76,
+        "cumulative": 0.01,
+        "sharpe": -0.5,
+        "volatility": 12.7
       },
       "2022-06": {
         "return": -3.65,
-        "cumulative": -4.13,
-        "sharpe": -0.54,
-        "volatility": 12.46
+        "cumulative": -3.64,
+        "sharpe": -0.42,
+        "volatility": 12.3
       },
       "2022-07": {
-        "return": 4.21,
-        "cumulative": -0.09,
-        "sharpe": -0.0,
-        "volatility": 12.97
+        "return": 4.63,
+        "cumulative": 0.82,
+        "sharpe": 0.15,
+        "volatility": 12.88
       },
       "2022-08": {
-        "return": -1.89,
-        "cumulative": -1.98,
-        "sharpe": -0.22,
-        "volatility": 13.11
+        "return": -0.89,
+        "cumulative": -0.08,
+        "sharpe": 0.01,
+        "volatility": 12.93
       },
       "2022-09": {
         "return": -7.11,
-        "cumulative": -8.94,
-        "sharpe": -0.61,
-        "volatility": 14.92
+        "cumulative": -7.18,
+        "sharpe": -0.43,
+        "volatility": 14.87
       },
       "2022-10": {
         "return": 15.23,
-        "cumulative": 4.93,
-        "sharpe": -0.01,
-        "volatility": 21.17
+        "cumulative": 6.96,
+        "sharpe": 0.13,
+        "volatility": 21.02
       },
       "2022-11": {
         "return": 2.41,
-        "cumulative": 7.45,
-        "sharpe": 0.37,
-        "volatility": 20.46
+        "cumulative": 9.53,
+        "sharpe": 0.53,
+        "volatility": 20.21
       },
       "2022-12": {
         "return": -0.0,
-        "cumulative": 7.45,
-        "sharpe": 0.1,
-        "volatility": 19.91
+        "cumulative": 9.53,
+        "sharpe": 0.26,
+        "volatility": 19.72
       },
       "2023-01": {
         "return": -0.14,
-        "cumulative": 7.3,
-        "sharpe": 0.02,
-        "volatility": 19.88
+        "cumulative": 9.38,
+        "sharpe": 0.17,
+        "volatility": 19.71
       },
       "2023-02": {
         "return": -0.5,
-        "cumulative": 6.76,
-        "sharpe": 0.11,
-        "volatility": 19.72
+        "cumulative": 8.83,
+        "sharpe": 0.27,
+        "volatility": 19.52
       },
       "2023-03": {
         "return": -2.34,
-        "cumulative": 4.26,
-        "sharpe": -0.2,
-        "volatility": 19.58
+        "cumulative": 6.28,
+        "sharpe": -0.05,
+        "volatility": 19.46
       },
       "2023-04": {
         "return": 3.29,
-        "cumulative": 7.69,
-        "sharpe": 0.2,
-        "volatility": 19.26
+        "cumulative": 9.78,
+        "sharpe": 0.36,
+        "volatility": 19.04
       },
       "2023-05": {
-        "return": -1.56,
-        "cumulative": 6.01,
+        "return": -2.85,
+        "cumulative": 6.65,
         "sharpe": 0.24,
-        "volatility": 19.16
+        "volatility": 19.35
       },
       "2023-06": {
         "return": 6.68,
-        "cumulative": 13.09,
+        "cumulative": 13.77,
         "sharpe": 0.82,
-        "volatility": 19.41
+        "volatility": 19.59
       },
       "2023-07": {
         "return": 4.1,
-        "cumulative": 17.74,
-        "sharpe": 0.82,
-        "volatility": 19.4
+        "cumulative": 18.44,
+        "sharpe": 0.79,
+        "volatility": 19.5
       },
       "2023-08": {
         "return": -0.48,
-        "cumulative": 17.17,
-        "sharpe": 0.91,
-        "volatility": 19.18
+        "cumulative": 17.87,
+        "sharpe": 0.82,
+        "volatility": 19.45
       },
       "2023-09": {
         "return": -1.04,
-        "cumulative": 15.95,
-        "sharpe": 1.49,
-        "volatility": 17.0
+        "cumulative": 16.65,
+        "sharpe": 1.36,
+        "volatility": 17.35
       },
       "2023-10": {
         "return": -1.66,
-        "cumulative": 14.03,
-        "sharpe": 0.7,
-        "volatility": 9.57
+        "cumulative": 14.72,
+        "sharpe": 0.53,
+        "volatility": 9.98
       },
       "2023-11": {
         "return": 7.89,
-        "cumulative": 23.03,
-        "sharpe": 1.05,
-        "volatility": 11.9
+        "cumulative": 23.77,
+        "sharpe": 0.9,
+        "volatility": 12.29
       },
       "2023-12": {
         "return": 2.16,
-        "cumulative": 25.69,
-        "sharpe": 1.26,
-        "volatility": 11.86
+        "cumulative": 26.44,
+        "sharpe": 1.1,
+        "volatility": 12.27
       },
       "2024-01": {
         "return": 1.05,
-        "cumulative": 27.01,
-        "sharpe": 1.39,
-        "volatility": 11.76
+        "cumulative": 27.77,
+        "sharpe": 1.22,
+        "volatility": 12.18
       },
       "2024-02": {
         "return": 7.88,
-        "cumulative": 37.02,
-        "sharpe": 2.0,
-        "volatility": 13.14
+        "cumulative": 37.84,
+        "sharpe": 1.81,
+        "volatility": 13.59
       },
       "2024-03": {
         "return": 5.17,
-        "cumulative": 44.1,
-        "sharpe": 2.91,
-        "volatility": 12.46
+        "cumulative": 44.97,
+        "sharpe": 2.65,
+        "volatility": 13.0
       },
       "2024-04": {
         "return": -5.19,
-        "cumulative": 36.63,
-        "sharpe": 1.69,
-        "volatility": 14.76
+        "cumulative": 37.45,
+        "sharpe": 1.53,
+        "volatility": 15.16
       },
       "2024-05": {
         "return": 2.07,
-        "cumulative": 39.46,
+        "cumulative": 40.29,
         "sharpe": 2.08,
         "volatility": 14.22
       },
       "2024-06": {
         "return": 0.88,
-        "cumulative": 40.68,
+        "cumulative": 41.53,
         "sharpe": 1.66,
         "volatility": 13.47
       },
       "2024-07": {
         "return": 4.43,
-        "cumulative": 46.92,
+        "cumulative": 47.8,
         "sharpe": 1.68,
         "volatility": 13.53
       },
       "2024-08": {
         "return": 5.35,
-        "cumulative": 54.78,
+        "cumulative": 55.71,
         "sharpe": 2.2,
         "volatility": 13.65
       },
       "2024-09": {
         "return": 0.32,
-        "cumulative": 55.27,
+        "cumulative": 56.21,
         "sharpe": 2.39,
         "volatility": 13.34
       },
       "2024-10": {
         "return": -0.5,
-        "cumulative": 54.5,
+        "cumulative": 55.43,
         "sharpe": 2.58,
         "volatility": 12.99
       },
       "2024-11": {
         "return": 6.9,
-        "cumulative": 65.17,
+        "cumulative": 66.16,
         "sharpe": 2.56,
         "volatility": 12.59
       },
       "2024-12": {
         "return": -6.17,
-        "cumulative": 54.97,
+        "cumulative": 55.91,
         "sharpe": 1.39,
         "volatility": 15.32
       }

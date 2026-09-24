@@ -12,8 +12,8 @@ strategies = ["Momentum", "Value", "Combined", "Benchmark"]
 periods = ["2021-2022", "2023-2024"]
 sharpe = np.array([
     [0.25, 0.92],   # Momentum
-    [0.64, 0.88],   # Value
-    [0.10, 1.35],   # Combined
+    [0.64, 1.12],   # Value
+    [0.16, 1.27],   # Combined
     [0.59, 1.12],   # Benchmark
 ])
 

@@ -5,7 +5,7 @@
     "latest_pb": 66.46,
     "momentum_months_selected": 17,
     "value_months_selected": 0,
-    "combined_months_selected": 13,
+    "combined_months_selected": 12,
     "total_months_evaluated": 48
   },
   "MSFT": {
@@ -23,7 +23,7 @@
     "latest_pb": 1.88,
     "momentum_months_selected": 30,
     "value_months_selected": 48,
-    "combined_months_selected": 31,
+    "combined_months_selected": 32,
     "total_months_evaluated": 48
   },
   "JNJ": {
@@ -32,7 +32,7 @@
     "latest_pb": 4.7,
     "momentum_months_selected": 1,
     "value_months_selected": 0,
-    "combined_months_selected": 2,
+    "combined_months_selected": 3,
     "total_months_evaluated": 48
   },
   "XOM": {
@@ -67,8 +67,8 @@
     "latest_momentum_12_1": 0.777,
     "latest_pb": 7.6,
     "momentum_months_selected": 13,
-    "value_months_selected": 38,
-    "combined_months_selected": 20,
+    "value_months_selected": 39,
+    "combined_months_selected": 19,
     "total_months_evaluated": 48
   },
   "HD": {
@@ -112,7 +112,7 @@
     "latest_momentum_12_1": 0.307,
     "latest_pb": 1.96,
     "momentum_months_selected": 11,
-    "value_months_selected": 39,
+    "value_months_selected": 38,
     "combined_months_selected": 12,
     "total_months_evaluated": 48
   },
@@ -122,7 +122,7 @@
     "latest_pb": 2.8,
     "momentum_months_selected": 5,
     "value_months_selected": 12,
-    "combined_months_selected": 7,
+    "combined_months_selected": 9,
     "total_months_evaluated": 48
   },
   "LIN": {
@@ -140,7 +140,7 @@
     "latest_pb": 15.18,
     "momentum_months_selected": 12,
     "value_months_selected": 0,
-    "combined_months_selected": 10,
+    "combined_months_selected": 9,
     "total_months_evaluated": 48
   },
   "RTX": {
@@ -149,7 +149,7 @@
     "latest_pb": 2.44,
     "momentum_months_selected": 19,
     "value_months_selected": 48,
-    "combined_months_selected": 22,
+    "combined_months_selected": 21,
     "total_months_evaluated": 48
   }
 }
