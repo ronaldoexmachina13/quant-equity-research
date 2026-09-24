@@ -2,6 +2,8 @@ import json
 
 import pandas as pd
 
+from config import IN_SAMPLE_END
+
 from src.database import load_book_value
 from src.factors import load_prices, calculate_momentum, calculate_value_score, calculate_combined_score
 from src.portfolio import build_portfolio
@@ -83,6 +85,10 @@ if __name__ == "__main__":
     common_dates = None
     for dates in valid_by_strategy.values():
         common_dates = dates if common_dates is None else common_dates.intersection(dates)
+
+    # Keep only in-sample months, so newer data added for the
+    # out-of-sample test cannot change these results.
+    common_dates = common_dates[common_dates <= IN_SAMPLE_END]
 
     print(f"Common dates across all 3 strategies: {len(common_dates)} months "
           f"({common_dates.min().date()} to {common_dates.max().date()})\n")

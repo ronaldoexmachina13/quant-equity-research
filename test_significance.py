@@ -1,5 +1,7 @@
 import pandas as pd
 
+from config import IN_SAMPLE_END
+
 from src.factors import load_prices, calculate_momentum, calculate_value_score, calculate_combined_score
 from src.database import load_book_value
 from src.portfolio import build_portfolio
@@ -35,6 +37,10 @@ if __name__ == "__main__":
     common_dates = strategy_returns["Momentum"].index
     for r in strategy_returns.values():
         common_dates = common_dates.intersection(r.index)
+
+    # Keep only in-sample months, so newer data added for the
+    # out-of-sample test cannot change these results.
+    common_dates = common_dates[common_dates <= IN_SAMPLE_END]
 
     benchmark_returns = calculate_benchmark_returns(monthly_returns).loc[common_dates]
     strategy_returns = {name: r.loc[common_dates] for name, r in strategy_returns.items()}

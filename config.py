@@ -19,3 +19,12 @@ UNIVERSE = [
 # Backtest date range for price history.
 START_DATE = "2020-01-01"
 END_DATE = "2024-12-31"
+
+# Evaluation windows (pre-registered in OUT_OF_SAMPLE_PLAN.md).
+# Every existing results file is computed on the IN-SAMPLE window only,
+# so extending END_DATE to fetch newer data cannot change those results.
+# The out-of-sample window is reported separately, never merged with it.
+IN_SAMPLE_START = "2021-01-01"
+IN_SAMPLE_END = "2024-12-31"
+OUT_OF_SAMPLE_START = "2025-01-01"
+OUT_OF_SAMPLE_END = "2026-08-31"

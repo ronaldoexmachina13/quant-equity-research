@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from config import UNIVERSE
+from config import UNIVERSE, IN_SAMPLE_END
 from src.factors import (
     load_prices,
     calculate_momentum,
@@ -103,7 +103,7 @@ def backtest_all_strategies(scores: dict, monthly_returns: pd.DataFrame, top_n: 
     common = None
     for r in returns.values():
         common = r.index if common is None else common.intersection(r.index)
-    return returns, common
+    return returns, common[common <= IN_SAMPLE_END]
 
 
 def build_weights_long_df(strategy_weights: dict, common_dates: pd.DatetimeIndex) -> pd.DataFrame:
@@ -183,6 +183,10 @@ if __name__ == "__main__":
     common_dates = strategy_returns["Momentum"].index
     for r in strategy_returns.values():
         common_dates = common_dates.intersection(r.index)
+
+    # Keep only in-sample months, so newer data added for the
+    # out-of-sample test cannot change these results.
+    common_dates = common_dates[common_dates <= IN_SAMPLE_END]
 
     benchmark_returns = calculate_benchmark_returns(monthly_returns).loc[common_dates]
 
