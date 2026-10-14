@@ -22,7 +22,7 @@ from src.backtest import (
     apply_transaction_costs,
 )
 from src.risk import summarize_risk, alpha_regression, bootstrap_sharpe_diff, sharpe_ratio
-from run_strategy_comparison import compute_all_scores, backtest_strategy_with_weights
+from run_strategy_comparison import compute_all_scores, backtest_strategy_with_weights, compare_within_period
 
 COST_BPS = 10          # same one-way cost as test_transaction_costs.py
 TOP_N = 5              # frozen portfolio size
@@ -33,6 +33,14 @@ BOOTSTRAP_SEED = 42    # same seed as the in-sample significance test
 FINDINGS_TO_CHECK = {
     "Value": "Full period (2021-2024)",   # Value's full-period alpha
     "Combined": "2023-2024",              # Combined's 2023-2024 regime result
+}
+
+# Calendar-year breakdown of the out-of-sample window. Descriptive only:
+# the pre-registered verdicts are read off the full window above, and a
+# year of monthly returns is far too short to test anything on its own.
+OOS_YEARS = {
+    "2025": ("2025-01-01", "2025-12-31"),
+    "2026 (Jan-Aug)": ("2026-01-01", OUT_OF_SAMPLE_END),
 }
 
 
@@ -121,7 +129,19 @@ def main():
               f"{'SUPPORTED (same sign)' if same_sign else 'NOT SUPPORTED'}")
     print("  With about 20 months, direction is tested, not significance (see plan).")
 
-    print("\nSaved results/oos_summary.csv and results/oos_monthly_returns.csv")
+    # ---- Calendar-year breakdown (descriptive, not a pre-registered test) ----
+    strategy_monthly = {name: monthly[name] for name in ["Momentum", "Value", "Combined"]}
+    by_year = pd.concat(
+        {label: compare_within_period(strategy_monthly, benchmark, start, end)
+         for label, (start, end) in OOS_YEARS.items()},
+        names=["period", "label"],
+    )
+    by_year.to_csv("results/oos_by_year.csv")
+    print("\nBy calendar year (descriptive only):")
+    print(by_year[["total_return", "annualized_volatility", "sharpe_ratio", "max_drawdown", "beta", "alpha"]]
+          .round(3).to_string())
+
+    print("\nSaved results/oos_summary.csv, results/oos_monthly_returns.csv and results/oos_by_year.csv")
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@
 
 **Key findings**
 
-- **Out of sample (Jan 2025 – Aug 2026, pre-registered):** the benchmark had the highest Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum). Value's in-sample alpha faded to +0.6% a year (t = 0.08). Combined's alpha held its sign and rose to +8.1% (t = 0.82), the only in-sample finding that held in meaningful size on unseen data. Nothing is statistically significant.
+- **Out of sample (Jan 2025 – Aug 2026, pre-registered):** the benchmark had the highest Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum). Value's in-sample alpha faded to +0.6% a year (t = 0.08). Combined's alpha held its sign and rose to +8.1% (t = 0.82), the only in-sample finding that held in meaningful size on unseen data. Split by year, the benchmark led on Sharpe in both 2025 and 2026 (Jan–Aug), and Combined's alpha was positive in both (+6.8%, then +10.9%). Nothing is statistically significant.
 - **In-sample full period (2021–2024):** Value has the highest Sharpe ratio (0.86, against 0.81 for the benchmark, 0.56 for Momentum and 0.65 for Combined) and the highest total return (89.7% vs 68.0%), but also the highest volatility (17.8% vs 14.5%). Its Sharpe lead over the benchmark is 0.05, far inside the noise band.
 - **Sub-periods:** Value edged the benchmark on Sharpe in 2021–2022 (0.64 vs 0.59) and edged it again in 2023–2024 (1.15 vs 1.13). Combined led in 2023–2024 (1.27 vs 1.13) after trailing badly in 2021–2022 (0.16).
 - **Downside risk:** on the Sortino ratio, which counts only downside volatility, Value and the benchmark are almost level over the full period (1.47 vs 1.43), and Value's 2021–2022 lead nearly disappears (1.09 vs 1.08) because more of its volatility was on the downside. Combined's 2023–2024 lead widens (2.59 vs 1.91).
@@ -312,6 +312,26 @@ Everything above was measured on 2021–2024, the period in which the strategies
 - **Momentum trailed again**, with the lowest Sharpe and a negative alpha, consistent with the in-sample result.
 
 Two caveats specific to this period. Treasury bills yielded roughly 4% over 2025–2026, twice the frozen 2% assumption, so every Sharpe ratio above overstates the level; comparisons between strategies are much less affected. And monthly turnover was lower than in-sample (Momentum 20%, Combined 16%, Value 1%), so costs mattered even less.
+
+### 2025 and 2026 separately
+
+The pre-registered verdicts above are read off the full 20-month window. Splitting it by calendar year is descriptive, not a further test: it shows whether the full-window result holds in each year or averages two years that point in different directions. It is the same re-slicing of one backtest used for the in-sample sub-periods (`compare_within_period()`, results in `results/oos_by_year.csv`).
+
+| | 2025 (12 months) | | | | 2026, Jan–Aug (8 months) | | | |
+|---|---|---|---|---|---|---|---|---|
+| | Momentum | Value | Combined | Benchmark | Momentum | Value | Combined | Benchmark |
+| Total return | 16.1% | **23.0%** | 19.1% | 16.1% | 7.7% | 15.7% | **21.8%** | 16.5% |
+| Annualized volatility | 10.6% | 14.8% | 10.3% | **8.2%** | 13.9% | 13.8% | 17.6% | **11.6%** |
+| Sharpe ratio | 1.32 | 1.41 | 1.66 | **1.73** | 0.70 | 1.62 | 1.84 | **2.05** |
+| Max drawdown | -6.0% | -8.3% | **-5.2%** | -5.4% | -4.3% | -4.0% | **-3.4%** | -4.7% |
+| Beta / alpha (annual) | 0.77 / +3.3% | 1.67 / -2.3% | 0.70 / **+6.8%** | 1.00 / 0.0% | 0.80 / -7.4% | 0.83 / +2.8% | 0.85 / **+10.9%** | 1.00 / 0.0% |
+
+2026 returns are for eight months and are not annualized; its Sharpe, volatility and alpha are annualized from eight data points and are correspondingly rough.
+
+- **The benchmark had the highest Sharpe in both years**, so the main conclusion is not an artefact of one period.
+- **Combined's alpha was positive in both years** (+6.8%, then +10.9%), with a beta below 1 each time. That consistency matters more than its size: the result that held on the full window was not carried by a single year.
+- **Value's alpha changed sign between years.** In 2025 its return came with a beta of 1.67 and a negative alpha; in 2026 the beta fell to 0.83 and the alpha turned positive. The full-window +0.6% is the net of the two, which is another reason to read the Value finding as faded rather than confirmed.
+- **Momentum's weak full-window result comes almost entirely from 2026.** It matched the benchmark's return in 2025 with a small positive alpha, then returned 7.7% against 16.5% in 2026.
 
 What can reasonably be inferred: across both periods, no strategy beat the passive benchmark on a risk-adjusted basis by a margin distinguishable from chance. The one hypothesis that held its direction on unseen data is Combined's positive alpha, and even that rests on 20 months and five stocks. It is worth testing on a longer history and a larger, point-in-time universe before any stronger claim is made.
 
