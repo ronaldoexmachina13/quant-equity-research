@@ -1,5 +1,7 @@
 # Quantitative Equity Strategy Research & Backtesting Framework
 
+[![tests](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml/badge.svg)](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml)
+
 ### [**→ View the live interactive dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/)
 
 *Can simple momentum and value strategies beat an equal-weight benchmark on a risk-adjusted basis?*
