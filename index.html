@@ -2,26 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quant Equity Research</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html">Quant Equity Research</a>
+    <div class="links">
+      <a href="index.html" class="active">Index</a>
+      <a href="strategies.html">Strategy Analysis</a>
+      <a href="stocks.html">Stock Analysis</a>
+      <a href="portfolio.html">Portfolio Timeline</a>
+    </div>
+  </div>
+</nav>
+<div class="subtitle-bar">Momentum (12-1) &middot; Value (P/B) &middot; Combined z-score vs equal-weight benchmark | 17 US large caps</div>
 <div class="wrap">
-
-  <nav class="topnav">
-    <span class="brand">Quant Equity Research</span>
-    <a href="index.html" class="active">Index</a>
-    <a href="strategies.html">Strategy Analysis</a>
-    <a href="stocks.html">Stock Analysis</a>
-    <a href="portfolio.html">Portfolio Timeline</a>
-  </nav>
 
   <section class="hero">
     <h1>Can simple factor strategies beat holding the whole universe?</h1>
     <p class="lede">A quantitative research project testing three systematic equity strategies (momentum, value, and a blend of the two) against a passive equal-weight benchmark on a 17-stock universe over 2021&ndash;2024. Results are reported as the backtest produced them, including where the active strategies fell short.</p>
 
     <div class="hero-finding">
-      <b>Headline finding:</b> no active strategy could be distinguished from a passive benchmark holding all 17 stocks in equal weight. Over the full four-year window Value had a slightly higher Sharpe ratio than the benchmark (0.86 vs 0.81), but it carried more market exposure (beta 1.06) and its lead depends on a handful of names. Splitting the window, Value edged the benchmark in 2021&ndash;2022 and Combined led in 2023&ndash;2024. None of these differences is statistically significant on 24 to 48 months of data, so they were treated as hypotheses for a pre-registered out-of-sample test. On the 20 months that followed (January 2025 to August 2026), the benchmark had the highest Sharpe ratio of the four; Value's alpha faded to almost zero, while Combined's alpha kept its direction, though not at a significant level. See the <a href="strategies.html" style="color: var(--value);">Strategy Analysis</a> page for the full breakdown, significance tests and the Out of Sample tab.
+      <b class="box-label">Headline finding:</b> no active strategy could be distinguished from a passive benchmark holding all 17 stocks in equal weight. Over the full four-year window Value had a slightly higher Sharpe ratio than the benchmark (0.86 vs 0.81), but it carried more market exposure (beta 1.06) and its lead depends on a handful of names. Splitting the window, Value edged the benchmark in 2021&ndash;2022 and Combined led in 2023&ndash;2024. None of these differences is statistically significant on 24 to 48 months of data, so they were treated as hypotheses for a pre-registered out-of-sample test. On the 20 months that followed (January 2025 to August 2026), the benchmark had the highest Sharpe ratio of the four; Value's alpha faded to almost zero, while Combined's alpha kept its direction, though not at a significant level. See the <a href="strategies.html">Strategy Analysis</a> page for the full breakdown, significance tests and the Out of Sample tab.
     </div>
 
     <div class="mini-stats">
@@ -54,7 +59,8 @@
   </div>
 
   <footer>
-    Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a>
+    <div class="facts"><span>17 US large caps</span><span>In sample 2021&ndash;2024</span><span>Out of sample Jan 2025 &ndash; Aug 2026</span></div>
+    <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
   </footer>
 
 </div>

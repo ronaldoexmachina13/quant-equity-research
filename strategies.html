@@ -2,118 +2,76 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Strategy Analysis: Quant Equity Research</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  .tab-btn.active { background: var(--text-primary); color: var(--bg); }
-  .oos-banner { border-left: 4px solid var(--benchmark); }
-  .metric-toggle { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-  .chart-legend { display: flex; gap: 1.1rem; margin: -0.25rem 0 0.75rem; font-size: 0.78rem; color: var(--text-secondary); }
-  .chart-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.4rem; vertical-align: middle; }
-  .metric-btn {
-    background: #0a0e1a;
-    border: 1px solid var(--panel-border);
-    color: var(--text-secondary);
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .metric-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
-  .metric-btn.active { background: var(--text-primary); color: var(--bg); border-color: transparent; }
-
+  .oos-banner { border-color: var(--oos); }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; margin: -0.25rem 0 0.75rem; font-size: 0.72rem; color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+  .chart-legend i { display: inline-block; width: 9px; height: 9px; margin-right: 0.4rem; vertical-align: 0; }
+  .chart-legend b { color: var(--oos); }
   .lens-toggle { display: flex; gap: 0.5rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
-  .lens-btn {
-    background: #0a0e1a;
-    border: 1px solid var(--panel-border);
-    color: var(--text-secondary);
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .lens-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
-  .lens-btn.active-quant { background: #2a4d8f; color: #fff; border-color: transparent; }
-  .lens-btn.active-wealth { background: #8f6a2a; color: #fff; border-color: transparent; }
-  .lens-btn.active-risk { background: #8f2a3f; color: #fff; border-color: transparent; }
-  .portfolio-toggle { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-  .timeline-table-wrap { max-height: 520px; overflow-y: auto; border: 1px solid var(--panel-border); border-radius: 10px; }
-  .timeline-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  .timeline-table thead th {
-    position: sticky; top: 0; background: #0d1220; text-align: left;
-    padding: 0.6rem 1rem; color: var(--text-muted); font-size: 0.72rem;
-    text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--panel-border);
-  }
-  .timeline-table td { padding: 0.55rem 1rem; border-bottom: 1px solid #131a2c; color: var(--text-secondary); }
-  .timeline-table tr:nth-child(even) td { background: #0a0e1a; }
-  .timeline-table td.month-cell { color: var(--text-primary); font-weight: 600; white-space: nowrap; }
-  .timeline-table td.period-cell { color: var(--text-primary); font-weight: 700; }
-  .timeline-table tr.period-group-start td { border-top: 2px solid var(--text-muted); }
-  .ticker-tag {
-    display: inline-block; background: #131a2c; border: 1px solid var(--panel-border);
-    border-radius: 6px; padding: 0.1rem 0.5rem; margin: 0.1rem 0.2rem 0.1rem 0; font-size: 0.8rem; color: var(--text-primary);
-  }
+  .click-detail { display: none; margin-top: 1rem; padding: 0.8rem 1rem; border: 1px solid var(--line); font-size: 0.8rem; color: var(--text); }
+  .timeline-table td.period-cell { color: var(--amber); font-weight: 700; white-space: nowrap; }
+  .timeline-table tr.period-group-start td { border-top: 1px solid var(--line); }
   .finding-label {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     font-weight: 700;
-    color: var(--value);
+    color: var(--amber);
     margin-bottom: 0.5rem;
     display: block;
   }
   .analysis-title {
     font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     font-weight: 700;
     margin-bottom: 0.6rem;
+    color: var(--amber);
   }
-  .analysis-title.quant { color: #6ea8ff; }
-  .analysis-title.wealth { color: #ffbf5e; }
-  .analysis-title.risk { color: #ff7a8f; }
   .formula-box {
-    background: #0a0e1a;
-    border: 1px solid var(--panel-border);
-    border-radius: 10px;
+    border: 1px solid var(--line);
     padding: 0.9rem 1.1rem;
-    font-family: 'Courier New', monospace;
-    font-size: 0.85rem;
-    color: var(--text-primary);
+    font-size: 0.82rem;
+    color: var(--text);
     margin: 0.9rem 0 1.2rem;
     line-height: 1.7;
     white-space: pre-wrap;
+    overflow-x: auto;
   }
   .interp-table {
     width: 100%;
     border-collapse: collapse;
     margin: 0.6rem 0 1.2rem;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
   }
   .interp-table th {
     text-align: left;
     padding: 0.5rem 0.9rem;
-    background: #0a0e1a;
-    color: var(--text-muted);
-    font-size: 0.72rem;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid var(--panel-border);
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--line);
   }
   .interp-table td {
     padding: 0.55rem 0.9rem;
-    border-bottom: 1px solid #131a2c;
-    color: var(--text-secondary);
+    border-bottom: 1px solid var(--rule);
+    color: var(--text);
+    vertical-align: top;
   }
-  .interp-table td.range { color: var(--text-primary); font-weight: 700; font-family: 'Courier New', monospace; }
+  .interp-table td.range { color: var(--amber); font-weight: 700; white-space: nowrap; }
+  .verdict-pos { color: var(--pos); }
+  .verdict-mixed { color: var(--amber); }
   .section-label {
     font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     font-weight: 700;
-    color: var(--text-muted);
+    color: var(--amber);
     margin: 1.3rem 0 0.5rem;
   }
   .section-label:first-child { margin-top: 0; }
@@ -130,32 +88,30 @@
     width: 22px;
     height: 22px;
     transform: translate(-50%, -50%);
-    border-radius: 50%;
     cursor: pointer;
   }
   .terrain-hotspot:hover {
-    background: rgba(255, 255, 255, 0.10);
-    outline: 1px solid rgba(255, 255, 255, 0.25);
+    outline: 1px solid var(--amber);
   }
   .terrain-hotspot .tooltip {
     position: absolute;
     bottom: 130%;
     left: 50%;
     transform: translateX(-50%);
-    background: #0d1220;
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
+    background: #000;
+    border: 1px solid var(--line);
     padding: 0.5rem 0.75rem;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     line-height: 1.5;
     white-space: nowrap;
-    color: var(--text-primary);
+    color: var(--text);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.15s ease;
     pointer-events: none;
     z-index: 5;
   }
+  .terrain-hotspot .tooltip b { color: var(--amber); }
   .terrain-hotspot:hover .tooltip {
     opacity: 1;
     visibility: visible;
@@ -170,15 +126,19 @@
 </style>
 </head>
 <body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html">Quant Equity Research</a>
+    <div class="links">
+      <a href="index.html">Index</a>
+      <a href="strategies.html" class="active">Strategy Analysis</a>
+      <a href="stocks.html">Stock Analysis</a>
+      <a href="portfolio.html">Portfolio Timeline</a>
+    </div>
+  </div>
+</nav>
+<div class="subtitle-bar">Momentum (12-1) &middot; Value (P/B) &middot; Combined z-score vs equal-weight benchmark | 17 US large caps</div>
 <div class="wrap">
-
-  <nav class="topnav">
-    <span class="brand">Quant Equity Research</span>
-    <a href="index.html">Index</a>
-    <a href="strategies.html" class="active">Strategy Analysis</a>
-    <a href="stocks.html">Stock Analysis</a>
-    <a href="portfolio.html">Portfolio Timeline</a>
-  </nav>
 
   <header>
     <h1>Momentum vs Value vs Combined vs Benchmark</h1>
@@ -208,9 +168,9 @@
           <button class="metric-btn" data-metric="vol">Volatility</button>
           <button class="metric-btn" data-metric="alpha">Alpha</button>
         </div>
-        <div class="chart-legend"><span><i style="background:#1baf7a"></i>2021&ndash;2022</span><span><i style="background:#eb6834"></i>2023&ndash;2024</span><span><i style="background:#e8c547"></i>Jan 2025&ndash;Aug 2026 <b style="color:#e8c547">(out of sample, 20 months)</b></span></div>
+        <div class="chart-legend"><span><i style="background:var(--p1)"></i>2021&ndash;2022</span><span><i style="background:var(--p2)"></i>2023&ndash;2024</span><span><i style="background:var(--oos)"></i>Jan 2025&ndash;Aug 2026 <b>(out of sample, 20 months)</b></span></div>
         <div class="chart-wrap"><canvas id="sharpeChart"></canvas></div>
-        <div id="clickDetail" style="display:none; margin-top:1rem; padding:0.9rem 1rem; background:#0a0e1a; border-radius:10px; font-size:0.85rem; color:var(--text-secondary);"></div>
+        <div id="clickDetail" class="click-detail"></div>
       </div>
 
       <div class="panel">
@@ -282,11 +242,11 @@ where, from monthly data:
             <tr>
               <th>Period</th>
               <th>Strategy</th>
-              <th>Strategy Sharpe</th>
-              <th>Benchmark Sharpe</th>
-              <th>Difference</th>
-              <th>90% CI</th>
-              <th>Significant?</th>
+              <th class="num">Strategy Sharpe</th>
+              <th class="num">Benchmark Sharpe</th>
+              <th class="num">Difference</th>
+              <th class="num">90% CI</th>
+              <th class="num">Significant?</th>
             </tr>
           </thead>
           <tbody id="significanceTableBody"></tbody>
@@ -302,9 +262,9 @@ where, from monthly data:
         <thead>
           <tr>
             <th>Strategy</th>
-            <th>Avg. Monthly Turnover</th>
-            <th>Sharpe (Gross &rarr; Net)</th>
-            <th>Total Return (Gross &rarr; Net)</th>
+            <th class="num">Avg. Monthly Turnover</th>
+            <th class="num">Sharpe (Gross &rarr; Net)</th>
+            <th class="num">Total Return (Gross &rarr; Net)</th>
           </tr>
         </thead>
         <tbody id="costTableBody"></tbody>
@@ -317,7 +277,7 @@ where, from monthly data:
   <div id="oosSection" style="display:none;">
     <div class="panel oos-banner">
       <h2>Out of sample: January 2025 to August 2026 <span>&middot; 20 months the strategies had never seen</span></h2>
-      <p class="definition-body">Every other tab on this page uses 2021&ndash;2024, the period in which the strategies were built and studied. Before any later data was downloaded, the strategy rules and the way the result would be read were written down in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/OUT_OF_SAMPLE_PLAN.md" target="_blank" style="color:var(--value);">OUT_OF_SAMPLE_PLAN.md</a> and committed to Git. The rules were then run once, unchanged, on the 20 months that followed. The results below are shown as they came out.</p>
+      <p class="definition-body">Every other tab on this page uses 2021&ndash;2024, the period in which the strategies were built and studied. Before any later data was downloaded, the strategy rules and the way the result would be read were written down in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/OUT_OF_SAMPLE_PLAN.md" target="_blank">OUT_OF_SAMPLE_PLAN.md</a> and committed to Git. The rules were then run once, unchanged, on the 20 months that followed. The results below are shown as they came out.</p>
     </div>
 
     <div class="panel">
@@ -330,7 +290,7 @@ where, from monthly data:
       <h2>Out-of-sample results</h2>
       <div class="timeline-table-wrap" style="max-height:none;">
         <table class="timeline-table" id="oosTable">
-          <thead><tr><th>Metric</th><th>Momentum</th><th>Value</th><th>Combined</th><th>Benchmark</th></tr></thead>
+          <thead><tr><th>Metric</th><th class="num"><span class="swatch" style="background:var(--momentum)"></span>Momentum</th><th class="num"><span class="swatch" style="background:var(--value)"></span>Value</th><th class="num"><span class="swatch" style="background:var(--combined)"></span>Combined</th><th class="num"><span class="swatch" style="background:var(--benchmark)"></span>Benchmark</th></tr></thead>
           <tbody id="oosTableBody"></tbody>
         </table>
       </div>
@@ -342,9 +302,9 @@ where, from monthly data:
       <table class="interp-table">
         <thead><tr><th>Pre-registered test</th><th>Result</th><th>Reading</th></tr></thead>
         <tbody>
-          <tr><td>Benchmark Sharpe at least as high as every strategy</td><td><b style="color:var(--value)">Holds</b></td><td>The benchmark had the highest Sharpe of the four. In-sample, Value had edged it by a noise-sized margin; out of sample, no strategy did.</td></tr>
-          <tr><td>Value's alpha keeps its positive sign</td><td><b style="color:var(--benchmark)">Passes, but faded</b></td><td>Alpha stayed positive but shrank from +2.9% a year in-sample to +0.6% (t = 0.08). With a beta of 1.18, Value's higher return is almost entirely explained by its greater market exposure.</td></tr>
-          <tr><td>Combined's 2023&ndash;2024 alpha keeps its positive sign</td><td><b style="color:var(--value)">Supported</b></td><td>Alpha rose from +4.0% to +8.1% with a beta of 0.79. Combined still trailed the benchmark on Sharpe, because most of its risk came from its five holdings rather than the market (R&sup2; 0.31), and the alpha's t-statistic is only 0.82.</td></tr>
+          <tr><td>Benchmark Sharpe at least as high as every strategy</td><td><b class="verdict-pos">Holds</b></td><td>The benchmark had the highest Sharpe of the four. In-sample, Value had edged it by a noise-sized margin; out of sample, no strategy did.</td></tr>
+          <tr><td>Value's alpha keeps its positive sign</td><td><b class="verdict-mixed">Passes, but faded</b></td><td>Alpha stayed positive but shrank from +2.9% a year in-sample to +0.6% (t = 0.08). With a beta of 1.18, Value's higher return is almost entirely explained by its greater market exposure.</td></tr>
+          <tr><td>Combined's 2023&ndash;2024 alpha keeps its positive sign</td><td><b class="verdict-pos">Supported</b></td><td>Alpha rose from +4.0% to +8.1% with a beta of 0.79. Combined still trailed the benchmark on Sharpe, because most of its risk came from its five holdings rather than the market (R&sup2; 0.31), and the alpha's t-statistic is only 0.82.</td></tr>
         </tbody>
       </table>
       <p class="caption">With 20 monthly returns, none of these differences is statistically significant, as the plan anticipated: the test checks direction, not significance. Treasury bills yielded about 4% in this period against the flat 2% assumption, so Sharpe levels are overstated; comparisons between strategies are much less affected. The one hypothesis that held in meaningful size is Combined's positive alpha, and it rests on 20 months and five stocks.</p>
@@ -352,13 +312,31 @@ where, from monthly data:
   </div>
 
   <footer>
-    Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a>
+    <div class="facts"><span>17 US large caps</span><span>In sample 2021&ndash;2024</span><span>Out of sample Jan 2025 &ndash; Aug 2026</span></div>
+    <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
   </footer>
 
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+/* Chart styling, set once for every chart on the page */
+Chart.defaults.font.family = '"DejaVu Sans Mono", "JetBrains Mono", Menlo, Consolas, ui-monospace, monospace';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = "#8A8A8A";
+Chart.defaults.borderColor = "#2A2A2A";
+Chart.defaults.scale.grid.color = "#2A2A2A";
+Chart.defaults.scale.grid.lineWidth = 1;
+Chart.defaults.plugins.legend.labels.color = "#E8E8E8";
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.boxHeight = 10;
+Object.assign(Chart.defaults.plugins.tooltip, {
+  backgroundColor: "#000000", borderColor: "#3A3A3A", borderWidth: 1, cornerRadius: 0,
+  titleColor: "#FFB000", bodyColor: "#E8E8E8", titleFont: { weight: "700" }
+});
+Chart.defaults.elements.bar.borderRadius = 0;
+const PERIOD_COLORS = ["#8A8A8A", "#E8E8E8", "#FFB000"];  // 2021-22, 2023-24, out of sample (amber = the "gold" OOS bars)
+
 const LABELS = ["Momentum", "Value", "Combined", "Benchmark"];
 
 const METRICS = {
@@ -378,30 +356,30 @@ const METRICS = {
 
 const DATA = {
   all: {
-    color: "#e8c547",
+    color: "#8A8A8A",
     title: "All strategies",
     body: "Four approaches to the same 17-stock universe, 2021&ndash;2024: a trend-following strategy, a value strategy, a blend of the two, and a passive benchmark that holds every stock in equal weight."
   },
   momentum: {
-    color: "#5b6b8c",
+    color: "#3ED88A",
     title: "Momentum",
     body: "Assumes <b>recent winners keep winning</b>. Each month it ranks all 17 stocks by trailing 12-month return, skipping the most recent month to avoid short-term reversal, and holds the top 5 in equal weight.",
     stats: { total: "47.7%", ann: "10.2%", vol: "14.8%", sharpe: "0.56", sortino: "0.99", dd: "-14.8%", beta: "0.87", alpha: "-1.7%" }
   },
   value: {
-    color: "#1baf7a",
+    color: "#29B6F6",
     title: "Value",
     body: "Assumes <b>cheap stocks are mispriced</b> and will rerate upward. Each month it ranks the stocks by Price-to-Book and holds the 5 <i>cheapest</i> (lowest P/B) in equal weight, the opposite ranking direction to momentum.",
     stats: { total: "89.7%", ann: "17.4%", vol: "17.8%", sharpe: "0.86", sortino: "1.47", dd: "-14.5%", beta: "1.06", alpha: "2.9%" }
   },
   combined: {
-    color: "#7c5cd4",
+    color: "#FFB000",
     title: "Combined",
     body: "Blends both signals into one ranking. Momentum and P/B sit on different numeric scales, so each is <b>z-scored</b> (standardized within each month) before the two are averaged, putting the factors on an equal nominal footing.",
     stats: { total: "56.0%", ann: "11.8%", vol: "14.9%", sharpe: "0.65", sortino: "1.21", dd: "-11.8%", beta: "0.88", alpha: "-0.4%" }
   },
   benchmark: {
-    color: "#e8c547",
+    color: "#FFFFFF",
     title: "Benchmark",
     body: "The <b>passive control</b>. Holds all 17 stocks in equal weight every month, with no ranking or selection. An active strategy has to beat this to justify its added complexity and turnover.",
     stats: { total: "68.0%", ann: "13.9%", vol: "14.5%", sharpe: "0.81", sortino: "1.43", dd: "-13.4%", beta: "1.00", alpha: "0.0%" }
@@ -520,7 +498,6 @@ function buildButtons() {
     btn.dataset.key = key;
     const label = key === "all" ? "All strategies" : DATA[key].title;
     btn.innerHTML = '<span class="dot" style="background:' + DATA[key].color + '"></span>' + label;
-    btn.style.background = key === currentStrategy ? DATA[key].color : "";
     btn.addEventListener("click", () => selectStrategy(key));
     bar.appendChild(btn);
   });
@@ -529,13 +506,7 @@ function buildButtons() {
 function updateButtonStyles() {
   document.querySelectorAll("#strategyBar .strategy-btn").forEach(btn => {
     const key = btn.dataset.key;
-    if (key === currentStrategy) {
-      btn.classList.add("active");
-      btn.style.background = DATA[key].color;
-    } else {
-      btn.classList.remove("active");
-      btn.style.background = "";
-    }
+    btn.classList.toggle("active", key === currentStrategy);
   });
 }
 
@@ -573,9 +544,9 @@ function buildChart() {
     data: {
       labels: LABELS,
       datasets: [
-        { label: "2021-2022", data: m.p1, backgroundColor: "#1baf7a", borderRadius: 4, maxBarThickness: 34 },
-        { label: "2023-2024", data: m.p2, backgroundColor: "#eb6834", borderRadius: 4, maxBarThickness: 34 },
-        { label: "2025-2026 (out of sample)", data: m.p3, backgroundColor: "#e8c547", borderRadius: 4, maxBarThickness: 34 }
+        { label: "2021-2022", data: m.p1, backgroundColor: PERIOD_COLORS[0], borderRadius: 0, maxBarThickness: 34 },
+        { label: "2023-2024", data: m.p2, backgroundColor: PERIOD_COLORS[1], borderRadius: 0, maxBarThickness: 34 },
+        { label: "2025-2026 (out of sample)", data: m.p3, backgroundColor: PERIOD_COLORS[2], borderRadius: 0, maxBarThickness: 34 }
       ]
     },
     options: {
@@ -589,7 +560,7 @@ function buildChart() {
         const val = [m.p1, m.p2, m.p3][el.datasetIndex][el.index];
         const box = document.getElementById("clickDetail");
         box.style.display = "block";
-        box.innerHTML = "<b style='color:var(--text-primary)'>" + DATA[strategyKey].title + " &middot; " + period +
+        box.innerHTML = "<b style='color:#fff'>" + DATA[strategyKey].title + " &middot; " + period +
           "</b><br>" + m.label + ": <b style='color:" + DATA[strategyKey].color + "'>" + val.toFixed(2) + m.suffix + "</b>";
         selectStrategy(strategyKey);
       },
@@ -598,8 +569,8 @@ function buildChart() {
         tooltip: { callbacks: { label: (item) => item.dataset.label + ": " + item.parsed.y.toFixed(2) + m.suffix + " " + m.label } }
       },
       scales: {
-        y: { beginAtZero: true, min: m.min, max: m.max, ticks: { color: "#6b7688", stepSize: m.step, callback: (v) => v + m.suffix }, grid: { color: "#1a2438" } },
-        x: { grid: { display: false }, ticks: { color: "#9aa5b8", font: { weight: "600" } } }
+        y: { beginAtZero: true, min: m.min, max: m.max, ticks: { stepSize: m.step, callback: (v) => v + m.suffix } },
+        x: { grid: { display: false }, ticks: { color: "#E8E8E8", font: { weight: "700" } } }
       }
     }
   });
@@ -615,15 +586,15 @@ function rebuildChart() {
 function updateChartHighlight(key) {
   const bg1 = LABELS.map((l, i) => {
     const k = ["momentum", "value", "combined", "benchmark"][i];
-    return key === "all" || key === k ? "#1baf7a" : "#1baf7a33";
+    return key === "all" || key === k ? PERIOD_COLORS[0] : PERIOD_COLORS[0] + "33";
   });
   const bg2 = LABELS.map((l, i) => {
     const k = ["momentum", "value", "combined", "benchmark"][i];
-    return key === "all" || key === k ? "#eb6834" : "#eb683433";
+    return key === "all" || key === k ? PERIOD_COLORS[1] : PERIOD_COLORS[1] + "33";
   });
   const bg3 = LABELS.map((l, i) => {
     const k = ["momentum", "value", "combined", "benchmark"][i];
-    return key === "all" || key === k ? "#e8c547" : "#e8c54733";
+    return key === "all" || key === k ? PERIOD_COLORS[2] : PERIOD_COLORS[2] + "33";
   });
   chart.data.datasets[0].backgroundColor = bg1;
   chart.data.datasets[1].backgroundColor = bg2;
@@ -689,6 +660,12 @@ buildTerrainHotspots();
 const SIGNIFICANCE_DATA = [{"period":"Full period (2021-2024)","strategy":"Momentum","strategy_sharpe":0.56,"benchmark_sharpe":0.81,"sharpe_diff":-0.26,"ci_lower":-0.84,"ci_upper":0.27,"significant":false},{"period":"Full period (2021-2024)","strategy":"Value","strategy_sharpe":0.86,"benchmark_sharpe":0.81,"sharpe_diff":0.05,"ci_lower":-0.46,"ci_upper":0.6,"significant":false},{"period":"Full period (2021-2024)","strategy":"Combined","strategy_sharpe":0.65,"benchmark_sharpe":0.81,"sharpe_diff":-0.16,"ci_lower":-0.73,"ci_upper":0.34,"significant":false},{"period":"2021-2022","strategy":"Momentum","strategy_sharpe":0.25,"benchmark_sharpe":0.59,"sharpe_diff":-0.34,"ci_lower":-1.2,"ci_upper":0.31,"significant":false},{"period":"2021-2022","strategy":"Value","strategy_sharpe":0.64,"benchmark_sharpe":0.59,"sharpe_diff":0.05,"ci_lower":-0.6,"ci_upper":0.87,"significant":false},{"period":"2021-2022","strategy":"Combined","strategy_sharpe":0.16,"benchmark_sharpe":0.59,"sharpe_diff":-0.43,"ci_lower":-1.26,"ci_upper":0.17,"significant":false},{"period":"2023-2024","strategy":"Momentum","strategy_sharpe":0.92,"benchmark_sharpe":1.13,"sharpe_diff":-0.21,"ci_lower":-1.19,"ci_upper":0.63,"significant":false},{"period":"2023-2024","strategy":"Value","strategy_sharpe":1.15,"benchmark_sharpe":1.13,"sharpe_diff":0.02,"ci_lower":-0.84,"ci_upper":0.9,"significant":false},{"period":"2023-2024","strategy":"Combined","strategy_sharpe":1.27,"benchmark_sharpe":1.13,"sharpe_diff":0.15,"ci_lower":-0.87,"ci_upper":0.98,"significant":false}];
 const COST_DATA = [{"strategy":"Momentum","avg_turnover":"22.9%","gross_sharpe":0.56,"net_sharpe":0.52,"gross_total_return":"47.7%","net_total_return":"44.5%"},{"strategy":"Value","avg_turnover":"4.2%","gross_sharpe":0.86,"net_sharpe":0.85,"gross_total_return":"89.7%","net_total_return":"89.0%"},{"strategy":"Combined","avg_turnover":"22.5%","gross_sharpe":0.65,"net_sharpe":0.61,"gross_total_return":"56.0%","net_total_return":"52.6%"}];
 
+const SERIES_COLORS = { Momentum: "#3ED88A", Value: "#29B6F6", Combined: "#FFB000", Benchmark: "#FFFFFF" };
+
+function strategyName(name) {
+  return '<span class="strategy-name"><span class="swatch" style="background:' + (SERIES_COLORS[name] || "#8A8A8A") + '"></span>' + name + "</span>";
+}
+
 function renderSignificanceTable() {
   const tbody = document.getElementById("significanceTableBody");
   tbody.innerHTML = "";
@@ -703,16 +680,16 @@ function renderSignificanceTable() {
       ? '<td class="period-cell">' + row.period + '</td>'
       : '<td></td>';
     const sigLabel = row.significant
-      ? '<b style="color:var(--value)">Yes</b>'
-      : '<span style="color:var(--text-muted)">No</span>';
+      ? '<b class="best">Yes</b>'
+      : '<span style="color:var(--muted)">No</span>';
     tr.innerHTML =
       periodCell +
-      "<td>" + row.strategy + "</td>" +
-      "<td>" + row.strategy_sharpe.toFixed(2) + "</td>" +
-      "<td>" + row.benchmark_sharpe.toFixed(2) + "</td>" +
-      "<td>" + (row.sharpe_diff > 0 ? "+" : "") + row.sharpe_diff.toFixed(2) + "</td>" +
-      "<td>[" + row.ci_lower.toFixed(2) + ", " + row.ci_upper.toFixed(2) + "]</td>" +
-      "<td>" + sigLabel + "</td>";
+      "<td>" + strategyName(row.strategy) + "</td>" +
+      '<td class="num">' + row.strategy_sharpe.toFixed(2) + "</td>" +
+      '<td class="num">' + row.benchmark_sharpe.toFixed(2) + "</td>" +
+      '<td class="num">' + (row.sharpe_diff > 0 ? "+" : "") + row.sharpe_diff.toFixed(2) + "</td>" +
+      '<td class="num">[' + row.ci_lower.toFixed(2) + ", " + row.ci_upper.toFixed(2) + "]</td>" +
+      '<td class="num">' + sigLabel + "</td>";
     tbody.appendChild(tr);
   });
 }
@@ -723,10 +700,10 @@ function renderCostTable() {
   COST_DATA.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML =
-      "<td>" + row.strategy + "</td>" +
-      "<td>" + row.avg_turnover + "</td>" +
-      "<td>" + row.gross_sharpe.toFixed(2) + " &rarr; " + row.net_sharpe.toFixed(2) + "</td>" +
-      "<td>" + row.gross_total_return + " &rarr; " + row.net_total_return + "</td>";
+      "<td>" + strategyName(row.strategy) + "</td>" +
+      '<td class="num">' + row.avg_turnover + "</td>" +
+      '<td class="num">' + row.gross_sharpe.toFixed(2) + " &rarr; " + row.net_sharpe.toFixed(2) + "</td>" +
+      '<td class="num">' + row.gross_total_return + " &rarr; " + row.net_total_return + "</td>";
     tbody.appendChild(tr);
   });
 }
@@ -736,7 +713,7 @@ function renderCostTable() {
    results/oos_summary.csv and results/oos_monthly_returns.csv. */
 const OOS_DATA = [{"label":"Momentum","total":"25.0%","ann":"14.3%","vol":"11.7%","sharpe":"1.05","sortino":"1.87","dd":"-6.0%","beta_alpha":"0.77 / -0.7%","tstat":"-0.08","sharpe_diff":"-0.83 [-2.64, +0.50]","net_sharpe":"1.01"},{"label":"Value","total":"42.2%","ann":"23.5%","vol":"14.1%","sharpe":"1.53","sortino":"3.22","dd":"-8.3%","beta_alpha":"1.18 / +0.6%","tstat":"0.08","sharpe_diff":"-0.36 [-1.78, +0.75]","net_sharpe":"1.53"},{"label":"Combined","total":"45.1%","ann":"25.0%","vol":"13.4%","sharpe":"1.72","sortino":"5.01","dd":"-5.2%","beta_alpha":"0.79 / +8.1%","tstat":"0.82","sharpe_diff":"-0.17 [-2.29, +1.43]","net_sharpe":"1.69"},{"label":"Benchmark","total":"35.2%","ann":"19.9%","vol":"9.5%","sharpe":"1.89","sortino":"3.59","dd":"-5.4%","beta_alpha":"1.00 / 0.0%","tstat":"","sharpe_diff":"","net_sharpe":""}];
 const OOS_GROWTH = {"dates":["Dec 2024","Jan 2025","Feb 2025","Mar 2025","Apr 2025","May 2025","Jun 2025","Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026"],"series":{"Momentum":[1.0,1.0524,1.0621,0.9984,0.9996,1.047,1.0719,1.0807,1.0733,1.0952,1.1506,1.1602,1.161,1.2044,1.2921,1.2369,1.2555,1.2449,1.3015,1.2575,1.2502],"Value":[1.0,1.0484,1.0637,1.0358,0.9755,1.0619,1.1225,1.088,1.155,1.1941,1.2076,1.205,1.2295,1.2503,1.2762,1.2561,1.3765,1.3215,1.3486,1.4034,1.422],"Combined":[1.0,1.067,1.0447,1.0111,1.0149,1.059,1.1108,1.1421,1.1343,1.1747,1.1801,1.19,1.1907,1.3032,1.4076,1.4056,1.4268,1.3786,1.4887,1.459,1.4506],"Benchmark":[1.0,1.0342,1.0447,1.0192,0.9881,1.0227,1.048,1.0479,1.093,1.1322,1.1471,1.1492,1.1607,1.22,1.2707,1.2114,1.2715,1.2628,1.2982,1.3405,1.3523]}};
-const OOS_COLORS = { Momentum: "#5b6b8c", Value: "#1baf7a", Combined: "#7c5cd4", Benchmark: "#e8c547" };
+const OOS_COLORS = { Momentum: "#3ED88A", Value: "#29B6F6", Combined: "#FFB000", Benchmark: "#FFFFFF" };
 let oosChart = null;
 
 function renderOosTable() {
@@ -751,14 +728,41 @@ function renderOosTable() {
     ["Beta / alpha (annual)", "beta_alpha"], ["Alpha t-statistic", "tstat"],
     ["Sharpe vs benchmark (90% CI)", "sharpe_diff"], ["Net Sharpe (after costs)", "net_sharpe"]
   ];
+  // Highest value in the row shown in amber, for rows where higher is plainly better
+  const HIGHLIGHT = ["sharpe", "net_sharpe"];
   tbody.innerHTML = "";
   rows.forEach(([name, key]) => {
     const tr = document.createElement("tr");
+    const nums = cols.map(c => parseFloat((byLabel[c] && byLabel[c][key]) || "NaN"));
+    const best = HIGHLIGHT.includes(key) ? Math.max(...nums.filter(v => !isNaN(v))) : null;
     tr.innerHTML = '<td class="month-cell">' + name + "</td>" +
-      cols.map(c => "<td>" + ((byLabel[c] && byLabel[c][key]) || "&ndash;") + "</td>").join("");
+      cols.map((c, i) => '<td class="num' + (nums[i] === best ? " best" : "") + '">' + ((byLabel[c] && byLabel[c][key]) || "&ndash;") + "</td>").join("");
     tbody.appendChild(tr);
   });
 }
+
+/* Final value of each line, written at the right edge in the series colour
+   (growth of $1 shown as cumulative return, e.g. 1.4506 -> +45.1%) */
+const endValueLabels = {
+  id: "endValueLabels",
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea } = chart;
+    const labels = chart.data.datasets.map((ds, i) => {
+      const meta = chart.getDatasetMeta(i);
+      if (!chart.isDatasetVisible(i) || !meta.data.length) return null;
+      const pct = (ds.data[ds.data.length - 1] - 1) * 100;
+      return { y: meta.data[meta.data.length - 1].y, color: ds.borderColor, text: (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%" };
+    }).filter(Boolean).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < labels.length; i++) {
+      if (labels[i].y - labels[i - 1].y < 13) labels[i].y = labels[i - 1].y + 13;
+    }
+    ctx.save();
+    ctx.font = "700 11px " + Chart.defaults.font.family;
+    ctx.textBaseline = "middle";
+    labels.forEach(l => { ctx.fillStyle = l.color; ctx.fillText(l.text, chartArea.right + 6, l.y); });
+    ctx.restore();
+  }
+};
 
 function renderOosChart() {
   if (oosChart || !OOS_GROWTH.dates.length) return;
@@ -772,25 +776,26 @@ function renderOosChart() {
         data: OOS_GROWTH.series[name],
         borderColor: OOS_COLORS[name],
         backgroundColor: OOS_COLORS[name],
-        borderWidth: name === "Benchmark" ? 2.5 : 2,
-        borderDash: name === "Benchmark" ? [6, 4] : [],
+        borderWidth: name === "Benchmark" ? 3 : 2,
         pointRadius: 0,
+        fill: false,
         tension: 0.15
       }))
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { right: 58 } },
       interaction: { mode: "index", intersect: false },
       plugins: {
-        legend: { labels: { color: "#9aa5b8", usePointStyle: true, pointStyle: "line" } },
         tooltip: { callbacks: { label: (item) => item.dataset.label + ": $" + item.parsed.y.toFixed(3) } }
       },
       scales: {
-        y: { ticks: { color: "#6b7688", callback: (v) => "$" + v.toFixed(2) }, grid: { color: "#1a2438" } },
-        x: { ticks: { color: "#9aa5b8", maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { display: false } }
+        y: { ticks: { callback: (v) => "$" + v.toFixed(2) } },
+        x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { display: false } }
       }
-    }
+    },
+    plugins: [endValueLabels]
   });
 }
 

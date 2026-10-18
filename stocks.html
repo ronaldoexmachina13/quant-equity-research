@@ -2,19 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stock Analysis | Quant Equity Research</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html">Quant Equity Research</a>
+    <div class="links">
+      <a href="index.html">Index</a>
+      <a href="strategies.html">Strategy Analysis</a>
+      <a href="stocks.html" class="active">Stock Analysis</a>
+      <a href="portfolio.html">Portfolio Timeline</a>
+    </div>
+  </div>
+</nav>
+<div class="subtitle-bar">Momentum (12-1) &middot; Value (P/B) &middot; Combined z-score vs equal-weight benchmark | 17 US large caps</div>
 <div class="wrap">
-
-  <nav class="topnav">
-    <span class="brand">Quant Equity Research</span>
-    <a href="index.html">Index</a>
-    <a href="strategies.html">Strategy Analysis</a>
-    <a href="stocks.html" class="active">Stock Analysis</a>
-    <a href="portfolio.html">Portfolio Timeline</a>
-  </nav>
 
   <header>
     <h1>The 17-stock universe</h1>
@@ -28,13 +33,14 @@
 
   <div class="year-toggle" id="selPeriodToggle" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:0 0 1.1rem;">
     <button class="metric-btn active" data-period="is">Selection counts: 2021&ndash;2024 (in sample)</button>
-    <button class="metric-btn" data-period="oos" style="border-style:dashed; border-color:var(--benchmark);">Jan 2025&ndash;Aug 2026 (out of sample)</button>
+    <button class="metric-btn" data-period="oos" style="border-style:dashed; border-color:var(--oos);">Jan 2025&ndash;Aug 2026 (out of sample)</button>
   </div>
 
   <div class="stock-grid" id="stockGrid"></div>
 
   <footer>
-    Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a>
+    <div class="facts"><span>17 US large caps</span><span>In sample 2021&ndash;2024</span><span>Out of sample Jan 2025 &ndash; Aug 2026</span></div>
+    <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
   </footer>
 
 </div>
@@ -60,7 +66,7 @@ const STOCKS = [
   {"ticker": "XOM", "name": "Exxon Mobil", "sector": "Energy", "latest_price": 160.95, "latest_momentum_12_1": 0.39, "latest_pb": 2.56, "momentum_months_selected": 25, "value_months_selected": 47, "combined_months_selected": 26, "total_months_evaluated": 48, "momentum_months_selected_oos": 5, "value_months_selected_oos": 20, "combined_months_selected_oos": 8, "total_months_oos": 20}
 ];
 
-const COLORS = { momentum: "#5b6b8c", value: "#1baf7a", combined: "#7c5cd4" };
+const COLORS = { momentum: "#3ED88A", value: "#29B6F6", combined: "#FFB000" };
 
 function selRow(label, count, total, color) {
   const pct = (count / total * 100).toFixed(0);
