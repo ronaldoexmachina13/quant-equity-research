@@ -6,6 +6,25 @@
 
 *Can simple momentum and value strategies beat an equal-weight benchmark on a risk-adjusted basis?*
 
+### Result at a glance
+
+> **Bottom line.** No strategy could be statistically distinguished from the equal-weight benchmark, either in sample (2021-2024) or on 20 pre-registered months the strategies had never seen (January 2025 to August 2026). On those unseen months the benchmark had the highest Sharpe ratio. Value's in-sample edge faded; Combined's alpha kept its sign but is not significant.
+
+| Strategy | Sharpe, in sample (2021-2024) | Sharpe, out of sample (Jan 2025 - Aug 2026) | Out-of-sample alpha a year (t-stat) |
+|---|---:|---:|---:|
+| Momentum | 0.56 | 1.05 | -0.7% (-0.08) |
+| Value | 0.86 | 1.53 | +0.6% (0.08) |
+| Combined | 0.65 | 1.72 | +8.1% (0.82) |
+| Equal-weight benchmark (17 stocks) | 0.81 | **1.89** | n/a |
+
+*Sharpe ratios use a flat 2% risk-free rate. Treasury bills paid about 4% in 2025-26, so the out-of-sample levels are overstated, although comparisons within a period are much less affected. Alpha is measured against the benchmark by OLS regression; a t-statistic near 1.65 would be needed for significance at the 90% level.*
+
+![Growth of 1 dollar invested at the end of December 2024: Combined +45.1%, Value +42.2%, benchmark +35.2%, Momentum +25.0%](results/oos_growth.png)
+
+*Out-of-sample growth of a $1 investment, before trading costs. Generated from `results/oos_monthly_returns.csv` by `make_oos_chart.py`.*
+
+**How the test was set up.** The strategy rules and the way the results would be read were committed to Git ([`OUT_OF_SAMPLE_PLAN.md`](OUT_OF_SAMPLE_PLAN.md)) before any 2025-26 data was downloaded, and the test was run once. A look-ahead bug in the value signal was found and fixed before that point and is documented in full below ("Correction: look-ahead in the value signal"). The unit tests, including one that guards against that bug, run automatically on every push.
+
 > **Status:** Version 0.5 (in progress). Momentum, value and a combined factor are fully tested, with a pre-registered out-of-sample test on 2025–2026, two robustness checks (portfolio concentration and a two-period split), bootstrap significance testing, transaction-cost modeling, a Sortino ratio alongside Sharpe, and beta and alpha against the benchmark. The pipeline is reproducible end to end (see "Reproducing this project end-to-end").
 >
 > **Correction (September 2026):** the value signal contained a one-month look-ahead, and the original price download had missed the final trading day of 2024. Both were fixed and every figure in this README was regenerated. The look-ahead fix was recorded before any out-of-sample data was downloaded, and the data fix before any out-of-sample result was computed. See "Correction: look-ahead in the value signal" for what changed and why.
