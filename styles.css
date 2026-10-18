@@ -9,7 +9,7 @@
   --combined: #FFB000;
   --value: #29B6F6;
   --momentum: #3ED88A;
-  /* Regime chart periods; out-of-sample is always amber ("gold" in the page text) */
+  /* Regime chart periods; out-of-sample is always amber */
   --p1: #8A8A8A;
   --p2: #E8E8E8;
   --oos: #FFB000;
@@ -301,6 +301,14 @@ footer .facts { display: flex; justify-content: space-between; gap: 0.4rem 1.5re
 footer .repo { margin-top: 0.6rem; text-transform: none; letter-spacing: 0; }
 footer a { color: var(--muted); }
 footer a:hover { color: var(--amber); }
+
+/* Narrower screens: tighter table cells so the confidence-interval column is not clipped */
+@media (max-width: 900px) {
+  .timeline-table { font-size: 0.74rem; }
+  .timeline-table thead th { padding: 0.5rem 0.5rem; white-space: normal; vertical-align: bottom; }
+  .timeline-table td { padding: 0.45rem 0.5rem; }
+  .timeline-table th.num { white-space: normal; }
+}
 
 @media (max-width: 600px) {
   .wrap { padding: 0 16px 2.5rem; }

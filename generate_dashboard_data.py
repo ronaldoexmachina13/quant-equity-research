@@ -133,8 +133,9 @@ def update_strategies_html(path: str, full: pd.DataFrame, p1: pd.DataFrame, p2: 
 
 def update_index_html(path: str, full: pd.DataFrame, metadata: dict):
     """
-    Update index.html's 4 mini-stat numbers in place. Order in the HTML
-    is fixed (stocks, strategies, months, benchmark Sharpe) and matches
+    Update index.html's 5 mini-stat numbers in place. Order in the HTML
+    is fixed (stocks, strategies, in-sample months, benchmark Sharpe,
+    out-of-sample months) and matches
     the order these values are generated in below -- if that order in
     index.html's <div class="mini-stats"> block ever changes, this must
     change to match.
@@ -147,12 +148,14 @@ def update_index_html(path: str, full: pd.DataFrame, metadata: dict):
     n_months = str(metadata["n_months"])
     benchmark_sharpe = num(full.loc["Benchmark", "sharpe_ratio"])
 
-    new_values = [n_stocks, n_strategies, n_months, benchmark_sharpe]
+    n_oos_months = str(len(pd.read_csv("results/oos_monthly_returns.csv")))
+
+    new_values = [n_stocks, n_strategies, n_months, benchmark_sharpe, n_oos_months]
 
     pattern = re.compile(r'<div class="ms-value">([^<]*)</div>')
     existing = pattern.findall(html)
-    if len(existing) != 4:
-        raise ValueError(f"Expected exactly 4 'ms-value' divs in {path}, found {len(existing)}. Aborting -- check the file manually before rerunning.")
+    if len(existing) != 5:
+        raise ValueError(f"Expected exactly 5 'ms-value' divs in {path}, found {len(existing)}. Aborting -- check the file manually before rerunning.")
 
     it = iter(new_values)
     html = pattern.sub(lambda m: f'<div class="ms-value">{next(it)}</div>', html)
@@ -161,7 +164,7 @@ def update_index_html(path: str, full: pd.DataFrame, metadata: dict):
         f.write(html)
 
     print(f"Updated {path}:")
-    print(f"  - stocks: {n_stocks}, strategies: {n_strategies}, months: {n_months}, benchmark Sharpe: {benchmark_sharpe}")
+    print(f"  - stocks: {n_stocks}, strategies: {n_strategies}, months: {n_months}, benchmark Sharpe: {benchmark_sharpe}, OOS months: {n_oos_months}")
 
 
 def update_portfolio_html(path: str, timeline: dict):
