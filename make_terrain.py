@@ -26,14 +26,25 @@ yi = np.linspace(0, len(periods) - 1, 90)
 Xi, Yi = np.meshgrid(xi, yi)
 Zi = spline(xi, yi).T
 
+# Dashboard palette (matches styles.css)
+BG = "#000000"
+TEXT = "#E8E8E8"
+MUTED = "#8A8A8A"
+LINE = "#3A3A3A"
+
+# Single-hue ramp: near-black at low Sharpe to bright amber at high Sharpe
 cmap = LinearSegmentedColormap.from_list(
-    "qrd", ["#0b1f3a", "#123a5c", "#1c7a6e", "#3fae6a", "#e8c547", "#d94f3d"], N=256
+    "amber", ["#0a0700", "#2b1d00", "#5c4000", "#946500", "#d18f00", "#FFB000", "#FFD98A"], N=256
 )
 
+# Same monospace family as the dashboard (falls back to matplotlib's default if missing)
+plt.rcParams["font.family"] = "monospace"
+plt.rcParams["font.monospace"] = ["DejaVu Sans Mono", "Consolas", "Menlo"]
+
 # ---------- Render ----------
-fig = plt.figure(figsize=(9, 6.5), facecolor="#05070d")
+fig = plt.figure(figsize=(9, 6.5), facecolor=BG)
 ax = fig.add_axes([0.03, 0.05, 0.94, 0.9], projection="3d")
-ax.set_facecolor("#05070d")
+ax.set_facecolor(BG)
 
 ax.plot_surface(Xi, Yi, Zi, cmap=cmap, linewidth=0, antialiased=True,
                  rstride=1, cstride=1, alpha=0.97, shade=True, vmin=0.0, vmax=1.4)
@@ -45,16 +56,16 @@ ax.plot_wireframe(Xi[::7, ::5], Yi[::7, ::5], Zi[::7, ::5],
 for xi_i in range(len(strategies)):
     for yi_i in range(len(periods)):
         ax.scatter([xi_i], [yi_i], [sharpe[xi_i, yi_i] + 0.03],
-                   color="white", s=45, edgecolor="#05070d",
+                   color="white", s=45, edgecolor=BG,
                    linewidth=1.2, depthshade=False, zorder=10)
 
 ax.set_xticks(x_ctrl)
-ax.set_xticklabels(strategies, color="#cfd8e3", fontsize=10.5, fontweight="bold")
+ax.set_xticklabels(strategies, color=TEXT, fontsize=10, fontweight="bold")
 ax.set_yticks(y_ctrl)
-ax.set_yticklabels(periods, color="#cfd8e3", fontsize=10.5, fontweight="bold")
+ax.set_yticklabels(periods, color=TEXT, fontsize=10, fontweight="bold")
 ax.set_zticks([0, 0.5, 1.0, 1.5])
-ax.set_zticklabels(["0.0", "0.5", "1.0", "1.5"], color="#8b95a5", fontsize=8.5)
-ax.set_zlabel("Sharpe Ratio", color="#8b95a5", fontsize=9.5, labelpad=8)
+ax.set_zticklabels(["0.0", "0.5", "1.0", "1.5"], color=MUTED, fontsize=8.5)
+ax.set_zlabel("Sharpe Ratio", color=MUTED, fontsize=9.5, labelpad=8)
 
 # Push tick labels further from the axes so "Benchmark" and "2021-2022"
 # don't collide with each other in the corner where the axes meet
@@ -62,9 +73,9 @@ ax.tick_params(axis='x', pad=12)
 ax.tick_params(axis='y', pad=18)
 
 ax.xaxis.pane.fill = ax.yaxis.pane.fill = ax.zaxis.pane.fill = False
-ax.xaxis.pane.set_edgecolor("#1a2438")
-ax.yaxis.pane.set_edgecolor("#1a2438")
-ax.zaxis.pane.set_edgecolor("#1a2438")
+ax.xaxis.pane.set_edgecolor(LINE)
+ax.yaxis.pane.set_edgecolor(LINE)
+ax.zaxis.pane.set_edgecolor(LINE)
 ax.grid(False)
 # Slightly wider azimuth opens up the corner further, on top of the padding above
 ax.view_init(elev=24, azim=-50)
