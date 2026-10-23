@@ -382,3 +382,110 @@ def months_needed_to_detect(mean: float, sd: float, z_alpha: float, z_power: flo
         return {"months": months, "direction": "underperformance",
                 "note": "negative mean: months needed to detect underperformance, not outperformance"}
     return {"months": months, "direction": "outperformance", "note": ""}
+
+
+# ---------------------------------------------------------------------------
+# Risk diagnostics (LIMITATIONS_PLAN.md, Phase 2B detailed design).
+# Descriptive measures on monthly returns; no test between strategies.
+# ---------------------------------------------------------------------------
+
+def _tail_percentile(returns: pd.Series, level: float) -> float:
+    """
+    The (1 - level) percentile of the returns, with numpy's linear
+    interpolation. The percentile is rounded to 10 decimals first so that,
+    e.g., level 0.95 asks for exactly the 5th percentile rather than
+    5.000000000000004 from floating-point subtraction.
+    """
+    return float(np.percentile(returns.values, round((1 - level) * 100, 10), method="linear"))
+
+
+def historical_var(returns: pd.Series, level: float = 0.95) -> float:
+    """
+    Historical Value at Risk: the return at the (1 - level) percentile,
+    reported as a positive loss. 0.06 means that in (1 - level) of months the
+    return was -6% or worse. Not clipped: if even the tail month is a gain,
+    the figure is negative.
+    """
+    return -_tail_percentile(returns, level)
+
+
+def expected_shortfall(returns: pd.Series, level: float = 0.95) -> float:
+    """
+    Historical Expected Shortfall: the average return over the months at or
+    below the (1 - level) percentile, reported as a positive loss.
+    """
+    cutoff = _tail_percentile(returns, level)
+    return -float(returns[returns <= cutoff].mean())
+
+
+def bootstrap_statistic_ci(returns: pd.Series, statistic, n_sims: int = 5000, ci: float = 0.90, seed: int | None = None) -> dict:
+    """
+    Bootstrap confidence interval for any statistic of one return series,
+    in the same style as bootstrap_sharpe_ci(): resample the months with
+    replacement n_sims times, recompute the statistic, take percentiles.
+
+    The resampled month positions depend only on the seed and the series
+    length, not on the values. So with the same seed (42 in the scripts),
+    every series of the same length gets the same resampled month indices,
+    and the intervals are paired across strategies: each resample draws the
+    same months for all of them.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(returns)
+    vals = returns.values
+    stats = np.empty(n_sims)
+    for i in range(n_sims):
+        idx = rng.integers(0, n, size=n)
+        stats[i] = statistic(pd.Series(vals[idx]))
+    lower = float(np.percentile(stats, (1 - ci) / 2 * 100))
+    upper = float(np.percentile(stats, (1 + ci) / 2 * 100))
+    return {
+        "point": statistic(returns),
+        "lower": lower,
+        "upper": upper,
+        "ci": ci,
+        "n_sims": n_sims,
+    }
+
+
+def hit_rate(returns: pd.Series) -> float:
+    """Share of months with a positive return. A month of exactly 0 is not positive."""
+    return float((returns > 0).mean())
+
+
+def hit_rate_vs_benchmark(returns: pd.Series, benchmark_returns: pd.Series) -> float:
+    """
+    Share of months in which the strategy's return was strictly above the
+    benchmark's. A tie does not count. The two series must cover the same
+    dates.
+    """
+    if not returns.index.equals(benchmark_returns.index):
+        raise ValueError("returns and benchmark_returns must cover the same dates.")
+    return float((returns > benchmark_returns).mean())
+
+
+def drawdown_series(returns: pd.Series, start_date) -> pd.DataFrame:
+    """
+    Underwater curve: cumulative value divided by its running maximum,
+    minus 1, month by month, with a starting value of 1.0 at start_date
+    (the month-end before the first return).
+
+    Same formula as max_drawdown() above. The only difference is the 1.0
+    starting point: max_drawdown() starts its running maximum at the value
+    after the first month, so a first-month loss that is never recovered
+    before the deepest trough would make this series' minimum deeper.
+
+    The monthly_return column holds the input returns and is blank (NaN) on
+    the starting row, which is a starting value, not a month of return.
+    """
+    start = pd.Timestamp(start_date)
+    if start >= returns.index[0]:
+        raise ValueError("start_date must be before the first return date.")
+    cumulative = pd.concat([pd.Series([1.0], index=[start]), (1 + returns).cumprod()])
+    running_peak = cumulative.cummax()
+    return pd.DataFrame({
+        "monthly_return": pd.concat([pd.Series([np.nan], index=[start]), returns.astype(float)]),
+        "cumulative_value": cumulative,
+        "running_peak": running_peak,
+        "drawdown": (cumulative - running_peak) / running_peak,
+    })

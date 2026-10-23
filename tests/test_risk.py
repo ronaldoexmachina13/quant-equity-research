@@ -12,6 +12,7 @@ import pytest
 from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha, alpha_regression
 from src.risk import tbill_yield_to_monthly, align_risk_free, annualized_risk_free, sharpe_ratio_tbill, downside_deviation_tbill, sortino_ratio_tbill, alpha_regression_tbill
 from src.risk import power_z_values, minimum_detectable_effect, months_needed_to_detect
+from src.risk import historical_var, expected_shortfall, bootstrap_statistic_ci, hit_rate, hit_rate_vs_benchmark, drawdown_series
 
 
 def test_annualized_return_constant_monthly_return():
@@ -349,3 +350,139 @@ def test_months_needed_round_trip_with_minimum_detectable_effect():
     n = months_needed_to_detect(mean, sd, z_alpha, z_power)["months"]
     assert minimum_detectable_effect(sd, n, z_alpha, z_power) <= mean
     assert minimum_detectable_effect(sd, n - 1, z_alpha, z_power) > mean
+
+
+# --- Risk diagnostics (LIMITATIONS_PLAN.md, Phase 2B) ---
+
+# 20 monthly returns, deliberately not in order. Sorted, they start
+# -10%, -6%, -4%, -2%, 0%, ...
+RETURNS_20 = pd.Series([0.03, -0.06, 0.01, 0.05, -0.10, 0.02, 0.04, -0.02, 0.03, 0.07,
+                        0.00, 0.02, 0.06, -0.04, 0.03, 0.01, 0.05, 0.02, 0.04, 0.03])
+
+
+def test_var_and_es_hand_worked_20_months():
+    """
+    With 20 months the 5th percentile sits at position 0.05 x 19 = 0.95
+    between the two worst months (linear interpolation):
+    -0.10 + 0.95 x (-0.06 - -0.10) = -0.062, so VaR = 6.2%.
+    Only the -10% month is at or below -6.2%, so ES = 10%.
+    """
+    assert historical_var(RETURNS_20) == pytest.approx(0.062, rel=1e-12)
+    assert expected_shortfall(RETURNS_20) == pytest.approx(0.10, rel=1e-12)
+
+
+def test_expected_shortfall_includes_months_equal_to_the_cutoff():
+    """
+    Adding one more month (+8%) makes 21: the position is 0.05 x 20 = 1.0,
+    exactly the second-worst month, -6%. VaR = 6%, and ES averages the
+    months at or below it, -10% and -6%, giving 8%.
+    """
+    returns_21 = pd.concat([RETURNS_20, pd.Series([0.08])], ignore_index=True)
+    assert historical_var(returns_21) == pytest.approx(0.06, rel=1e-12)
+    assert expected_shortfall(returns_21) == pytest.approx(0.08, rel=1e-12)
+
+
+def test_var_and_es_do_not_depend_on_month_order():
+    shuffled = RETURNS_20.sample(frac=1.0, random_state=7).reset_index(drop=True)
+    assert historical_var(shuffled) == pytest.approx(historical_var(RETURNS_20), rel=1e-12)
+    assert expected_shortfall(shuffled) == pytest.approx(expected_shortfall(RETURNS_20), rel=1e-12)
+
+
+def test_var_and_es_follow_the_level_argument():
+    """
+    11 months, sorted -8%, -5%, -3%, -1%, 0%, 1%, ... At level 0.90 the 10th
+    percentile is at position 0.10 x 10 = 1.0, the -5% month: VaR = 5%,
+    ES = average of -8% and -5% = 6.5%. At the default 0.95 the position is
+    0.5: -0.08 + 0.5 x 0.03 = -0.065, VaR = 6.5%, ES = 8%.
+    """
+    returns = pd.Series([0.02, -0.05, 0.06, 0.0, -0.08, 0.04, -0.01, 0.01, 0.05, -0.03, 0.03])
+    assert historical_var(returns, level=0.90) == pytest.approx(0.05, rel=1e-12)
+    assert expected_shortfall(returns, level=0.90) == pytest.approx(0.065, rel=1e-12)
+    assert historical_var(returns) == pytest.approx(0.065, rel=1e-12)
+    assert expected_shortfall(returns) == pytest.approx(0.08, rel=1e-12)
+
+
+def test_bootstrap_statistic_ci_constant_series_collapses_to_point():
+    """Every resample of a constant -1% series has VaR and ES of exactly 1%."""
+    returns = pd.Series([-0.01] * 20)
+    for statistic in [historical_var, expected_shortfall]:
+        result = bootstrap_statistic_ci(returns, statistic, n_sims=200, seed=42)
+        assert result["point"] == pytest.approx(0.01)
+        assert result["lower"] == pytest.approx(0.01)
+        assert result["upper"] == pytest.approx(0.01)
+
+
+def test_bootstrap_statistic_ci_same_seed_same_interval():
+    a = bootstrap_statistic_ci(RETURNS_20, historical_var, n_sims=500, seed=42)
+    b = bootstrap_statistic_ci(RETURNS_20, historical_var, n_sims=500, seed=42)
+    assert (a["lower"], a["upper"]) == (b["lower"], b["upper"])
+
+
+def test_hit_rates_hand_worked():
+    """
+    Strategy +1%, -2%, 0%, +3%: two positive months of four (0% is not
+    positive) = 0.5. Against a benchmark of 0%, -3%, 0%, +4%: beats it in
+    months 1 and 2, ties in month 3 (not counted), trails in month 4 = 0.5.
+    """
+    dates = pd.date_range("2021-01-31", periods=4, freq="ME")
+    strat = pd.Series([0.01, -0.02, 0.0, 0.03], index=dates)
+    bench = pd.Series([0.0, -0.03, 0.0, 0.04], index=dates)
+    assert hit_rate(strat) == pytest.approx(0.5)
+    assert hit_rate_vs_benchmark(strat, bench) == pytest.approx(0.5)
+
+
+def test_hit_rate_vs_benchmark_requires_same_dates():
+    dates = pd.date_range("2021-01-31", periods=3, freq="ME")
+    with pytest.raises(ValueError):
+        hit_rate_vs_benchmark(pd.Series([0.01, 0.02, 0.03], index=dates),
+                              pd.Series([0.01, 0.02], index=dates[:2]))
+
+
+def test_drawdown_series_hand_path():
+    """
+    +10%, -20%, +5%, +20% from 1.0: values 1.1, 0.88, 0.924, 1.1088; peak
+    1.1 until the last month; drawdown 0, -20%, -16%, 0 (0 at the start
+    too). Its minimum equals max_drawdown() because month 1 is a gain.
+    """
+    dates = pd.date_range("2021-01-31", periods=4, freq="ME")
+    returns = pd.Series([0.10, -0.20, 0.05, 0.20], index=dates)
+    dd = drawdown_series(returns, "2020-12-31")
+    assert list(dd["cumulative_value"]) == pytest.approx([1.0, 1.1, 0.88, 0.924, 1.1088])
+    assert list(dd["drawdown"]) == pytest.approx([0.0, 0.0, -0.20, -0.16, 0.0])
+    assert dd["drawdown"].min() == pytest.approx(max_drawdown(returns), rel=1e-12)
+
+
+def test_drawdown_series_counts_a_first_month_loss_from_the_start():
+    """
+    -10% then +5%: from the 1.0 start the path is 0.9, 0.945, so the
+    drawdown is -10% then -5.5%. max_drawdown() starts its peak at 0.9 and
+    reports 0. This documents the registered 1.0 starting point.
+    """
+    dates = pd.date_range("2021-01-31", periods=2, freq="ME")
+    returns = pd.Series([-0.10, 0.05], index=dates)
+    dd = drawdown_series(returns, "2020-12-31")
+    assert list(dd["drawdown"]) == pytest.approx([0.0, -0.10, -0.055])
+    assert max_drawdown(returns) == pytest.approx(0.0)
+
+
+def test_drawdown_series_anchor_row_has_blank_monthly_return():
+    """
+    The 1.0 starting row is not a month of return: its monthly_return must
+    be blank even when the caller's series also has a value on that date
+    (as a longer backtest series would). Every other row carries the input
+    return, so exactly len(returns) rows are non-blank.
+    """
+    dates = pd.date_range("2024-12-31", periods=4, freq="ME")
+    longer = pd.Series([0.03, 0.01, -0.02, 0.04], index=dates)  # has a Dec 2024 value
+    period = longer.loc["2025-01-01":]
+    dd = drawdown_series(period, "2024-12-31")
+    assert np.isnan(dd.loc["2024-12-31", "monthly_return"])
+    assert dd.loc["2024-12-31", "cumulative_value"] == 1.0
+    assert list(dd["monthly_return"].iloc[1:]) == pytest.approx(list(period))
+    assert dd["monthly_return"].notna().sum() == len(period)
+
+
+def test_drawdown_series_start_must_precede_returns():
+    dates = pd.date_range("2021-01-31", periods=2, freq="ME")
+    with pytest.raises(ValueError):
+        drawdown_series(pd.Series([0.01, 0.02], index=dates), "2021-01-31")
