@@ -360,7 +360,7 @@ What can reasonably be inferred: across both periods, no strategy beat the passi
 
 ## Sensitivity updates (October 2026)
 
-Three of the limitations listed below were examined after the out-of-sample test: the flat risk-free rate, the simple cost model, and the absence of statistically significant results. Each analysis was pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) and committed before any code was run. Three dated amendments record clarifications made before the corresponding results existed: aligning the significance threshold with the project's 90% convention, adding a drift-inclusive turnover variant, and fixing the periods and definitions of the power analysis. These are labelled sensitivities and diagnostics. None changes a strategy, and the published figures above are unchanged; the new figures sit beside them.
+Four of the limitations listed below were examined after the out-of-sample test: the flat risk-free rate, the simple cost model, the absence of statistically significant results, and the coarse robustness testing. Each analysis was pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) and committed before any code was run. Dated amendments record clarifications made before the corresponding results existed: aligning the significance threshold with the project's 90% convention, adding a drift-inclusive turnover variant, fixing the periods and definitions of the power analysis, and adding extra reproduction checks and a note on the eligible universe to the robustness grid. These are labelled sensitivities and diagnostics. None changes a strategy, and the published figures above are unchanged; the new figures sit beside them.
 
 ### Period-specific risk-free rate
 
@@ -412,6 +412,44 @@ One out-of-sample detail deserves a caution. Combined's Sortino ratio (5.0 at a 
 
 The practical implication is that backtests of a handful of five-stock portfolios have little power. A more informative design tests the signals themselves across many stocks, which is the reason for the longer-history, larger-universe extension listed under "What's next".
 
+### Robustness grid
+
+**Question.** Does the conclusion that no active strategy beats the benchmark on a risk-adjusted basis survive reasonable changes to portfolio size, rebalancing frequency and the momentum lookback?
+
+**Method.** The grid was pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) before any code was run, and every cell is reported. Portfolio size: the top 3, 5, 8 or 10 of the 17 stocks. Rebalancing: monthly, or quarterly (selection refreshed in January, April, July and October, with positions drifting in between). Momentum lookback: 6-1, 9-1 or 12-1 months, for Momentum and Combined only. That gives 56 cells per period. In each cell the benchmark is equal weight across all 17 stocks, rebalanced at the same frequency as that cell, so that differences reflect stock selection and not rebalancing. Net figures use 10 bps one-way on drift-inclusive turnover for strategies and benchmark alike, with the flat 2% risk-free rate. The base case (top 5, monthly, 12-1) remains the headline and is not replaced by any cell. Before writing anything, the script checks that the base cell and the monthly top-8 cell reproduce the published figures and that the net Sharpe ratios match the cost sensitivity above (`run_robustness_grid.py`, `results/robustness_grid.csv`, `results/robustness_grid_summary.csv`).
+
+No significance test is run on individual cells. With 112 cells across the two periods, some would look favourable by chance alone. What is read instead is the share of cells with a positive Sharpe difference against the benchmark, the median difference, and how often the sign differs from the base case. A strategy is called stable if the sign matches the base case in at least 75% of its cells.
+
+Net Sharpe difference against the like-for-like benchmark (strategy minus benchmark):
+
+| Period | Strategy | Cells | Share positive | Median | Base case | Stability |
+|---|---|---|---|---|---|---|
+| In sample | Momentum | 24 | 0% | −0.21 | −0.29 | stable |
+| In sample | Value | 8 | 50% | +0.01 | +0.05 | fragile |
+| In sample | Combined | 24 | 0% | −0.20 | −0.20 | stable |
+| Out of sample* | Momentum | 24 | 8% | −0.80 | −0.88 | stable |
+| Out of sample* | Value | 8 | 38% | −0.17 | −0.36 | fragile |
+| Out of sample* | Combined | 24 | 13% | −0.40 | −0.20 | stable |
+
+*Out-of-sample cells are a second look at data already seen. The pre-registered out-of-sample test remains the official one. Momentum chooses from all 17 stocks; Value and Combined choose from the 14 to 16 that have a valid book value in any month, while the benchmark holds all 17.
+
+**What the results suggest.** The conclusion holds for Momentum and Combined. Both are stable in both periods and consistent across them: in sample, none of their 24 cells beats the benchmark, and out of sample 2 of 24 (Momentum) and 3 of 24 (Combined) do. For Momentum, portfolio size moves the difference more than the lookback does. In sample, its median difference goes from −0.39 at 3 stocks to −0.14 at 10, while the medians for the three lookbacks lie between −0.18 and −0.32. As the portfolio gets closer to the benchmark's breadth, the gap narrows, as expected. It is closer to zero at 10 stocks than at 3 in 5 of 6 combinations in sample and in all 6 out of sample, though not at every step.
+
+Value is the exception, and the pre-registration says a failure is reported as found. It is fragile in both periods and not consistent across them (median +0.01 in sample, −0.17 out of sample). In sample, its difference against the benchmark depends on concentration:
+
+| Portfolio size | Monthly | Quarterly |
+|---|---|---|
+| 3 stocks | +0.37 | +0.38 |
+| 5 stocks | +0.05 | +0.12 |
+| 8 stocks | −0.08 | −0.14 |
+| 10 stocks | −0.02 | −0.03 |
+
+Value is ahead of the benchmark only when it holds 3 or 5 stocks, which is consistent with the top-8 check earlier in this note. Out of sample there is no comparable pattern: the three positive cells are 3 stocks quarterly and 10 stocks monthly and quarterly, while 5 and 8 stocks are negative. A strategy whose sign depends on how many stocks it holds, and whose pattern does not repeat in the next period, gives little reason to expect a lasting edge. With only 3 stocks, one or two picks drive the result.
+
+Quarterly rebalancing lowers turnover in every paired cell (to roughly 55% to 70% of the monthly level in the median), but the effect on net Sharpe is not what I had expected. I had expected it to help Momentum and Combined more than Value. In sample, the median change is about zero for Momentum (0.00) and small for Combined (+0.03) and Value (+0.01). Out of sample it is negative for Momentum (−0.25) and Combined (−0.26) and positive for Value (+0.14). Refreshing the selection less often appears to cost more than the saved trading costs in 2025–26, whereas Value's slow-moving signal loses little. This change mixes the cost saving with the effect of staler selection, and only one quarterly schedule was tested.
+
+Overall, the grid is consistent with the main conclusion and adds one qualification: the one result that came closest to beating the benchmark, Value's in-sample lead, is also the one most sensitive to specification.
+
 ## Limitations
 
 - **Only 17 stocks.** A small, hand-picked group rather than a full index; a larger universe might behave differently.
@@ -419,7 +457,7 @@ The practical implication is that backtests of a handful of five-stock portfolio
 - **Short test periods.** The study covers 2021–2024 in-sample and 20 months out of sample. 2022 was a difficult year for momentum strategies generally, and no period before 2021 has been tested.
 - **Flat risk-free rate.** Sharpe ratios use a constant 2% rather than period-specific Treasury bill yields. Bill yields averaged roughly 1% over 2021–2022 and roughly 5% over 2023–2024, so this understates first-period Sharpe ratios and overstates second-period ones; over the 2025–2026 out-of-sample period bills yielded roughly 4%, so those Sharpe levels are also overstated. Comparisons within a period are much less affected than the levels. Re-computing with actual bill rates (see "Sensitivity updates") changes no Sharpe ranking in any period; the headline tables keep the flat 2% for consistency with the pre-registered out-of-sample test.
 - **Unresolved fundamentals gaps.** V is excluded: two raw filings exist from 2009–2010, but both are a decade too stale for the 2020–2024 window under the 6-month forward-fill cap. Visa's multi-class share structure most likely explains why so little exists under the standard XBRL tags. HD and DIS have partially understood coverage gaps. None of this changes the overall conclusion, but the Value and Combined results do not rest on complete data.
-- **Coarse robustness testing.** One alternative concentration (top 8) and one two-way period split have been tested; other portfolio sizes, rebalancing frequencies and rolling-window tests have not. Two periods are enough to show that the full-period result is not the whole story, but not enough to characterize how regime-dependent these strategies are. Further changes need their own justification rather than being tried until the numbers improve, which would amount to data mining.
+- **Coarse robustness testing.** A pre-registered grid (portfolio sizes of 3, 5, 8 and 10; monthly and quarterly rebalancing; momentum lookbacks of 6, 9 and 12 months) and a two-way period split have been tested (see "Sensitivity updates"). Other quarterly refresh months, rolling-window tests across more than two periods, other universes, sector effects and different factor definitions have not. Two periods are enough to show that the full-period result is not the whole story, but not enough to characterize how regime-dependent these strategies are. Further changes need their own justification rather than being tried until the numbers improve, which would amount to data mining.
 - **No result is statistically significant.** Every strategy-versus-benchmark Sharpe gap, in-sample and out of sample, has a 90% bootstrap confidence interval that includes zero, and no alpha has a regression t-statistic larger than 0.94 in absolute value. The regime story is economically plausible but not statistically confirmed. See `test_significance.py` and the period-split section above. A power analysis (see "Sensitivity updates") shows why: over 68 months a strategy would need to beat the benchmark by roughly 9% a year to be detected reliably, against a largest observed gap of 3.6%.
 - **Simple transaction-cost model.** A flat 10 bps one-way cost is a reasonable starting point for a liquid large-cap universe, but real costs vary by name, trade size and market conditions, none of which is modeled. Cost levels from 0 to 50 bps, and the benchmark's own rebalancing, are examined under "Sensitivity updates", and the conclusion holds at every level tested; per-name and size-dependent costs are still not modeled.
 
@@ -460,6 +498,7 @@ The sensitivity analyses described under "Sensitivity updates" run after the out
 python run_rf_sensitivity.py     # Sharpe, Sortino and alpha with actual 3-month Treasury bill rates (downloads TB3MS from FRED)
 python run_cost_sensitivity.py   # costs of 0 to 50 bps, drift-inclusive turnover, break-even cost
 python run_power_analysis.py     # minimum detectable effect, and months needed to detect the observed active returns
+python run_robustness_grid.py   # 56 cells per period: portfolio size, rebalancing frequency, momentum lookback
 ```
 
 Each script prints what it computed as it runs. The test suite (`python -m pytest tests/ -v`) covers the core factor-construction, risk-metric and turnover logic independently of any live data pull, so it runs without a network connection or a populated database.
@@ -482,7 +521,7 @@ quant-equity-research/
 │   ├── factors.py                   # builds the momentum, value, and combined signals
 │   ├── fundamentals.py              # pulls and cleans SEC EDGAR fundamentals for the value factor
 │   ├── portfolio.py                 # ranks stocks, builds the portfolio
-│   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover (incl. drift-based) and transaction costs, break-even cost
+│   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover (incl. drift-based) and transaction costs, break-even cost, buy-and-hold between quarterly refreshes
 │   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha (incl. OLS regression), Treasury-bill variants, power analysis, volatility, drawdown, rolling metrics, bootstrap testing
 ├── tests/
 │   ├── test_factors.py              # unit tests for momentum/value/combined and portfolio construction
@@ -502,6 +541,7 @@ quant-equity-research/
 ├── run_rf_sensitivity.py            # risk-free rate sensitivity (actual Treasury bill rates)
 ├── run_cost_sensitivity.py          # transaction-cost sensitivity and break-even cost
 ├── run_power_analysis.py            # statistical power of the active-return tests
+├── run_robustness_grid.py           # robustness grid (portfolio size, rebalancing frequency, momentum lookback)
 ├── test_significance.py             # bootstrap Sharpe confidence intervals and OLS alpha significance tests
 ├── test_transaction_costs.py        # turnover and cost-adjusted returns for each active strategy
 ├── generate_portfolio_timeline.py   # computes month-by-month holdings/contributions/rolling metrics
@@ -523,10 +563,11 @@ quant-equity-research/
 - **Completed: period-specific risk-free rate.** Sharpe, Sortino and alpha recomputed with monthly 3-month Treasury bill yields, pre-registered in `LIMITATIONS_PLAN.md`. Levels move, rankings within each period do not (apart from one Sortino ranking in 2021–2022). Results are in `results/rf_sensitivity.csv`.
 - **Completed: cost sensitivity.** Costs of 0 to 50 bps with the benchmark's own rebalancing charged and a drift-inclusive turnover variant; no strategy reaches a break-even cost. Results are in `results/cost_sensitivity.csv`.
 - **Completed: power analysis.** Over 68 months the minimum detectable annualised active return is about 9%, against a largest observed gap of 3.6%, which explains why no result is significant. Results are in `results/power_analysis.csv`.
+- **Completed: robustness grid.** 56 cells per period over portfolio size, rebalancing frequency and momentum lookback, pre-registered before it was run. Momentum and Combined stay below the benchmark in nearly every cell; Value's result depends on how many stocks it holds. Results are in `results/robustness_grid.csv` and `results/robustness_grid_summary.csv`.
 - **Longer history and a point-in-time universe.** Extend the test back to about 2012 (the start of usable XBRL data) on a universe drawn from historical index membership, holding a top decile or quintile rather than a fixed top 5, with its own pre-registration. This addresses the two largest limitations: short samples and survivorship bias.
 - **Further risk metrics:** Value at Risk and Expected Shortfall (CVaR), and hit rate.
 - **Combined factor construction.** Rank on book-to-price, or on cross-sectional ranks instead of raw P/B z-scores, to test whether Combined's momentum tilt comes from the skew in P/B.
-- **Further robustness testing:** a larger universe, alternative rebalancing frequencies and a rolling-window test across more than two periods, to measure how regime-dependent these strategies are rather than only showing that they are. Any change needs a stated reason in advance, not a search for better numbers.
+- **Further robustness testing:** a larger universe, other quarterly refresh months and a rolling-window test across more than two periods, to measure how regime-dependent these strategies are rather than only showing that they are. Any change needs a stated reason in advance, not a search for better numbers.
 
 ---
 
