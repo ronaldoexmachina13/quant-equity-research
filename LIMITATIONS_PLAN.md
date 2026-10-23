@@ -69,3 +69,15 @@ Clarifications of 1A (implementation choices, no change to the question or the d
 5. One extra row per period, with strategy "Risk-free", reports the annualised rate: 0.02 in the flat column and the actual T-bill rate in the T-bill column.
 6. The script is named run_rf_sensitivity.py.
 7. The TB3MS monthly average is applied to the same month's return, as registered. It does not affect which stocks are held, so it is not look-ahead.
+
+## Amendment 2 (2026-10-23, before any Phase 1B code was written or run)
+
+Reason: while planning 1B, it was found that calculate_turnover() counts only changes in target weights. It does not count the trades that rebalance held names back to equal weight after prices drift. The benchmark's only trades are such drift trades. Charging the benchmark for drift but not the strategies would be asymmetric and would flatter the strategies. No Phase 1B result existed when this amendment was written.
+
+Changes and clarifications to 1B:
+1. Two turnover bases for the strategies. (a) Existing basis: calculate_turnover(). It must reproduce transaction_cost_impact.csv and oos_summary.csv, or the script stops. (b) Drift-inclusive basis, labelled as such, which also counts the trades that rebalance held names after drift. The benchmark is always charged on drift-based turnover (rebalancing to equal weights each month).
+2. Drift definition: the pre-trade weight at month t is the month t-1 target weight drifted by month t-1 returns and renormalised. Turnover is 0.5 times the sum of absolute differences between the month t target and the pre-trade weights. NaN returns are treated as 0. The first month is a purchase from cash. Only month t-1 returns are used, so there is no look-ahead.
+3. Break-even cost: the one-way cost between 0 and 50 bps at which the strategy's Sharpe equals the benchmark's, with both net of the same cost, on the flat 2% basis. If there is no crossing, the result is recorded as "below benchmark at 0 bps" or "above benchmark at 50 bps".
+4. Periods: full in-sample (2021-2024) and out of sample (Jan 2025 to Aug 2026). In sample, the first month is a purchase from cash. Out of sample, January 2025 is a rebalance from the December 2024 holdings, as in the existing scripts.
+5. Output: results/cost_sensitivity.csv in long format, one row per period, strategy, turnover basis and cost level, with the benchmark Sharpe, the Sharpe difference, the break-even cost and a note.
+6. Reading rules, fixed now: (a) the headline 10 bps assumption on the existing basis is unchanged; (b) both bases are reported, and neither is chosen after seeing the results; (c) the drift-inclusive basis is the like-for-like comparison with the benchmark, and the existing basis is reported because it reproduces the published numbers; (d) expectation recorded in advance: drift-inclusive turnover is higher for the strategies, so their break-even costs will be lower than on the existing basis; where a strategy is already below the benchmark at 0 bps, no break-even exists and this is reported as such.
