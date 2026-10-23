@@ -94,3 +94,46 @@ Clarifications to 1C:
 5. Months needed: the figure answers "how long a sample would be needed if the true mean active return equalled the observed one". The observed mean is itself noisy, so this is illustrative and is labelled as such. A zero or negative observed mean is reported as such and never as a failure.
 6. Power uses the standard two-sided approximation (z_alpha + z_power) and ignores the far tail.
 7. Reading rules, fixed now: (a) the conclusion that no result is statistically significant stays unchanged whatever the power figures show; (b) the figures are used only to explain why the tests have little power and how large an effect would be needed, not to re-interpret any observed result; (c) if the minimum detectable effect for n = 68 exceeds the largest observed annualised active return, this is stated in the README as the reason no result is significant.
+
+## Phase 2 detailed design: robustness grid (2026-10-23, before any Phase 2 code was written or run)
+
+This entry replaces the grid description in the Phase 2 outline above. Differences from the outline: the cost dimension is dropped, because Phase 1B already covers costs from 0 to 50 bps; the extra diagnostics (rolling Sharpe, drawdown chart, VaR and Expected Shortfall, hit rate) are separated into a later descriptive step, Phase 2B, which tests no hypothesis and will be specified when we reach it.
+
+### Question and hypothesis
+- Question: does the conclusion "no active strategy beats the benchmark on a risk-adjusted basis by a margin distinguishable from chance" survive reasonable changes to portfolio size, rebalancing frequency and the momentum lookback?
+- Hypothesis recorded in advance: the conclusion is robust, meaning the sign of each strategy's Sharpe difference against the benchmark does not depend on one particular specification. This could fail, and a failure is reported as found.
+
+### Grid (every cell is run and reported)
+- Strategies: Momentum, Value, Combined.
+- Portfolio size (equal-weighted top N): 3, 5, 8, 10 stocks out of 17.
+- Rebalancing: monthly (the existing method, which resets equal weights among the selected names each month) and quarterly (selection refreshed every third month, in January, April, July and October, with holdings carried between refreshes and drifting with prices). The quarterly schedule starts in January 2021 and continues unbroken into the out-of-sample window. Only this one quarterly phase is run. Phase sensitivity (refreshing in February or March instead) is a stated limitation, not tested.
+- Momentum lookback: 6-1, 9-1 and 12-1 months (skip month fixed at 1). Applies to Momentum and Combined only. Combined uses the same lookback in its momentum component. Value has no lookback.
+- Cells: Momentum 24, Value 8, Combined 24, which is 56 per period.
+- Base specification (the published headline, unchanged): top 5, monthly, 12-1. It is flagged in the output and no other cell replaces it.
+
+### Periods
+- In sample: Jan 2021 to Dec 2024 (48 months), the same window for every cell regardless of lookback.
+- Out of sample: Jan 2025 to Aug 2026 (20 months), computed for the same cells as a stability check and reported separately. This is a second look at data already seen, and it is labelled as such. The pre-registered out-of-sample test remains the single official test and its published figures stand.
+- No cell in either period is used to choose, change or promote a specification.
+
+### Benchmark and costs
+- The benchmark in each cell is equal weight across all 17 stocks, rebalanced at the same frequency as that cell (monthly or quarterly, drifting in between), so that differences reflect stock selection and not rebalancing. The official monthly benchmark stays the headline.
+- Flat 2% risk-free rate, as in the published results.
+- Net figures use 10 bps one-way on the drift-inclusive turnover basis for strategies and benchmark alike (Amendment 2), so both are charged the same way. Gross figures are reported too.
+
+### Outputs (new files only; existing files are never overwritten)
+- `results/robustness_grid.csv`: one row per period, strategy and cell, with the settings, an is_base_case flag, gross and net Sharpe for strategy and like-for-like benchmark, the differences, average turnover, annualised return, volatility and maximum drawdown.
+- `results/robustness_grid_summary.csv`: one row per period and strategy, with the number of cells, the share of cells with a positive net Sharpe difference, the median, minimum and maximum difference, the base-case difference, and the share of cells whose sign differs from the base case.
+
+### Reproduction gates (the script stops without writing if any fails)
+- The base cell, monthly, top 5, 12-1 for Momentum and Combined, must reproduce the published gross Sharpe ratios for strategies and benchmark in `strategy_comparison_full_period.csv` and `oos_summary.csv`.
+- The monthly top 8 cell at 12-1 must reproduce `strategy_comparison_concentration.csv`.
+- Unit tests with hand-made inputs must cover the quarterly schedule, the drift of held positions between refreshes, and turnover that is zero in non-refresh months.
+
+### Reading rules, fixed now
+1. The headline specification is not replaced by any cell.
+2. No per-cell significance test is run. With 112 cells across the two periods, some cells would show a positive difference by chance alone, so individual cells are not read. The figures that are read are the share of cells with a positive difference, the median difference and the share of sign flips.
+3. A strategy's result is called stable in a period if the sign of its net Sharpe difference matches the base case in at least 75% of its cells, and fragile otherwise. It is called consistent across periods if the in-sample and out-of-sample median differences have the same sign.
+4. Every cell is reported, including unfavourable ones, in the CSV and in a table in the README.
+5. Expectations recorded in advance: as the portfolio size approaches 17, the difference against the benchmark moves towards zero, because the portfolio approaches the benchmark; quarterly rebalancing lowers turnover and so helps net Sharpe for Momentum and Combined more than for Value.
+6. Neither the grid nor any other analysis in this plan will be used to search for a better specification. If a later change to the strategies is wanted, it needs its own pre-registration.
