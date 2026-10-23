@@ -9,6 +9,7 @@ import pytest
 
 from src.backtest import calculate_turnover, apply_transaction_costs
 from src.backtest import calculate_monthly_returns, run_backtest, equal_weight_targets, calculate_turnover_with_drift, find_break_even_cost
+from src.backtest import hold_between_refreshes
 
 
 def test_turnover_first_month_is_full_weight_not_half():
@@ -193,3 +194,95 @@ def test_break_even_cost_above_benchmark_at_50():
     result = find_break_even_cost(BENCH_GROSS + 0.01, TURNOVER_STRAT, BENCH_GROSS, TURNOVER_BENCH)
     assert result["crossings_bps"] == []
     assert result["note"] == "above benchmark at 50 bps"
+
+
+# --- Quarterly rebalancing (LIMITATIONS_PLAN.md, Phase 2) ---
+
+# Six months, January to June 2021: refreshes fall in January and April. Targets switch from A/B to B/C in April; in other months they are
+# deliberately different from what is held, to show they are ignored.
+Q_DATES = pd.date_range("2021-01-31", periods=6, freq="ME")
+Q_TARGETS = pd.DataFrame({
+    "A": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "B": [0.5, 0.0, 0.5, 0.5, 0.0, 0.0],
+    "C": [0.0, 1.0, 0.5, 0.5, 1.0, 1.0],
+}, index=Q_DATES)
+Q_RETURNS = pd.DataFrame({
+    "A": [0.10, -0.05, 0.02, 0.00, 0.03, 0.01],
+    "B": [0.00, 0.10, -0.04, 0.05, 0.00, 0.02],
+    "C": [0.05, 0.00, 0.01, -0.02, 0.04, 0.00],
+}, index=Q_DATES)
+
+
+def test_hold_between_refreshes_follows_the_quarterly_schedule():
+    """Held weights equal the targets in January and April only."""
+    held = hold_between_refreshes(Q_TARGETS, Q_RETURNS)
+    for date in Q_DATES:
+        if date.month in (1, 4):
+            assert list(held.loc[date]) == pytest.approx(list(Q_TARGETS.loc[date]))
+        else:
+            assert list(held.loc[date]) != pytest.approx(list(Q_TARGETS.loc[date]))
+
+
+def test_hold_between_refreshes_drifts_positions_by_hand():
+    """
+    Bought 50/50 A/B in January. January: A +10%, B 0% -> February holds
+    0.55/1.05 and 0.50/1.05. February: A -5%, B +10% -> values 0.5225 and
+    0.55, so March holds 0.5225/1.0725 and 0.55/1.0725. C is never held.
+    """
+    held = hold_between_refreshes(Q_TARGETS, Q_RETURNS)
+    assert list(held.loc["2021-02-28"]) == pytest.approx([0.55 / 1.05, 0.50 / 1.05, 0.0], rel=1e-12)
+    assert list(held.loc["2021-03-31"]) == pytest.approx([0.5225 / 1.0725, 0.55 / 1.0725, 0.0], rel=1e-12)
+
+
+def test_quarterly_turnover_is_zero_between_refreshes():
+    """
+    With held weights fed to calculate_turnover_with_drift(), turnover is
+    the full weight in January (from cash), exactly zero in February, March,
+    May and June, and positive at the April refresh.
+    """
+    held = hold_between_refreshes(Q_TARGETS, Q_RETURNS)
+    turnover = calculate_turnover_with_drift(held, Q_RETURNS)
+    assert turnover.loc["2021-01-31"] == pytest.approx(1.0)
+    for date in ["2021-02-28", "2021-03-31", "2021-05-31", "2021-06-30"]:
+        assert turnover.loc[date] == pytest.approx(0.0, abs=1e-15)
+    assert turnover.loc["2021-04-30"] > 0
+
+
+def test_quarterly_turnover_at_refresh_uses_drifted_holdings():
+    """
+    The April trade is measured against the March holdings grown by March
+    returns (A +2%, B -4%), not against the January target of 50/50.
+    """
+    held = hold_between_refreshes(Q_TARGETS, Q_RETURNS)
+    march = held.loc["2021-03-31"]
+    grown = march * (1 + Q_RETURNS.loc["2021-03-31"])
+    pre_trade = grown / grown.sum()
+    expected = 0.5 * (Q_TARGETS.loc["2021-04-30"] - pre_trade).abs().sum()
+    turnover = calculate_turnover_with_drift(held, Q_RETURNS)
+    assert turnover.loc["2021-04-30"] == pytest.approx(expected, rel=1e-12)
+    naive = 0.5 * (Q_TARGETS.loc["2021-04-30"] - Q_TARGETS.loc["2021-01-31"]).abs().sum()
+    assert turnover.loc["2021-04-30"] != pytest.approx(naive)
+
+
+def test_quarterly_returns_compound_like_buy_and_hold():
+    """
+    Over January to March, the quarterly portfolio's compounded return must
+    equal buying 50/50 A/B at the start and holding: 0.5 x A's growth +
+    0.5 x B's growth over the three months.
+    """
+    held = hold_between_refreshes(Q_TARGETS, Q_RETURNS)
+    portfolio = run_backtest(held, Q_RETURNS)
+    compounded = (1 + portfolio.loc[:"2021-03-31"]).prod()
+    growth = (1 + Q_RETURNS.loc[:"2021-03-31"]).prod()
+    assert compounded == pytest.approx(0.5 * growth["A"] + 0.5 * growth["B"], rel=1e-12)
+
+
+def test_hold_between_refreshes_must_start_in_a_refresh_month():
+    with pytest.raises(ValueError):
+        hold_between_refreshes(Q_TARGETS.iloc[1:], Q_RETURNS.iloc[1:])
+
+
+def test_hold_between_refreshes_every_month_equals_monthly_targets():
+    """Refreshing in every month reduces to the monthly path: held = targets."""
+    held = hold_between_refreshes(Q_TARGETS, Q_RETURNS, refresh_months=tuple(range(1, 13)))
+    pd.testing.assert_frame_equal(held, Q_TARGETS.astype(float))

@@ -156,6 +156,48 @@ def find_break_even_cost(strat_gross: pd.Series, strat_turnover: pd.Series,
     return {"crossings_bps": crossings, "note": note}
 
 
+# ---------------------------------------------------------------------------
+# Quarterly rebalancing (LIMITATIONS_PLAN.md, Phase 2 detailed design).
+# ---------------------------------------------------------------------------
+
+def hold_between_refreshes(target_weights: pd.DataFrame, asset_returns: pd.DataFrame,
+                           refresh_months: tuple = (1, 4, 7, 10)) -> pd.DataFrame:
+    """
+    The weights actually held at the start of each month when the selection
+    is only refreshed in refresh_months (January, April, July and October by
+    default) and positions are carried, drifting with prices, in between.
+
+    - Refresh month t: held weights are that month's target (whose signal,
+      as in the monthly path, uses information up to t-1).
+    - Other months: the previous month's held weights, grown by the previous
+      month's returns and renormalised, w_t = w_{t-1}(1 + r_{t-1}) / sum.
+      This is buy-and-hold over the quarter. Missing returns count as 0, as
+      in calculate_turnover_with_drift() and run_backtest().
+
+    Feeding the result to run_backtest() gives the returns, and to
+    calculate_turnover_with_drift() gives turnover that is exactly zero in
+    non-refresh months. Refreshing in every month returns the targets.
+    """
+    targets = target_weights.fillna(0)
+    returns = asset_returns.reindex(index=targets.index, columns=targets.columns).fillna(0)
+    if targets.index[0].month not in refresh_months:
+        raise ValueError(f"The first month ({targets.index[0].date()}) must be a refresh month.")
+
+    held = pd.DataFrame(0.0, index=targets.index, columns=targets.columns)
+    previous_date = None
+    for date in targets.index:
+        if date.month in refresh_months:
+            row = targets.loc[date]
+            if row.sum() <= 0:
+                raise ValueError(f"No valid target portfolio in refresh month {date.date()}.")
+        else:
+            grown = held.loc[previous_date] * (1 + returns.loc[previous_date])
+            row = grown / grown.sum()
+        held.loc[date] = row
+        previous_date = date
+    return held
+
+
 if __name__ == "__main__":
     prices = load_prices()
     momentum = calculate_momentum(prices)
