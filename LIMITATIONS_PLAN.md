@@ -202,3 +202,36 @@ The membership is stored as a table index_membership (ticker, start_date, end_da
 
 ### Deliverables
 New scripts at the repository root, resumable and cached, in the existing naming style; unit tests with hand-made inputs for the membership reconstruction (a short invented list of changes whose result is checked by hand) and for the usability rules; and the five output files above. No README, HTML or LIMITATIONS_PLAN.md edits by Claude Code. Ronaldo commits.
+
+## Phase 2B detailed design: risk diagnostics (2026-10-23, before any Phase 2B code was written or run)
+
+This entry specifies the descriptive step mentioned in the Phase 2 design. Rolling Sharpe is dropped from it, because the Portfolio Timeline page already shows rolling 12-month Sharpe and volatility.
+
+### Purpose
+Descriptive tail-risk and consistency measures from the project roadmap (Value at Risk, Expected Shortfall, hit rate) and a drawdown chart. No hypothesis is tested. Nothing in this step changes a strategy or a published result.
+
+### Definitions, fixed now
+- Returns: the published monthly gross returns of Momentum, Value, Combined and the monthly-rebalanced equal-weight Benchmark, in the base specification (top 5, monthly, 12-1 where applicable). These are the same series the earlier scripts use.
+- Periods: in sample (48 months) and the full 68 months for Value at Risk and Expected Shortfall. For the hit rates, worst and best month and the drawdown series, out of sample (20 months) is reported as well. Value at Risk and Expected Shortfall are not reported for 20 months alone, because 20 observations leave a single observation in the 5% tail.
+- Historical Value at Risk at 95%: the monthly return at the 5th percentile of the period's returns (numpy percentile with linear interpolation), reported as a positive loss. A figure of 6.0% means that in 5% of months the return was -6.0% or worse.
+- Expected Shortfall at 95%: the average loss over the months whose return is at or below that 5th percentile value, reported as a positive loss.
+- Intervals: 90% bootstrap intervals for Value at Risk and Expected Shortfall (5,000 resamples with replacement, seed 42), as in the existing bootstrap code.
+- Hit rate, two versions: the share of months with a positive return, and the share of months in which a strategy's return exceeded the benchmark's (strategies only).
+- Also reported: worst month, best month and the number of months.
+- Drawdown series: the underwater curve (cumulative value divided by its running maximum, minus 1), month by month, for each strategy and the benchmark. In sample starts at 1.0 in January 2021, and out of sample starts at 1.0 at the end of December 2024, consistent with the existing out-of-sample growth chart.
+
+### Outputs (new files only; existing files are never overwritten)
+- results/risk_diagnostics.csv: one row per period and strategy, with the measures above.
+- results/drawdown_series.csv: one row per period, month and strategy.
+
+### Reproduction gates (the script stops without writing if any fails)
+1. The returns must reproduce the published Sharpe ratios at the flat 2% rate for the strategies and the benchmark, in sample and out of sample, and the saved out-of-sample monthly returns, to 1e-9.
+2. The maximum drawdown computed from the new drawdown series must match the published maximum drawdown for every strategy and the benchmark, in sample and out of sample, to 1e-9.
+3. Unit tests with hand-made inputs must cover Value at Risk and Expected Shortfall on a short list whose percentile and tail average can be checked by hand, both hit rates, and the drawdown of a hand-made path.
+
+### Reading rules, fixed now
+1. The measures are descriptive. No test between strategies is run.
+2. With 48 and 68 monthly observations the 5% tail rests on about two or three months, so the intervals are expected to be wide. Expectation recorded in advance: the 90% intervals of the strategies and the benchmark overlap for both Value at Risk and Expected Shortfall, so no strategy is described as having lower or higher tail risk than another on this evidence.
+3. Hit rates are read against 50%. The difference from 50% is not tested.
+4. The drawdown chart shows what happened. The published maximum drawdown figures are unchanged.
+5. After the results exist, a panel is added to the Sensitivity tab of the dashboard through the generator, with no hand-typed figures.
