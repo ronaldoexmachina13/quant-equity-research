@@ -150,6 +150,7 @@
         <button class="strategy-btn tab-btn" data-tab="sharpe">Sharpe Ratio</button>
     <button class="strategy-btn tab-btn" data-tab="robustness">Robustness</button>
     <button class="strategy-btn tab-btn" data-tab="oos">Out of Sample</button>
+    <button class="strategy-btn tab-btn" data-tab="sensitivity">Sensitivity</button>
   </div>
 
   <!-- ===== SECTION: 4 STRATEGIES ===== -->
@@ -311,6 +312,74 @@ where, from monthly data:
     </div>
   </div>
 
+  <!-- ===== SECTION: SENSITIVITY ===== -->
+  <div id="sensitivitySection" style="display:none;">
+    <div class="panel">
+      <h2>Four checks on how far the conclusions depend on the assumptions</h2>
+      <p class="definition-body">These checks were added after the main results. Each was written down in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/LIMITATIONS_PLAN.md" target="_blank">LIMITATIONS_PLAN.md</a> and committed before any code was run. They are sensitivities and diagnostics: none of them changes a strategy or replaces a result shown on the other tabs.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Does the risk-free rate change the picture?</h2>
+      <p class="definition-body">Sharpe ratios elsewhere on this site deduct a flat 2% risk-free rate. This table recomputes them with the actual 3-month Treasury bill rate for each month. Each cell shows Sharpe at a flat 2% &rarr; Sharpe at the actual rate.</p>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table" id="rfTable">
+          <thead><tr><th>Period</th><th class="num">Avg. bill rate</th><th class="num">Momentum</th><th class="num">Value</th><th class="num">Combined</th><th class="num">Benchmark</th></tr></thead>
+          <tbody id="rfTableBody"></tbody>
+        </table>
+      </div>
+      <p class="caption" style="margin-top:0.9rem;">When bills paid about 1% (2021&ndash;2022) every Sharpe ratio rises, and when they paid about 5% (2023&ndash;2024) every one falls, so the levels depend on the rate used. The order of the strategies against the benchmark does not change, and the benchmark still has the highest out-of-sample Sharpe ratio.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Do higher trading costs change the ranking?</h2>
+      <p class="definition-body">Costs of 0 to 50 bps one-way, charged on turnover that also counts the trades needed to restore equal weights among the names already held, for the strategies and the benchmark alike. Sharpe is shown at 0 / 10 / 50 bps.</p>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table" id="costSensTable">
+          <thead><tr><th>Strategy</th><th class="num">Turnover a month, in sample</th><th class="num">Sharpe in sample, 0 / 10 / 50 bps</th><th class="num">Turnover a month, out of sample*</th><th class="num">Sharpe out of sample*, 0 / 10 / 50 bps</th></tr></thead>
+          <tbody id="costSensTableBody"></tbody>
+        </table>
+      </div>
+      <p class="caption" style="margin-top:0.9rem;">No strategy reaches a cost level, between 0 and 50 bps, at which its Sharpe ratio overtakes the benchmark's. Momentum and Combined lose the most because they trade the most. Value stays ahead of the benchmark in sample even at 50 bps, because its turnover is close to the benchmark's own.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Why is nothing statistically significant?</h2>
+      <p class="definition-body">With 68 months of data, how large would a strategy's yearly lead over the benchmark need to be to be detected reliably? The minimum detectable effect uses a 10% two-sided test with 80% power on the monthly active return (strategy minus benchmark). It is estimated from the same sample, so the figures are illustrative, and 170 months is a hypothetical sample length, not a result.</p>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table" id="powerTable">
+          <thead><tr><th>Strategy</th><th class="num">Mean active return a year</th><th class="num">Tracking error</th><th class="num">Minimum detectable, 68 months</th><th class="num">Same, hypothetical 170 months</th><th class="num">Months needed for the observed mean</th></tr></thead>
+          <tbody id="powerTableBody"></tbody>
+        </table>
+      </div>
+      <p class="caption" style="margin-top:0.9rem;">The observed leads and lags are far smaller than the roughly 9% a year that 68 months can detect. The lack of significant results is what a test this weak would show for a modest true effect, so it does not mean that no effect exists. Even 170 months would need a gap of about 6% a year.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Do the results survive different settings?</h2>
+      <p class="definition-body">A grid of 56 settings per period: portfolio size (3, 5, 8 or 10 stocks), monthly or quarterly rebalancing and, for Momentum and Combined, the lookback (6-1, 9-1 or 12-1). Each setting is compared with a benchmark rebalanced at the same frequency. No setting is tested on its own or singled out. The table shows the net Sharpe difference against the benchmark (strategy minus benchmark) and how often its sign matches the base case (top 5, monthly, 12-1).</p>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table" id="gridTable">
+          <thead><tr><th>Period</th><th>Strategy</th><th class="num">Settings</th><th class="num">Share ahead of benchmark</th><th class="num">Median difference</th><th class="num">Base case</th><th class="num">Verdict</th><th class="num">Names available</th></tr></thead>
+          <tbody id="gridTableBody"></tbody>
+        </table>
+      </div>
+      <p class="caption" style="margin-top:0.9rem;">Momentum and Combined stay behind the benchmark in nearly every setting, in both periods. Value is the exception: whether it is ahead depends on the setting, and the pattern differs between the two periods. A setting is called stable if the sign matches the base case in at least 75% of cases. *Out-of-sample settings are a second look at data already seen; the pre-registered out-of-sample test remains the official one. Value and Combined can only choose among names with a valid book value, while the benchmark holds all 17.</p>
+    </div>
+
+    <div class="panel">
+      <h2>How does Value depend on the number of stocks it holds?</h2>
+      <p class="definition-body">Net Sharpe difference against the benchmark for Value, by portfolio size and rebalancing frequency.</p>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table" id="sizeTable">
+          <thead><tr><th>Portfolio size</th><th class="num">In sample, monthly</th><th class="num">In sample, quarterly</th><th class="num">Out of sample*, monthly</th><th class="num">Out of sample*, quarterly</th></tr></thead>
+          <tbody id="sizeTableBody"></tbody>
+        </table>
+      </div>
+      <p class="caption" style="margin-top:0.9rem;">In sample, Value is ahead of the benchmark only when it holds 3 or 5 stocks, so its lead depends on concentration; with so few stocks, one or two picks drive the result. Out of sample the same pattern does not appear. A result that changes with the number of stocks held, and does not repeat in the next period, gives little reason to expect a lasting edge.</p>
+    </div>
+  </div>
+
   <footer>
     <div class="facts"><span>17 US large caps</span><span>In sample 2021&ndash;2024</span><span>Out of sample Jan 2025 &ndash; Aug 2026</span></div>
     <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
@@ -438,6 +507,7 @@ function initTabs() {
       document.getElementById("sharpeSection").style.display = tab === "sharpe" ? "block" : "none";
       document.getElementById("robustnessSection").style.display = tab === "robustness" ? "block" : "none";
       document.getElementById("oosSection").style.display = tab === "oos" ? "block" : "none";
+      document.getElementById("sensitivitySection").style.display = tab === "sensitivity" ? "block" : "none";
       if (tab === "oos") renderOosChart();
     });
   });
@@ -799,9 +869,67 @@ function renderOosChart() {
   });
 }
 
+/* ===== Sensitivity tab =====
+   SENSITIVITY_DATA is written by generate_dashboard_data.py from
+   results/rf_sensitivity.csv, cost_sensitivity.csv, power_analysis.csv,
+   robustness_grid.csv and robustness_grid_summary.csv. Do not edit by hand. */
+const SENSITIVITY_DATA = {"rf":[{"period":"2021&ndash;2024","rate":"3.0%","cells":{"Momentum":"0.56 &rarr; 0.49","Value":"0.86 &rarr; 0.81","Combined":"0.65 &rarr; 0.59","Benchmark":"0.81 &rarr; 0.75"}},{"period":"2021&ndash;2022","rate":"1.0%","cells":{"Momentum":"0.25 &rarr; 0.31","Value":"0.64 &rarr; 0.69","Combined":"0.16 &rarr; 0.22","Benchmark":"0.59 &rarr; 0.65"}},{"period":"2023&ndash;2024","rate":"5.0%","cells":{"Momentum":"0.92 &rarr; 0.70","Value":"1.15 &rarr; 0.96","Combined":"1.27 &rarr; 1.05","Benchmark":"1.13 &rarr; 0.88"}},{"period":"Out of sample, Jan 2025&ndash;Aug 2026","rate":"3.9%","cells":{"Momentum":"1.05 &rarr; 0.89","Value":"1.53 &rarr; 1.40","Combined":"1.72 &rarr; 1.58","Benchmark":"1.89 &rarr; 1.69"}}],"cost":[{"strategy":"Momentum","is_turnover":"24.2%","is_sharpe":"0.56 / 0.51 / 0.34","oos_turnover":"21.5%","oos_sharpe":"1.05 / 1.00 / 0.81"},{"strategy":"Value","is_turnover":"6.2%","is_sharpe":"0.86 / 0.85 / 0.81","oos_turnover":"3.5%","oos_sharpe":"1.53 / 1.52 / 1.50"},{"strategy":"Combined","is_turnover":"23.7%","is_sharpe":"0.65 / 0.61 / 0.44","oos_turnover":"17.6%","oos_sharpe":"1.72 / 1.68 / 1.54"},{"strategy":"Benchmark","is_turnover":"4.2%","is_sharpe":"0.81 / 0.81 / 0.77","oos_turnover":"2.6%","oos_sharpe":"1.89 / 1.88 / 1.85"}],"power":[{"strategy":"Momentum","mean":"-3.6%","te":"8.3%","mde68":"8.6%","mde170":"5.5%","months":"390 (underperformance)"},{"strategy":"Value","mean":"+3.6%","te":"8.9%","mde68":"9.3%","mde170":"5.9%","months":"459"},{"strategy":"Combined","mean":"+0.1%","te":"8.9%","mde68":"9.3%","mde170":"5.9%","months":"not meaningful (mean near zero)"}],"grid":[{"period":"In sample","strategy":"Momentum","cells":24,"share_positive":"0%","median":"-0.21","base":"-0.29","stability":"stable","eligible":"17"},{"period":"In sample","strategy":"Value","cells":8,"share_positive":"50%","median":"+0.01","base":"+0.05","stability":"fragile","eligible":"14 to 16"},{"period":"In sample","strategy":"Combined","cells":24,"share_positive":"0%","median":"-0.20","base":"-0.19","stability":"stable","eligible":"14 to 16"},{"period":"Out of sample*","strategy":"Momentum","cells":24,"share_positive":"8%","median":"-0.80","base":"-0.88","stability":"stable","eligible":"17"},{"period":"Out of sample*","strategy":"Value","cells":8,"share_positive":"38%","median":"-0.17","base":"-0.36","stability":"fragile","eligible":"15 to 16"},{"period":"Out of sample*","strategy":"Combined","cells":24,"share_positive":"13%","median":"-0.40","base":"-0.20","stability":"stable","eligible":"15 to 16"}],"value_by_size":[{"size":"3 stocks","is_monthly":"+0.37","is_quarterly":"+0.38","oos_monthly":"-0.08","oos_quarterly":"+0.14"},{"size":"5 stocks","is_monthly":"+0.05","is_quarterly":"+0.12","oos_monthly":"-0.36","oos_quarterly":"-0.28"},{"size":"8 stocks","is_monthly":"-0.08","is_quarterly":"-0.14","oos_monthly":"-0.29","oos_quarterly":"-0.26"},{"size":"10 stocks","is_monthly":"-0.02","is_quarterly":"-0.03","oos_monthly":"+0.04","oos_quarterly":"+0.08"}]};
+
+function fillRows(bodyId, rows) {
+  const tbody = document.getElementById(bodyId);
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  rows.forEach(html => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = html;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderSensitivity() {
+  const d = SENSITIVITY_DATA;
+  if (!d.rf.length) return;
+  const names = ["Momentum", "Value", "Combined", "Benchmark"];
+
+  fillRows("rfTableBody", d.rf.map(r =>
+    '<td class="period-cell">' + r.period + '</td><td class="num">' + r.rate + "</td>" +
+    names.map(n => '<td class="num">' + r.cells[n] + "</td>").join("")));
+
+  fillRows("costSensTableBody", d.cost.map(r =>
+    "<td>" + strategyName(r.strategy) + "</td>" +
+    '<td class="num">' + r.is_turnover + '</td><td class="num">' + r.is_sharpe + "</td>" +
+    '<td class="num">' + r.oos_turnover + '</td><td class="num">' + r.oos_sharpe + "</td>"));
+
+  fillRows("powerTableBody", d.power.map(r =>
+    "<td>" + strategyName(r.strategy) + "</td>" +
+    '<td class="num">' + r.mean + '</td><td class="num">' + r.te + "</td>" +
+    '<td class="num">' + r.mde68 + '</td><td class="num">' + r.mde170 + "</td>" +
+    '<td class="num">' + r.months + "</td>"));
+
+  let lastPeriod = null;
+  fillRows("gridTableBody", d.grid.map(r => {
+    const isNewGroup = r.period !== lastPeriod;
+    lastPeriod = r.period;
+    const verdict = r.stability === "stable"
+      ? "stable"
+      : '<b class="verdict-mixed">' + r.stability + "</b>";
+    return (isNewGroup ? '<td class="period-cell">' + r.period + "</td>" : "<td></td>") +
+      "<td>" + strategyName(r.strategy) + "</td>" +
+      '<td class="num">' + r.cells + '</td><td class="num">' + r.share_positive + "</td>" +
+      '<td class="num">' + r.median + '</td><td class="num">' + r.base + "</td>" +
+      '<td class="num">' + verdict + '</td><td class="num">' + r.eligible + "</td>";
+  }));
+
+  fillRows("sizeTableBody", d.value_by_size.map(r =>
+    "<td>" + r.size + "</td>" +
+    '<td class="num">' + r.is_monthly + '</td><td class="num">' + r.is_quarterly + "</td>" +
+    '<td class="num">' + r.oos_monthly + '</td><td class="num">' + r.oos_quarterly + "</td>"));
+}
+
 renderSignificanceTable();
 renderCostTable();
 renderOosTable();
+renderSensitivity();
 </script>
 </body>
 </html>

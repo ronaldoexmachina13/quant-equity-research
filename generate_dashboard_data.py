@@ -388,6 +388,130 @@ def update_oos_data(path: str, oos_rows: list, oos_growth: dict):
     print(f"Updated {path}: OOS_DATA ({len(oos_rows)} rows), OOS_GROWTH ({len(oos_growth['dates'])} points)")
 
 
+def signed_num(x: float, decimals: int = 2) -> str:
+    """0.045 -> '+0.05', -0.293 -> '-0.29', values that round to zero -> '0.00'"""
+    v = round_half_up(x, decimals) + 0.0
+    return f"{v:+.{decimals}f}" if v != 0 else f"{0:.{decimals}f}"
+
+
+def build_sensitivity_data() -> dict:
+    """
+    Build the display-ready rows for the Sensitivity tab from the four
+    sensitivity CSVs (T-bill rate, cost levels, power analysis, robustness
+    grid). Rounding happens here, once, from full precision. Nothing on the
+    tab is typed by hand except the explanatory text around the tables.
+    """
+    strategies = ["Momentum", "Value", "Combined"]
+
+    # 1. Risk-free rate: Sharpe at a flat 2% against actual 3-month bill rates
+    rf = pd.read_csv("results/rf_sensitivity.csv")
+    rf_periods = [
+        ("Full period (2021-2024)", "2021&ndash;2024"),
+        ("2021-2022", "2021&ndash;2022"),
+        ("2023-2024", "2023&ndash;2024"),
+        ("Out of sample (Jan 2025-Aug 2026)", "Out of sample, Jan 2025&ndash;Aug 2026"),
+    ]
+    rf_rows = []
+    for key, label in rf_periods:
+        sub = rf[rf["period"] == key]
+        rate = sub[(sub["strategy"] == "Risk-free") & (sub["metric"] == "annualized_rate")].iloc[0]
+        cells = {}
+        for name in ORDER:
+            r = sub[(sub["strategy"] == name) & (sub["metric"] == "sharpe_ratio")].iloc[0]
+            cells[name] = f"{num(r['flat_2pct'])} &rarr; {num(r['tbill'])}"
+        rf_rows.append({"period": label, "rate": pct(float(rate["tbill"])), "cells": cells})
+
+    # 2. Cost levels: Sharpe at 0 / 10 / 50 bps, drift-inclusive turnover basis
+    cost = pd.read_csv("results/cost_sensitivity.csv")
+    in_sample, out_sample = "Full period (2021-2024)", "Out of sample (Jan 2025-Aug 2026)"
+    cost_rows = []
+    for name in ORDER:
+        basis = "drift (equal-weight rebalance)" if name == "Benchmark" else "drift-inclusive"
+        row = {"strategy": name}
+        for tag, period in (("is", in_sample), ("oos", out_sample)):
+            x = cost[(cost["period"] == period) & (cost["strategy"] == name)
+                     & (cost["turnover_basis"] == basis)].set_index("cost_bps")
+            row[tag + "_turnover"] = pct(float(x.loc[0, "avg_monthly_turnover"]))
+            row[tag + "_sharpe"] = " / ".join(num(float(x.loc[b, "sharpe_ratio"])) for b in (0, 10, 50))
+        cost_rows.append(row)
+
+    # 3. Power analysis: primary level (10% two-sided, 80% power), full 68 months
+    power = pd.read_csv("results/power_analysis.csv")
+    power = power[power["significance_level"].str.contains("primary")]
+    combined = "In and out of sample combined (2021-Aug 2026)"
+    power_rows = []
+    for name in strategies:
+        sub = power[(power["period"] == combined) & (power["strategy"] == name)]
+        mde = sub[sub["metric"] == "mde_annualised"]
+        m68 = mde[mde["n_months"] == 68].iloc[0]
+        m170 = mde[mde["n_months"] == 170].iloc[0]
+        need = sub[sub["metric"] == "months_needed"].iloc[0]
+        # A figure above 10,000 months comes from a mean active return that is
+        # almost exactly zero, so it carries no information and is not shown.
+        if float(need["value"]) > 10000:
+            months = "not meaningful (mean near zero)"
+        else:
+            months = f"{int(need['value'])}"
+            if "underperformance" in str(need["note"]):
+                months += " (underperformance)"
+        power_rows.append({
+            "strategy": name,
+            "mean": signed_pct(float(m68["mean_active_annualised"])),
+            "te": pct(float(m68["sd_active_annualised"])),
+            "mde68": pct(float(m68["value"])),
+            "mde170": pct(float(m170["value"])),
+            "months": months,
+        })
+
+    # 4. Robustness grid: summary per period and strategy, and Value by portfolio size
+    summary = pd.read_csv("results/robustness_grid_summary.csv")
+    grid = pd.read_csv("results/robustness_grid.csv")
+    grid_periods = [("In sample (2021-2024)", "In sample"),
+                    ("Out of sample (Jan 2025-Aug 2026)", "Out of sample*")]
+    grid_rows = []
+    for key, label in grid_periods:
+        for name in strategies:
+            r = summary[(summary["period"] == key) & (summary["strategy"] == name)].iloc[0]
+            lo, hi = int(r["eligible_names_min"]), int(r["eligible_names_max"])
+            grid_rows.append({
+                "period": label,
+                "strategy": name,
+                "cells": int(r["n_cells"]),
+                "share_positive": pct(float(r["share_positive_net_diff"]), 0),
+                "median": signed_num(float(r["median_net_diff"])),
+                "base": signed_num(float(r["base_case_net_diff"])),
+                "stability": str(r["stability"]),
+                "eligible": f"{lo}" if lo == hi else f"{lo} to {hi}",
+            })
+    value = grid[grid["strategy"] == "Value"]
+    size_rows = []
+    for n in (3, 5, 8, 10):
+        row = {"size": f"{n} stocks"}
+        for tag, key in (("is", grid_periods[0][0]), ("oos", grid_periods[1][0])):
+            for reb in ("monthly", "quarterly"):
+                cell = value[(value["period"] == key) & (value["top_n"] == n) & (value["rebalance"] == reb)]
+                row[f"{tag}_{reb}"] = signed_num(float(cell["net_sharpe_diff"].iloc[0]))
+        size_rows.append(row)
+
+    return {"rf": rf_rows, "cost": cost_rows, "power": power_rows,
+            "grid": grid_rows, "value_by_size": size_rows}
+
+
+def update_sensitivity_data(path: str, data: dict):
+    """Inject the sensitivity results into strategies.html (SENSITIVITY_DATA)."""
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+    pattern = re.compile(r"const SENSITIVITY_DATA = \{.*?\};", re.DOTALL)
+    if not pattern.search(html):
+        raise ValueError(f"Could not find the SENSITIVITY_DATA placeholder in {path}.")
+    line = f"const SENSITIVITY_DATA = {json.dumps(data, separators=(',', ':'))};"
+    html = pattern.sub(lambda m: line, html, count=1)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"Updated {path}: SENSITIVITY_DATA ({len(data['rf'])} risk-free, {len(data['cost'])} cost, "
+          f"{len(data['power'])} power, {len(data['grid'])} grid, {len(data['value_by_size'])} size rows)")
+
+
 if __name__ == "__main__":
     full = load_period("results/strategy_comparison_full_period.csv")
     p1 = load_period("results/strategy_comparison_2021_2022.csv")
@@ -400,6 +524,8 @@ if __name__ == "__main__":
     update_robustness_data("strategies.html", significance_rows, cost_rows)
 
     update_oos_data("strategies.html", build_oos_rows(), build_oos_growth())
+
+    update_sensitivity_data("strategies.html", build_sensitivity_data())
 
     with open("results/backtest_metadata.json") as f:
         metadata = json.load(f)
