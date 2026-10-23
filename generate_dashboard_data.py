@@ -493,8 +493,46 @@ def build_sensitivity_data() -> dict:
                 row[f"{tag}_{reb}"] = signed_num(float(cell["net_sharpe_diff"].iloc[0]))
         size_rows.append(row)
 
+    # 5. Risk diagnostics: Value at Risk, Expected Shortfall and hit rates
+    risk = pd.read_csv("results/risk_diagnostics.csv")
+    risk_periods = [("In sample (2021-2024)", "In sample, 48 months"),
+                    ("Full period (Jan 2021-Aug 2026)", "Full period, 68 months"),
+                    ("Out of sample (Jan 2025-Aug 2026)", "Out of sample*, 20 months")]
+
+    def interval(point, lower, upper) -> str:
+        """0.0567, 0.0325, 0.0780 -> '5.7% [3.2, 7.8]'"""
+        return (f"{pct(float(point))} [{round_half_up(float(lower) * 100, 1):.1f}, "
+                f"{round_half_up(float(upper) * 100, 1):.1f}]")
+
+    risk_rows = []
+    for key, label in risk_periods:
+        for name in ORDER:
+            r = risk[(risk["period"] == key) & (risk["strategy"] == name)].iloc[0]
+            has_tail = pd.notna(r["var_95"])
+            worst_date = pd.to_datetime(r["worst_month_date"]).strftime("%b %Y")
+            risk_rows.append({
+                "period": label,
+                "strategy": name,
+                "var": interval(r["var_95"], r["var_95_ci_lower"], r["var_95_ci_upper"]) if has_tail else "not reported",
+                "es": interval(r["es_95"], r["es_95_ci_lower"], r["es_95_ci_upper"]) if has_tail else "not reported",
+                "positive": pct(float(r["hit_rate_positive"]), 0),
+                "ahead": "" if pd.isna(r["hit_rate_vs_benchmark"]) else pct(float(r["hit_rate_vs_benchmark"]), 0),
+                "worst": f"{signed_pct(float(r['worst_month']))} ({worst_date})",
+            })
+
+    # 6. Drawdown series (in percent), in sample and out of sample, each starting at 1.0
+    dd = pd.read_csv("results/drawdown_series.csv")
+    drawdown = {}
+    for tag, key in (("insample", "In sample (2021-2024)"), ("oos", "Out of sample (Jan 2025-Aug 2026)")):
+        wide = dd[dd["period"] == key].pivot(index="date", columns="strategy", values="drawdown").sort_index()
+        drawdown[tag] = {
+            "dates": [pd.to_datetime(d).strftime("%b %Y") for d in wide.index],
+            "series": {name: [round_half_up(float(v) * 100, 2) + 0.0 for v in wide[name]] for name in ORDER},
+        }
+
     return {"rf": rf_rows, "cost": cost_rows, "power": power_rows,
-            "grid": grid_rows, "value_by_size": size_rows}
+            "grid": grid_rows, "value_by_size": size_rows,
+            "risk": risk_rows, "drawdown": drawdown}
 
 
 def update_sensitivity_data(path: str, data: dict):
@@ -509,7 +547,8 @@ def update_sensitivity_data(path: str, data: dict):
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Updated {path}: SENSITIVITY_DATA ({len(data['rf'])} risk-free, {len(data['cost'])} cost, "
-          f"{len(data['power'])} power, {len(data['grid'])} grid, {len(data['value_by_size'])} size rows)")
+          f"{len(data['power'])} power, {len(data['grid'])} grid, {len(data['value_by_size'])} size, "
+          f"{len(data['risk'])} risk rows, drawdown series for {len(data['drawdown'])} periods)")
 
 
 if __name__ == "__main__":

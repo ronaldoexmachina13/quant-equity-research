@@ -360,7 +360,7 @@ What can reasonably be inferred: across both periods, no strategy beat the passi
 
 ## Sensitivity updates (October 2026)
 
-Four of the limitations listed below were examined after the out-of-sample test: the flat risk-free rate, the simple cost model, the absence of statistically significant results, and the coarse robustness testing. Each analysis was pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) and committed before any code was run. Dated amendments record clarifications made before the corresponding results existed: aligning the significance threshold with the project's 90% convention, adding a drift-inclusive turnover variant, fixing the periods and definitions of the power analysis, and adding extra reproduction checks and a note on the eligible universe to the robustness grid. These are labelled sensitivities and diagnostics. None changes a strategy, and the published figures above are unchanged; the new figures sit beside them.
+Four of the limitations listed below were examined after the out-of-sample test: the flat risk-free rate, the simple cost model, the absence of statistically significant results, and the coarse robustness testing. Each analysis was pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) and committed before any code was run. Dated amendments record clarifications made before the corresponding results existed: aligning the significance threshold with the project's 90% convention, adding a drift-inclusive turnover variant, fixing the periods and definitions of the power analysis, and adding extra reproduction checks and a note on the eligible universe to the robustness grid. These are labelled sensitivities and diagnostics. None changes a strategy, and the published figures above are unchanged; the new figures sit beside them. A last step adds the descriptive risk measures from the project roadmap (Value at Risk, Expected Shortfall, hit rates and a drawdown series); it tests no hypothesis.
 
 ### Period-specific risk-free rate
 
@@ -450,6 +450,27 @@ Quarterly rebalancing lowers turnover in every paired cell (to roughly 55% to 70
 
 Overall, the grid is consistent with the main conclusion and adds one qualification: the one result that came closest to beating the benchmark, Value's in-sample lead, is also the one most sensitive to specification.
 
+### Risk diagnostics
+
+**Question.** What do the tails of the monthly returns look like, and how often does each strategy have a positive month, or beat the benchmark?
+
+**Method.** These are descriptive measures from the project roadmap, pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) before any code was run (`run_risk_diagnostics.py`, `results/risk_diagnostics.csv`, `results/drawdown_series.csv`). Historical Value at Risk (VaR) at 95% is the monthly return at the 5th percentile, shown as a loss: 5.7% means that in 5% of months the return was −5.7% or worse. Expected Shortfall (ES) is the average loss over the months at or below that point. Each comes with a 90% bootstrap interval (5,000 resamples). They are shown for the 48 in-sample months and for the full 68 months. For the 20 out-of-sample months alone, the 5% tail holds a single observation, so VaR and ES are not reported. There are two hit rates: the share of positive months, and the share of months in which a strategy beat the benchmark. The returns are the published monthly gross returns of the base specification. Before writing anything, the script checks that they reproduce the published Sharpe ratios and that the drawdown series reproduces every published maximum drawdown.
+
+| Period | Series | VaR 95% [90% interval] | ES 95% [90% interval] | Positive months | Months ahead of benchmark |
+|---|---|---|---|---|---|
+| In sample (48) | Momentum | 5.7% [3.2, 7.8] | 7.2% [4.5, 8.0] | 54% | 50% |
+| | Value | 8.0% [4.9, 8.8] | 8.6% [6.4, 8.9] | 65% | 52% |
+| | Combined | 5.1% [3.7, 6.8] | 6.1% [4.7, 7.1] | 54% | 48% |
+| | Benchmark | 5.4% [3.7, 7.1] | 6.5% [4.6, 7.7] | 60% | |
+| Full period (68) | Momentum | 5.6% [3.5, 7.5] | 6.9% [4.8, 7.8] | 59% | 49% |
+| | Value | 7.2% [4.6, 8.7] | 8.4% [6.2, 8.8] | 66% | 51% |
+| | Combined | 4.9% [3.5, 6.1] | 5.8% [4.4, 6.7] | 57% | 49% |
+| | Benchmark | 4.8% [3.5, 6.0] | 6.1% [4.5, 7.2] | 65% | |
+
+**What the results suggest.** The expectation recorded in advance holds: the 90% intervals of all four series overlap, for both VaR and ES, in sample and over 68 months. On this evidence, no strategy can be called riskier or safer in the tail than another. Value has the highest point estimates (8.0% and 8.6% in sample), but its interval overlaps the others'. That is what one would expect when the 5% tail holds only 3 or 4 months. Those months are largely the same for every series: the worst in-sample month was June 2022 for Value and September 2022 for the other three, and the best month for all four was October 2022. A few months in 2022 therefore drive these measures. The upper end of an ES interval cannot be worse than a series' worst month, because a resample can only repeat months that happened, so the true tail could be heavier than anything in 68 months.
+
+The hit rates tell a similar story. The share of months in which a strategy beat the benchmark is 48% to 52% in sample and 49% to 51% over the full period, close to a coin toss. Out of sample it is 45% for Momentum and 50% for Value and Combined, over only 20 months. The share of positive months out of sample is 70% for Momentum and Value, 65% for Combined and 75% for the benchmark. Hit rates are read against 50% and are not tested. The published maximum drawdown figures are unchanged, and the drawdown series behind them is shown on the dashboard.
+
 ## Limitations
 
 - **Only 17 stocks.** A small, hand-picked group rather than a full index; a larger universe might behave differently.
@@ -466,7 +487,7 @@ Overall, the grid is consistent with the main conclusion and adds one qualificat
 Alongside the Python/SQL pipeline, a 4-page interactive dashboard (`index.html`, `strategies.html`, `stocks.html`, `portfolio.html`, styled by `styles.css`) makes the results explorable. It is plain HTML, CSS and JavaScript with Chart.js for charting: no framework and no build step.
 
 - **Index:** headline finding, key statistics and navigation.
-- **Strategy Analysis:** toggle between Momentum, Value, Combined and Benchmark; switch the regime-split chart (2021–2022 vs 2023–2024) between Total Return, Annualized Return, Sharpe Ratio, Sortino Ratio, Volatility and Alpha; read three analysis views (Quant Research, Wealth Management, Risk) for each strategy. A Sharpe tab explains the ratio and shows the same regime data as a 3D surface, captioned as a visual illustration only (strategies and periods are discrete categories, not a continuous space), with hover tooltips giving the exact Sharpe at each of the 8 measured points. A Robustness tab shows the significance tests and transaction-cost results.
+- **Strategy Analysis:** toggle between Momentum, Value, Combined and Benchmark; switch the regime-split chart (2021–2022 vs 2023–2024) between Total Return, Annualized Return, Sharpe Ratio, Sortino Ratio, Volatility and Alpha; read three analysis views (Quant Research, Wealth Management, Risk) for each strategy. A Sharpe tab explains the ratio and shows the same regime data as a 3D surface, captioned as a visual illustration only (strategies and periods are discrete categories, not a continuous space), with hover tooltips giving the exact Sharpe at each of the 8 measured points. A Robustness tab shows the significance tests and transaction-cost results. An Out of Sample tab shows the pre-registered 2025–2026 test, and a Sensitivity tab shows the risk-free rate, cost, power, robustness-grid and risk-diagnostics checks, all generated from the results files.
 - **Stock Analysis:** all 17 tickers with current momentum and Price-to-Book figures, and how often each strategy held each stock across the 48-month backtest.
 - **Portfolio Timeline:** month-by-month holdings for any strategy and year, with each holding's contribution to that month's return, plus rolling 12-month Sharpe ratio and volatility.
 
@@ -499,6 +520,7 @@ python run_rf_sensitivity.py     # Sharpe, Sortino and alpha with actual 3-month
 python run_cost_sensitivity.py   # costs of 0 to 50 bps, drift-inclusive turnover, break-even cost
 python run_power_analysis.py     # minimum detectable effect, and months needed to detect the observed active returns
 python run_robustness_grid.py   # 56 cells per period: portfolio size, rebalancing frequency, momentum lookback
+python run_risk_diagnostics.py  # Value at Risk, Expected Shortfall, hit rates and drawdown series
 ```
 
 Each script prints what it computed as it runs. The test suite (`python -m pytest tests/ -v`) covers the core factor-construction, risk-metric and turnover logic independently of any live data pull, so it runs without a network connection or a populated database.
@@ -522,7 +544,7 @@ quant-equity-research/
 │   ├── fundamentals.py              # pulls and cleans SEC EDGAR fundamentals for the value factor
 │   ├── portfolio.py                 # ranks stocks, builds the portfolio
 │   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover (incl. drift-based) and transaction costs, break-even cost, buy-and-hold between quarterly refreshes
-│   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha (incl. OLS regression), Treasury-bill variants, power analysis, volatility, drawdown, rolling metrics, bootstrap testing
+│   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha (incl. OLS regression), Treasury-bill variants, power analysis, VaR and Expected Shortfall, hit rates, volatility, drawdown, rolling metrics, bootstrap testing
 ├── tests/
 │   ├── test_factors.py              # unit tests for momentum/value/combined and portfolio construction
 │   ├── test_risk.py                 # unit tests for the risk metrics, checked against hand-worked cases
@@ -542,6 +564,7 @@ quant-equity-research/
 ├── run_cost_sensitivity.py          # transaction-cost sensitivity and break-even cost
 ├── run_power_analysis.py            # statistical power of the active-return tests
 ├── run_robustness_grid.py           # robustness grid (portfolio size, rebalancing frequency, momentum lookback)
+├── run_risk_diagnostics.py          # Value at Risk, Expected Shortfall, hit rates and drawdown series
 ├── test_significance.py             # bootstrap Sharpe confidence intervals and OLS alpha significance tests
 ├── test_transaction_costs.py        # turnover and cost-adjusted returns for each active strategy
 ├── generate_portfolio_timeline.py   # computes month-by-month holdings/contributions/rolling metrics
@@ -565,7 +588,7 @@ quant-equity-research/
 - **Completed: power analysis.** Over 68 months the minimum detectable annualised active return is about 9%, against a largest observed gap of 3.6%, which explains why no result is significant. Results are in `results/power_analysis.csv`.
 - **Completed: robustness grid.** 56 cells per period over portfolio size, rebalancing frequency and momentum lookback, pre-registered before it was run. Momentum and Combined stay below the benchmark in nearly every cell; Value's result depends on how many stocks it holds. Results are in `results/robustness_grid.csv` and `results/robustness_grid_summary.csv`.
 - **Longer history and a point-in-time universe.** Extend the test back to about 2012 (the start of usable XBRL data) on a universe drawn from historical index membership, holding a top decile or quintile rather than a fixed top 5, with its own pre-registration. This addresses the two largest limitations: short samples and survivorship bias.
-- **Further risk metrics:** Value at Risk and Expected Shortfall (CVaR), and hit rate.
+- **Completed: risk diagnostics.** Historical Value at Risk and Expected Shortfall with bootstrap intervals, two hit rates and a drawdown series, pre-registered before it was run. The intervals of all four series overlap, so no strategy can be called riskier in the tail on this evidence. Results are in `results/risk_diagnostics.csv` and `results/drawdown_series.csv`.
 - **Combined factor construction.** Rank on book-to-price, or on cross-sectional ranks instead of raw P/B z-scores, to test whether Combined's momentum tilt comes from the skew in P/B.
 - **Further robustness testing:** a larger universe, other quarterly refresh months and a rolling-window test across more than two periods, to measure how regime-dependent these strategies are rather than only showing that they are. Any change needs a stated reason in advance, not a search for better numbers.
 
