@@ -137,3 +137,12 @@ This entry replaces the grid description in the Phase 2 outline above. Differenc
 4. Every cell is reported, including unfavourable ones, in the CSV and in a table in the README.
 5. Expectations recorded in advance: as the portfolio size approaches 17, the difference against the benchmark moves towards zero, because the portfolio approaches the benchmark; quarterly rebalancing lowers turnover and so helps net Sharpe for Momentum and Combined more than for Value.
 6. Neither the grid nor any other analysis in this plan will be used to search for a better specification. If a later change to the strategies is wanted, it needs its own pre-registration.
+
+## Amendment 5 (2026-10-23, before any Phase 2 code was written or run)
+
+Reason: the Phase 2 implementation plan was reviewed against the design above, and four points were settled. No Phase 2 result existed when this amendment was written.
+
+1. Extra reproduction gates, in addition to those registered: the base cell's net Sharpe at 10 bps on the drift-inclusive basis must match the corresponding rows of results/cost_sensitivity.csv, for the strategies and the monthly benchmark, to 1e-9; and the grid must contain exactly 56 cells per period, over 48 and 20 months.
+2. Definitions: share_sign_differs_from_base is computed over all of a strategy's cells in the period, including the base cell, which always matches itself. A cell with a net Sharpe difference of exactly zero is counted as not positive. If the base-case difference is exactly zero, stability is reported as undefined.
+3. Eligible universe: Value and Combined can only select among names with a valid book value (14 to 16 of the 17 names each month, because V has no usable book value and HD and DIS have gaps), while the benchmark holds all 17. Expectation 5 of the Phase 2 design (the difference moves towards zero as the portfolio size approaches 17) therefore applies to Momentum, and need not hold for Value and Combined, whose top 10 never approaches the whole benchmark. This is a feature of the published design and is not changed.
+4. The summary file robustness_grid_summary.csv gains two descriptive columns, eligible_names_min and eligible_names_max, giving the smallest and largest number of names with a valid score in any month of the period for that strategy. They are computed from the data, not typed in.
