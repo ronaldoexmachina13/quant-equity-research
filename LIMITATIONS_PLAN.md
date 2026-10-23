@@ -54,3 +54,18 @@ New scripts at the repository root following the existing naming style, new func
 - Signal-level tests: rank information coefficient, quintile spread, Fama-MacBeth regression.
 - Coverage reporting per date, and a disclosed count of members without prices. Survivorship bias is reduced, not eliminated.
 - Expectation recorded in advance: value (P/B) may look weak over 2012-2020. If so, it is reported as found.
+
+## Amendment 1 (2026-10-23, before any Phase 1 code was written or run)
+
+Reason: Phase 0 found that the original text of this plan used a 1.96 threshold "as before", while the project has always used the 90% level (|t| above 1.65; see the significant_at_90pct column, README.md and test_significance.py). The wording was an error in the plan, not a change of method. No Phase 1 result existed when this amendment was written.
+
+Changes:
+1. Rule 1A(c) is replaced by: an alpha is called significant at the project's usual 90% level if |t| > 1.65. The script also prints whether any |t| exceeds 1.96, marked as information only.
+2. In 1C, significance is set at 10% two-sided (z = 1.645) with 80% power, consistent with the rest of the project. The same figures at 5% two-sided (z = 1.96) are reported alongside, marked as information only.
+
+Clarifications of 1A (implementation choices, no change to the question or the data):
+3. Sharpe ratio with a time-varying rate: (strategy annualised return minus the compounded annualised T-bill return over the same months) divided by the annualised volatility of the strategy's own returns. The annualisation convention must be the same as the existing functions in src/risk.py. With a flat 2% series this reproduces the existing formula exactly, which is the reproduction check. Sortino and the alpha regression follow the same approach, with month t's rate as the target and as the deduction.
+4. Benchmark rows report Sharpe and Sortino only. Alpha against itself is zero by construction.
+5. One extra row per period, with strategy "Risk-free", reports the annualised rate: 0.02 in the flat column and the actual T-bill rate in the T-bill column.
+6. The script is named run_rf_sensitivity.py.
+7. The TB3MS monthly average is applied to the same month's return, as registered. It does not affect which stocks are held, so it is not look-ahead.
