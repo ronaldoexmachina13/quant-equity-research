@@ -17,7 +17,7 @@
 | Combined | 0.65 | 1.72 | +8.1% (0.82) |
 | Equal-weight benchmark (17 stocks) | 0.81 | **1.89** | n/a |
 
-*Sharpe ratios use a flat 2% risk-free rate. Treasury bills paid about 4% in 2025-26, so the out-of-sample levels are overstated, although comparisons within a period are much less affected. Alpha is measured against the benchmark by OLS regression; a t-statistic near 1.65 would be needed for significance at the 90% level.*
+*Sharpe ratios use a flat 2% risk-free rate. Treasury bills paid about 4% in 2025-26, so the out-of-sample levels are overstated, although comparisons within a period are much less affected. Alpha is measured against the benchmark by OLS regression; a t-statistic near 1.65 would be needed for significance at the 90% level. A sensitivity using actual Treasury bill rates is reported under "Sensitivity updates" and does not change the conclusion.*
 
 ![Growth of 1 dollar invested at the end of December 2024: Combined +45.1%, Value +42.2%, benchmark +35.2%, Momentum +25.0%](results/oos_growth.png)
 
@@ -288,6 +288,8 @@ The impact is uneven across strategies, and it links to the holdings data. Value
 
 This does not change the core conclusion. The benchmark's 0.81 Sharpe exceeds Momentum's and Combined's by a wider margin after costs. Value's net Sharpe (0.85) stays just above it, but the benchmark's own rebalancing costs are not modeled, and the gap remains far smaller than the bootstrap's noise band. Value, the strategy that came closest, is also the cheapest to run, an advantage the gross figures alone do not show.
 
+*Update:* a range of cost levels (0 to 50 bps) and the benchmark's own rebalancing costs are examined under "Sensitivity updates" below. The conclusion is unchanged.
+
 ## Correction: look-ahead in the value signal
 
 While preparing the out-of-sample test, I found a timing error in the value signal. The backtest applies the weights dated month *t* to the return earned during month *t*, from the close of month *t−1* to the close of month *t*. Momentum was built correctly for this: its skip-month convention only uses prices up to month *t−1*. The value score dated month *t*, however, divided the month-*t* closing price by book value, so each rebalance used a price that was not known until the end of the month it was trading. The fix lags the score by one month (`shift(1)` in `calculate_value_score()`), and a unit test (`test_calculate_value_score_uses_previous_month_price`) now fails if this timing ever regresses.
@@ -356,16 +358,70 @@ The pre-registered verdicts above are read off the full 20-month window. Splitti
 
 What can reasonably be inferred: across both periods, no strategy beat the passive benchmark on a risk-adjusted basis by a margin distinguishable from chance. The one hypothesis that held its direction on unseen data is Combined's positive alpha, and even that rests on 20 months and five stocks. It is worth testing on a longer history and a larger, point-in-time universe before any stronger claim is made.
 
+## Sensitivity updates (October 2026)
+
+Three of the limitations listed below were examined after the out-of-sample test: the flat risk-free rate, the simple cost model, and the absence of statistically significant results. Each analysis was pre-registered in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) and committed before any code was run. Three dated amendments record clarifications made before the corresponding results existed: aligning the significance threshold with the project's 90% convention, adding a drift-inclusive turnover variant, and fixing the periods and definitions of the power analysis. These are labelled sensitivities and diagnostics. None changes a strategy, and the published figures above are unchanged; the new figures sit beside them.
+
+### Period-specific risk-free rate
+
+**Question.** How much do the Sharpe ratios change if the flat 2% is replaced by the actual 3-month Treasury bill rate?
+
+**Method.** The rate is the monthly FRED series TB3MS (saved unmodified in `results/tbill_3m_monthly.csv`), applied to the return of the same month. It does not affect which stocks are held. With a flat 2% rate, the new code reproduces the published figures exactly, and the script checks this before writing anything (`run_rf_sensitivity.py`, `results/rf_sensitivity.csv`).
+
+Sharpe ratio, flat 2% → actual bill rate:
+
+| Period | Avg. bill rate | Momentum | Value | Combined | Benchmark |
+|---|---|---|---|---|---|
+| 2021–2024 | 3.0% | 0.56 → 0.49 | 0.86 → 0.81 | 0.65 → 0.59 | 0.81 → 0.75 |
+| 2021–2022 | 1.0% | 0.25 → 0.31 | 0.64 → 0.69 | 0.16 → 0.22 | 0.59 → 0.65 |
+| 2023–2024 | 5.0% | 0.92 → 0.70 | 1.15 → 0.96 | 1.27 → 1.05 | 1.13 → 0.88 |
+| Out of sample (Jan 2025–Aug 2026) | 3.9% | 1.05 → 0.89 | 1.53 → 1.40 | 1.72 → 1.58 | 1.89 → 1.69 |
+
+**What the results suggest.** The levels move as expected: up when bills paid less than 2%, down when they paid more. The comparisons within a period barely move, because every series is charged the same rate. The benchmark still has the highest out-of-sample Sharpe ratio, and no Sharpe or alpha ranking changes in any period. One Sortino ranking does change, as the pre-registration requires me to report: in 2021–2022 Value's Sortino ratio was marginally ahead of the benchmark's at a flat 2% (1.09 against 1.08), and at actual bill rates the benchmark leads (1.20 against 1.17). A gap of 0.01 is not meaningful. No alpha is significant: the largest |t| is 0.90 (0.94 at a flat 2%), and none exceeds 1.65. Combined's out-of-sample alpha moves from +8.1% to +7.7% a year.
+
+One out-of-sample detail deserves a caution. Combined's Sortino ratio (5.0 at a flat 2%, 4.3 at bill rates) is above the benchmark's (3.6 and 3.1), even though its Sharpe ratio is below. With 20 months and few down months, the Sortino ratio rests on very little data, and I do not read this as evidence of an edge.
+
+### Transaction-cost sensitivity
+
+**Question.** At what one-way cost does each strategy's Sharpe ratio fall to the benchmark's, and does charging the benchmark for its own rebalancing matter?
+
+**Method.** Costs of 0, 5, 10, 25 and 50 bps one-way, in sample and out of sample, on the flat 2% basis (`run_cost_sensitivity.py`, `results/cost_sensitivity.csv`). The strategies are charged on two turnover bases. The existing basis counts changes in target weights and reproduces the cost table above exactly; the script stops if it does not. The drift-inclusive basis also counts the trades needed to restore equal weights among the names already held, which is the only kind of trade the benchmark makes. Because the benchmark is charged on its own drift trades, only the drift-inclusive basis treats it and the strategies alike. Both bases are reported. The table shows the drift-inclusive basis; the existing basis gives slightly higher Sharpe ratios for Momentum, Value and Combined at every cost above 0 bps.
+
+| Strategy | Avg. monthly turnover (in sample / out of sample) | Sharpe in sample at 0 / 10 / 50 bps | Sharpe out of sample at 0 / 10 / 50 bps |
+|---|---|---|---|
+| Momentum | 24.2% / 21.5% | 0.56 / 0.51 / 0.34 | 1.05 / 1.00 / 0.81 |
+| Value | 6.2% / 3.5% | 0.86 / 0.85 / 0.81 | 1.53 / 1.52 / 1.50 |
+| Combined | 23.7% / 17.6% | 0.65 / 0.61 / 0.44 | 1.72 / 1.68 / 1.54 |
+| Benchmark | 4.2% / 2.6% | 0.81 / 0.81 / 0.77 | 1.89 / 1.88 / 1.85 |
+
+**What the results suggest.** No strategy reaches a break-even cost between 0 and 50 bps, on either basis, in either period. Momentum and Combined are already below the benchmark at 0 bps in sample, and all three strategies are below it out of sample. Value stays above the benchmark in sample even at 50 bps (0.81 against 0.77), because its turnover is close to the benchmark's. Costs widen the gap for Momentum and Combined but do not change any ranking. The benchmark's own costs matter very little: its Sharpe ratio falls by about 0.01 at 10 bps. (Its in-sample turnover includes the initial purchase in January 2021, which accounts for about 2 of the 4.2 percentage points; its drift trading alone is about 2% a month.) Drift-inclusive turnover is higher than the existing measure for every strategy, as expected; for Value it rises from 4.2% to 6.2% in sample and from 1.0% to 3.5% out of sample. The pre-registered expectation that break-even costs would be lower on the drift basis cannot be tested, because no break-even cost exists. The headline 10 bps assumption is unchanged.
+
+### Statistical power
+
+**Question.** Why is nothing statistically significant, and how much data would it take?
+
+**Method.** For each strategy, the monthly active return (strategy minus benchmark) is tested against zero at the 10% two-sided level with 80% power (`run_power_analysis.py`, `results/power_analysis.csv`). This is a test of the mean active return, not the beta-adjusted alpha regression reported elsewhere. The standard deviation is estimated from the same sample, so the figures are illustrative. The annualised figure is 12 times the monthly one, the same convention as the alpha. The table uses the full 68 months (in sample plus out of sample). The 170-month column is a hypothetical sample length, roughly a 2012–2026 study, and is not a result.
+
+| Strategy | Mean active return (annualised) | Tracking error | Minimum detectable effect, 68 months | Same, hypothetical 170 months | Months needed for the observed mean |
+|---|---|---|---|---|---|
+| Momentum | −3.6% | 8.3% | 8.6% | 5.5% | 390 (to detect underperformance) |
+| Value | +3.6% | 8.9% | 9.3% | 5.9% | 459 |
+| Combined | +0.1% | 8.9% | 9.3% | 5.9% | not meaningful (mean near zero) |
+
+**What the results suggest.** With 68 months, a strategy would need to beat the benchmark by roughly 9% a year to be detected reliably, while the largest observed gap is 3.6%. The absence of significant results is therefore what these tests would produce for a modest true effect, and it should not be read as evidence that no effect exists. Even a 170-month sample would need a gap of about 5.5% to 6% a year. If the true mean active return equalled the observed one, detecting it would take about 390 to 460 months, or 32 to 38 years. Combined's mean over the full period is close to zero (about −1.8% a year in sample and +4.7% out of sample), so its months-needed figure carries no information. The same figures at the 5% two-sided level are about 13% larger. The conclusion that no result is statistically significant is unchanged.
+
+The practical implication is that backtests of a handful of five-stock portfolios have little power. A more informative design tests the signals themselves across many stocks, which is the reason for the longer-history, larger-universe extension listed under "What's next".
+
 ## Limitations
 
 - **Only 17 stocks.** A small, hand-picked group rather than a full index; a larger universe might behave differently.
 - **Mild survivorship bias.** The 17 tickers were selected today on current size and liquidity, then applied retroactively to 2020–2024. Any large company that merged, was acquired or ran into serious distress during that window is absent because only surviving companies were available to pick. For established large caps this bias is modest, but it is present.
 - **Short test periods.** The study covers 2021–2024 in-sample and 20 months out of sample. 2022 was a difficult year for momentum strategies generally, and no period before 2021 has been tested.
-- **Flat risk-free rate.** Sharpe ratios use a constant 2% rather than period-specific Treasury bill yields. Bill yields averaged roughly 1% over 2021–2022 and roughly 5% over 2023–2024, so this understates first-period Sharpe ratios and overstates second-period ones; over the 2025–2026 out-of-sample period bills yielded roughly 4%, so those Sharpe levels are also overstated. Comparisons within a period are much less affected than the levels.
+- **Flat risk-free rate.** Sharpe ratios use a constant 2% rather than period-specific Treasury bill yields. Bill yields averaged roughly 1% over 2021–2022 and roughly 5% over 2023–2024, so this understates first-period Sharpe ratios and overstates second-period ones; over the 2025–2026 out-of-sample period bills yielded roughly 4%, so those Sharpe levels are also overstated. Comparisons within a period are much less affected than the levels. Re-computing with actual bill rates (see "Sensitivity updates") changes no Sharpe ranking in any period; the headline tables keep the flat 2% for consistency with the pre-registered out-of-sample test.
 - **Unresolved fundamentals gaps.** V is excluded: two raw filings exist from 2009–2010, but both are a decade too stale for the 2020–2024 window under the 6-month forward-fill cap. Visa's multi-class share structure most likely explains why so little exists under the standard XBRL tags. HD and DIS have partially understood coverage gaps. None of this changes the overall conclusion, but the Value and Combined results do not rest on complete data.
 - **Coarse robustness testing.** One alternative concentration (top 8) and one two-way period split have been tested; other portfolio sizes, rebalancing frequencies and rolling-window tests have not. Two periods are enough to show that the full-period result is not the whole story, but not enough to characterize how regime-dependent these strategies are. Further changes need their own justification rather than being tried until the numbers improve, which would amount to data mining.
-- **No result is statistically significant.** Every strategy-versus-benchmark Sharpe gap, in-sample and out of sample, has a 90% bootstrap confidence interval that includes zero, and no alpha has a regression t-statistic larger than 0.94 in absolute value. The regime story is economically plausible but not statistically confirmed. See `test_significance.py` and the period-split section above.
-- **Simple transaction-cost model.** A flat 10 bps one-way cost is a reasonable starting point for a liquid large-cap universe, but real costs vary by name, trade size and market conditions, none of which is modeled. The benchmark's own (much smaller) rebalancing turnover is also not cost-modeled.
+- **No result is statistically significant.** Every strategy-versus-benchmark Sharpe gap, in-sample and out of sample, has a 90% bootstrap confidence interval that includes zero, and no alpha has a regression t-statistic larger than 0.94 in absolute value. The regime story is economically plausible but not statistically confirmed. See `test_significance.py` and the period-split section above. A power analysis (see "Sensitivity updates") shows why: over 68 months a strategy would need to beat the benchmark by roughly 9% a year to be detected reliably, against a largest observed gap of 3.6%.
+- **Simple transaction-cost model.** A flat 10 bps one-way cost is a reasonable starting point for a liquid large-cap universe, but real costs vary by name, trade size and market conditions, none of which is modeled. Cost levels from 0 to 50 bps, and the benchmark's own rebalancing, are examined under "Sensitivity updates", and the conclusion holds at every level tested; per-name and size-dependent costs are still not modeled.
 
 ## Interactive Dashboard
 
@@ -398,6 +454,14 @@ python generate_dashboard_data.py      # writes all of the above into index.html
 python run_out_of_sample.py            # pre-registered out-of-sample test on Jan 2025 - Aug 2026, saves results/oos_*.csv
 ```
 
+The sensitivity analyses described under "Sensitivity updates" run after the out-of-sample test. Each stops before writing anything if its flat-2% results do not reproduce the published figures, and none overwrites an existing results file:
+
+```bash
+python run_rf_sensitivity.py     # Sharpe, Sortino and alpha with actual 3-month Treasury bill rates (downloads TB3MS from FRED)
+python run_cost_sensitivity.py   # costs of 0 to 50 bps, drift-inclusive turnover, break-even cost
+python run_power_analysis.py     # minimum detectable effect, and months needed to detect the observed active returns
+```
+
 Each script prints what it computed as it runs. The test suite (`python -m pytest tests/ -v`) covers the core factor-construction, risk-metric and turnover logic independently of any live data pull, so it runs without a network connection or a populated database.
 
 SEC EDGAR and Yahoo Finance data update continuously, so a fresh run may produce slightly different "latest price," "latest momentum" and "latest Price/Book" figures on the Stock Analysis page. Those are live snapshots. The backtest results (Sharpe ratios, returns and everything in the tables above) will not change, since they are based on fixed historical windows set in `config.py`.
@@ -409,6 +473,7 @@ SEC EDGAR and Yahoo Finance data update continuously, so a fresh run may produce
 quant-equity-research/
 ├── config.py                        # single source of truth for the stock universe, date range and in-/out-of-sample windows
 ├── OUT_OF_SAMPLE_PLAN.md            # pre-registered out-of-sample test plan, with dated amendments
+├── LIMITATIONS_PLAN.md              # pre-registered plan for the sensitivity analyses and the next version, with dated amendments
 ├── database/                        # SQLite database (generated, not committed)
 ├── sql/                             # standalone SQL analytical queries (schema, factor construction, turnover/regime), cross-checked against src/
 ├── src/
@@ -417,8 +482,8 @@ quant-equity-research/
 │   ├── factors.py                   # builds the momentum, value, and combined signals
 │   ├── fundamentals.py              # pulls and cleans SEC EDGAR fundamentals for the value factor
 │   ├── portfolio.py                 # ranks stocks, builds the portfolio
-│   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover and transaction costs
-│   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha (incl. OLS regression), volatility, drawdown, rolling metrics, bootstrap testing
+│   ├── backtest.py                  # simulates returns, compares vs benchmark, turnover (incl. drift-based) and transaction costs, break-even cost
+│   └── risk.py                      # Sharpe and Sortino ratios, beta and alpha (incl. OLS regression), Treasury-bill variants, power analysis, volatility, drawdown, rolling metrics, bootstrap testing
 ├── tests/
 │   ├── test_factors.py              # unit tests for momentum/value/combined and portfolio construction
 │   ├── test_risk.py                 # unit tests for the risk metrics, checked against hand-worked cases
@@ -434,6 +499,9 @@ quant-equity-research/
 ├── run_fundamentals_pipeline.py     # fetches + stores book value end to end
 ├── run_strategy_comparison.py       # backtests all strategies, saves results/*.csv
 ├── run_out_of_sample.py             # pre-registered out-of-sample test (Jan 2025 - Aug 2026)
+├── run_rf_sensitivity.py            # risk-free rate sensitivity (actual Treasury bill rates)
+├── run_cost_sensitivity.py          # transaction-cost sensitivity and break-even cost
+├── run_power_analysis.py            # statistical power of the active-return tests
 ├── test_significance.py             # bootstrap Sharpe confidence intervals and OLS alpha significance tests
 ├── test_transaction_costs.py        # turnover and cost-adjusted returns for each active strategy
 ├── generate_portfolio_timeline.py   # computes month-by-month holdings/contributions/rolling metrics
@@ -452,10 +520,12 @@ quant-equity-research/
 - **Completed: alpha significance.** OLS regression with statsmodels; no alpha is significant (largest |t| = 0.94 after the value-signal correction). Results are in `results/alpha_significance.csv`.
 - **Completed: value-signal timing correction.** One-month look-ahead removed, with a regression test, and all results regenerated (see the correction section).
 - **Completed: out-of-sample test.** The unchanged rules were run on January 2025 to August 2026, pre-registered in `OUT_OF_SAMPLE_PLAN.md` before the data was downloaded. The benchmark led on Sharpe; Combined's alpha held its direction and Value's faded. Results are in `results/oos_summary.csv`.
+- **Completed: period-specific risk-free rate.** Sharpe, Sortino and alpha recomputed with monthly 3-month Treasury bill yields, pre-registered in `LIMITATIONS_PLAN.md`. Levels move, rankings within each period do not (apart from one Sortino ranking in 2021–2022). Results are in `results/rf_sensitivity.csv`.
+- **Completed: cost sensitivity.** Costs of 0 to 50 bps with the benchmark's own rebalancing charged and a drift-inclusive turnover variant; no strategy reaches a break-even cost. Results are in `results/cost_sensitivity.csv`.
+- **Completed: power analysis.** Over 68 months the minimum detectable annualised active return is about 9%, against a largest observed gap of 3.6%, which explains why no result is significant. Results are in `results/power_analysis.csv`.
 - **Longer history and a point-in-time universe.** Extend the test back to about 2012 (the start of usable XBRL data) on a universe drawn from historical index membership, holding a top decile or quintile rather than a fixed top 5, with its own pre-registration. This addresses the two largest limitations: short samples and survivorship bias.
 - **Further risk metrics:** Value at Risk and Expected Shortfall (CVaR), and hit rate.
 - **Combined factor construction.** Rank on book-to-price, or on cross-sectional ranks instead of raw P/B z-scores, to test whether Combined's momentum tilt comes from the skew in P/B.
-- **Period-specific risk-free rate.** Replace the flat 2% with monthly Treasury bill yields.
 - **Further robustness testing:** a larger universe, alternative rebalancing frequencies and a rolling-window test across more than two periods, to measure how regime-dependent these strategies are rather than only showing that they are. Any change needs a stated reason in advance, not a search for better numbers.
 
 ---
