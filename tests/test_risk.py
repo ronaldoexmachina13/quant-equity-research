@@ -5,11 +5,13 @@ These functions are pure math -- given the same returns series, they
 always produce the same answer -- so we can check them against numbers
 worked out by hand, with no database or network involved.
 """
+import numpy as np
 import pandas as pd
 import pytest
 
 from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha, alpha_regression
 from src.risk import tbill_yield_to_monthly, align_risk_free, annualized_risk_free, sharpe_ratio_tbill, downside_deviation_tbill, sortino_ratio_tbill, alpha_regression_tbill
+from src.risk import power_z_values, minimum_detectable_effect, months_needed_to_detect
 
 
 def test_annualized_return_constant_monthly_return():
@@ -282,3 +284,68 @@ def test_align_risk_free_raises_on_missing_month():
     rf = pd.Series([0.003, 0.003], index=dates[:2])
     with pytest.raises(ValueError):
         align_risk_free(returns, rf)
+
+
+# --- Statistical power (LIMITATIONS_PLAN.md, Phase 1C) ---
+
+def test_power_z_values_match_standard_tables():
+    """10% two-sided -> 1.6449, 5% two-sided -> 1.9600, 80% power -> 0.8416."""
+    z_alpha, z_power = power_z_values(0.10, 0.80)
+    assert z_alpha == pytest.approx(1.6449, abs=1e-4)
+    assert z_power == pytest.approx(0.8416, abs=1e-4)
+    assert power_z_values(0.05, 0.80)[0] == pytest.approx(1.9600, abs=1e-4)
+
+
+def test_minimum_detectable_effect_hand_worked():
+    """
+    sd 2% a month, 100 months, z_alpha + z_power = 2.5:
+    2.5 x 0.02 / sqrt(100) = 0.005 a month, or 12 x 0.005 = 6% a year.
+    """
+    mde = minimum_detectable_effect(0.02, 100, 2.0, 0.5)
+    assert mde == pytest.approx(0.005, rel=1e-12)
+    assert 12 * mde == pytest.approx(0.06, rel=1e-12)
+
+
+def test_minimum_detectable_effect_rejects_bad_inputs():
+    with pytest.raises(ValueError):
+        minimum_detectable_effect(0.02, 1, 2.0, 0.5)
+    with pytest.raises(ValueError):
+        minimum_detectable_effect(-0.02, 100, 2.0, 0.5)
+
+
+def test_months_needed_exact_answer_is_not_pushed_up_by_rounding():
+    """(2.5 x 0.02 / 0.005)^2 = 100 exactly, so the answer is 100, not 101."""
+    result = months_needed_to_detect(0.005, 0.02, 2.0, 0.5)
+    assert result["months"] == 100
+    assert result["direction"] == "outperformance"
+
+
+def test_months_needed_rounds_up_non_integer_answer():
+    """(2.5 x 0.02 / 0.004)^2 = 156.25, which needs 157 whole months."""
+    assert months_needed_to_detect(0.004, 0.02, 2.0, 0.5)["months"] == 157
+
+
+def test_months_needed_negative_mean_is_underperformance():
+    """A two-sided test detects a -0.5% mean as easily as +0.5%: 100 months."""
+    result = months_needed_to_detect(-0.005, 0.02, 2.0, 0.5)
+    assert result["months"] == 100
+    assert result["direction"] == "underperformance"
+    assert "underperformance" in result["note"]
+
+
+def test_months_needed_zero_mean_is_reported_not_raised():
+    result = months_needed_to_detect(0.0, 0.02, 2.0, 0.5)
+    assert np.isnan(result["months"])
+    assert result["direction"] == "none"
+    assert "not detectable" in result["note"]
+
+
+def test_months_needed_round_trip_with_minimum_detectable_effect():
+    """
+    At the months needed, the minimum detectable effect is at or below the
+    mean; one month fewer, it is still above it.
+    """
+    mean, sd, z_alpha, z_power = 0.003, 0.025, 1.6449, 0.8416
+    n = months_needed_to_detect(mean, sd, z_alpha, z_power)["months"]
+    assert minimum_detectable_effect(sd, n, z_alpha, z_power) <= mean
+    assert minimum_detectable_effect(sd, n - 1, z_alpha, z_power) > mean

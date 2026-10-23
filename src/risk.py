@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from scipy.stats import norm
 
 TRADING_PERIODS_PER_YEAR = 12  # we're working in monthly returns
 
@@ -326,3 +327,58 @@ def alpha_regression_tbill(returns: pd.Series, benchmark_returns: pd.Series, rf_
         "beta": model.params.iloc[1],
         "r_squared": model.rsquared,
     }
+
+
+# ---------------------------------------------------------------------------
+# Statistical power (LIMITATIONS_PLAN.md, Phase 1C, Amendments 1 and 3).
+#
+# These describe a test of a mean return against zero, using the standard
+# two-sided normal approximation (z_alpha + z_power), which ignores the far
+# tail. They are not the beta-adjusted alpha regression above.
+# ---------------------------------------------------------------------------
+
+def power_z_values(alpha_two_sided: float, power: float) -> tuple[float, float]:
+    """
+    Critical values for a two-sided test at level alpha_two_sided with the
+    given power: z_alpha = Phi^-1(1 - alpha/2), z_power = Phi^-1(power).
+    E.g. (0.10, 0.80) -> (1.645, 0.842).
+    """
+    return float(norm.ppf(1 - alpha_two_sided / 2)), float(norm.ppf(power))
+
+
+def minimum_detectable_effect(sd: float, n: int, z_alpha: float, z_power: float) -> float:
+    """
+    Smallest true mean that a sample of n observations with standard
+    deviation sd would detect at the given level and power:
+    (z_alpha + z_power) * sd / sqrt(n). Same units as sd (monthly in,
+    monthly out).
+    """
+    if n < 2:
+        raise ValueError("n must be at least 2.")
+    if sd < 0:
+        raise ValueError("sd cannot be negative.")
+    return (z_alpha + z_power) * sd / np.sqrt(n)
+
+
+def months_needed_to_detect(mean: float, sd: float, z_alpha: float, z_power: float) -> dict:
+    """
+    Number of observations needed for a mean of this size to be detected:
+    ((z_alpha + z_power) * sd / |mean|)^2, rounded up to a whole month.
+
+    The value is rounded to 9 decimals before rounding up, so that an exact
+    answer such as 100 is not pushed to 101 by floating-point error. A zero
+    mean has no answer (NaN). A negative mean is detectable as
+    underperformance under a two-sided test, so |mean| is used and the
+    direction is reported.
+
+    Returns {"months": int or NaN, "direction": str, "note": str}.
+    """
+    if mean == 0:
+        return {"months": np.nan, "direction": "none",
+                "note": "mean active return is zero: not detectable at any sample length"}
+    raw = ((z_alpha + z_power) * sd / abs(mean)) ** 2
+    months = int(np.ceil(round(raw, 9)))
+    if mean < 0:
+        return {"months": months, "direction": "underperformance",
+                "note": "negative mean: months needed to detect underperformance, not outperformance"}
+    return {"months": months, "direction": "outperformance", "note": ""}
