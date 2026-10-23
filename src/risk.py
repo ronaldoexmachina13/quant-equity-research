@@ -229,3 +229,100 @@ def alpha_regression(returns: pd.Series, benchmark_returns: pd.Series, risk_free
         "beta": model.params.iloc[1],
         "r_squared": model.rsquared,
     }
+
+
+# ---------------------------------------------------------------------------
+# Time-varying risk-free rate (LIMITATIONS_PLAN.md, Phase 1A).
+#
+# The functions above take one constant annual rate. The versions below take
+# a monthly risk-free series instead (one rate per month, as a decimal), so a
+# T-bill rate can be charged month by month. They are separate functions so
+# that the published flat-2% figures keep coming from unchanged code. With a
+# constant series equal to (1.02)^(1/12) - 1 they reproduce the functions
+# above, which tests/test_risk.py checks.
+# ---------------------------------------------------------------------------
+
+def tbill_yield_to_monthly(yield_pct: pd.Series) -> pd.Series:
+    """
+    Convert an annual yield quoted in percent (e.g. 5.0 for 5%) to a
+    monthly decimal rate: (1 + y/100)^(1/12) - 1. Same compounding
+    convention as the flat rate in sharpe_ratio() and alpha() above.
+    """
+    return (1 + yield_pct / 100) ** (1 / TRADING_PERIODS_PER_YEAR) - 1
+
+
+def align_risk_free(returns: pd.Series, rf_monthly: pd.Series) -> pd.Series:
+    """
+    The monthly risk-free rate for exactly the dates in `returns`. Raises
+    instead of silently dropping or filling months, because a missing rate
+    would change which months the ratio is measured over.
+    """
+    rf = rf_monthly.reindex(returns.index)
+    if rf.isna().any():
+        missing = list(returns.index[rf.isna()])
+        raise ValueError(f"No risk-free rate for {len(missing)} return date(s), e.g. {missing[:3]}")
+    return rf
+
+
+def annualized_risk_free(rf_monthly: pd.Series) -> float:
+    """
+    Compound the monthly risk-free rates into one annual rate, with the
+    same convention as annualized_return(), so the two can be subtracted.
+    """
+    return annualized_return(rf_monthly)
+
+
+def sharpe_ratio_tbill(returns: pd.Series, rf_monthly: pd.Series) -> float:
+    """
+    Sharpe ratio against a monthly risk-free series: the strategy's
+    annualized return minus the compounded annualized risk-free return over
+    the same months, divided by the annualized volatility of the strategy's
+    own returns (LIMITATIONS_PLAN.md, Amendment 1, item 3).
+    """
+    rf = align_risk_free(returns, rf_monthly)
+    return (annualized_return(returns) - annualized_risk_free(rf)) / annualized_volatility(returns)
+
+
+def downside_deviation_tbill(returns: pd.Series, rf_monthly: pd.Series) -> float:
+    """
+    Annualized downside deviation with month t's risk-free rate as month
+    t's target. Otherwise identical to downside_deviation(): months above
+    the target count as zero shortfall but stay in the average.
+    """
+    rf = align_risk_free(returns, rf_monthly)
+    shortfall = np.minimum(returns - rf, 0)
+    return np.sqrt((shortfall ** 2).mean()) * np.sqrt(TRADING_PERIODS_PER_YEAR)
+
+
+def sortino_ratio_tbill(returns: pd.Series, rf_monthly: pd.Series) -> float:
+    """
+    Sortino ratio against a monthly risk-free series, built the same way
+    as sharpe_ratio_tbill(). Returns NaN if the series never falls below
+    the target (ratio undefined).
+    """
+    downside = downside_deviation_tbill(returns, rf_monthly)
+    if downside == 0:
+        return np.nan
+    rf = align_risk_free(returns, rf_monthly)
+    return (annualized_return(returns) - annualized_risk_free(rf)) / downside
+
+
+def alpha_regression_tbill(returns: pd.Series, benchmark_returns: pd.Series, rf_monthly: pd.Series) -> dict:
+    """
+    Same OLS as alpha_regression(), but month t's risk-free rate is
+    deducted from both the strategy's and the benchmark's month-t return:
+
+        (r_t - rf_t) = alpha + beta * (b_t - rf_t) + error
+    """
+    aligned = pd.concat([returns, benchmark_returns], axis=1).dropna()
+    rf = align_risk_free(aligned.iloc[:, 0], rf_monthly)
+    y = aligned.iloc[:, 0] - rf
+    x = sm.add_constant(aligned.iloc[:, 1] - rf)
+    model = sm.OLS(y, x).fit()
+    return {
+        "alpha": model.params.iloc[0] * TRADING_PERIODS_PER_YEAR,
+        "alpha_tstat": model.tvalues.iloc[0],
+        "alpha_pvalue": model.pvalues.iloc[0],
+        "beta": model.params.iloc[1],
+        "r_squared": model.rsquared,
+    }

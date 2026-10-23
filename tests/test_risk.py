@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 
 from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha, alpha_regression
+from src.risk import tbill_yield_to_monthly, align_risk_free, annualized_risk_free, sharpe_ratio_tbill, downside_deviation_tbill, sortino_ratio_tbill, alpha_regression_tbill
 
 
 def test_annualized_return_constant_monthly_return():
@@ -177,3 +178,107 @@ def test_alpha_regression_matches_alpha_and_detects_real_outperformance():
     assert result["beta"] == pytest.approx(beta(strat, bench), rel=1e-9)
     assert result["alpha_tstat"] > 3
     assert result["alpha_pvalue"] < 0.01
+
+
+# --- Time-varying risk-free rate (LIMITATIONS_PLAN.md, Phase 1A) ---
+
+# Same expression the flat-rate functions use internally for 2% a year,
+# so the equivalence test below compares like with like.
+FLAT_2PCT_MONTHLY = (1 + 0.02) ** (1 / 12) - 1
+
+RETURNS_12M = pd.Series([0.01, -0.02, 0.03, -0.01, 0.02, -0.03,
+                         0.01, 0.00, 0.02, -0.01, 0.01, -0.02])
+BENCH_12M = pd.Series([0.01, -0.005, 0.015, 0.0, 0.02, -0.01,
+                       0.012, -0.004, 0.008, 0.003, -0.012, 0.018])
+
+
+def test_tbill_yield_to_monthly_converts_5_percent():
+    """
+    A 5% annual yield is (1.05)^(1/12) - 1 a month, and twelve such
+    months must compound back to exactly 5%.
+    """
+    monthly = tbill_yield_to_monthly(pd.Series([5.0]))
+    assert monthly.iloc[0] == pytest.approx(1.05 ** (1 / 12) - 1, rel=1e-12)
+    assert (1 + monthly.iloc[0]) ** 12 - 1 == pytest.approx(0.05, rel=1e-12)
+
+
+def test_annualized_risk_free_of_constant_rate():
+    """Twelve months at a constant 3%-a-year monthly rate annualize to 3%."""
+    rf = pd.Series([1.03 ** (1 / 12) - 1] * 12)
+    assert annualized_risk_free(rf) == pytest.approx(0.03, rel=1e-12)
+
+
+def test_tbill_functions_match_flat_functions_at_constant_2pct():
+    """
+    With a constant series equal to the flat 2% monthly rate, every
+    T-bill function must give the same answer as its flat-rate
+    counterpart. This is the reproduction check of Amendment 1, item 3.
+    """
+    rf = pd.Series([FLAT_2PCT_MONTHLY] * 12)
+    assert sharpe_ratio_tbill(RETURNS_12M, rf) == pytest.approx(sharpe_ratio(RETURNS_12M), rel=1e-12)
+    assert downside_deviation_tbill(RETURNS_12M, rf) == pytest.approx(downside_deviation(RETURNS_12M), rel=1e-12)
+    assert sortino_ratio_tbill(RETURNS_12M, rf) == pytest.approx(sortino_ratio(RETURNS_12M), rel=1e-12)
+    flat = alpha_regression(RETURNS_12M, BENCH_12M)
+    tbill = alpha_regression_tbill(RETURNS_12M, BENCH_12M, rf)
+    for key in ["alpha", "alpha_tstat", "alpha_pvalue", "beta", "r_squared"]:
+        assert tbill[key] == pytest.approx(flat[key], rel=1e-12)
+
+
+def test_sharpe_ratio_tbill_with_varying_rate():
+    """
+    Six months at 0.1% and six at 0.3%: over 12 months the risk-free leg
+    compounds to 1.001^6 x 1.003^6 - 1, which is subtracted from the
+    strategy's 12-month return; volatility is the strategy's own.
+    """
+    rf = pd.Series([0.001] * 6 + [0.003] * 6)
+    rf_annual = 1.001 ** 6 * 1.003 ** 6 - 1
+    expected = ((1 + RETURNS_12M).prod() - 1 - rf_annual) / (RETURNS_12M.std() * 12 ** 0.5)
+    assert sharpe_ratio_tbill(RETURNS_12M, rf) == pytest.approx(expected, rel=1e-12)
+
+
+def test_downside_deviation_tbill_uses_each_months_rate():
+    """
+    Returns of 1% and 0% against targets of 0.5% and 0.2%: only the
+    second month falls short, by 0.2%, so the downside deviation is
+    sqrt((0 + 0.002^2) / 2) x sqrt(12).
+    """
+    returns = pd.Series([0.01, 0.0])
+    rf = pd.Series([0.005, 0.002])
+    expected = (0.002 ** 2 / 2) ** 0.5 * 12 ** 0.5
+    assert downside_deviation_tbill(returns, rf) == pytest.approx(expected, rel=1e-12)
+
+
+def test_alpha_regression_tbill_deducts_each_months_rate():
+    """
+    A strategy built so that its excess return is exactly 2x the
+    benchmark's excess return in every month, (r - rf) = 2 (b - rf), must
+    show beta = 2 and alpha = 0 when rf varies month to month. This only
+    holds if the rate is deducted month by month, not as an average.
+    """
+    rf = pd.Series([0.000, 0.001, 0.002, 0.003, 0.004, 0.005,
+                    0.004, 0.003, 0.002, 0.001, 0.000, 0.002])
+    strat = 2 * BENCH_12M - rf
+    result = alpha_regression_tbill(strat, BENCH_12M, rf)
+    assert result["beta"] == pytest.approx(2.0, rel=1e-9)
+    assert result["alpha"] == pytest.approx(0.0, abs=1e-12)
+
+
+def test_alpha_regression_tbill_constant_outperformance():
+    """
+    Beta-1 strategy earning 0.5% a month above the benchmark: the rate
+    cancels out, so alpha is 6% a year whatever the risk-free path.
+    """
+    rf = pd.Series([0.000, 0.001, 0.002, 0.003, 0.004, 0.005,
+                    0.004, 0.003, 0.002, 0.001, 0.000, 0.002])
+    result = alpha_regression_tbill(BENCH_12M + 0.005, BENCH_12M, rf)
+    assert result["beta"] == pytest.approx(1.0, rel=1e-9)
+    assert result["alpha"] == pytest.approx(0.06, rel=1e-9)
+
+
+def test_align_risk_free_raises_on_missing_month():
+    """A return date with no risk-free rate must raise, not be dropped or filled."""
+    dates = pd.to_datetime(["2025-01-31", "2025-02-28", "2025-03-31"])
+    returns = pd.Series([0.01, 0.02, 0.03], index=dates)
+    rf = pd.Series([0.003, 0.003], index=dates[:2])
+    with pytest.raises(ValueError):
+        align_risk_free(returns, rf)
