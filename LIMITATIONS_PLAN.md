@@ -81,3 +81,16 @@ Changes and clarifications to 1B:
 4. Periods: full in-sample (2021-2024) and out of sample (Jan 2025 to Aug 2026). In sample, the first month is a purchase from cash. Out of sample, January 2025 is a rebalance from the December 2024 holdings, as in the existing scripts.
 5. Output: results/cost_sensitivity.csv in long format, one row per period, strategy, turnover basis and cost level, with the benchmark Sharpe, the Sharpe difference, the break-even cost and a note.
 6. Reading rules, fixed now: (a) the headline 10 bps assumption on the existing basis is unchanged; (b) both bases are reported, and neither is chosen after seeing the results; (c) the drift-inclusive basis is the like-for-like comparison with the benchmark, and the existing basis is reported because it reproduces the published numbers; (d) expectation recorded in advance: drift-inclusive turnover is higher for the strategies, so their break-even costs will be lower than on the existing basis; where a strategy is already below the benchmark at 0 bps, no break-even exists and this is reported as such.
+
+## Amendment 3 (2026-10-23, before any Phase 1C code was written or run)
+
+Reason: the original 1C text does not say which periods supply the standard deviation, which test the power figures refer to, or how the hypothetical sample length is labelled. These are recorded now. No Phase 1C result existed when this amendment was written.
+
+Clarifications to 1C:
+1. Periods: the monthly active return series (strategy minus equal-weight benchmark, flat 2% basis) is taken for three periods: in sample 2021-2024 (n = 48), out of sample Jan 2025 to Aug 2026 (n = 20), and the two combined (n = 68). The standard deviation is estimated separately for each period.
+2. Test: the figures refer to a test of the mean monthly active return against zero. They are not the beta-adjusted alpha regression, whose t-statistics are reported elsewhere. This is stated in every output row.
+3. Annualisation: the annualised figure is 12 times the monthly figure, the same arithmetic convention as the alpha regression.
+4. n = 170 months is a hypothetical sample length (about the length of a 2012 to 2026 study) and is labelled as hypothetical in the output. It is not a result.
+5. Months needed: the figure answers "how long a sample would be needed if the true mean active return equalled the observed one". The observed mean is itself noisy, so this is illustrative and is labelled as such. A zero or negative observed mean is reported as such and never as a failure.
+6. Power uses the standard two-sided approximation (z_alpha + z_power) and ignores the far tail.
+7. Reading rules, fixed now: (a) the conclusion that no result is statistically significant stays unchanged whatever the power figures show; (b) the figures are used only to explain why the tests have little power and how large an effect would be needed, not to re-interpret any observed result; (c) if the minimum detectable effect for n = 68 exceeds the largest observed annualised active return, this is stated in the README as the reason no result is significant.
