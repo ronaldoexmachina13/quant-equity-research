@@ -1,0 +1,56 @@
+# LIMITATIONS_PLAN.md: pre-registration of work on the README limitations
+
+Registered: 2026-10-23, before any of the work below is run.
+Scope: addresses the limitations listed in README.md (flat risk-free rate, simple cost model, no statistical significance, coarse robustness, small universe, short sample).
+Rule: this file is committed before any code is written. Existing entries are never edited. Changes are appended as dated amendments.
+
+## General principles
+- Everything in Phase 1 is a labelled sensitivity or diagnostic. It does not change the strategies and does not replace any published number. Original results stay in place and the new results are shown beside them.
+- No parameter of the strategies (lookbacks, top 5, equal weights, monthly rebalance, 10 bps) is changed in Phase 1.
+- All variants that are run are reported, whatever the result.
+- New outputs go to new files. No existing file in `results/` is modified.
+
+## Phase 0: consistency check (read only)
+Compare every statistic quoted in README.md and the HTML pages (Sharpe, alpha, t-statistics, total returns) with the corresponding CSV in `results/`. List mismatches. Known item to check: the README states the largest alpha t-statistic as 0.94, while a pre-correction status note recorded 1.13. Output: a short list of discrepancies, with no edits.
+
+## Phase 1: risk-free rate, cost sensitivity, power analysis
+
+### 1A. Period-specific risk-free rate
+- Question: how much do the Sharpe ratios, Sortino ratios and alphas change when the flat 2% is replaced by the actual 3-month Treasury bill rate?
+- Hypothesis: levels move materially (roughly +1% to +3% of annual excess return depending on the period) but the ranking of strategies and benchmark within each period is mostly unchanged, since all series are charged the same rate.
+- Data: FRED series TB3MS (3-month Treasury bill secondary market rate, monthly, percent per annum), downloaded from FRED. Save the raw series to `results/tbill_3m_monthly.csv`. Use the value for each month as the risk-free rate applied to that month, converted to a monthly rate as (1 + y/100)^(1/12) - 1. State this convention in the script.
+- Method: recompute Sharpe, Sortino and the alpha regression (excess returns on benchmark excess returns, statsmodels OLS) for Momentum, Value, Combined and Benchmark over: in-sample 2021-2024, 2021-2022, 2023-2024, and out-of-sample Jan 2025 to Aug 2026. Show the flat-2% value and the T-bill value side by side.
+- Output: `results/rf_sensitivity.csv` (period, strategy, metric, flat_2pct, tbill).
+- Reading rules, fixed now: (a) if the benchmark still has the highest out-of-sample Sharpe under T-bill rates, the main conclusion is unchanged; (b) any change in the ranking of strategies within a period is reported explicitly in the README, not omitted; (c) no alpha is called significant unless |t| > 1.96, as before.
+
+### 1B. Transaction-cost sensitivity
+- Question: at what cost level does each strategy's Sharpe fall to the benchmark's, and how much does the benchmark's own rebalancing cost matter?
+- Method: re-run the existing backtest logic with one-way costs of 0, 5, 10, 25 and 50 bps, in-sample and out-of-sample separately. Apply the same cost rate to the benchmark, using its own monthly turnover from rebalancing to equal weights. Report the break-even cost for each strategy (cost at which its Sharpe equals the benchmark's, or "none within 0 to 50 bps").
+- Output: `results/cost_sensitivity.csv`.
+- The 10 bps case must reproduce the existing `transaction_cost_impact.csv` figures for the strategies. If it does not, stop and report why.
+- Reading rule: costs are a sensitivity. The headline 10 bps assumption does not change.
+
+### 1C. Statistical power analysis
+- Question: how large would a strategy's annualised alpha or Sharpe gap need to be to be detectable with the data available, and how long a sample would be needed for the observed effects?
+- Method: using the monthly active return series (strategy minus benchmark) and its standard deviation, compute (i) the minimum detectable annualised active return at 5% two-sided significance and 80% power for n = 48, 68 and about 170 months, using MDE = (z_0.975 + z_0.80) * sd / sqrt(n), and (ii) the number of months needed to detect the observed mean active return at the same significance and power. Label clearly that the standard deviation is estimated from the same sample and the figures are illustrative.
+- Output: `results/power_analysis.csv`.
+- Purpose: to explain, not to rescue, the finding that nothing is significant. The conclusion that no result is statistically significant stays unchanged.
+
+### Phase 1 deliverables
+New scripts at the repository root following the existing naming style, new functions in `src/risk.py` where reusable, unit tests with hand-made inputs, and the three new CSVs. No README or HTML edits by Claude Code. Ronaldo commits.
+
+## Phase 2: full robustness grid (outline, to be pre-registered in detail before running)
+- Grid: portfolio size (top 3, 5, 8, 10), rebalance frequency (monthly, quarterly), momentum lookback (6-1, 9-1, 12-1), cost (5, 10, 25 bps). Every cell is reported, as a table and a heat map. No selection of a preferred cell.
+- Additional diagnostics: rolling 24-month Sharpe, drawdown chart, VaR and Expected Shortfall, hit rate.
+
+## Phase 3: data feasibility check for Version 0.6 (outline)
+- Uses no returns and no strategy results, so it cannot bias the design.
+- Questions: (1) how many historical S&P 500 members from 2012 can be reconstructed from the public constituent change history; (2) how many have price history available in yfinance; (3) how many have usable SEC book value, and how coverage varies by sector and year.
+- Output: a coverage report only. Its result decides whether top quintile or top decile is realistic.
+
+## Phase 4: Version 0.6 (outline, own pre-registration required)
+- Point-in-time S&P 500 universe from about 2012 to 2026; frozen v0.5 signal definitions with no tuning; new portfolio size (top quintile or decile) fixed before any run.
+- Evidence design: 2012-2020 is the new test (never examined by this specification). 2021-2026 on the larger universe is reported as a re-test, not as out-of-sample, because the period is already known.
+- Signal-level tests: rank information coefficient, quintile spread, Fama-MacBeth regression.
+- Coverage reporting per date, and a disclosed count of members without prices. Survivorship bias is reduced, not eliminated.
+- Expectation recorded in advance: value (P/B) may look weak over 2012-2020. If so, it is reported as found.
