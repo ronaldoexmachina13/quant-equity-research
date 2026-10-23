@@ -148,3 +148,57 @@ Reason: the Phase 2 implementation plan was reviewed against the design above, a
 4. The summary file robustness_grid_summary.csv gains two descriptive columns, eligible_names_min and eligible_names_max, giving the smallest and largest number of names with a valid score in any month of the period for that strategy. They are computed from the data, not typed in.
 
 Note (2026-10-23): the Phase 2 detailed design above is the fourth dated entry in this file, and there is no Amendment 4. The label Amendment 5 is kept as written, to avoid editing registered text.
+
+## Phase 3 detailed design: data feasibility check for a larger universe (2026-10-23, before any Phase 3 code was written or run)
+
+This entry replaces the Phase 3 outline above. It is registered now so that the design is fixed in advance, and it has not been run. Phase 4 (a point-in-time universe study) remains a documented future step with its own pre-registration.
+
+### Question
+Can a point-in-time S&P 500 universe from 2012 be rebuilt from free public data well enough to support a signal-level study, and how much of it would be missing?
+
+### Hard constraint
+Phase 3 computes no returns, no signal values and no strategy performance. Prices are used only to count whether the data needed exists. This means that nothing in Phase 3 can bias a later design.
+
+### Sources
+- Membership: the public Wikipedia page "List of S&P 500 companies" (current constituents, with GICS sector) and its table of changes to the list (additions and removals with dates). The current list is walked backwards through the changes to rebuild membership by date. No other source is used to fill gaps.
+- Prices: yfinance, downloaded from 2011-01-01 to 2026-09-01 (end exclusive) to allow a 12-month warm-up before 2012.
+- Fundamentals: SEC EDGAR company facts, through the existing functions in src/fundamentals.py (get_book_value_per_share and forward_fill_book_value with the 6-month cap). The book-value rule is reused, not re-implemented.
+- Ticker to CIK: the SEC ticker file, as the existing code does. Names that cannot be mapped are counted, not dropped silently.
+
+### Isolation from the published results
+Phase 3 writes to a separate database file (database/universe_feasibility.db, gitignored) and a gitignored cache folder for raw downloads. It does not write to the tables prices or book_value in database/quant_research.db, and it does not modify any existing results file.
+
+### SQL
+The membership is stored as a table index_membership (ticker, start_date, end_date) in the separate database. "Members at date t" is one SQL query, stored in sql/universe_at_date.sql, and the monthly coverage counts are produced by joining that query with the availability tables. This is the genuine use of SQL in this phase.
+
+### Definitions, fixed now
+- Evaluation months: January 2012 to August 2026 (176 months).
+- Universe in month t: members at the end of month t-1, so a stock added during month t is not in month t's universe.
+- Signal inputs available (momentum): month-end adjusted prices exist for t-1 and t-12.
+- Book value available (value): a book value per share from a filing dated on or before the end of t-1 and not older than 6 months (the existing forward-fill rule), and a price for t-1.
+- Usable for Value and Combined: member, signal inputs available and book value available. Usable for Momentum: member and signal inputs available.
+- Return observable: a month-end price also exists for t. This is NOT required for usability, because requiring it would drop stocks that were delisted or acquired during month t and would build survivorship bias into the universe. It is measured separately, as the delisting gap: the number of usable names whose month-t return cannot be observed.
+- A download that fails with an error is retried (at most three times) and is never counted as missing data. Only a confirmed empty result is counted as missing. Persistent errors are listed separately.
+- Prices are matched to a membership window only inside that window, and tickers whose price history starts after their membership start, or has a gap inside it, are flagged. This guards against ticker reuse and ticker changes.
+
+### Outputs (new files only; existing files are never overwritten)
+- results/universe_membership.csv: ticker, company, current GICS sector (current members only, otherwise blank), start_date, end_date, source row.
+- results/universe_coverage_monthly.csv: for each month, the number of members, with signal inputs, with a CIK, with book value, usable for Momentum, usable for Value and Combined, and the delisting gap.
+- results/universe_coverage_by_year.csv: the same, averaged by year, split into members that stayed in the index to the end and members that were removed at some point. This split is the survivorship diagnostic.
+- results/universe_coverage_by_sector.csv: coverage by current GICS sector, for current members, with removed names in an "unknown" row.
+- results/universe_exclusions.csv: an audit list of every name that is excluded or partly covered, with its membership dates and the reason (no CIK, no prices, partial prices, no book value, persistent download error).
+
+### Validation gates (the script stops and reports instead of writing a conclusion if one fails)
+1. The reconstructed membership must contain the 17 stocks of the published study as members for the whole of their documented membership in the evaluation window.
+2. For those 17 stocks, over the months that overlap with the existing database, the availability of prices and of book value computed by the new stage must match the existing prices and book_value tables month by month. V must show no book value, as in the published study.
+3. The reconstructed number of members must be between 480 and 520 in every month. A month outside this range is flagged as unreliable and excluded from the thresholds below.
+
+### Decision rules, fixed now
+1. Portfolio size: a decile portfolio is feasible in a month if at least 200 names are usable for Value and Combined, and a quintile portfolio if at least 100 are. Fewer than 100 means the universe is too thin for that month.
+2. Study window: the earliest month from which the applicable threshold holds in every later month. The result is reported as a start date, not chosen by hand.
+3. Survivorship flag: a calendar year is flagged as impaired if more than 20% of member-months in that year have no usable price data, or if the share usable among removed members is more than 15 percentage points below the share among members that stayed.
+4. Delisting gap: any year in which usable names with no month-t return exceed 1% of usable names is flagged, and a delisting-return treatment would be needed before any later returns study.
+5. If thresholds 1 and 2 are met for at least 10 years, a larger-universe study is recommended as a possible future step. If not, the report says the data does not support one and lists what would be needed. Either outcome is reported as found.
+
+### Deliverables
+New scripts at the repository root, resumable and cached, in the existing naming style; unit tests with hand-made inputs for the membership reconstruction (a short invented list of changes whose result is checked by hand) and for the usability rules; and the five output files above. No README, HTML or LIMITATIONS_PLAN.md edits by Claude Code. Ronaldo commits.
