@@ -92,8 +92,14 @@ def clean_cell(value) -> str | None:
 
 
 def normalize_ticker(value) -> str | None:
-    """Wikipedia writes share classes as BRK.B; yfinance and the SEC file use BRK-B."""
+    """
+    Wikipedia writes share classes as BRK.B; yfinance and the SEC file use BRK-B.
+    A few cells of the changes table carry a stray trailing "|" (for example
+    "ALLE |"), which is dropped.
+    """
     text = clean_cell(value)
+    if text:
+        text = text.split("|")[0].strip()
     return text.upper().replace(".", "-") if text else None
 
 

@@ -73,6 +73,8 @@ def test_clean_cell_and_normalize_ticker():
     assert clean_cell(float("nan")) is None
     assert normalize_ticker("brk.b") == "BRK-B"
     assert normalize_ticker("") is None
+    assert normalize_ticker("ALLE |") == "ALLE"
+    assert normalize_ticker(" | ") is None
 
 
 def test_parse_constituents():
