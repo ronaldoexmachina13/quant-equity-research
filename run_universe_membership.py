@@ -1,8 +1,9 @@
 """
 Phase 3, step 1 of 4: rebuild point-in-time S&P 500 membership.
 
-Source: the Wikipedia page "List of S&P 500 companies" (current constituents
-and the table of changes), fetched once and cached. The current list is
+Sources: the Wikipedia page "List of S&P 500 companies" (current constituents)
+and the page "Historical components of the S&P 500" (table of changes, see
+Amendment 7), each fetched once and cached. The current list is
 walked backwards through the changes (LIMITATIONS_PLAN.md, Phase 3 and
 Amendment 6). Writes table index_membership in
 database/universe_feasibility.db. Writes nothing to results/; the
@@ -18,7 +19,7 @@ import requests
 from config import UNIVERSE
 from src.fundamentals import HEADERS
 from src.universe import (
-    FEASIBILITY_DB_PATH, WIKIPEDIA_URL, FIRST_PRICE_MONTH, EVALUATION_START, EVALUATION_END,
+    FEASIBILITY_DB_PATH, WIKIPEDIA_URL, WIKIPEDIA_CHANGES_URL, FIRST_PRICE_MONTH, EVALUATION_START, EVALUATION_END,
     GATE1_START, MEMBERS_MIN, MEMBERS_MAX,
     cache_dir, month_range, evaluation_months_frame, parse_constituents, parse_changes,
     rebuild_membership, tickers_in_window, format_intervals, gate1_failures,
@@ -26,15 +27,15 @@ from src.universe import (
 )
 
 
-def fetch_wikipedia_html() -> str:
+def fetch_wikipedia_html(url: str, file_stem: str) -> str:
     """Return the cached page, downloading it once if it is not cached yet."""
-    path = cache_dir() / "wikipedia" / "list_of_sp500_companies.html"
+    path = cache_dir() / "wikipedia" / f"{file_stem}.html"
     if path.exists():
         print(f"Using cached Wikipedia page: {path}")
         return path.read_text(encoding="utf-8")
 
     def fetch():
-        response = requests.get(WIKIPEDIA_URL, headers=HEADERS, timeout=60)
+        response = requests.get(url, headers=HEADERS, timeout=60)
         response.raise_for_status()
         return response.text
 
@@ -44,7 +45,7 @@ def fetch_wikipedia_html() -> str:
         raise SystemExit(f"Wikipedia download failed after {attempts} attempts: {message}")
     write_bytes_atomic(path, html.encode("utf-8"))
     write_json(path.with_suffix(".meta.json"),
-               {"url": WIKIPEDIA_URL, "retrieved_utc": datetime.now(timezone.utc).isoformat()})
+               {"url": url, "retrieved_utc": datetime.now(timezone.utc).isoformat()})
     print(f"Downloaded and cached Wikipedia page: {path}")
     return html
 
@@ -94,9 +95,10 @@ def print_report(current, changes, intervals, problems):
 
 
 if __name__ == "__main__":
-    html = fetch_wikipedia_html()
-    current = parse_constituents(html)
-    changes = parse_changes(html)
+    constituents_html = fetch_wikipedia_html(WIKIPEDIA_URL, "list_of_sp500_companies")
+    changes_html = fetch_wikipedia_html(WIKIPEDIA_CHANGES_URL, "historical_components")
+    current = parse_constituents(constituents_html)
+    changes = parse_changes(changes_html)
     if current["ticker"].isna().any() or current["ticker"].duplicated().any():
         raise SystemExit("Current constituents table has blank or duplicated tickers; stopping.")
 

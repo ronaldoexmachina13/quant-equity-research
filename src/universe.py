@@ -21,6 +21,7 @@ EXISTING_DB_PATH = "database/quant_research.db"
 SQL_DIR = Path(__file__).resolve().parent.parent / "sql"
 
 WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+WIKIPEDIA_CHANGES_URL = "https://en.wikipedia.org/wiki/Historical_components_of_the_S%26P_500"
 PRICE_START = "2011-01-01"
 PRICE_END = "2026-09-01"  # yfinance end date is exclusive, so this fetches through 31 Aug 2026
 FIRST_PRICE_MONTH = "2011-01"  # t-12 for the first evaluation month
