@@ -220,3 +220,4 @@ __marimo__/
 database/*.db
 quicktest.py
 .claude/
+data_cache/
