@@ -1,0 +1,701 @@
+ticker,company,membership,member_months,reason,detail
+A,Agilent Technologies,before history to current,188,partial book value,166 of 188 member months with book value
+AA,Alcoa,before history to 2016-10-31,70,no book value,0 of 70 member months with book value
+AAL,American Airlines Group,2015-03-23 to 2024-09-22,114,partial book value,47 of 114 member months with book value
+ABBV,AbbVie,2013-01-02 to current,164,partial book value,129 of 164 member months with book value
+ABMD,Abiomed,2018-05-31 to 2022-12-21,55,no prices,0 of 55 member months with a month-end price
+ABMD,Abiomed,2018-05-31 to 2022-12-21,55,no CIK,ticker not in the SEC ticker file
+ABNB,Airbnb,2023-09-18 to current,36,no book value,0 of 36 member months with book value
+ACE,Chubb,before history to 2016-01-18,60,no prices,0 of 60 member months with a month-end price
+ACE,Chubb,before history to 2016-01-18,60,no CIK,ticker not in the SEC ticker file
+ACN,Accenture,2011-07-05 to current,182,no book value,0 of 182 member months with book value
+ADM,Archer Daniels Midland,before history to current,188,partial book value,187 of 188 member months with book value
+ADP,Automatic Data Processing,before history to current,188,partial book value,173 of 188 member months with book value
+ADS,Alliance Data Systems,2013-12-23 to 2020-06-21,78,no prices,0 of 78 member months with a month-end price
+ADS,Alliance Data Systems,2013-12-23 to 2020-06-21,78,no CIK,ticker not in the SEC ticker file
+ADSK,Autodesk,before history to current,188,partial book value,161 of 188 member months with book value
+ADT,ADT,2012-10-01 to 2016-05-02,43,no prices,0 of 43 member months with a month-end price
+ADT,ADT,2012-10-01 to 2016-05-02,43,no book value,0 of 43 member months with book value
+AET,Aetna,before history to 2018-12-02,95,no prices,0 of 95 member months with a month-end price
+AET,Aetna,before history to 2018-12-02,95,no CIK,ticker not in the SEC ticker file
+AGN,Allergan,before history to 2020-05-11,112,no prices,0 of 112 member months with a month-end price
+AGN,Allergan,before history to 2020-05-11,112,no CIK,ticker not in the SEC ticker file
+AIG,American International Group,before history to current,188,partial book value,187 of 188 member months with book value
+AIZ,Assurant,before history to current,188,partial book value,185 of 188 member months with book value
+AKS,AK Steel,2008-07-01 to 2011-12-15,11,no prices,0 of 11 member months with a month-end price
+AKS,AK Steel,2008-07-01 to 2011-12-15,11,no CIK,ticker not in the SEC ticker file
+ALL,Allstate,before history to current,188,partial book value,175 of 188 member months with book value
+ALLE,Allegion,2013-12-02 to current,153,partial book value,134 of 153 member months with book value
+ALTR,Altera,before history to 2015-12-28,59,no prices,0 of 59 member months with a month-end price
+ALTR,Altera,before history to 2015-12-28,59,no CIK,ticker not in the SEC ticker file
+ALXN,Alexion Pharmaceuticals,2012-05-21 to 2021-07-20,110,no prices,0 of 110 member months with a month-end price
+ALXN,Alexion Pharmaceuticals,2012-05-21 to 2021-07-20,110,no CIK,ticker not in the SEC ticker file
+AMCR,Amcor,2019-06-11 to current,87,partial book value,81 of 87 member months with book value
+AMG,Affiliated Managers Group,2014-07-01 to 2019-12-22,65,partial book value,59 of 65 member months with book value
+AMP,Ameriprise Financial,before history to current,188,partial book value,179 of 188 member months with book value
+AMTM,Amentum,2024-09-30 to 2024-12-22,3,no book value,0 of 3 member months with book value
+ANDV,Andeavor,before history to 2018-09-30,93,no prices,0 of 93 member months with a month-end price
+ANDV,Andeavor,before history to 2018-09-30,93,no CIK,ticker not in the SEC ticker file
+ANR,Alpha Natural Resources,2011-06-01 to 2012-10-01,16,no prices,0 of 16 member months with a month-end price
+ANR,Alpha Natural Resources,2011-06-01 to 2012-10-01,16,no CIK,ticker not in the SEC ticker file
+ANSS,Ansys,2017-06-19 to 2025-07-17,97,no prices,0 of 97 member months with a month-end price
+ANSS,Ansys,2017-06-19 to 2025-07-17,97,no CIK,ticker not in the SEC ticker file
+AON,Aon plc,before history to current,188,partial book value,146 of 188 member months with book value
+AOS,A. O. Smith,2017-07-26 to current,110,no book value,0 of 110 member months with book value
+APA,APA Corporation,before history to current,188,partial book value,55 of 188 member months with book value
+APC,Anadarko Petroleum,before history to 2019-08-08,103,no prices,0 of 103 member months with a month-end price
+APC,Anadarko Petroleum,before history to 2019-08-08,103,no book value,0 of 103 member months with book value
+APOL,Apollo Education Group,before history to 2013-06-30,30,no prices,0 of 30 member months with a month-end price
+APOL,Apollo Education Group,before history to 2013-06-30,30,no CIK,ticker not in the SEC ticker file
+APTV,Aptiv,before history to current,188,partial prices,starts after membership start; 178 of 188 member months with a month-end price
+APTV,Aptiv,before history to current,188,partial book value,173 of 188 member months with book value
+ARES,Ares Management,2025-12-11 to current,9,no book value,0 of 9 member months with book value
+ARG,Airgas,2009-09-28 to 2016-05-22,64,no prices,0 of 64 member months with a month-end price
+ARG,Airgas,2009-09-28 to 2016-05-22,64,no CIK,ticker not in the SEC ticker file
+ARNC,Arconic,2016-11-01 to 2020-03-31,41,no prices,0 of 41 member months with a month-end price
+ARNC,Arconic,2016-11-01 to 2020-03-31,41,no CIK,ticker not in the SEC ticker file
+ATVI,Activision Blizzard,2015-08-28 to 2023-10-17,98,no prices,0 of 98 member months with a month-end price
+ATVI,Activision Blizzard,2015-08-28 to 2023-10-17,98,no CIK,ticker not in the SEC ticker file
+AVB,AvalonBay Communities,2007-01-10 to 2026-08-17,187,no prices,0 of 187 member months with a month-end price
+AVB,AvalonBay Communities,2007-01-10 to 2026-08-17,187,no CIK,ticker not in the SEC ticker file
+AVGO,Broadcom,2014-05-08 to current,148,partial book value,99 of 148 member months with book value
+AVP,Avon Products,before history to 2015-03-22,50,no prices,0 of 50 member months with a month-end price
+AVP,Avon Products,before history to 2015-03-22,50,no CIK,ticker not in the SEC ticker file
+AYE,Allegheny Energy,before history to 1976-06-30; 2000-12-05 to 2011-02-24,1,no prices,0 of 1 member months with a month-end price
+AYE,Allegheny Energy,before history to 1976-06-30; 2000-12-05 to 2011-02-24,1,no CIK,ticker not in the SEC ticker file
+AYI,Acuity Brands,2016-05-03 to 2018-06-17,25,partial book value,24 of 25 member months with book value
+AZO,AutoZone,before history to current,188,no book value,0 of 188 member months with book value
+BA,Boeing,before history to current,188,partial book value,109 of 188 member months with book value
+BALL,Ball Corporation,before history to current,188,partial book value,186 of 188 member months with book value
+BAX,Baxter International,before history to current,188,partial book value,185 of 188 member months with book value
+BBBY,Bed Bath & Beyond,before history to 2017-07-25,78,no prices,0 of 78 member months with a month-end price
+BBBY,Bed Bath & Beyond,before history to 2017-07-25,78,no CIK,ticker not in the SEC ticker file
+BBWI,"Bath & Body Works, Inc.",before history to 2024-09-30,165,partial book value,26 of 165 member months with book value
+BBY,Best Buy,before history to current,188,partial book value,172 of 188 member months with book value
+BCR,CR Bard,before history to 2018-01-02,84,no prices,0 of 84 member months with a month-end price
+BCR,CR Bard,before history to 2018-01-02,84,no CIK,ticker not in the SEC ticker file
+BEAM,Suntory Global Spirits,before history to 2014-04-30,40,no prices,0 of 40 member months with a month-end price
+BEAM,Suntory Global Spirits,before history to 2014-04-30,40,no book value,0 of 40 member months with book value
+BF-B,Brown–Forman,before history to current,188,partial book value,84 of 188 member months with book value
+BG,Bunge Global,2023-03-15 to current,42,partial book value,28 of 42 member months with book value
+BHF,Brighthouse Financial,2017-08-08 to 2019-04-01,20,partial book value,17 of 20 member months with book value
+BHI,Baker Hughes,before history to 2017-07-06,78,no prices,0 of 78 member months with a month-end price
+BHI,Baker Hughes,before history to 2017-07-06,78,no CIK,ticker not in the SEC ticker file
+BIG,Big Lots,before history to 2013-02-14,25,no prices,0 of 25 member months with a month-end price
+BIG,Big Lots,before history to 2013-02-14,25,no CIK,ticker not in the SEC ticker file
+BIO,Bio-Rad Laboratories,2020-06-22 to 2024-09-22,51,no book value,0 of 51 member months with book value
+BKNG,Booking Holdings,before history to current,188,partial book value,154 of 188 member months with book value
+BKR,Baker Hughes,2017-07-07 to current,110,partial book value,55 of 110 member months with book value
+BLK,BlackRock,2011-04-01 to current,185,partial book value,22 of 185 member months with book value
+BMC,BMC Software,before history to 2013-09-09,32,no prices,0 of 32 member months with a month-end price
+BMC,BMC Software,before history to 2013-09-09,32,no CIK,ticker not in the SEC ticker file
+BMS,Bemis Company,before history to 2014-12-04; 2019-06-07 to 2019-06-10,47,no prices,0 of 47 member months with a month-end price
+BMS,Bemis Company,before history to 2014-12-04; 2019-06-07 to 2019-06-10,47,no CIK,ticker not in the SEC ticker file
+BRCM,Broadcom Corporation,before history to 2016-01-31,61,no prices,0 of 61 member months with a month-end price
+BRCM,Broadcom Corporation,before history to 2016-01-31,61,no CIK,ticker not in the SEC ticker file
+BRK-B,Berkshire Hathaway,before history to current,188,partial book value,10 of 188 member months with book value
+BRO,Brown & Brown,2021-09-20 to current,60,partial book value,48 of 60 member months with book value
+BSX,Boston Scientific,before history to current,188,partial book value,176 of 188 member months with book value
+BTU,Peabody Energy,before history to 2014-09-19,44,no prices,0 of 44 member months with a month-end price
+BXLT,Baxalta,2015-07-01 to 2016-06-02,11,no prices,0 of 11 member months with a month-end price
+BXLT,Baxalta,2015-07-01 to 2016-06-02,11,no CIK,ticker not in the SEC ticker file
+C,Citigroup,before history to current,188,partial book value,187 of 188 member months with book value
+CA,CA Technologies,before history to 2018-11-05,94,no prices,0 of 94 member months with a month-end price
+CA,CA Technologies,before history to 2018-11-05,94,no CIK,ticker not in the SEC ticker file
+CAH,Cardinal Health,before history to current,188,partial book value,139 of 188 member months with book value
+CAM,Cameron International,before history to 2016-04-03,63,no prices,0 of 63 member months with a month-end price
+CAM,Cameron International,before history to 2016-04-03,63,no CIK,ticker not in the SEC ticker file
+CARR,Carrier Global,2020-04-03 to current,77,partial book value,76 of 77 member months with book value
+CAT,Caterpillar Inc.,before history to current,188,partial book value,182 of 188 member months with book value
+CB,Chubb Limited,2010-07-14 to current,188,partial book value,168 of 188 member months with book value
+CBE,Cooper Industries,before history to 2009-09-27; 2011-11-18 to 2012-12-02,13,no prices,0 of 13 member months with a month-end price
+CBE,Cooper Industries,before history to 2009-09-27; 2011-11-18 to 2012-12-02,13,no CIK,ticker not in the SEC ticker file
+CCE,Coca-Cola Enterprises,before history to 2016-05-30,64,no prices,0 of 64 member months with a month-end price
+CCE,Coca-Cola Enterprises,before history to 2016-05-30,64,no CIK,ticker not in the SEC ticker file
+CCI,Crown Castle,2012-03-13 to current,174,partial book value,157 of 174 member months with book value
+CCL,Carnival Corporation,1998-12-11 to current,188,partial book value,173 of 188 member months with book value
+CDAY,Ceridian,2021-09-20 to 2024-01-31,29,no prices,0 of 29 member months with a month-end price
+CDAY,Ceridian,2021-09-20 to 2024-01-31,29,no CIK,ticker not in the SEC ticker file
+CEG,Constellation Energy Group,before history to 2012-03-12; 2022-02-02 to current,69,partial prices,starts after membership start; 55 of 69 member months with a month-end price
+CEG,Constellation Energy Group,before history to 2012-03-12; 2022-02-02 to current,69,partial book value,52 of 69 member months with book value
+CELG,Celgene,before history to 2019-11-20,106,no prices,0 of 106 member months with a month-end price
+CELG,Celgene,before history to 2019-11-20,106,no CIK,ticker not in the SEC ticker file
+CEPH,Cephalon,before history to 2011-10-13,9,no prices,0 of 9 member months with a month-end price
+CEPH,Cephalon,before history to 2011-10-13,9,no CIK,ticker not in the SEC ticker file
+CERN,Cerner,2010-04-29 to 2022-06-07,137,no prices,0 of 137 member months with a month-end price
+CERN,Cerner,2010-04-29 to 2022-06-07,137,no CIK,ticker not in the SEC ticker file
+CFG,Citizens Financial Group,2016-02-01 to current,127,partial book value,121 of 127 member months with book value
+CFN,Carefusion,before history to 2015-03-17,50,no prices,0 of 50 member months with a month-end price
+CFN,Carefusion,before history to 2015-03-17,50,no CIK,ticker not in the SEC ticker file
+CHD,Church & Dwight,2015-12-29 to current,129,partial book value,117 of 129 member months with book value
+CHK,Chesapeake Energy,before history to 2018-03-18,86,no prices,0 of 86 member months with a month-end price
+CHK,Chesapeake Energy,before history to 2018-03-18,86,no CIK,ticker not in the SEC ticker file
+CHTR,Charter Communications,2016-09-08 to current,120,partial book value,5 of 120 member months with book value
+CI,Cigna,before history to current,188,partial book value,91 of 188 member months with book value
+CL,Colgate-Palmolive,before history to current,188,partial book value,150 of 188 member months with book value
+CLX,Clorox,before history to current,188,partial book value,157 of 188 member months with book value
+CMA,Comerica,before history to 2024-06-23,161,no prices,0 of 161 member months with a month-end price
+CMA,Comerica,before history to 2024-06-23,161,no CIK,ticker not in the SEC ticker file
+CMCSA,Comcast,before history to current,188,no book value,0 of 188 member months with book value
+CMCSK,Comcast Series K,2015-09-18 to 2015-12-14,3,no prices,0 of 3 member months with a month-end price
+CMCSK,Comcast Series K,2015-09-18 to 2015-12-14,3,no CIK,ticker not in the SEC ticker file
+CME,CME Group,before history to current,188,no book value,0 of 188 member months with book value
+CNP,CenterPoint Energy,before history to current,188,partial book value,187 of 188 member months with book value
+COIN,Coinbase,2025-05-19 to current,16,partial book value,11 of 16 member months with book value
+COL,Rockwell Collins,before history to 2018-12-02,95,no prices,0 of 95 member months with a month-end price
+COL,Rockwell Collins,before history to 2018-12-02,95,no CIK,ticker not in the SEC ticker file
+COP,ConocoPhillips,before history to current,188,partial book value,182 of 188 member months with book value
+COR,Cencora,before history to current,188,partial book value,177 of 188 member months with book value
+COTY,Coty,2016-09-30 to 2020-09-20,48,partial book value,46 of 48 member months with book value
+COV,Covidien,before history to 2009-06-04; 2011-02-28 to 2015-01-26,47,no prices,0 of 47 member months with a month-end price
+COV,Covidien,before history to 2009-06-04; 2011-02-28 to 2015-01-26,47,no CIK,ticker not in the SEC ticker file
+CPAY,Corpay,before history to current,188,partial book value,181 of 188 member months with book value
+CPGX,Columbia Pipeline Group,2015-07-02 to 2016-07-04,12,no prices,0 of 12 member months with a month-end price
+CPGX,Columbia Pipeline Group,2015-07-02 to 2016-07-04,12,no CIK,ticker not in the SEC ticker file
+CPRI,Capri Holdings,before history to 2020-05-11,112,partial prices,starts after membership start; 101 of 112 member months with a month-end price
+CPRI,Capri Holdings,before history to 2020-05-11,112,partial book value,87 of 112 member months with book value
+CPRT,Copart,2018-07-02 to current,98,partial book value,92 of 98 member months with book value
+CPWR,Compuware,1998-12-11 to 2011-12-30,11,no book value,0 of 11 member months with book value
+CRWD,CrowdStrike,2024-06-24 to current,27,partial book value,15 of 27 member months with book value
+CSC,Computer Sciences Corporation,before history to 2015-11-30,59,no prices,0 of 59 member months with a month-end price
+CSC,Computer Sciences Corporation,before history to 2015-11-30,59,no CIK,ticker not in the SEC ticker file
+CSGP,CoStar Group,2022-09-19 to current,48,partial book value,30 of 48 member months with book value
+CSRA,CSRA,2015-12-01 to 2018-04-03,28,no prices,0 of 28 member months with a month-end price
+CSRA,CSRA,2015-12-01 to 2018-04-03,28,no CIK,ticker not in the SEC ticker file
+CTLT,Catalent,2020-09-21 to 2024-12-22,51,no prices,0 of 51 member months with a month-end price
+CTLT,Catalent,2020-09-21 to 2024-12-22,51,no CIK,ticker not in the SEC ticker file
+CTRA,Coterra Energy,before history to 2026-05-06,184,no prices,0 of 184 member months with a month-end price
+CTRA,Coterra Energy,before history to 2026-05-06,184,no CIK,ticker not in the SEC ticker file
+CTXS,Citrix Systems,before history to 2022-10-02,141,no prices,0 of 141 member months with a month-end price
+CTXS,Citrix Systems,before history to 2022-10-02,141,no CIK,ticker not in the SEC ticker file
+CVC,Cablevision Systems,2010-12-17 to 2016-06-21,65,no prices,0 of 65 member months with a month-end price
+CVC,Cablevision Systems,2010-12-17 to 2016-06-21,65,no CIK,ticker not in the SEC ticker file
+CVH,Coventry Health Care,before history to 2013-05-07,28,no prices,0 of 28 member months with a month-end price
+CVH,Coventry Health Care,before history to 2013-05-07,28,no CIK,ticker not in the SEC ticker file
+CVNA,Carvana,2025-12-22 to current,9,no book value,0 of 9 member months with book value
+CXO,Concho Resources,2016-02-22 to 2021-01-20,59,no prices,0 of 59 member months with a month-end price
+CXO,Concho Resources,2016-02-22 to 2021-01-20,59,no CIK,ticker not in the SEC ticker file
+DAL,Delta Air Lines,2013-09-10 to current,156,partial book value,155 of 156 member months with book value
+DASH,DoorDash,2025-03-24 to current,18,no book value,0 of 18 member months with book value
+DAY,Dayforce,2024-02-01 to 2026-02-08,24,no prices,0 of 24 member months with a month-end price
+DAY,Dayforce,2024-02-01 to 2026-02-08,24,no CIK,ticker not in the SEC ticker file
+DD,DuPont,before history to 2017-08-31; 2019-06-03 to current,167,partial book value,87 of 167 member months with book value
+DDOG,Datadog,2025-07-09 to current,14,no book value,0 of 14 member months with book value
+DELL,Dell,before history to 2013-10-28; 2024-09-23 to current,57,partial prices,starts after membership start; 24 of 57 member months with a month-end price
+DELL,Dell,before history to 2013-10-28; 2024-09-23 to current,57,no book value,0 of 57 member months with book value
+DF,Dean Foods,before history to 2013-05-22,28,no prices,0 of 28 member months with a month-end price
+DF,Dean Foods,before history to 2013-05-22,28,no CIK,ticker not in the SEC ticker file
+DFS,Discover Financial,2007-07-02 to 2025-05-18,172,no prices,0 of 172 member months with a month-end price
+DFS,Discover Financial,2007-07-02 to 2025-05-18,172,no CIK,ticker not in the SEC ticker file
+DIS,Walt Disney Company (The),1976-07-01 to current,188,partial book value,88 of 188 member months with book value
+DISCA,"Discovery, Inc.",before history to 2022-04-10,135,no prices,0 of 135 member months with a month-end price
+DISCA,"Discovery, Inc.",before history to 2022-04-10,135,no CIK,ticker not in the SEC ticker file
+DISCK,"Discovery, Inc.",2014-08-06 to 2022-04-10,92,no prices,0 of 92 member months with a month-end price
+DISCK,"Discovery, Inc.",2014-08-06 to 2022-04-10,92,no CIK,ticker not in the SEC ticker file
+DISH,Dish Network,2017-03-13 to 2023-06-19,75,no prices,0 of 75 member months with a month-end price
+DISH,Dish Network,2017-03-13 to 2023-06-19,75,no CIK,ticker not in the SEC ticker file
+DLTR,Dollar Tree,2011-12-16 to current,177,partial book value,158 of 177 member months with book value
+DNB,Dun & Bradstreet,before history to 2017-04-04,75,no prices,0 of 75 member months with a month-end price
+DNB,Dun & Bradstreet,before history to 2017-04-04,75,no CIK,ticker not in the SEC ticker file
+DNR,Denbury Resources,before history to 2015-03-22,50,no prices,0 of 50 member months with a month-end price
+DNR,Denbury Resources,before history to 2015-03-22,50,no CIK,ticker not in the SEC ticker file
+DO,Diamond Offshore Drilling,before history to 2016-09-29,68,no prices,0 of 68 member months with a month-end price
+DO,Diamond Offshore Drilling,before history to 2016-09-29,68,no CIK,ticker not in the SEC ticker file
+DOV,Dover Corporation,before history to current,188,partial book value,176 of 188 member months with book value
+DOW,Dow Chemical Company,before history to 2017-08-31; 2019-04-02 to current,169,partial prices,starts after membership start; 89 of 169 member months with a month-end price
+DOW,Dow Chemical Company,before history to 2017-08-31; 2019-04-02 to current,169,partial book value,88 of 169 member months with book value
+DPS,Dr Pepper Snapple Group,before history to 2018-07-01,90,no prices,0 of 90 member months with a month-end price
+DPS,Dr Pepper Snapple Group,before history to 2018-07-01,90,no CIK,ticker not in the SEC ticker file
+DPZ,Domino's,2020-05-12 to current,76,no book value,0 of 76 member months with book value
+DRE,Duke Realty,2017-07-26 to 2022-10-02,63,no prices,0 of 63 member months with a month-end price
+DRE,Duke Realty,2017-07-26 to 2022-10-02,63,no CIK,ticker not in the SEC ticker file
+DTV,DirecTV,before history to 2015-07-28,54,no prices,0 of 54 member months with a month-end price
+DTV,DirecTV,before history to 2015-07-28,54,no CIK,ticker not in the SEC ticker file
+DV,DeVry,before history to 2012-09-30,21,no prices,0 of 21 member months with a month-end price
+DV,DeVry,before history to 2012-09-30,21,no book value,0 of 21 member months with book value
+DVA,DaVita,before history to current,188,partial book value,174 of 188 member months with book value
+DWDP,DuPont,2017-09-01 to 2019-06-02,21,no prices,0 of 21 member months with a month-end price
+DWDP,DuPont,2017-09-01 to 2019-06-02,21,no CIK,ticker not in the SEC ticker file
+DXC,DXC Technology,2017-04-04 to 2023-10-02,78,partial book value,74 of 78 member months with book value
+DXCM,Dexcom,2020-05-12 to current,76,partial book value,66 of 76 member months with book value
+EA,Electronic Arts,before history to 2026-08-04,187,no prices,0 of 187 member months with a month-end price
+EA,Electronic Arts,before history to 2026-08-04,187,no CIK,ticker not in the SEC ticker file
+ECHO,EchoStar,before history to current,188,partial book value,6 of 188 member months with book value
+ED,Consolidated Edison,before history to current,188,partial book value,167 of 188 member months with book value
+EL,Estée Lauder Companies (The),before history to current,188,no book value,0 of 188 member months with book value
+ELV,Elevance Health,before history to current,188,partial book value,182 of 188 member months with book value
+EMC,EMC Corporation,before history to 2016-09-07,68,no prices,0 of 68 member months with a month-end price
+EMC,EMC Corporation,before history to 2016-09-07,68,no CIK,ticker not in the SEC ticker file
+ENDP,Endo International,2015-01-27 to 2017-03-01,26,no prices,0 of 26 member months with a month-end price
+ENDP,Endo International,2015-01-27 to 2017-03-01,26,no CIK,ticker not in the SEC ticker file
+EOG,EOG Resources,before history to current,188,partial book value,176 of 188 member months with book value
+EP,El Paso Corporation,before history to 2012-05-16,16,no book value,0 of 16 member months with book value
+EPAM,EPAM Systems,2021-12-14 to 2026-06-01,54,partial book value,52 of 54 member months with book value
+EQT,EQT Corporation,before history to 2018-11-12; 2022-10-03 to current,141,partial book value,139 of 141 member months with book value
+ERIE,Erie Indemnity,2024-09-23 to current,24,no book value,0 of 24 member months with book value
+ES,Eversource Energy,before history to current,188,partial book value,181 of 188 member months with book value
+ESRX,Express Scripts,2003-09-25 to 2018-12-23,95,no prices,0 of 95 member months with a month-end price
+ESRX,Express Scripts,2003-09-25 to 2018-12-23,95,no CIK,ticker not in the SEC ticker file
+ESV,Ensco,2012-07-31 to 2016-03-29,44,no prices,0 of 44 member months with a month-end price
+ESV,Ensco,2012-07-31 to 2016-03-29,44,no CIK,ticker not in the SEC ticker file
+ETFC,E-Trade,before history to 2020-10-06,117,no prices,0 of 117 member months with a month-end price
+ETFC,E-Trade,before history to 2020-10-06,117,no CIK,ticker not in the SEC ticker file
+ETN,Eaton Corporation,before history to current,188,partial book value,163 of 188 member months with book value
+ETR,Entergy,before history to current,188,partial book value,179 of 188 member months with book value
+ETSY,Etsy,2020-09-21 to 2024-09-22,48,partial book value,28 of 48 member months with book value
+EVHC,Envision Healthcare,2016-12-02 to 2018-10-10,22,no prices,0 of 22 member months with a month-end price
+EVHC,Envision Healthcare,2016-12-02 to 2018-10-10,22,no CIK,ticker not in the SEC ticker file
+EVRG,Evergy,2018-06-05 to current,99,partial book value,97 of 99 member months with book value
+EW,Edwards Lifesciences,2011-03-31 to current,186,partial book value,174 of 186 member months with book value
+EXPE,Expedia Group,2007-10-02 to current,188,partial book value,64 of 188 member months with book value
+F,Ford Motor Company,before history to current,188,partial book value,6 of 188 member months with book value
+FBHS,Fortune Brands Home & Security,2016-06-22 to 2022-12-18,78,no prices,0 of 78 member months with a month-end price
+FBHS,Fortune Brands Home & Security,2016-06-22 to 2022-12-18,78,no CIK,ticker not in the SEC ticker file
+FDO,Family Dollar,before history to 2015-07-07,54,no prices,0 of 54 member months with a month-end price
+FDO,Family Dollar,before history to 2015-07-07,54,no CIK,ticker not in the SEC ticker file
+FDXF,FedEx Freight,2026-06-01 to current,3,no book value,0 of 3 member months with book value
+FE,FirstEnergy,before history to current,188,partial book value,182 of 188 member months with book value
+FICO,Fair Isaac,2023-03-20 to current,42,no book value,0 of 42 member months with book value
+FII,Federated Investors,before history to 2013-01-01,24,no prices,0 of 24 member months with a month-end price
+FII,Federated Investors,before history to 2013-01-01,24,no CIK,ticker not in the SEC ticker file
+FIS,Fidelity National Information Services,before history to current,188,partial book value,187 of 188 member months with book value
+FISV,Fiserv,before history to current,188,partial book value,174 of 188 member months with book value
+FITB,Fifth Third Bancorp,before history to current,188,partial book value,173 of 188 member months with book value
+FL,Foot Locker,2016-04-04 to 2019-08-08,40,no prices,0 of 40 member months with a month-end price
+FL,Foot Locker,2016-04-04 to 2019-08-08,40,no CIK,ticker not in the SEC ticker file
+FLIR,FLIR Systems,before history to 2021-05-13,124,no prices,0 of 124 member months with a month-end price
+FLIR,FLIR Systems,before history to 2021-05-13,124,no CIK,ticker not in the SEC ticker file
+FOX,21st Century Fox,2015-09-18 to 2019-03-18; 2019-03-19 to current,132,partial prices,starts after membership start; 90 of 132 member months with a month-end price
+FOX,21st Century Fox,2015-09-18 to 2019-03-18; 2019-03-19 to current,132,partial book value,6 of 132 member months with book value
+FOXA,21st Century Fox,before history to 2019-03-18; 2019-03-19 to current,188,partial prices,starts after membership start; 90 of 188 member months with a month-end price
+FOXA,21st Century Fox,before history to 2019-03-18; 2019-03-19 to current,188,partial book value,6 of 188 member months with book value
+FRC,First Republic Bank,2019-01-02 to 2023-05-03,52,no prices,0 of 52 member months with a month-end price
+FRC,First Republic Bank,2019-01-02 to 2023-05-03,52,no CIK,ticker not in the SEC ticker file
+FRX,Forest Laboratories,before history to 2014-06-30,42,no prices,0 of 42 member months with a month-end price
+FRX,Forest Laboratories,before history to 2014-06-30,42,no CIK,ticker not in the SEC ticker file
+FTI,TechnipFMC,2009-06-05 to 2021-02-11,121,partial book value,49 of 121 member months with book value
+FTNT,Fortinet,2018-10-11 to current,95,partial book value,73 of 95 member months with book value
+FTR,Frontier Communications,before history to 2017-03-19,74,no prices,0 of 74 member months with a month-end price
+FTR,Frontier Communications,before history to 2017-03-19,74,no CIK,ticker not in the SEC ticker file
+FTV,Fortive,2016-07-05 to current,122,partial book value,121 of 122 member months with book value
+GAS,Nicor Gas,before history to 2011-12-11; 2011-12-12 to 2016-06-30,66,no prices,0 of 66 member months with a month-end price
+GAS,Nicor Gas,before history to 2011-12-11; 2011-12-12 to 2016-06-30,66,no CIK,ticker not in the SEC ticker file
+GDDY,GoDaddy,2024-06-24 to current,27,partial book value,26 of 27 member months with book value
+GEHC,GE HealthCare,2023-01-04 to current,44,partial book value,41 of 44 member months with book value
+GEN,Gen Digital,before history to current,188,partial book value,158 of 188 member months with book value
+GENZ,Genzyme,before history to 2011-03-31,3,no CIK,ticker not in the SEC ticker file
+GEV,GE Vernova,2024-04-02 to current,29,partial book value,26 of 29 member months with book value
+GGP,GGP Inc.,2013-12-10 to 2018-08-27,56,no prices,0 of 56 member months with a month-end price
+GGP,GGP Inc.,2013-12-10 to 2018-08-27,56,no CIK,ticker not in the SEC ticker file
+GHC,Graham Holdings,before history to 2014-09-19,44,no book value,0 of 44 member months with book value
+GIS,General Mills,before history to current,188,partial book value,185 of 188 member months with book value
+GMCR,Keurig Green Mountain,2014-03-21 to 2016-03-06,24,no prices,0 of 24 member months with a month-end price
+GMCR,Keurig Green Mountain,2014-03-21 to 2016-03-06,24,no CIK,ticker not in the SEC ticker file
+GOOG,Alphabet Inc. (Class C),before history to current,188,partial book value,127 of 188 member months with book value
+GOOGL,Alphabet Inc. (Class A),2014-04-03 to current,149,partial book value,127 of 149 member months with book value
+GPS,Gap,before history to 2022-02-02,133,no prices,0 of 133 member months with a month-end price
+GPS,Gap,before history to 2022-02-02,133,no CIK,ticker not in the SEC ticker file
+GR,Goodrich Corporation,before history to 2012-07-30,18,no CIK,ticker not in the SEC ticker file
+HAR,Harman International,before history to 2017-03-15,74,no prices,0 of 74 member months with a month-end price
+HAR,Harman International,before history to 2017-03-15,74,no CIK,ticker not in the SEC ticker file
+HAS,Hasbro,before history to current,188,partial book value,174 of 188 member months with book value
+HBAN,Huntington Bancshares,before history to current,188,partial book value,172 of 188 member months with book value
+HBI,Hanesbrands,2015-03-23 to 2021-12-19,81,no prices,0 of 81 member months with a month-end price
+HBI,Hanesbrands,2015-03-23 to 2021-12-19,81,no CIK,ticker not in the SEC ticker file
+HCA,HCA Healthcare,2015-01-27 to current,140,partial book value,39 of 140 member months with book value
+HCBK,Hudson City Bancorp,before history to 2015-11-01,58,no prices,0 of 58 member months with a month-end price
+HCBK,Hudson City Bancorp,before history to 2015-11-01,58,no CIK,ticker not in the SEC ticker file
+HD,Home Depot (The),before history to current,188,partial book value,167 of 188 member months with book value
+HES,Hess Corporation,before history to 2025-07-22,174,no prices,0 of 174 member months with a month-end price
+HES,Hess Corporation,before history to 2025-07-22,174,no CIK,ticker not in the SEC ticker file
+HFC,HollyFrontier,2018-06-18 to 2021-06-03,36,no prices,0 of 36 member months with a month-end price
+HFC,HollyFrontier,2018-06-18 to 2021-06-03,36,no CIK,ticker not in the SEC ticker file
+HIG,Hartford (The),before history to current,188,partial book value,172 of 188 member months with book value
+HLT,Hilton Worldwide,2017-06-19 to current,111,partial book value,28 of 111 member months with book value
+HNZ,Heinz,before history to 2013-06-05,29,no prices,0 of 29 member months with a month-end price
+HNZ,Heinz,before history to 2013-06-05,29,no CIK,ticker not in the SEC ticker file
+HOLX,Hologic,2016-03-30 to 2026-04-08,121,no prices,0 of 121 member months with a month-end price
+HOLX,Hologic,2016-03-30 to 2026-04-08,121,no CIK,ticker not in the SEC ticker file
+HON,Honeywell Technologies,before history to current,188,partial book value,182 of 188 member months with book value
+HONA,Honeywell Aerospace,2026-06-29 to current,3,no book value,0 of 3 member months with book value
+HOOD,Robinhood Markets,2025-09-22 to current,12,no book value,0 of 12 member months with book value
+HOT,Starwood Hotels and Resorts,before history to 2016-09-21,68,no prices,0 of 68 member months with a month-end price
+HOT,Starwood Hotels and Resorts,before history to 2016-09-21,68,no CIK,ticker not in the SEC ticker file
+HPE,Hewlett Packard Enterprise,2015-11-02 to current,130,partial book value,129 of 130 member months with book value
+HPQ,HP Inc.,before history to current,188,partial book value,65 of 188 member months with book value
+HRB,H&R Block,before history to 2020-09-20,116,partial book value,89 of 116 member months with book value
+HRL,Hormel Foods,2009-03-03 to current,188,no book value,0 of 188 member months with book value
+HSP,Hospira,before history to 2015-09-01,56,no prices,0 of 56 member months with a month-end price
+HSP,Hospira,before history to 2015-09-01,56,no CIK,ticker not in the SEC ticker file
+HST,Host Hotels & Resorts,before history to current,188,partial book value,154 of 188 member months with book value
+HSY,Hershey Company (The),before history to current,188,partial book value,92 of 188 member months with book value
+HUM,Humana,before history to current,188,partial book value,175 of 188 member months with book value
+IBKR,Interactive Brokers,2025-08-28 to current,13,no book value,0 of 13 member months with book value
+ICE,Intercontinental Exchange,2007-09-26 to current,188,partial book value,157 of 188 member months with book value
+IDXX,Idexx Laboratories,2017-01-05 to current,116,partial book value,92 of 116 member months with book value
+IGT,International Game Technology,before history to 2014-06-19,41,no prices,0 of 41 member months with a month-end price
+IGT,International Game Technology,before history to 2014-06-19,41,no CIK,ticker not in the SEC ticker file
+ILMN,"Illumina, Inc.",2015-11-19 to 2024-06-23; 2026-09-21 to current,103,partial book value,95 of 103 member months with book value
+INFO,IHS Markit,2017-06-02 to 2022-03-01,57,no prices,0 of 57 member months with a month-end price
+INFO,IHS Markit,2017-06-02 to 2022-03-01,57,no CIK,ticker not in the SEC ticker file
+INTC,Intel,before history to current,188,partial book value,179 of 188 member months with book value
+IP,International Paper,before history to current,188,partial book value,172 of 188 member months with book value
+IPG,Interpublic Group,before history to 2025-11-27,178,no prices,0 of 178 member months with a month-end price
+IPG,Interpublic Group,before history to 2025-11-27,178,no CIK,ticker not in the SEC ticker file
+IQV,IQVIA,2017-11-15 to current,106,partial book value,103 of 106 member months with book value
+IR,Ingersoll Rand,2020-03-02 to current,78,partial book value,77 of 78 member months with book value
+IRM,Iron Mountain,before history to current,188,partial book value,165 of 188 member months with book value
+IT,Gartner,2017-04-05 to current,113,partial book value,109 of 113 member months with book value
+ITW,Illinois Tool Works,before history to current,188,partial book value,187 of 188 member months with book value
+JCP,JCPenney,before history to 2013-12-01,35,no prices,0 of 35 member months with a month-end price
+JCP,JCPenney,before history to 2013-12-01,35,no CIK,ticker not in the SEC ticker file
+JDSU,JDS Uniphase,2000-07-27 to 2013-12-22,35,no prices,0 of 35 member months with a month-end price
+JDSU,JDS Uniphase,2000-07-27 to 2013-12-22,35,no CIK,ticker not in the SEC ticker file
+JNJ,Johnson & Johnson,before history to current,188,partial book value,184 of 188 member months with book value
+JNPR,Juniper Networks,2006-06-02 to 2025-07-08,174,no prices,0 of 174 member months with a month-end price
+JNPR,Juniper Networks,2006-06-02 to 2025-07-08,174,no CIK,ticker not in the SEC ticker file
+JNS,Janus Capital Group,before history to 2011-11-17,10,no prices,0 of 10 member months with a month-end price
+JNS,Janus Capital Group,before history to 2011-11-17,10,no CIK,ticker not in the SEC ticker file
+JOY,Joy Global,before history to 2015-10-06,57,no prices,0 of 57 member months with a month-end price
+JOY,Joy Global,before history to 2015-10-06,57,no CIK,ticker not in the SEC ticker file
+JWN,Nordstrom,before history to 2020-06-21,113,no prices,0 of 113 member months with a month-end price
+JWN,Nordstrom,before history to 2020-06-21,113,no CIK,ticker not in the SEC ticker file
+K,Kellanova,before history to 2025-12-10,179,no prices,0 of 179 member months with a month-end price
+K,Kellanova,before history to 2025-12-10,179,no CIK,ticker not in the SEC ticker file
+KEY,KeyCorp,before history to current,188,partial book value,184 of 188 member months with book value
+KEYS,Keysight Technologies,2018-11-06 to current,94,partial book value,92 of 94 member months with book value
+KFT,Kraft Foods,2007-03-30 to 2012-10-01,21,no prices,0 of 21 member months with a month-end price
+KFT,Kraft Foods,2007-03-30 to 2012-10-01,21,no CIK,ticker not in the SEC ticker file
+KHC,Kraft Heinz,2015-07-06 to current,134,partial book value,132 of 134 member months with book value
+KLAC,KLA Corporation,before history to current,188,partial book value,181 of 188 member months with book value
+KMB,Kimberly-Clark,before history to current,188,partial book value,182 of 188 member months with book value
+KMI,Kinder Morgan,2012-05-17 to current,172,partial book value,139 of 172 member months with book value
+KO,Coca-Cola Company (The),before history to current,188,partial book value,184 of 188 member months with book value
+KR,Kroger,before history to current,188,partial book value,187 of 188 member months with book value
+KRFT,Kraft Foods,2012-10-02 to 2015-07-05,33,no prices,0 of 33 member months with a month-end price
+KRFT,Kraft Foods,2012-10-02 to 2015-07-05,33,no CIK,ticker not in the SEC ticker file
+KSU,Kansas City Southern,2013-05-23 to 2021-12-13,103,no prices,0 of 103 member months with a month-end price
+KSU,Kansas City Southern,2013-05-23 to 2021-12-13,103,no CIK,ticker not in the SEC ticker file
+LEG,Leggett & Platt,before history to 2021-12-19,131,no prices,0 of 131 member months with a month-end price
+LEG,Leggett & Platt,before history to 2021-12-19,131,no CIK,ticker not in the SEC ticker file
+LEN,Lennar,before history to current,188,no book value,0 of 188 member months with book value
+LH,Labcorp,before history to current,188,partial book value,187 of 188 member months with book value
+LHX,L3Harris,before history to current,188,partial book value,182 of 188 member months with book value
+LIFE,Life Technologies,before history to 2014-01-23,36,no prices,0 of 36 member months with a month-end price
+LIFE,Life Technologies,before history to 2014-01-23,36,no book value,0 of 36 member months with book value
+LIN,Linde plc,before history to current,188,partial book value,88 of 188 member months with book value
+LKQ,LKQ Corporation,2016-05-23 to 2025-12-21,115,partial book value,111 of 115 member months with book value
+LLL,L3 Technologies,before history to 2019-06-30,102,no prices,0 of 102 member months with a month-end price
+LLL,L3 Technologies,before history to 2019-06-30,102,no CIK,ticker not in the SEC ticker file
+LLTC,Linear Technology,before history to 2017-03-12,74,no prices,0 of 74 member months with a month-end price
+LLTC,Linear Technology,before history to 2017-03-12,74,no CIK,ticker not in the SEC ticker file
+LM,Legg Mason,before history to 2016-12-01,71,no prices,0 of 71 member months with a month-end price
+LM,Legg Mason,before history to 2016-12-01,71,no CIK,ticker not in the SEC ticker file
+LMT,Lockheed Martin,before history to current,188,partial book value,176 of 188 member months with book value
+LO,Lorillard Tobacco Company,2008-06-10 to 2015-06-10,53,no prices,0 of 53 member months with a month-end price
+LO,Lorillard Tobacco Company,2008-06-10 to 2015-06-10,53,no CIK,ticker not in the SEC ticker file
+LOW,Lowe's,before history to current,188,partial book value,117 of 188 member months with book value
+LSI,LSI Corporation,before history to 2014-05-07,40,no prices,0 of 40 member months with a month-end price
+LSI,LSI Corporation,before history to 2014-05-07,40,no CIK,ticker not in the SEC ticker file
+LUMN,Lumen Technologies,before history to 2023-03-19,146,partial book value,143 of 146 member months with book value
+LVLT,Level 3 Communications,2014-11-05 to 2017-10-12,35,no prices,0 of 35 member months with a month-end price
+LVLT,Level 3 Communications,2014-11-05 to 2017-10-12,35,no CIK,ticker not in the SEC ticker file
+LW,Lamb Weston,2018-12-03 to 2026-03-22,87,partial book value,58 of 87 member months with book value
+LXK,Lexmark,before history to 2012-09-30,21,no prices,0 of 21 member months with a month-end price
+LXK,Lexmark,before history to 2012-09-30,21,no CIK,ticker not in the SEC ticker file
+LYV,Live Nation Entertainment,2019-12-23 to current,81,partial book value,55 of 81 member months with book value
+M,Macy's,before history to 2020-04-05,111,partial book value,102 of 111 member months with book value
+MA,Mastercard,before history to current,188,partial book value,4 of 188 member months with book value
+MAA,Mid-America Apartment Communities,2016-12-02 to current,117,partial book value,85 of 117 member months with book value
+MAR,Marriott International,before history to current,188,partial book value,105 of 188 member months with book value
+MAS,Masco,before history to current,188,partial book value,136 of 188 member months with book value
+MCD,McDonald's,before history to current,188,partial book value,73 of 188 member months with book value
+MCK,McKesson,before history to current,188,partial book value,130 of 188 member months with book value
+MCO,Moody's Corporation,before history to current,188,partial book value,139 of 188 member months with book value
+MDLZ,Mondelez International,2012-10-02 to current,167,partial book value,166 of 167 member months with book value
+MDT,Medtronic,before history to current,188,partial book value,132 of 188 member months with book value
+MEE,Massey Energy,2008-06-23 to 2011-05-31,5,no prices,0 of 5 member months with a month-end price
+MEE,Massey Energy,2008-06-23 to 2011-05-31,5,no CIK,ticker not in the SEC ticker file
+META,Meta Platforms,before history to current,188,partial prices,starts after membership start; 172 of 188 member months with a month-end price
+META,Meta Platforms,before history to current,188,no book value,0 of 188 member months with book value
+MFE,McAfee,before history to 2011-02-27,1,no prices,0 of 1 member months with a month-end price
+MFE,McAfee,before history to 2011-02-27,1,no CIK,ticker not in the SEC ticker file
+MHK,Mohawk Industries,2013-12-23 to 2025-12-21,144,partial book value,142 of 144 member months with book value
+MHS,Medco Health Solutions,before history to 2012-04-02,15,no prices,0 of 15 member months with a month-end price
+MHS,Medco Health Solutions,before history to 2012-04-02,15,no CIK,ticker not in the SEC ticker file
+MI,Marshall & Ilsley,before history to 2011-07-04,6,no prices,0 of 6 member months with a month-end price
+MI,Marshall & Ilsley,before history to 2011-07-04,6,no book value,0 of 6 member months with book value
+MJN,Mead Johnson,2009-12-18 to 2017-06-18,77,no prices,0 of 77 member months with a month-end price
+MJN,Mead Johnson,2009-12-18 to 2017-06-18,77,no CIK,ticker not in the SEC ticker file
+MKC,McCormick & Company,before history to current,188,no book value,0 of 188 member months with book value
+MMI,Motorola Mobility,2011-01-03 to 2012-05-20,16,no prices,0 of 16 member months with a month-end price
+MMI,Motorola Mobility,2011-01-03 to 2012-05-20,16,no book value,0 of 16 member months with book value
+MNK,Mallinckrodt,2014-08-18 to 2017-07-25,35,no prices,0 of 35 member months with a month-end price
+MNK,Mallinckrodt,2014-08-18 to 2017-07-25,35,no CIK,ticker not in the SEC ticker file
+MO,Altria,before history to current,188,partial book value,132 of 188 member months with book value
+MOLX,Molex,before history to 2013-12-09,35,no prices,0 of 35 member months with a month-end price
+MOLX,Molex,before history to 2013-12-09,35,no CIK,ticker not in the SEC ticker file
+MON,Monsanto,before history to 2018-06-06,89,no prices,0 of 89 member months with a month-end price
+MON,Monsanto,before history to 2018-06-06,89,no CIK,ticker not in the SEC ticker file
+MOS,Mosaic Company (The),2011-09-23 to current,180,partial book value,137 of 180 member months with book value
+MPC,Marathon Petroleum,2011-06-30 to current,183,partial book value,172 of 183 member months with book value
+MRO,Marathon Oil,before history to 2024-11-25,166,no prices,0 of 166 member months with a month-end price
+MRO,Marathon Oil,before history to 2024-11-25,166,no CIK,ticker not in the SEC ticker file
+MSCI,MSCI,2018-04-04 to current,101,partial book value,13 of 101 member months with book value
+MSI,Motorola Solutions,before history to current,188,partial book value,104 of 188 member months with book value
+MTCH,Match Group,2021-09-20 to 2026-03-22,54,no book value,0 of 54 member months with book value
+MTD,Mettler Toledo,2016-09-06 to current,120,partial book value,84 of 120 member months with book value
+MWW,Monster Worldwide,before history to 2011-12-15,11,no prices,0 of 11 member months with a month-end price
+MWW,Monster Worldwide,before history to 2011-12-15,11,no CIK,ticker not in the SEC ticker file
+MXIM,Maxim Integrated Products,before history to 2007-09-26; 2018-12-03 to 2021-08-29,32,no prices,0 of 32 member months with a month-end price
+MXIM,Maxim Integrated Products,before history to 2007-09-26; 2018-12-03 to 2021-08-29,32,no CIK,ticker not in the SEC ticker file
+NBL,Noble Energy,before history to 2020-10-11,117,no prices,0 of 117 member months with a month-end price
+NBL,Noble Energy,before history to 2020-10-11,117,no CIK,ticker not in the SEC ticker file
+NDAQ,"Nasdaq, Inc.",before history to current,188,partial book value,182 of 188 member months with book value
+NE,Noble Corporation,before history to 2015-07-19,54,no prices,0 of 54 member months with a month-end price
+NE,Noble Corporation,before history to 2015-07-19,54,no book value,0 of 54 member months with book value
+NEE,NextEra Energy,before history to current,188,partial book value,148 of 188 member months with book value
+NEM,Newmont,before history to current,188,partial book value,185 of 188 member months with book value
+NFX,Newfield Exploration,2010-12-17 to 2019-02-14,97,no prices,0 of 97 member months with a month-end price
+NFX,Newfield Exploration,2010-12-17 to 2019-02-14,97,no CIK,ticker not in the SEC ticker file
+NI,NiSource,before history to current,188,partial book value,178 of 188 member months with book value
+NKE,"Nike, Inc.",before history to current,188,partial book value,51 of 188 member months with book value
+NLSN,Nielsen Holdings,2013-07-08 to 2022-10-11,111,no prices,0 of 111 member months with a month-end price
+NLSN,Nielsen Holdings,2013-07-08 to 2022-10-11,111,no CIK,ticker not in the SEC ticker file
+NOVL,Novell,before history to 2011-04-26,3,no prices,0 of 3 member months with a month-end price
+NOVL,Novell,before history to 2011-04-26,3,no CIK,ticker not in the SEC ticker file
+NRG,NRG Energy,before history to current,188,partial book value,175 of 188 member months with book value
+NSM,National Semiconductor,before history to 2011-09-22,8,no prices,0 of 8 member months with a month-end price
+NSM,National Semiconductor,before history to 2011-09-22,8,no CIK,ticker not in the SEC ticker file
+NVLS,Novellus Systems,before history to 2012-06-04,17,no prices,0 of 17 member months with a month-end price
+NVLS,Novellus Systems,before history to 2012-06-04,17,no CIK,ticker not in the SEC ticker file
+NWS,News Corp (Class B),2015-09-18 to current,132,no book value,0 of 132 member months with book value
+NWSA,News Corp (Class A),2013-07-01 to current,158,partial book value,6 of 158 member months with book value
+NYX,NYSE Euronext,before history to 2013-11-12,34,no prices,0 of 34 member months with a month-end price
+NYX,NYSE Euronext,before history to 2013-11-12,34,no CIK,ticker not in the SEC ticker file
+OGN,Organon & Co.,2021-06-03 to 2023-10-17,28,no book value,0 of 28 member months with book value
+OKE,Oneok,before history to current,188,partial book value,176 of 188 member months with book value
+ORCL,Oracle Corporation,before history to current,188,partial book value,170 of 188 member months with book value
+ORLY,O'Reilly Automotive,before history to current,188,partial book value,133 of 188 member months with book value
+OTIS,Otis Worldwide,2020-04-03 to current,77,no book value,0 of 77 member months with book value
+PBCT,People's United Financial,before history to 2022-04-03,135,no prices,0 of 135 member months with a month-end price
+PBCT,People's United Financial,before history to 2022-04-03,135,no CIK,ticker not in the SEC ticker file
+PBI,Pitney Bowes,before history to 2017-02-28,74,partial book value,64 of 74 member months with book value
+PCL,Plum Creek Timber,before history to 2016-02-21,61,no prices,0 of 61 member months with a month-end price
+PCL,Plum Creek Timber,before history to 2016-02-21,61,no CIK,ticker not in the SEC ticker file
+PCP,Precision Castparts Corporation,before history to 2016-01-31,61,no prices,0 of 61 member months with a month-end price
+PCP,Precision Castparts Corporation,before history to 2016-01-31,61,no CIK,ticker not in the SEC ticker file
+PCS,MetroPCS,2009-06-29 to 2013-04-29,27,no prices,0 of 27 member months with a month-end price
+PCS,MetroPCS,2009-06-29 to 2013-04-29,27,no CIK,ticker not in the SEC ticker file
+PDCO,Patterson Companies,before history to 2018-03-18,86,no prices,0 of 86 member months with a month-end price
+PDCO,Patterson Companies,before history to 2018-03-18,86,no CIK,ticker not in the SEC ticker file
+PEG,Public Service Enterprise Group,before history to current,188,partial book value,185 of 188 member months with book value
+PETM,PetSmart,2012-10-10 to 2015-03-11,29,no prices,0 of 29 member months with a month-end price
+PETM,PetSmart,2012-10-10 to 2015-03-11,29,no CIK,ticker not in the SEC ticker file
+PGN,Progress Energy,before history to 2012-07-01,18,no prices,0 of 18 member months with a month-end price
+PGN,Progress Energy,before history to 2012-07-01,18,no CIK,ticker not in the SEC ticker file
+PKG,Packaging Corporation of America,2017-07-26 to current,110,partial book value,97 of 110 member months with book value
+PLD,Prologis,before history to current,188,partial book value,180 of 188 member months with book value
+PLL,Pall Corporation,before history to 2015-08-27,55,no prices,0 of 55 member months with a month-end price
+PLL,Pall Corporation,before history to 2015-08-27,55,no CIK,ticker not in the SEC ticker file
+PM,Philip Morris International,before history to current,188,partial book value,22 of 188 member months with book value
+PNW,Pinnacle West Capital,before history to current,188,partial book value,186 of 188 member months with book value
+POM,Pepco Holdings,before history to 2016-03-29,62,no prices,0 of 62 member months with a month-end price
+POM,Pepco Holdings,before history to 2016-03-29,62,no book value,0 of 62 member months with book value
+PPL,PPL Corporation,before history to current,188,partial book value,173 of 188 member months with book value
+PRGO,Perrigo,2011-12-16 to 2021-09-19,117,partial book value,90 of 117 member months with book value
+PRU,Prudential Financial,before history to current,188,partial book value,160 of 188 member months with book value
+PSX,Phillips 66,2012-04-23 to current,173,partial book value,172 of 173 member months with book value
+PVH,PVH,2013-02-15 to 2022-09-18,115,partial book value,114 of 115 member months with book value
+PWR,Quanta Services,before history to current,188,partial book value,176 of 188 member months with book value
+PXD,Pioneer Natural Resources,before history to 2024-05-07,160,no prices,0 of 160 member months with a month-end price
+PXD,Pioneer Natural Resources,before history to 2024-05-07,160,no CIK,ticker not in the SEC ticker file
+PYPL,PayPal,2015-07-20 to current,134,partial book value,124 of 134 member months with book value
+Q,Qwest Communications,before history to 2011-03-30; 2017-08-29 to 2017-11-14; 2025-11-03 to current,15,partial prices,starts after membership start; 10 of 15 member months with a month-end price
+Q,Qwest Communications,before history to 2011-03-30; 2017-08-29 to 2017-11-14; 2025-11-03 to current,15,partial book value,10 of 15 member months with book value
+QEP,QEP Resources,2010-06-30 to 2015-06-30,54,no prices,0 of 54 member months with a month-end price
+QEP,QEP Resources,2010-06-30 to 2015-06-30,54,no CIK,ticker not in the SEC ticker file
+QRVO,Qorvo,2015-06-11 to 2024-12-22,114,no prices,0 of 114 member months with a month-end price
+QRVO,Qorvo,2015-06-11 to 2024-12-22,114,no CIK,ticker not in the SEC ticker file
+R,Ryder System,before history to 2017-06-18,77,partial book value,61 of 77 member months with book value
+RAI,Reynolds American,before history to 2017-07-25,78,no prices,0 of 78 member months with a month-end price
+RAI,Reynolds American,before history to 2017-07-25,78,no CIK,ticker not in the SEC ticker file
+RCL,Royal Caribbean Group,2014-12-05 to current,141,partial book value,127 of 141 member months with book value
+RDC,Rowan Companies,before history to 2014-08-17,43,no prices,0 of 43 member months with a month-end price
+RDC,Rowan Companies,before history to 2014-08-17,43,no CIK,ticker not in the SEC ticker file
+RDDT,Reddit,2026-08-18 to current,1,no book value,0 of 1 member months with book value
+REG,Regency Centers,2017-03-02 to current,114,partial book value,96 of 114 member months with book value
+REGN,Regeneron Pharmaceuticals,2013-04-30 to current,161,no book value,0 of 161 member months with book value
+RHT,Red Hat,before history to 2019-07-14,102,no prices,0 of 102 member months with a month-end price
+RHT,Red Hat,before history to 2019-07-14,102,no CIK,ticker not in the SEC ticker file
+RL,Ralph Lauren Corporation,before history to current,188,no book value,0 of 188 member months with book value
+ROK,Rockwell Automation,before history to current,188,partial book value,176 of 188 member months with book value
+ROP,Roper Technologies,before history to current,188,partial book value,182 of 188 member months with book value
+ROST,Ross Stores,2009-12-18 to current,188,partial book value,181 of 188 member months with book value
+RRD,RR Donnelley,before history to 2012-12-10,23,no prices,0 of 23 member months with a month-end price
+RRD,RR Donnelley,before history to 2012-12-10,23,no CIK,ticker not in the SEC ticker file
+RSG,Republic Services,before history to current,188,partial book value,187 of 188 member months with book value
+RSH,RadioShack,before history to 2011-06-29,5,no prices,0 of 5 member months with a month-end price
+RSH,RadioShack,before history to 2011-06-29,5,no CIK,ticker not in the SEC ticker file
+RTN,Raytheon Company,before history to 2020-04-05,111,no prices,0 of 111 member months with a month-end price
+RTN,Raytheon Company,before history to 2020-04-05,111,no CIK,ticker not in the SEC ticker file
+S,Sprint Nextel,before history to 2013-07-07,30,no prices,0 of 30 member months with a month-end price
+S,Sprint Nextel,before history to 2013-07-07,30,no book value,0 of 30 member months with book value
+SAI,SAIC,2009-12-18 to 2013-09-19,32,no prices,0 of 32 member months with a month-end price
+SAI,SAIC,2009-12-18 to 2013-09-19,32,no CIK,ticker not in the SEC ticker file
+SBAC,SBA Communications,2017-09-01 to current,108,no book value,0 of 108 member months with book value
+SBNY,Signature Bank,2021-12-20 to 2023-03-14,15,no prices,0 of 15 member months with a month-end price
+SBNY,Signature Bank,2021-12-20 to 2023-03-14,15,no CIK,ticker not in the SEC ticker file
+SBUX,Starbucks,2000-06-07 to current,188,partial book value,100 of 188 member months with book value
+SCG,SCANA,before history to 2019-01-01,96,no prices,0 of 96 member months with a month-end price
+SCG,SCANA,before history to 2019-01-01,96,no CIK,ticker not in the SEC ticker file
+SCHW,Charles Schwab Corporation,before history to current,188,partial book value,140 of 188 member months with book value
+SE,Spectra Energy,before history to 2017-02-27,73,no prices,0 of 73 member months with a month-end price
+SE,Spectra Energy,before history to 2017-02-27,73,no book value,0 of 73 member months with book value
+SEE,Sealed Air,before history to 2023-12-17,155,no prices,0 of 155 member months with a month-end price
+SEE,Sealed Air,before history to 2023-12-17,155,no CIK,ticker not in the SEC ticker file
+SHLD,Sears Holdings,before history to 2012-09-04,20,no prices,0 of 20 member months with a month-end price
+SHLD,Sears Holdings,before history to 2012-09-04,20,no CIK,ticker not in the SEC ticker file
+SHW,Sherwin-Williams,before history to current,188,partial book value,179 of 188 member months with book value
+SIAL,Sigma-Aldrich,before history to 2015-11-18,58,no prices,0 of 58 member months with a month-end price
+SIAL,Sigma-Aldrich,before history to 2015-11-18,58,no CIK,ticker not in the SEC ticker file
+SIVB,SVB Financial Group,2018-03-19 to 2023-03-14,60,no prices,0 of 60 member months with a month-end price
+SIVB,SVB Financial Group,2018-03-19 to 2023-03-14,60,no CIK,ticker not in the SEC ticker file
+SKYD,Skydance,before history to current,188,partial book value,10 of 188 member months with book value
+SLE,Sara Lee Corporation,before history to 2012-06-28,17,no prices,0 of 17 member months with a month-end price
+SLE,Sara Lee Corporation,before history to 2012-06-28,17,no book value,0 of 17 member months with book value
+SMCI,Supermicro,2024-03-18 to current,30,partial book value,27 of 30 member months with book value
+SNDK,SanDisk,before history to 2016-05-12; 2025-11-28 to current,74,partial prices,starts after membership start; 10 of 74 member months with a month-end price
+SNDK,SanDisk,before history to 2016-05-12; 2025-11-28 to current,74,partial book value,10 of 74 member months with book value
+SNI,Scripps Networks Interactive,before history to 2018-03-06,86,no prices,0 of 86 member months with a month-end price
+SNI,Scripps Networks Interactive,before history to 2018-03-06,86,no CIK,ticker not in the SEC ticker file
+SOLS,Solstice Advanced Materials,2025-10-30 to 2025-12-21,2,no book value,0 of 2 member months with book value
+SOLV,Solventum,2024-04-01 to current,29,partial book value,25 of 29 member months with book value
+SPG,Simon Property Group,before history to current,188,partial book value,6 of 188 member months with book value
+SPGI,S&P Global,before history to current,188,partial book value,182 of 188 member months with book value
+SPLS,Staples,before history to 2017-09-17,80,no prices,0 of 80 member months with a month-end price
+SPLS,Staples,before history to 2017-09-17,80,no CIK,ticker not in the SEC ticker file
+SRCL,Stericycle,before history to 2018-12-02,95,no prices,0 of 95 member months with a month-end price
+SRCL,Stericycle,before history to 2018-12-02,95,no CIK,ticker not in the SEC ticker file
+SRE,Sempra,before history to current,188,partial book value,187 of 188 member months with book value
+STI,SunTrust Banks,before history to 2019-12-08,107,no prices,0 of 107 member months with a month-end price
+STI,SunTrust Banks,before history to 2019-12-08,107,no book value,0 of 107 member months with book value
+STJ,St Jude Medical,before history to 2017-01-04,72,no prices,0 of 72 member months with a month-end price
+STJ,St Jude Medical,before history to 2017-01-04,72,no CIK,ticker not in the SEC ticker file
+STX,Seagate Technology,2012-07-02 to current,170,partial book value,135 of 170 member months with book value
+STZ,Constellation Brands,2005-07-01 to current,188,no book value,0 of 188 member months with book value
+SUN,Sunoco,before history to 2012-10-09,21,partial prices,starts after membership start; 1 of 21 member months with a month-end price
+SUN,Sunoco,before history to 2012-10-09,21,no book value,0 of 21 member months with book value
+SVU,Supervalu,before history to 2012-04-22,15,no prices,0 of 15 member months with a month-end price
+SVU,Supervalu,before history to 2012-04-22,15,no CIK,ticker not in the SEC ticker file
+SW,Smurfit Westrock,before history to current,188,partial book value,22 of 188 member months with book value
+SWN,Southwestern Energy,before history to 2017-04-03,75,no prices,0 of 75 member months with a month-end price
+SWN,Southwestern Energy,before history to 2017-04-03,75,no CIK,ticker not in the SEC ticker file
+SWY,Safeway,before history to 2015-01-26,48,no prices,0 of 48 member months with a month-end price
+SWY,Safeway,before history to 2015-01-26,48,no CIK,ticker not in the SEC ticker file
+TAP,Molson Coors,before history to 2026-09-20,188,no book value,0 of 188 member months with book value
+TDG,TransDigm Group,2016-06-03 to current,123,no book value,0 of 123 member months with book value
+TE,TECO Energy,before history to 2016-06-30,66,no prices,0 of 66 member months with a month-end price
+TE,TECO Energy,before history to 2016-06-30,66,no book value,0 of 66 member months with book value
+TECH,Bio-Techne,2021-08-30 to current,61,partial book value,55 of 61 member months with book value
+TEG,Integrys Energy Group,before history to 2015-06-30,54,no prices,0 of 54 member months with a month-end price
+TEG,Integrys Energy Group,before history to 2015-06-30,54,no CIK,ticker not in the SEC ticker file
+TER,Teradyne,before history to 2013-12-22; 2020-09-21 to current,107,partial book value,93 of 107 member months with book value
+TFX,Teleflex,2019-01-18 to 2025-03-23,74,partial book value,73 of 74 member months with book value
+TGNA,Tegna,before history to 2017-06-01,77,no prices,0 of 77 member months with a month-end price
+TGNA,Tegna,before history to 2017-06-01,77,no CIK,ticker not in the SEC ticker file
+TGT,Target Corporation,before history to current,188,partial book value,179 of 188 member months with book value
+TIE,Titanium Metals,before history to 2012-12-20,23,no prices,0 of 23 member months with a month-end price
+TIE,Titanium Metals,before history to 2012-12-20,23,no CIK,ticker not in the SEC ticker file
+TIF,Tiffany & Co,before history to 2021-01-06,120,no prices,0 of 120 member months with a month-end price
+TIF,Tiffany & Co,before history to 2021-01-06,120,no CIK,ticker not in the SEC ticker file
+TJX,TJX Companies,before history to current,188,partial book value,179 of 188 member months with book value
+TKO,TKO Group Holdings,2025-03-24 to current,18,no book value,0 of 18 member months with book value
+TLAB,Tellabs,before history to 2011-12-19,11,no prices,0 of 11 member months with a month-end price
+TLAB,Tellabs,before history to 2011-12-19,11,no CIK,ticker not in the SEC ticker file
+TMO,Thermo Fisher Scientific,before history to current,188,partial book value,177 of 188 member months with book value
+TRIP,TripAdvisor,2011-12-20 to 2019-12-22,96,partial book value,80 of 96 member months with book value
+TRMB,Trimble Inc.,2021-01-21 to current,68,partial book value,63 of 68 member months with book value
+TROW,T. Rowe Price,before history to current,188,partial book value,178 of 188 member months with book value
+TRV,Travelers Companies (The),before history to current,188,partial book value,178 of 188 member months with book value
+TSN,Tyson Foods,before history to current,188,no book value,0 of 188 member months with book value
+TSS,TSYS,before history to 2019-09-22,104,no prices,0 of 104 member months with a month-end price
+TSS,TSYS,before history to 2019-09-22,104,no CIK,ticker not in the SEC ticker file
+TTD,The Trade Desk,2025-07-18 to 2026-09-20,14,no book value,0 of 14 member months with book value
+TTWO,Take-Two Interactive,2018-03-19 to current,102,partial book value,82 of 102 member months with book value
+TWC,Time Warner Cable,before history to 2016-05-17,64,no prices,0 of 64 member months with a month-end price
+TWC,Time Warner Cable,before history to 2016-05-17,64,no CIK,ticker not in the SEC ticker file
+TWTR,Twitter,2018-06-07 to 2022-10-31,53,no prices,0 of 53 member months with a month-end price
+TWTR,Twitter,2018-06-07 to 2022-10-31,53,no CIK,ticker not in the SEC ticker file
+TWX,Time Warner,before history to 2018-06-19,89,no prices,0 of 89 member months with a month-end price
+TWX,Time Warner,before history to 2018-06-19,89,no CIK,ticker not in the SEC ticker file
+TXN,Texas Instruments,before history to current,188,partial book value,187 of 188 member months with book value
+TXT,Textron,before history to current,188,partial book value,186 of 188 member months with book value
+TYC,Tyco International,2010-08-26 to 2016-09-05,68,no prices,0 of 68 member months with a month-end price
+TYC,Tyco International,2010-08-26 to 2016-09-05,68,no CIK,ticker not in the SEC ticker file
+UA,Under Armour (Class C),2016-04-08 to 2022-06-20,74,no book value,0 of 74 member months with book value
+UAA,Under Armour (Class A),before history to 2022-06-20,137,no book value,0 of 137 member months with book value
+UHS,Universal Health Services,2014-09-20 to current,144,no book value,0 of 144 member months with book value
+UNH,UnitedHealth Group,before history to current,188,partial book value,178 of 188 member months with book value
+UNM,Unum,before history to 2021-09-19,128,partial book value,110 of 128 member months with book value
+UPS,United Parcel Service,before history to current,188,no book value,0 of 188 member months with book value
+V,Visa Inc.,2009-12-18 to current,188,no book value,0 of 188 member months with book value
+VAR,Varian Medical Systems,before history to 2021-04-19,123,no prices,0 of 123 member months with a month-end price
+VAR,Varian Medical Systems,before history to 2021-04-19,123,no CIK,ticker not in the SEC ticker file
+VFC,VF Corporation,before history to 2024-04-02,159,partial book value,151 of 159 member months with book value
+VIAB,Viacom,before history to 2019-12-04,107,no prices,0 of 107 member months with a month-end price
+VIAB,Viacom,before history to 2019-12-04,107,no CIK,ticker not in the SEC ticker file
+VLO,Valero Energy,before history to current,188,partial book value,181 of 188 member months with book value
+VMC,Vulcan Materials Company,before history to current,188,partial book value,162 of 188 member months with book value
+VRSK,Verisk Analytics,2015-10-07 to current,131,partial book value,117 of 131 member months with book value
+VRSN,Verisign,before history to current,188,partial book value,9 of 188 member months with book value
+VRTX,Vertex Pharmaceuticals,2013-09-20 to current,156,partial book value,144 of 156 member months with book value
+VTR,Ventas,2009-03-03 to current,188,partial book value,186 of 188 member months with book value
+VTRS,Viatris,before history to current,188,partial book value,66 of 188 member months with book value
+WAT,Waters Corporation,before history to current,188,partial book value,178 of 188 member months with book value
+WBA,Walgreens Boots Alliance,before history to 2025-08-27,175,no prices,0 of 175 member months with a month-end price
+WBA,Walgreens Boots Alliance,before history to 2025-08-27,175,no CIK,ticker not in the SEC ticker file
+WBD,Warner Bros. Discovery,2022-04-11 to 2026-10-05,53,no prices,0 of 53 member months with a month-end price
+WBD,Warner Bros. Discovery,2022-04-11 to 2026-10-05,53,no CIK,ticker not in the SEC ticker file
+WCG,WellCare,2018-09-14 to 2020-01-27,16,no prices,0 of 16 member months with a month-end price
+WCG,WellCare,2018-09-14 to 2020-01-27,16,no CIK,ticker not in the SEC ticker file
+WDAY,"Workday, Inc.",2024-12-23 to current,21,no book value,0 of 21 member months with book value
+WEC,WEC Energy Group,before history to current,188,partial book value,130 of 188 member months with book value
+WFC,Wells Fargo,before history to current,188,partial book value,174 of 188 member months with book value
+WFM,Whole Foods Market,before history to 2017-08-28,79,no prices,0 of 79 member months with a month-end price
+WFM,Whole Foods Market,before history to 2017-08-28,79,no CIK,ticker not in the SEC ticker file
+WFR,MEMC Electronic Materials,before history to 2011-12-15,11,no prices,0 of 11 member months with a month-end price
+WFR,MEMC Electronic Materials,before history to 2011-12-15,11,no CIK,ticker not in the SEC ticker file
+WIN,Windstream Communications,before history to 2015-04-06,51,no prices,0 of 51 member months with a month-end price
+WIN,Windstream Communications,before history to 2015-04-06,51,no CIK,ticker not in the SEC ticker file
+WLTW,Willis Towers Watson,2016-01-05 to 2022-01-09,72,no prices,0 of 72 member months with a month-end price
+WLTW,Willis Towers Watson,2016-01-05 to 2022-01-09,72,no CIK,ticker not in the SEC ticker file
+WMB,Williams Companies,before history to current,188,partial book value,180 of 188 member months with book value
+WMT,Walmart,before history to current,188,partial book value,183 of 188 member months with book value
+WPX,WPX Energy,2011-12-31 to 2014-03-20,27,no prices,0 of 27 member months with a month-end price
+WPX,WPX Energy,2011-12-31 to 2014-03-20,27,no CIK,ticker not in the SEC ticker file
+WST,West Pharmaceutical Services,2020-05-22 to current,76,partial book value,74 of 76 member months with book value
+WU,Western Union,before history to 2021-12-19,131,partial book value,107 of 131 member months with book value
+WY,Weyerhaeuser,before history to current,188,partial book value,175 of 188 member months with book value
+WYN,Wyndham Worldwide,before history to 2018-05-30,88,no prices,0 of 88 member months with a month-end price
+WYN,Wyndham Worldwide,before history to 2018-05-30,88,no CIK,ticker not in the SEC ticker file
+WYNN,Wynn Resorts,before history to current,188,partial book value,100 of 188 member months with book value
+X,United States Steel,before history to 2014-07-01,42,no prices,0 of 42 member months with a month-end price
+X,United States Steel,before history to 2014-07-01,42,no CIK,ticker not in the SEC ticker file
+XEC,Cimarex Energy,2014-06-20 to 2020-03-01,69,no prices,0 of 69 member months with a month-end price
+XEC,Cimarex Energy,2014-06-20 to 2020-03-01,69,no CIK,ticker not in the SEC ticker file
+XEL,Xcel Energy,before history to current,188,partial book value,181 of 188 member months with book value
+XL,XL Group,before history to 2018-09-13,92,no prices,0 of 92 member months with a month-end price
+XL,XL Group,before history to 2018-09-13,92,no CIK,ticker not in the SEC ticker file
+XLNX,Xilinx,before history to 2022-02-14,133,no prices,0 of 133 member months with a month-end price
+XLNX,Xilinx,before history to 2022-02-14,133,no CIK,ticker not in the SEC ticker file
+XOM,ExxonMobil,before history to current,188,partial book value,179 of 188 member months with book value
+XRAY,Dentsply Sirona,before history to 2024-04-02,159,partial book value,155 of 159 member months with book value
+XRX,Xerox,before history to 2021-03-21,122,partial book value,16 of 122 member months with book value
+XYL,Xylem Inc.,2011-10-31 to current,179,partial book value,178 of 179 member months with book value
+XYZ,"Block, Inc.",2025-07-23 to current,14,no book value,0 of 14 member months with book value
+YHOO,Yahoo!,1999-12-08 to 2017-06-18,77,no prices,0 of 77 member months with a month-end price
+YHOO,Yahoo!,1999-12-08 to 2017-06-18,77,no CIK,ticker not in the SEC ticker file
+YUM,Yum! Brands,before history to current,188,partial book value,69 of 188 member months with book value
+ZION,Zions Bancorporation,before history to 2024-03-17,158,partial book value,143 of 158 member months with book value
+ZTS,Zoetis,2013-06-21 to current,159,partial book value,157 of 159 member months with book value

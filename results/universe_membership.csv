@@ -1,0 +1,887 @@
+ticker,company,gics_sector,start_date,end_date,source_row
+A,Agilent Technologies,Health Care,,,start: before recorded history; end: current list
+AA,Alcoa,,,2016-10-31,start: before recorded history; end: changes row 220
+AAL,American Airlines Group,,2015-03-23,2024-09-22,start: changes row 269; end: changes row 49
+AAP,Advance Auto Parts,,2015-07-08,2023-08-24,start: changes row 262; end: changes row 72
+AAPL,Apple Inc.,Information Technology,,,start: before recorded history; end: current list
+ABBV,AbbVie,Health Care,2013-01-02,,start: changes row 311; end: current list
+ABK,Ambac Financial,,2000-12-05,2008-06-09,start: changes row 399; end: changes row 380
+ABMD,Abiomed,,2018-05-31,2022-12-21,start: changes row 182; end: changes row 80
+ABNB,Airbnb,Consumer Discretionary,2023-09-18,,start: changes row 71; end: current list
+ABS,Albertsons,,,2006-06-01,start: before recorded history; end: changes row 392
+ABT,Abbott Laboratories,Health Care,,,start: before recorded history; end: current list
+ACAS,American Capital,,,2009-03-02,start: before recorded history; end: changes row 371
+ACE,Chubb,,,2016-01-18,start: before recorded history; end: changes row 246
+ACGL,Arch Capital Group,Financials,2022-11-01,,start: changes row 84; end: current list
+ACN,Accenture,Information Technology,2011-07-05,,start: changes row 340; end: current list
+ADBE,Adobe Inc.,Information Technology,,,start: before recorded history; end: current list
+ADCT,ADC Telecommunications,,,2007-07-01,start: before recorded history; end: changes row 389
+ADI,Analog Devices,Information Technology,,,start: before recorded history; end: current list
+ADM,Archer Daniels Midland,Consumer Staples,,,start: before recorded history; end: current list
+ADP,Automatic Data Processing,Industrials,,,start: before recorded history; end: current list
+ADS,Alliance Data Systems,,2013-12-23,2020-06-21,start: changes row 293; end: changes row 129
+ADSK,Autodesk,Information Technology,,,start: before recorded history; end: current list
+ADT,ADT,,2012-10-01,2016-05-02,start: changes row 318; end: changes row 234
+AEE,Ameren,Utilities,,,start: before recorded history; end: current list
+AEP,American Electric Power,Utilities,,,start: before recorded history; end: current list
+AES,AES Corporation,Utilities,,,start: before recorded history; end: current list
+AET,Aetna,,,2018-12-02,start: before recorded history; end: changes row 168
+AFL,Aflac,Financials,,,start: before recorded history; end: current list
+AGN,Allergan,,,2020-05-11,start: before recorded history; end: changes row 134
+AIG,American International Group,Financials,,,start: before recorded history; end: current list
+AIV,Aimco,,,2020-12-20,start: before recorded history; end: changes row 122
+AIZ,Assurant,Financials,,,start: before recorded history; end: current list
+AJG,Arthur J. Gallagher & Co.,Financials,2016-05-31,,start: changes row 230; end: current list
+AKAM,Akamai Technologies,Information Technology,,,start: before recorded history; end: current list
+AKS,AK Steel,,2008-07-01,2011-12-15,start: changes row 377; end: changes row 332
+ALB,Albemarle Corporation,Materials,2016-07-01,,start: changes row 227; end: current list
+ALGN,Align Technology,Health Care,2017-06-19,,start: changes row 203; end: current list
+ALK,Alaska Air Group,,2016-05-13,2023-12-17,start: changes row 233; end: changes row 64
+ALL,Allstate,Financials,,,start: before recorded history; end: current list
+ALLE,Allegion,Industrials,2013-12-02,,start: changes row 297; end: current list
+ALTR,Altera,,,2015-12-28,start: before recorded history; end: changes row 248
+ALXN,Alexion Pharmaceuticals,,2012-05-21,2021-07-20,start: changes row 325; end: changes row 110
+AMAT,Applied Materials,Information Technology,,,start: before recorded history; end: current list
+AMCR,Amcor,Materials,2019-06-11,,start: changes row 155; end: current list
+AMD,Advanced Micro Devices,Information Technology,,2013-09-19,start: before recorded history; end: changes row 300
+AMD,Advanced Micro Devices,Information Technology,2017-03-20,,start: changes row 209; end: current list
+AME,Ametek,Industrials,2013-09-20,,start: changes row 301; end: current list
+AMG,Affiliated Managers Group,,2014-07-01,2019-12-22,start: changes row 284; end: changes row 142
+AMGN,Amgen,Health Care,,,start: before recorded history; end: current list
+AMP,Ameriprise Financial,Financials,,,start: before recorded history; end: current list
+AMT,American Tower,Real Estate,,,start: before recorded history; end: current list
+AMTM,Amentum,,2024-09-30,2024-12-22,start: changes row 48; end: changes row 44
+AMZN,Amazon,Consumer Discretionary,2005-11-18,,start: changes row 393; end: current list
+AN,AutoNation,,,2017-08-07,start: before recorded history; end: changes row 195
+ANDV,Andeavor,,,2018-09-30,start: before recorded history; end: changes row 173
+ANET,Arista Networks,Information Technology,2018-08-28,,start: changes row 175; end: current list
+ANF,Abercrombie & Fitch,,,2013-12-22,start: before recorded history; end: changes row 293
+ANR,Alpha Natural Resources,,2011-06-01,2012-10-01,start: changes row 342; end: changes row 316
+ANSS,Ansys,,2017-06-19,2025-07-17,start: changes row 204; end: changes row 36
+AON,Aon plc,Financials,,,start: before recorded history; end: current list
+AOS,A. O. Smith,Industrials,2017-07-26,,start: changes row 197; end: current list
+APA,APA Corporation,Energy,,,start: before recorded history; end: current list
+APC,Anadarko Petroleum,,,2019-08-08,start: before recorded history; end: changes row 151
+APD,Air Products,Materials,,,start: before recorded history; end: current list
+APH,Amphenol,Information Technology,,,start: before recorded history; end: current list
+APO,Apollo Global Management,Financials,2024-12-23,,start: changes row 43; end: current list
+APOL,Apollo Education Group,,,2013-06-30,start: before recorded history; end: changes row 304
+APP,AppLovin,Communication Services,2025-09-22,,start: changes row 33; end: current list
+APTV,Aptiv,Consumer Discretionary,,,start: before recorded history; end: current list
+ARE,Alexandria Real Estate Equities,Real Estate,2017-03-20,,start: changes row 211; end: current list
+ARES,Ares Management,Financials,2025-12-11,,start: changes row 25; end: current list
+ARG,Airgas,,2009-09-28,2016-05-22,start: changes row 366; end: changes row 231
+ARNC,Arconic,,2016-11-01,2020-03-31,start: changes row 220; end: changes row 139
+ATI,Allegheny Technologies,,,2015-07-01,start: before recorded history; end: changes row 264
+ATO,Atmos Energy,Utilities,2019-02-15,,start: changes row 163; end: current list
+ATVI,Activision Blizzard,,2015-08-28,2023-10-17,start: changes row 259; end: changes row 67
+AV,Avaya,,,2007-10-25,start: before recorded history; end: changes row 383
+AVB,AvalonBay Communities,,2007-01-10,2026-08-17,start: changes row 391; end: changes row 7
+AVGO,Broadcom,Information Technology,2014-05-08,,start: changes row 286; end: current list
+AVP,Avon Products,,,2015-03-22,start: before recorded history; end: changes row 272
+AVY,Avery Dennison,Materials,,,start: before recorded history; end: current list
+AWK,American Water Works,Utilities,2016-03-04,,start: changes row 242; end: current list
+AXON,Axon Enterprise,Industrials,2023-05-04,,start: changes row 74; end: current list
+AXP,American Express,Financials,,,start: before recorded history; end: current list
+AYE,Allegheny Energy,,,1976-06-30,start: before recorded history; end: changes row 412
+AYE,Allegheny Energy,,2000-12-05,2011-02-24,start: changes row 398; end: changes row 347
+AYI,Acuity Brands,,2016-05-03,2018-06-17,start: changes row 234; end: changes row 179
+AZO,AutoZone,Consumer Discretionary,,,start: before recorded history; end: current list
+BA,Boeing,Industrials,,,start: before recorded history; end: current list
+BAC,Bank of America,Financials,,,start: before recorded history; end: current list
+BALL,Ball Corporation,Materials,,,start: before recorded history; end: current list
+BAX,Baxter International,Health Care,,,start: before recorded history; end: current list
+BBBY,Bed Bath & Beyond,,,2017-07-25,start: before recorded history; end: changes row 197
+BBWI,"Bath & Body Works, Inc.",,,2024-09-30,start: before recorded history; end: changes row 47
+BBY,Best Buy,Consumer Discretionary,,,start: before recorded history; end: current list
+BC,Brunswick,,,2008-06-22,start: before recorded history; end: changes row 378
+BCR,CR Bard,,,2018-01-02,start: before recorded history; end: changes row 188
+BDX,Becton Dickinson,Health Care,,,start: before recorded history; end: current list
+BE,Bloom Energy,Industrials,2026-09-21,,start: changes row 4; end: current list
+BEAM,Suntory Global Spirits,,,2014-04-30,start: before recorded history; end: changes row 287
+BEN,Franklin Resources,Financials,,,start: before recorded history; end: current list
+BF-B,Brown–Forman,Consumer Staples,,,start: before recorded history; end: current list
+BG,Bunge Global,Consumer Staples,2023-03-15,,start: changes row 76; end: current list
+BHF,Brighthouse Financial,,2017-08-08,2019-04-01,start: changes row 195; end: changes row 159
+BHI,Baker Hughes,,,2017-07-06,start: before recorded history; end: changes row 201
+BIG,Big Lots,,,2013-02-14,start: before recorded history; end: changes row 310
+BIIB,Biogen,Health Care,,,start: before recorded history; end: current list
+BIO,Bio-Rad Laboratories,,2020-06-22,2024-09-22,start: changes row 129; end: changes row 51
+BJS,BJ Services,,,2010-04-28,start: before recorded history; end: changes row 358
+BKNG,Booking Holdings,Consumer Discretionary,,,start: before recorded history; end: current list
+BKR,Baker Hughes,Energy,2017-07-07,,start: changes row 201; end: current list
+BLDR,Builders FirstSource,,2023-12-18,2026-09-20,start: changes row 65; end: changes row 6
+BLK,BlackRock,Financials,2011-04-01,,start: changes row 344; end: current list
+BMC,BMC Software,,,2013-09-09,start: before recorded history; end: changes row 302
+BMS,Bemis Company,,,2014-12-04,start: before recorded history; end: changes row 277
+BMS,Bemis,,2019-06-07,2019-06-10,start: changes row 156; end: changes row 155
+BMY,Bristol Myers Squibb,Health Care,,,start: before recorded history; end: current list
+BNY,BNY Mellon,Financials,,,start: before recorded history; end: current list
+BR,Broadridge Financial Solutions,Industrials,2018-06-18,,start: changes row 178; end: current list
+BRCM,Broadcom Corporation,,,2016-01-31,start: before recorded history; end: changes row 245
+BRK-B,Berkshire Hathaway,Financials,,,start: before recorded history; end: current list
+BRO,Brown & Brown,Financials,2021-09-20,,start: changes row 108; end: current list
+BS,Bethlehem Steel,,,2000-12-04,start: before recorded history; end: changes row 396
+BSX,Boston Scientific,Health Care,,,start: before recorded history; end: current list
+BTU,Peabody Energy,,,2014-09-19,start: before recorded history; end: changes row 279
+BWA,BorgWarner,,2011-12-16,2025-03-23,start: changes row 332; end: changes row 39
+BX,Blackstone Inc.,Financials,2023-09-18,,start: changes row 70; end: current list
+BXLT,Baxalta,,2015-07-01,2016-06-02,start: changes row 266; end: changes row 229
+BXP,"BXP, Inc.",Real Estate,,,start: before recorded history; end: current list
+C,Citigroup,Financials,,,start: before recorded history; end: current list
+CA,CA Technologies,,,2018-11-05,start: before recorded history; end: changes row 171
+CAG,Conagra Brands,,,2026-06-29,start: before recorded history; end: changes row 9
+CAH,Cardinal Health,Health Care,,,start: before recorded history; end: current list
+CAM,Cameron International,,,2016-04-03,start: before recorded history; end: changes row 238
+CARR,Carrier Global,Industrials,2020-04-03,,start: changes row 138; end: current list
+CASY,Casey's,Consumer Staples,2026-04-09,,start: changes row 16; end: current list
+CAT,Caterpillar Inc.,Industrials,,,start: before recorded history; end: current list
+CB,Chubb Limited,Financials,2010-07-14,,start: changes row 355; end: current list
+CBE,Cooper Industries,,,2009-09-27,start: before recorded history; end: changes row 366
+CBE,Cooper Industries,,2011-11-18,2012-12-02,start: changes row 336; end: changes row 314
+CBOE,Cboe Global Markets,Financials,2017-03-01,,start: changes row 215; end: current list
+CBRE,CBRE Group,Real Estate,,,start: before recorded history; end: current list
+CCE,Coca-Cola Enterprises,,,2016-05-30,start: before recorded history; end: changes row 230
+CCI,Crown Castle,Real Estate,2012-03-13,,start: changes row 329; end: current list
+CCK,Crown Holdings,,,2000-12-04,start: before recorded history; end: changes row 399
+CCL,Carnival Corporation,Consumer Discretionary,1998-12-11,,start: changes row 407; end: current list
+CDAY,Ceridian,,2021-09-20,2024-01-31,start: changes row 107; end: changes row 62
+CDNS,Cadence Design Systems,Information Technology,2017-09-18,,start: changes row 191; end: current list
+CDW,CDW Corporation,Information Technology,2019-09-23,,start: changes row 150; end: current list
+CE,Celanese,,2018-12-24,2025-03-23,start: changes row 166; end: changes row 41
+CEG,Constellation Energy Group,Utilities,,2012-03-12,start: before recorded history; end: changes row 329
+CEG,Constellation Energy,Utilities,2022-02-02,,start: changes row 100; end: current list
+CELG,Celgene,,,2019-11-20,start: before recorded history; end: changes row 147
+CEPH,Cephalon,,,2011-10-13,start: before recorded history; end: changes row 338
+CERN,Cerner,,2010-04-29,2022-06-07,start: changes row 358; end: changes row 93
+CF,CF Industries,Materials,,,start: before recorded history; end: current list
+CFC,Countrywide Financial Corp,,,2008-06-30,start: before recorded history; end: changes row 377
+CFG,Citizens Financial Group,Financials,2016-02-01,,start: changes row 244; end: current list
+CFN,Carefusion,,,2015-03-17,start: before recorded history; end: changes row 273
+CHD,Church & Dwight,Consumer Staples,2015-12-29,,start: changes row 248; end: current list
+CHK,Chesapeake Energy,,,2018-03-18,start: before recorded history; end: changes row 186
+CHRW,C.H. Robinson,Industrials,,,start: before recorded history; end: current list
+CHTR,Charter Communications,Communication Services,2016-09-08,,start: changes row 223; end: current list
+CI,Cigna,Health Care,,,start: before recorded history; end: current list
+CIEN,Ciena,Information Technology,,2009-12-17,start: before recorded history; end: changes row 360
+CIEN,Ciena,Information Technology,2026-02-09,,start: changes row 21; end: current list
+CINF,Cincinnati Financial,Financials,,,start: before recorded history; end: current list
+CL,Colgate-Palmolive,Consumer Staples,,,start: before recorded history; end: current list
+CLF,Cliffs Natural Resources,,2009-12-18,2014-04-01,start: changes row 362; end: changes row 290
+CLX,Clorox,Consumer Staples,,,start: before recorded history; end: current list
+CMA,Comerica,,,2024-06-23,start: before recorded history; end: changes row 53
+CMCSA,Comcast,Communication Services,,,start: before recorded history; end: current list
+CMCSK,Comcast Series K,,2015-09-18,2015-12-14,start: changes row 255; end: changes row 249
+CME,CME Group,Financials,,,start: before recorded history; end: current list
+CMG,Chipotle Mexican Grill,Consumer Discretionary,2011-04-27,,start: changes row 343; end: current list
+CMI,Cummins,Industrials,,,start: before recorded history; end: current list
+CMS,CMS Energy,Utilities,,,start: before recorded history; end: current list
+CNC,Centene Corporation,Health Care,2016-03-30,,start: changes row 240; end: current list
+CNP,CenterPoint Energy,Utilities,,,start: before recorded history; end: current list
+CNX,Consol Energy,,,2016-03-03,start: before recorded history; end: changes row 242
+COF,Capital One,Financials,,,start: before recorded history; end: current list
+COHR,Coherent Corp.,Information Technology,2026-03-23,,start: changes row 19; end: current list
+COIN,Coinbase,Financials,2025-05-19,,start: changes row 38; end: current list
+COL,Rockwell Collins,,,2018-12-02,start: before recorded history; end: changes row 167
+COO,Cooper Companies (The),Health Care,2016-09-22,,start: changes row 222; end: current list
+COP,ConocoPhillips,Energy,,,start: before recorded history; end: current list
+COR,Cencora,Health Care,,,start: before recorded history; end: current list
+COST,Costco,Consumer Staples,,,start: before recorded history; end: current list
+COTY,Coty,,2016-09-30,2020-09-20,start: changes row 221; end: changes row 127
+COV,Covidien,,,2009-06-04,start: before recorded history; end: changes row 370
+COV,Covidien,,2011-02-28,2015-01-26,start: changes row 346; end: changes row 276
+CPAY,Corpay,Financials,,,start: before recorded history; end: current list
+CPB,Campbell's,,,2026-06-21,start: before recorded history; end: changes row 12
+CPGX,Columbia Pipeline Group,,2015-07-02,2016-07-04,start: changes row 264; end: changes row 225
+CPRI,Capri Holdings,,,2020-05-11,start: before recorded history; end: changes row 133
+CPRT,Copart,Industrials,2018-07-02,,start: changes row 176; end: current list
+CPT,Camden Property Trust,Real Estate,2022-04-04,,start: changes row 96; end: current list
+CPWR,Compuware,,1998-12-11,2011-12-30,start: changes row 408; end: changes row 330
+CRH,CRH plc,Materials,2025-12-22,,start: changes row 22; end: current list
+CRL,Charles River Laboratories,Health Care,2021-05-14,,start: changes row 113; end: current list
+CRM,Salesforce,Information Technology,2008-09-12,,start: changes row 375; end: current list
+CRWD,CrowdStrike,Information Technology,2024-06-24,,start: changes row 53; end: current list
+CSC,Computer Sciences Corporation,,,2015-11-30,start: before recorded history; end: changes row 250
+CSCO,Cisco,Information Technology,,,start: before recorded history; end: current list
+CSGP,CoStar Group,Real Estate,2022-09-19,,start: changes row 88; end: current list
+CSRA,CSRA,,2015-12-01,2018-04-03,start: changes row 250; end: changes row 183
+CSX,CSX Corporation,Industrials,,,start: before recorded history; end: current list
+CTAS,Cintas,Industrials,,,start: before recorded history; end: current list
+CTLT,Catalent,,2020-09-21,2024-12-22,start: changes row 128; end: changes row 45
+CTRA,Coterra Energy,,,2026-05-06,start: before recorded history; end: changes row 15
+CTSH,Cognizant,Information Technology,,,start: before recorded history; end: current list
+CTVA,Corteva,,2019-06-03,2026-10-05,start: changes row 158; end: changes row 2
+CTX,Centex Corp.,,,2009-08-18,start: before recorded history; end: changes row 367
+CTXS,Citrix Systems,,,2022-10-02,start: before recorded history; end: changes row 86
+CVC,Cablevision Systems,,2010-12-17,2016-06-21,start: changes row 349; end: changes row 228
+CVG,Convergys,,2000-06-12,2009-12-17,start: changes row 401; end: changes row 363
+CVH,Coventry Health Care,,,2013-05-07,start: before recorded history; end: changes row 308
+CVNA,Carvana,Consumer Discretionary,2025-12-22,,start: changes row 23; end: current list
+CVS,CVS Health,Health Care,,,start: before recorded history; end: current list
+CVX,Chevron Corporation,Energy,,,start: before recorded history; end: current list
+CXO,Concho Resources,,2016-02-22,2021-01-20,start: changes row 243; end: changes row 120
+CZR,Caesars Entertainment,,2021-03-22,2025-09-21,start: changes row 118; end: changes row 32
+D,Dominion Energy,Utilities,,,start: before recorded history; end: current list
+DAL,Delta Air Lines,Industrials,2013-09-10,,start: changes row 302; end: current list
+DASH,DoorDash,Consumer Discretionary,2025-03-24,,start: changes row 39; end: current list
+DAY,Dayforce,,2024-02-01,2026-02-08,start: changes row 62; end: changes row 21
+DD,DuPont,Industrials,,2017-08-31,start: before recorded history; end: changes row 193
+DD,DuPont,Industrials,2019-06-03,,start: changes row 157; end: current list
+DDOG,Datadog,Information Technology,2025-07-09,,start: changes row 37; end: current list
+DE,Deere & Company,Industrials,,,start: before recorded history; end: current list
+DECK,Deckers Brands,Consumer Discretionary,2024-03-18,,start: changes row 61; end: current list
+DELL,Dell,Information Technology,,2013-10-28,start: before recorded history; end: changes row 299
+DELL,Dell Technologies,Information Technology,2024-09-23,,start: changes row 50; end: current list
+DF,Dean Foods,,,2013-05-22,start: before recorded history; end: changes row 307
+DFS,Discover Financial,,2007-07-02,2025-05-18,start: changes row 389; end: changes row 38
+DG,Dollar General,Consumer Staples,2012-12-03,,start: changes row 314; end: current list
+DGX,Quest Diagnostics,Health Care,,,start: before recorded history; end: current list
+DHI,D. R. Horton,Consumer Discretionary,,,start: before recorded history; end: current list
+DHR,Danaher Corporation,Health Care,,,start: before recorded history; end: current list
+DIS,Walt Disney Company (The),Communication Services,1976-07-01,,start: changes row 412; end: current list
+DISCA,"Discovery, Inc.",,,2022-04-10,start: before recorded history; end: changes row 94
+DISCK,"Discovery, Inc.",,2014-08-06,2022-04-10,start: changes row 282; end: changes row 95
+DISH,Dish Network,,2017-03-13,2023-06-19,start: changes row 213; end: changes row 73
+DJ,Dow Jones,,,2007-12-12,start: before recorded history; end: changes row 382
+DLR,Digital Realty,Real Estate,2016-05-18,,start: changes row 232; end: current list
+DLTR,Dollar Tree,Consumer Staples,2011-12-16,,start: changes row 334; end: current list
+DNB,Dun & Bradstreet,,,2017-04-04,start: before recorded history; end: changes row 207
+DNR,Denbury Resources,,,2015-03-22,start: before recorded history; end: changes row 270
+DO,Diamond Offshore Drilling,,,2016-09-29,start: before recorded history; end: changes row 221
+DOC,Healthpeak Properties,Real Estate,,,start: before recorded history; end: current list
+DOV,Dover Corporation,Industrials,,,start: before recorded history; end: current list
+DOW,Dow Chemical Company,Materials,,2017-08-31,start: before recorded history; end: changes row 192
+DOW,Dow Inc.,Materials,2019-04-02,,start: changes row 159; end: current list
+DPS,Dr Pepper Snapple Group,,,2018-07-01,start: before recorded history; end: changes row 176
+DPZ,Domino's,Consumer Discretionary,2020-05-12,,start: changes row 133; end: current list
+DRE,Duke Realty,,2017-07-26,2022-10-02,start: changes row 196; end: changes row 87
+DRI,Darden Restaurants,Consumer Discretionary,,,start: before recorded history; end: current list
+DTE,DTE Energy,Utilities,,,start: before recorded history; end: current list
+DTV,DirecTV,,,2015-07-28,start: before recorded history; end: changes row 260
+DUK,Duke Energy,Utilities,,,start: before recorded history; end: current list
+DV,DeVry,,,2012-09-30,start: before recorded history; end: changes row 319
+DVA,DaVita,Health Care,,,start: before recorded history; end: current list
+DVN,Devon Energy,Energy,,,start: before recorded history; end: current list
+DWDP,DuPont,,2017-09-01,2019-06-02,start: changes row 192; end: changes row 157
+DXC,DXC Technology,,2017-04-04,2023-10-02,start: changes row 208; end: changes row 68
+DXCM,Dexcom,Health Care,2020-05-12,,start: changes row 134; end: current list
+DYN,Dynegy,,,2009-12-17,start: before recorded history; end: changes row 361
+EA,Electronic Arts,,,2026-08-04,start: before recorded history; end: changes row 8
+EBAY,eBay Inc.,Consumer Discretionary,,,start: before recorded history; end: current list
+ECHO,EchoStar,Communication Services,,,start: before recorded history; end: current list
+ECL,Ecolab,Materials,,,start: before recorded history; end: current list
+ED,Consolidated Edison,Utilities,,,start: before recorded history; end: current list
+EFX,Equifax,Industrials,,,start: before recorded history; end: current list
+EG,Everest Group,Financials,,,start: before recorded history; end: current list
+EIX,Edison International,Utilities,,,start: before recorded history; end: current list
+EK,Eastman Kodak,,,2010-12-16,start: before recorded history; end: changes row 350
+EL,Estée Lauder Companies (The),Consumer Staples,,,start: before recorded history; end: current list
+ELV,Elevance Health,Health Care,,,start: before recorded history; end: current list
+EMC,EMC Corporation,,,2016-09-07,start: before recorded history; end: changes row 223
+EME,Emcor,Industrials,2025-09-22,,start: changes row 31; end: current list
+EMN,Eastman Chemical Co.,,,2025-11-03,start: before recorded history; end: changes row 27
+EMR,Emerson Electric,Industrials,,,start: before recorded history; end: current list
+ENDP,Endo International,,2015-01-27,2017-03-01,start: changes row 276; end: changes row 214
+ENPH,Enphase Energy,,2021-01-07,2025-09-21,start: changes row 121; end: changes row 31
+EOG,EOG Resources,Energy,,,start: before recorded history; end: current list
+EP,El Paso Corporation,,,2012-05-16,start: before recorded history; end: changes row 326
+EPAM,EPAM Systems,,2021-12-14,2026-06-01,start: changes row 105; end: changes row 13
+EQIX,Equinix,Real Estate,2015-03-23,,start: changes row 270; end: current list
+EQT,EQT Corporation,Energy,,2018-11-12,start: before recorded history; end: changes row 170
+EQT,EQT Corporation,Energy,2022-10-03,,start: changes row 87; end: current list
+ERIE,Erie Indemnity,Financials,2024-09-23,,start: changes row 51; end: current list
+ES,Eversource Energy,Utilities,,,start: before recorded history; end: current list
+ESRX,Express Scripts,,2003-09-25,2018-12-23,start: changes row 395; end: changes row 166
+ESS,Essex Property Trust,Real Estate,2014-04-02,,start: changes row 290; end: current list
+ESV,Ensco,,2012-07-31,2016-03-29,start: changes row 321; end: changes row 240
+ETFC,E-Trade,,,2020-10-06,start: before recorded history; end: changes row 125
+ETN,Eaton Corporation,Industrials,,,start: before recorded history; end: current list
+ETR,Entergy,Utilities,,,start: before recorded history; end: current list
+ETSY,Etsy,,2020-09-21,2024-09-22,start: changes row 126; end: changes row 50
+EVHC,Envision Healthcare,,2016-12-02,2018-10-10,start: changes row 219; end: changes row 172
+EVRG,Evergy,Utilities,2018-06-05,,start: changes row 181; end: current list
+EW,Edwards Lifesciences,Health Care,2011-03-31,,start: changes row 345; end: current list
+EXC,Exelon,Utilities,,,start: before recorded history; end: current list
+EXE,Expand Energy,Energy,2025-03-24,,start: changes row 42; end: current list
+EXPD,Expeditors International,Industrials,,,start: before recorded history; end: current list
+EXPE,Expedia Group,Consumer Discretionary,2007-10-02,,start: changes row 384; end: current list
+EXR,Extra Space Storage,Real Estate,2016-01-19,,start: changes row 246; end: current list
+F,Ford Motor Company,Consumer Discretionary,,,start: before recorded history; end: current list
+FANG,Diamondback Energy,Energy,2018-12-03,,start: changes row 169; end: current list
+FAST,Fastenal,Industrials,2008-09-12,,start: changes row 376; end: current list
+FBHS,Fortune Brands Home & Security,,2016-06-22,2022-12-18,start: changes row 228; end: changes row 81
+FCX,Freeport-McMoRan,Materials,,,start: before recorded history; end: current list
+FDC,First Data,,,2007-09-25,start: before recorded history; end: changes row 387
+FDO,Family Dollar,,,2015-07-07,start: before recorded history; end: changes row 262
+FDS,FactSet,Financials,2021-12-20,,start: changes row 104; end: current list
+FDX,FedEx,Industrials,,,start: before recorded history; end: current list
+FDXF,FedEx Freight,Industrials,2026-06-01,,start: changes row 14; end: current list
+FE,FirstEnergy,Utilities,,,start: before recorded history; end: current list
+FERG,Ferguson Enterprises,Industrials,2026-08-05,,start: changes row 8; end: current list
+FFIV,"F5, Inc.",Information Technology,2010-12-17,,start: changes row 350; end: current list
+FHN,First Horizon,,,2013-06-20,start: before recorded history; end: changes row 305
+FICO,Fair Isaac,Information Technology,2023-03-20,,start: changes row 75; end: current list
+FII,Federated Investors,,,2013-01-01,start: before recorded history; end: changes row 311
+FIS,Fidelity National Information Services,Financials,,,start: before recorded history; end: current list
+FISV,Fiserv,Financials,,,start: before recorded history; end: current list
+FITB,Fifth Third Bancorp,Financials,,,start: before recorded history; end: current list
+FIX,Comfort Systems USA,Industrials,2025-12-22,,start: changes row 24; end: current list
+FL,Foot Locker,,2016-04-04,2019-08-08,start: changes row 238; end: changes row 152
+FLEX,Flex Ltd.,Information Technology,2026-06-22,,start: changes row 12; end: current list
+FLIR,FLIR Systems,,,2021-05-13,start: before recorded history; end: changes row 113
+FLR,Fluor Corporation,,,2019-06-02,start: before recorded history; end: changes row 158
+FLS,Flowserve,,,2021-03-21,start: before recorded history; end: changes row 115
+FMC,FMC Corporation,,2009-08-19,2025-03-23,start: changes row 367; end: changes row 42
+FNM,Fannie Mae,,,2008-09-11,start: before recorded history; end: changes row 376
+FOSL,Fossil Group,,2012-04-03,2016-01-04,start: changes row 328; end: changes row 247
+FOX,21st Century Fox,Communication Services,2015-09-18,2019-03-18,start: changes row 256; end: changes row 161
+FOX,Fox Corporation (Class B),Communication Services,2019-03-19,,start: changes row 161; end: current list
+FOXA,21st Century Fox,Communication Services,,2019-03-18,start: before recorded history; end: changes row 160
+FOXA,Fox Corporation (Class A),Communication Services,2019-03-19,,start: changes row 160; end: current list
+FRC,First Republic Bank,,2019-01-02,2023-05-03,start: changes row 165; end: changes row 74
+FRE,Freddie Mac,,,2008-09-11,start: before recorded history; end: changes row 375
+FRT,Federal Realty Investment Trust,Real Estate,2016-02-01,,start: changes row 245; end: current list
+FRX,Forest Laboratories,,,2014-06-30,start: before recorded history; end: changes row 284
+FSLR,First Solar,Information Technology,,2017-03-19,start: before recorded history; end: changes row 211
+FSLR,First Solar,Information Technology,2022-12-19,,start: changes row 81; end: current list
+FTI,TechnipFMC,,2009-06-05,2021-02-11,start: changes row 370; end: changes row 119
+FTNT,Fortinet,Information Technology,2018-10-11,,start: changes row 172; end: current list
+FTR,Frontier Communications,,,2017-03-19,start: before recorded history; end: changes row 210
+FTV,Fortive,Industrials,2016-07-05,,start: changes row 225; end: current list
+GAS,Nicor Gas,,,2011-12-11,start: before recorded history; end: changes row 335
+GAS,AGL Resources,,2011-12-12,2016-06-30,start: changes row 335; end: changes row 226
+GD,General Dynamics,Industrials,,,start: before recorded history; end: current list
+GDDY,GoDaddy,Information Technology,2024-06-24,,start: changes row 54; end: current list
+GE,GE Aerospace,Industrials,,,start: before recorded history; end: current list
+GEHC,GE HealthCare,Health Care,2023-01-04,,start: changes row 79; end: current list
+GEN,Gen Digital,Information Technology,,,start: before recorded history; end: current list
+GENZ,Genzyme,,,2011-03-31,start: before recorded history; end: changes row 344
+GEV,GE Vernova,Industrials,2024-04-02,,start: changes row 58; end: current list
+GGP,GGP Inc.,,2013-12-10,2018-08-27,start: changes row 296; end: changes row 175
+GHC,Graham Holdings,,,2014-09-19,start: before recorded history; end: changes row 280
+GILD,Gilead Sciences,Health Care,,,start: before recorded history; end: current list
+GIS,General Mills,Consumer Staples,,,start: before recorded history; end: current list
+GL,Globe Life,Financials,,,start: before recorded history; end: current list
+GLK,Great Lakes Chemical,,,2005-06-30,start: before recorded history; end: changes row 394
+GLW,Corning Inc.,Information Technology,,,start: before recorded history; end: current list
+GM,General Motors,Consumer Discretionary,2013-06-06,,start: changes row 306; end: current list
+GMCR,Keurig Green Mountain,,2014-03-21,2016-03-06,start: changes row 291; end: changes row 241
+GME,GameStop,,2007-12-13,2016-04-24,start: changes row 382; end: changes row 235
+GNRC,Generac,Industrials,2021-03-22,,start: changes row 117; end: current list
+GNW,Genworth Financial,,,2015-11-17,start: before recorded history; end: changes row 252
+GOOG,Alphabet Inc. (Class C),Communication Services,,,start: before recorded history; end: current list
+GOOGL,Alphabet Inc. (Class A),Communication Services,2014-04-03,,start: changes row 289; end: current list
+GPC,Genuine Parts Company,Consumer Discretionary,,,start: before recorded history; end: current list
+GPN,Global Payments,Financials,2016-04-25,,start: changes row 235; end: current list
+GPS,Gap,,,2022-02-02,start: before recorded history; end: changes row 99
+GR,Goodrich Corporation,,,2012-07-30,start: before recorded history; end: changes row 321
+GRA,WR Grace,,,2000-12-04,start: before recorded history; end: changes row 398
+GRMN,Garmin,Consumer Discretionary,2012-12-11,,start: changes row 313; end: current list
+GRN,General Re,,,1998-12-10,start: before recorded history; end: changes row 407
+GS,Goldman Sachs,Financials,,,start: before recorded history; end: current list
+GT,The Goodyear Tire & Rubber Company,,,2019-02-26,start: before recorded history; end: changes row 162
+GWW,W. W. Grainger,Industrials,,,start: before recorded history; end: current list
+HAL,Halliburton,Energy,,,start: before recorded history; end: current list
+HAR,Harman International,,,2017-03-15,start: before recorded history; end: changes row 212
+HAS,Hasbro,Consumer Discretionary,,,start: before recorded history; end: current list
+HBAN,Huntington Bancshares,Financials,,,start: before recorded history; end: current list
+HBI,Hanesbrands,,2015-03-23,2021-12-19,start: changes row 272; end: changes row 103
+HCA,HCA Healthcare,Health Care,2015-01-27,,start: changes row 275; end: current list
+HCBK,Hudson City Bancorp,,,2015-11-01,start: before recorded history; end: changes row 253
+HD,Home Depot (The),Consumer Discretionary,,,start: before recorded history; end: current list
+HES,Hess Corporation,,,2025-07-22,start: before recorded history; end: changes row 35
+HFC,HollyFrontier,,2018-06-18,2021-06-03,start: changes row 179; end: changes row 111
+HIG,Hartford (The),Financials,,,start: before recorded history; end: current list
+HII,Huntington Ingalls Industries,Industrials,2018-01-03,,start: changes row 188; end: current list
+HLT,Hilton Worldwide,Consumer Discretionary,2017-06-19,,start: changes row 202; end: current list
+HNG,Houston Natural Gas,,,1976-06-30,start: before recorded history; end: changes row 411
+HNZ,Heinz,,,2013-06-05,start: before recorded history; end: changes row 306
+HOG,Harley-Davidson,,,2020-06-21,start: before recorded history; end: changes row 130
+HOLX,Hologic,,2016-03-30,2026-04-08,start: changes row 239; end: changes row 16
+HON,Honeywell Technologies,Industrials,,,start: before recorded history; end: current list
+HONA,Honeywell Aerospace,Industrials,2026-06-29,,start: changes row 10; end: current list
+HOOD,Robinhood Markets,Financials,2025-09-22,,start: changes row 32; end: current list
+HOT,Starwood Hotels and Resorts,,,2016-09-21,start: before recorded history; end: changes row 222
+HP,Helmerich & Payne,,2010-02-26,2020-05-21,start: changes row 359; end: changes row 132
+HPE,Hewlett Packard Enterprise,Information Technology,2015-11-02,,start: changes row 253; end: current list
+HPH,Harnischfeger Industries,,,1999-06-08,start: before recorded history; end: changes row 404
+HPQ,HP Inc.,Information Technology,,,start: before recorded history; end: current list
+HRB,H&R Block,,,2020-09-20,start: before recorded history; end: changes row 126
+HRL,Hormel Foods,Consumer Staples,2009-03-03,,start: changes row 371; end: current list
+HSIC,Henry Schein,Health Care,2015-03-18,,start: changes row 273; end: current list
+HSP,Hospira,,,2015-09-01,start: before recorded history; end: changes row 258
+HST,Host Hotels & Resorts,Real Estate,,,start: before recorded history; end: current list
+HSY,Hershey Company (The),Consumer Staples,,,start: before recorded history; end: current list
+HUBB,Hubbell Incorporated,Industrials,2023-10-18,,start: changes row 66; end: current list
+HUM,Humana,Health Care,,,start: before recorded history; end: current list
+HWM,Howmet Aerospace,Industrials,2020-04-01,,start: changes row 139; end: current list
+IBKR,Interactive Brokers,Financials,2025-08-28,,start: changes row 34; end: current list
+IBM,IBM,Information Technology,,,start: before recorded history; end: current list
+ICE,Intercontinental Exchange,Financials,2007-09-26,,start: changes row 387; end: current list
+IDXX,Idexx Laboratories,Health Care,2017-01-05,,start: changes row 217; end: current list
+IEX,IDEX Corporation,Industrials,2019-08-09,,start: changes row 152; end: current list
+IFF,International Flavors & Fragrances,Materials,,,start: before recorded history; end: current list
+IGT,International Game Technology,,,2014-06-19,start: before recorded history; end: changes row 285
+ILMN,"Illumina, Inc.",Health Care,2015-11-19,2024-06-23,start: changes row 251; end: changes row 54
+ILMN,"Illumina, Inc.",Health Care,2026-09-21,,start: changes row 6; end: current list
+INCY,Incyte,Health Care,2017-02-28,,start: changes row 216; end: current list
+INFO,IHS Markit,,2017-06-02,2022-03-01,start: changes row 206; end: changes row 97
+INTC,Intel,Information Technology,,,start: before recorded history; end: current list
+INTU,Intuit,Information Technology,2000-12-05,,start: changes row 396; end: current list
+INVH,Invitation Homes,Real Estate,2022-09-19,,start: changes row 89; end: current list
+IP,International Paper,Materials,,,start: before recorded history; end: current list
+IPG,Interpublic Group,,,2025-11-27,start: before recorded history; end: changes row 26
+IPGP,IPG Photonics,,2018-03-07,2022-06-20,start: changes row 187; end: changes row 92
+IQV,IQVIA,Health Care,2017-11-15,,start: changes row 189; end: current list
+IR,Ingersoll Rand,Industrials,2020-03-02,,start: changes row 140; end: current list
+IRM,Iron Mountain,Real Estate,,,start: before recorded history; end: current list
+ISRG,Intuitive Surgical,Health Care,,,start: before recorded history; end: current list
+IT,Gartner,Information Technology,2017-04-05,,start: changes row 207; end: current list
+ITT,ITT,,,2011-10-30,start: before recorded history; end: changes row 337
+ITW,Illinois Tool Works,Industrials,,,start: before recorded history; end: current list
+IVZ,Invesco,Financials,,,start: before recorded history; end: current list
+J,Jacobs Solutions,Industrials,,,start: before recorded history; end: current list
+JBHT,J.B. Hunt,Industrials,2015-07-01,,start: changes row 265; end: current list
+JBL,Jabil Circuit,Information Technology,,2014-11-04,start: before recorded history; end: changes row 278
+JBL,Jabil,Information Technology,2023-12-18,,start: changes row 64; end: current list
+JCI,Johnson Controls,Industrials,,,start: before recorded history; end: current list
+JCP,JCPenney,,,2013-12-01,start: before recorded history; end: changes row 297
+JDSU,JDS Uniphase,,2000-07-27,2013-12-22,start: changes row 400; end: changes row 294
+JEF,Jefferies Financial Group,,,2019-09-25,start: before recorded history; end: changes row 149
+JKHY,Jack Henry & Associates,Financials,2018-11-13,,start: changes row 170; end: current list
+JNJ,Johnson & Johnson,Health Care,,,start: before recorded history; end: current list
+JNPR,Juniper Networks,,2006-06-02,2025-07-08,start: changes row 392; end: changes row 37
+JNS,Janus Capital Group,,,2011-11-17,start: before recorded history; end: changes row 336
+JNY,Jones Apparel Group,,,2009-03-02,start: before recorded history; end: changes row 372
+JOY,Joy Global,,,2015-10-06,start: before recorded history; end: changes row 254
+JPM,JPMorgan Chase,Financials,,,start: before recorded history; end: current list
+JWN,Nordstrom,,,2020-06-21,start: before recorded history; end: changes row 131
+K,Kellanova,,,2025-12-10,start: before recorded history; end: changes row 25
+KBH,KB Home,,,2009-12-17,start: before recorded history; end: changes row 362
+KDP,Keurig Dr Pepper,Consumer Staples,2022-06-21,,start: changes row 91; end: current list
+KEY,KeyCorp,Financials,,,start: before recorded history; end: current list
+KEYS,Keysight Technologies,Information Technology,2018-11-06,,start: changes row 171; end: current list
+KFT,Kraft Foods,,2007-03-30,2012-10-01,start: changes row 390; end: changes row 317
+KG,King Pharmaceuticals,,,2010-12-16,start: before recorded history; end: changes row 349
+KHC,Kraft Heinz,Consumer Staples,2015-07-06,,start: changes row 263; end: current list
+KIM,Kimco Realty,Real Estate,,,start: before recorded history; end: current list
+KKR,KKR & Co.,Financials,2024-06-24,,start: changes row 52; end: current list
+KLAC,KLA Corporation,Information Technology,,,start: before recorded history; end: current list
+KMB,Kimberly-Clark,Consumer Staples,,,start: before recorded history; end: current list
+KMI,Kinder Morgan,Energy,2012-05-17,,start: changes row 326; end: current list
+KMX,CarMax,,2010-06-28,2025-10-30,start: changes row 357; end: changes row 29
+KO,Coca-Cola Company (The),Consumer Staples,,,start: before recorded history; end: current list
+KR,Kroger,Consumer Staples,,,start: before recorded history; end: current list
+KRFT,Kraft Foods,,2012-10-02,2015-07-05,start: changes row 316; end: changes row 263
+KSE,KeySpan,,,2007-08-23,start: before recorded history; end: changes row 388
+KSS,Kohl's,,,2020-09-20,start: before recorded history; end: changes row 128
+KSU,Kansas City Southern,,2013-05-23,2021-12-13,start: changes row 307; end: changes row 105
+KVUE,Kenvue,Consumer Staples,2023-08-25,,start: changes row 72; end: current list
+L,Loews Corporation,Financials,,,start: before recorded history; end: current list
+LDOS,Leidos,Industrials,2019-08-09,,start: changes row 151; end: current list
+LDW,Laidlaw,,,1999-12-07,start: before recorded history; end: changes row 403
+LEG,Leggett & Platt,,,2021-12-19,start: before recorded history; end: changes row 101
+LEH,Lehman Brothers,,,2008-09-15,start: before recorded history; end: changes row 374
+LEN,Lennar,Consumer Discretionary,,,start: before recorded history; end: current list
+LH,Labcorp,Health Care,,,start: before recorded history; end: current list
+LHX,L3Harris,Industrials,,,start: before recorded history; end: current list
+LIFE,Life Technologies,,,2014-01-23,start: before recorded history; end: changes row 292
+LII,Lennox International,Industrials,2024-12-23,,start: changes row 45; end: current list
+LIN,Linde plc,Materials,,,start: before recorded history; end: current list
+LITE,Lumentum,Information Technology,2026-03-23,,start: changes row 18; end: current list
+LKQ,LKQ Corporation,,2016-05-23,2025-12-21,start: changes row 231; end: changes row 22
+LLL,L3 Technologies,,,2019-06-30,start: before recorded history; end: changes row 154
+LLTC,Linear Technology,,,2017-03-12,start: before recorded history; end: changes row 213
+LLY,Lilly (Eli),Health Care,,,start: before recorded history; end: current list
+LM,Legg Mason,,,2016-12-01,start: before recorded history; end: changes row 219
+LMT,Lockheed Martin,Industrials,,,start: before recorded history; end: current list
+LNC,Lincoln National Corporation,,,2023-09-17,start: before recorded history; end: changes row 70
+LNT,Alliant Energy,Utilities,2016-07-01,,start: changes row 226; end: current list
+LO,Lorillard Tobacco Company,,2008-06-10,2015-06-10,start: changes row 380; end: changes row 267
+LOW,Lowe's,Consumer Discretionary,,,start: before recorded history; end: current list
+LRCX,Lam Research,Information Technology,2012-06-05,,start: changes row 324; end: current list
+LSI,LSI Corporation,,,2014-05-07,start: before recorded history; end: changes row 286
+LULU,Lululemon Athletica,Consumer Discretionary,2023-10-18,,start: changes row 67; end: current list
+LUMN,Lumen Technologies,,,2023-03-19,start: before recorded history; end: changes row 75
+LUV,Southwest Airlines,Industrials,,,start: before recorded history; end: current list
+LVLT,Level 3 Communications,,2014-11-05,2017-10-12,start: changes row 278; end: changes row 190
+LVS,Las Vegas Sands,Consumer Discretionary,2019-10-03,,start: changes row 148; end: current list
+LW,Lamb Weston,,2018-12-03,2026-03-22,start: changes row 167; end: changes row 19
+LXK,Lexmark,,,2012-09-30,start: before recorded history; end: changes row 318
+LYB,LyondellBasell,Materials,2012-09-05,,start: changes row 320; end: current list
+LYV,Live Nation Entertainment,Communication Services,2019-12-23,,start: changes row 142; end: current list
+M,Macy's,,,2020-04-05,start: before recorded history; end: changes row 135
+MA,Mastercard,Financials,,,start: before recorded history; end: current list
+MAA,Mid-America Apartment Communities,Real Estate,2016-12-02,,start: changes row 218; end: current list
+MAC,Macerich,,2013-05-08,2019-12-22,start: changes row 308; end: changes row 144
+MAR,Marriott International,Consumer Discretionary,,,start: before recorded history; end: current list
+MAS,Masco,Industrials,,,start: before recorded history; end: current list
+MAT,Mattel,,,2019-06-06,start: before recorded history; end: changes row 156
+MBC,MasterBrand,,2022-12-15,2022-12-18,start: changes row 83; end: changes row 82
+MBI,MBIA,,,2009-12-17,start: before recorded history; end: changes row 364
+MCD,McDonald's,Consumer Discretionary,,,start: before recorded history; end: current list
+MCHP,Microchip Technology,Information Technology,,,start: before recorded history; end: current list
+MCK,McKesson,Health Care,,,start: before recorded history; end: current list
+MCO,Moody's Corporation,Financials,,,start: before recorded history; end: current list
+MDLZ,Mondelez International,Consumer Staples,2012-10-02,,start: changes row 317; end: current list
+MDP,Meredith Corp,,,2011-01-02,start: before recorded history; end: changes row 348
+MDT,Medtronic,Health Care,,,start: before recorded history; end: current list
+MEE,Massey Energy,,2008-06-23,2011-05-31,start: changes row 379; end: changes row 342
+MET,MetLife,Financials,,,start: before recorded history; end: current list
+META,Meta Platforms,Communication Services,,,start: before recorded history; end: current list
+MFE,McAfee,,,2011-02-27,start: before recorded history; end: changes row 346
+MGM,MGM Resorts,Consumer Discretionary,2017-07-26,,start: changes row 200; end: current list
+MHK,Mohawk Industries,,2013-12-23,2025-12-21,start: changes row 294; end: changes row 24
+MHS,Medco Health Solutions,,,2012-04-02,start: before recorded history; end: changes row 328
+MI,Marshall & Ilsley,,,2011-07-04,start: before recorded history; end: changes row 340
+MIL,Millipore,,,2010-07-13,start: before recorded history; end: changes row 355
+MJN,Mead Johnson,,2009-12-18,2017-06-18,start: changes row 361; end: changes row 205
+MKC,McCormick & Company,Consumer Staples,,,start: before recorded history; end: current list
+MKTX,MarketAxess,,2019-07-01,2025-09-21,start: changes row 154; end: changes row 33
+MLM,Martin Marietta Materials,Materials,2014-07-02,,start: changes row 283; end: current list
+MMI,Motorola Mobility,,2011-01-03,2012-05-20,start: changes row 348; end: changes row 325
+MMM,3M,Industrials,,,start: before recorded history; end: current list
+MNK,Mallinckrodt,,2014-08-18,2017-07-25,start: changes row 281; end: changes row 199
+MNST,Monster Beverage,Consumer Staples,2012-06-29,,start: changes row 323; end: current list
+MO,Altria,Consumer Staples,,,start: before recorded history; end: current list
+MOH,Molina Healthcare,,2022-03-02,2026-03-22,start: changes row 97; end: changes row 18
+MOLX,Molex,,,2013-12-09,start: before recorded history; end: changes row 296
+MON,Monsanto,,,2018-06-06,start: before recorded history; end: changes row 180
+MOS,Mosaic Company (The),Materials,2011-09-23,,start: changes row 339; end: current list
+MPC,Marathon Petroleum,Energy,2011-06-30,,start: changes row 341; end: current list
+MPWR,Monolithic Power Systems,Information Technology,2021-02-12,,start: changes row 119; end: current list
+MRK,Merck & Co.,Health Care,,,start: before recorded history; end: current list
+MRNA,Moderna,Health Care,2021-07-21,,start: changes row 110; end: current list
+MRO,Marathon Oil,,,2024-11-25,start: before recorded history; end: changes row 46
+MRSH,Marsh McLennan,Financials,,,start: before recorded history; end: current list
+MRVL,Marvell Technology,Information Technology,2026-06-22,,start: changes row 11; end: current list
+MS,Morgan Stanley,Financials,,,start: before recorded history; end: current list
+MSCI,MSCI,Financials,2018-04-04,,start: changes row 183; end: current list
+MSFT,Microsoft,Information Technology,,,start: before recorded history; end: current list
+MSI,Motorola Solutions,Information Technology,,,start: before recorded history; end: current list
+MTB,M&T Bank,Financials,,,start: before recorded history; end: current list
+MTCH,Match Group,,2021-09-20,2026-03-22,start: changes row 106; end: changes row 17
+MTD,Mettler Toledo,Health Care,2016-09-06,,start: changes row 224; end: current list
+MU,Micron Technology,Information Technology,,,start: before recorded history; end: current list
+MUR,Murphy Oil,,,2017-07-25,start: before recorded history; end: changes row 198
+MWW,Monster Worldwide,,,2011-12-15,start: before recorded history; end: changes row 333
+MXIM,Maxim Integrated Products,,,2007-09-26,start: before recorded history; end: changes row 386
+MXIM,Maxim Integrated,,2018-12-03,2021-08-29,start: changes row 168; end: changes row 109
+NAVI,Navient,,2014-05-01,2018-06-04,start: changes row 288; end: changes row 181
+NBL,Noble Energy,,,2020-10-11,start: before recorded history; end: changes row 123
+NBR,Nabors Industries,,,2015-03-22,start: before recorded history; end: changes row 271
+NCLH,Norwegian Cruise Line Holdings,Consumer Discretionary,2017-10-13,,start: changes row 190; end: current list
+NCR,NCR Corporation,,,2007-09-30,start: before recorded history; end: changes row 385
+NDAQ,"Nasdaq, Inc.",Financials,,,start: before recorded history; end: current list
+NDSN,Nordson Corporation,Industrials,2022-02-15,,start: changes row 98; end: current list
+NE,Noble Corporation,,,2015-07-19,start: before recorded history; end: changes row 261
+NEE,NextEra Energy,Utilities,,,start: before recorded history; end: current list
+NEM,Newmont,Materials,,,start: before recorded history; end: current list
+NFLX,Netflix,Communication Services,2010-12-17,,start: changes row 351; end: current list
+NFX,Newfield Exploration,,2010-12-17,2019-02-14,start: changes row 352; end: changes row 163
+NI,NiSource,Utilities,,,start: before recorded history; end: current list
+NKE,"Nike, Inc.",Consumer Discretionary,,,start: before recorded history; end: current list
+NKTR,Nektar Therapeutics,,2018-03-19,2019-10-02,start: changes row 186; end: changes row 148
+NLSN,Nielsen Holdings,,2013-07-08,2022-10-11,start: changes row 303; end: changes row 85
+NOC,Northrop Grumman,Industrials,,,start: before recorded history; end: current list
+NOV,Nov,,,2021-09-19,start: before recorded history; end: changes row 108
+NOVL,Novell,,,2011-04-26,start: before recorded history; end: changes row 343
+NOW,ServiceNow,Information Technology,2019-11-21,,start: changes row 147; end: current list
+NRG,NRG Energy,Utilities,,,start: before recorded history; end: current list
+NSC,Norfolk Southern,Industrials,,,start: before recorded history; end: current list
+NSM,National Semiconductor,,,2011-09-22,start: before recorded history; end: changes row 339
+NTAP,NetApp,Information Technology,,,start: before recorded history; end: current list
+NTRS,Northern Trust,Financials,,,start: before recorded history; end: current list
+NUE,Nucor,Materials,,,start: before recorded history; end: current list
+NVDA,Nvidia,Information Technology,,,start: before recorded history; end: current list
+NVLS,Novellus Systems,,,2012-06-04,start: before recorded history; end: changes row 324
+NVR,"NVR, Inc.",Consumer Discretionary,2019-09-26,,start: changes row 149; end: current list
+NWL,Newell Brands,,,2023-09-17,start: before recorded history; end: changes row 71
+NWS,News Corp (Class B),Communication Services,2015-09-18,,start: changes row 257; end: current list
+NWSA,News Corp (Class A),Communication Services,2013-07-01,,start: changes row 304; end: current list
+NXPI,NXP Semiconductors,Information Technology,2021-03-22,,start: changes row 115; end: current list
+NYT,The New York Times Company,,,2010-12-16,start: before recorded history; end: changes row 352
+NYX,NYSE Euronext,,,2013-11-12,start: before recorded history; end: changes row 298
+O,Realty Income,Real Estate,2015-04-07,,start: changes row 268; end: current list
+ODFL,Old Dominion,Industrials,2019-12-09,,start: changes row 145; end: current list
+ODP,Office Depot,,,2010-12-16,start: before recorded history; end: changes row 351
+OGN,Organon & Co.,,2021-06-03,2023-10-17,start: changes row 112; end: changes row 66
+OI,Owens-Illinois,,,2000-12-04,start: before recorded history; end: changes row 397
+OI,Owens-Illinois,,2008-12-31,2016-12-01,start: changes row 373; end: changes row 218
+OKE,Oneok,Energy,,,start: before recorded history; end: current list
+OMC,Omnicom Group,Communication Services,,,start: before recorded history; end: current list
+OMX,OfficeMax,,,2008-06-22,start: before recorded history; end: changes row 379
+ON,ON Semiconductor,Information Technology,2022-06-21,,start: changes row 92; end: current list
+ORCL,Oracle Corporation,Information Technology,,,start: before recorded history; end: current list
+ORLY,O'Reilly Automotive,Consumer Discretionary,,,start: before recorded history; end: current list
+OTIS,Otis Worldwide,Industrials,2020-04-03,,start: changes row 137; end: current list
+OXY,Occidental Petroleum,Energy,,,start: before recorded history; end: current list
+P,Everpure,Information Technology,2026-09-21,,start: changes row 5; end: current list
+PANW,Palo Alto Networks,Information Technology,2023-06-20,,start: changes row 73; end: current list
+PAYC,Paycom,,2020-01-28,2026-03-22,start: changes row 141; end: changes row 20
+PAYX,Paychex,Industrials,,,start: before recorded history; end: current list
+PBCT,People's United Financial,,,2022-04-03,start: before recorded history; end: changes row 96
+PBI,Pitney Bowes,,,2017-02-28,start: before recorded history; end: changes row 215
+PCAR,Paccar,Industrials,,,start: before recorded history; end: current list
+PCG,Pacific Gas & Electric Company,Utilities,,2019-01-17,start: before recorded history; end: changes row 164
+PCG,PG&E Corporation,Utilities,2022-10-03,,start: changes row 86; end: current list
+PCL,Plum Creek Timber,,,2016-02-21,start: before recorded history; end: changes row 243
+PCP,Precision Castparts Corporation,,,2016-01-31,start: before recorded history; end: changes row 244
+PCS,MetroPCS,,2009-06-29,2013-04-29,start: changes row 368; end: changes row 309
+PDCO,Patterson Companies,,,2018-03-18,start: before recorded history; end: changes row 185
+PEG,Public Service Enterprise Group,Utilities,,,start: before recorded history; end: current list
+PENN,Penn Entertainment,,2021-03-22,2022-09-18,start: changes row 116; end: changes row 89
+PEP,PepsiCo,Consumer Staples,,,start: before recorded history; end: current list
+PETM,PetSmart,,2012-10-10,2015-03-11,start: changes row 315; end: changes row 274
+PFE,Pfizer,Health Care,,,start: before recorded history; end: current list
+PFG,Principal Financial Group,Financials,,,start: before recorded history; end: current list
+PG,Procter & Gamble,Consumer Staples,,,start: before recorded history; end: current list
+PGN,Progress Energy,,,2012-07-01,start: before recorded history; end: changes row 322
+PGR,Progressive Corporation,Financials,,,start: before recorded history; end: current list
+PH,Parker Hannifin,Industrials,,,start: before recorded history; end: current list
+PHM,PulteGroup,Consumer Discretionary,,,start: before recorded history; end: current list
+PKG,Packaging Corporation of America,Materials,2017-07-26,,start: changes row 198; end: current list
+PLD,Prologis,Real Estate,,,start: before recorded history; end: current list
+PLL,Pall Corporation,,,2015-08-27,start: before recorded history; end: changes row 259
+PLTR,Palantir Technologies,Information Technology,2024-09-23,,start: changes row 49; end: current list
+PM,Philip Morris International,Consumer Staples,,,start: before recorded history; end: current list
+PNC,PNC Financial Services,Financials,,,start: before recorded history; end: current list
+PNR,Pentair,Industrials,2012-10-01,,start: changes row 319; end: current list
+PNW,Pinnacle West Capital,Utilities,,,start: before recorded history; end: current list
+PODD,Insulet Corporation,Health Care,2023-03-15,,start: changes row 77; end: current list
+POM,Pepco Holdings,,,2016-03-29,start: before recorded history; end: changes row 239
+POOL,Pool Corporation,,2020-10-07,2026-06-21,start: changes row 125; end: changes row 11
+PPG,PPG Industries,Materials,,,start: before recorded history; end: current list
+PPL,PPL Corporation,Utilities,,,start: before recorded history; end: current list
+PRGO,Perrigo,,2011-12-16,2021-09-19,start: changes row 333; end: changes row 106
+PRU,Prudential Financial,Financials,,,start: before recorded history; end: current list
+PSA,Public Storage,Real Estate,,,start: before recorded history; end: current list
+PSX,Phillips 66,Energy,2012-04-23,,start: changes row 327; end: current list
+PTC,PTC Inc.,Information Technology,2021-04-20,,start: changes row 114; end: current list
+PTV,Pactiv,,,2010-11-16,start: before recorded history; end: changes row 353
+PVH,PVH,,2013-02-15,2022-09-18,start: changes row 310; end: changes row 88
+PWR,Quanta Services,Industrials,,,start: before recorded history; end: current list
+PXD,Pioneer Natural Resources,,,2024-05-07,start: before recorded history; end: changes row 55
+PYPL,PayPal,Financials,2015-07-20,,start: changes row 261; end: current list
+Q,Qwest Communications,Information Technology,,2011-03-30,start: before recorded history; end: changes row 345
+Q,QuintilesIMS,Information Technology,2017-08-29,2017-11-14,start: changes row 194; end: changes row 189
+Q,Qnity Electronics,Information Technology,2025-11-03,,start: changes row 28; end: current list
+QCOM,Qualcomm,Information Technology,,,start: before recorded history; end: current list
+QEP,QEP Resources,,2010-06-30,2015-06-30,start: changes row 356; end: changes row 266
+QRVO,Qorvo,,2015-06-11,2024-12-22,start: changes row 267; end: changes row 43
+QTRN,Quintiles Transnational,,,2003-09-24,start: before recorded history; end: changes row 395
+R,Ryder System,,,2017-06-18,start: before recorded history; end: changes row 204
+RAD,Rite Aid,,,2000-07-26,start: before recorded history; end: changes row 400
+RAI,Reynolds American,,,2017-07-25,start: before recorded history; end: changes row 200
+RCL,Royal Caribbean Group,Consumer Discretionary,2014-12-05,,start: changes row 277; end: current list
+RDC,Rowan Companies,,,2014-08-17,start: before recorded history; end: changes row 281
+RDDT,Reddit,Communication Services,2026-08-18,,start: changes row 7; end: current list
+REG,Regency Centers,Real Estate,2017-03-02,,start: changes row 214; end: current list
+REGN,Regeneron Pharmaceuticals,Health Care,2013-04-30,,start: changes row 309; end: current list
+RF,Regions Financial Corporation,Financials,,,start: before recorded history; end: current list
+RHI,Robert Half,,,2024-06-23,start: before recorded history; end: changes row 52
+RHT,Red Hat,,,2019-07-14,start: before recorded history; end: changes row 153
+RIG,Transocean,,2013-10-29,2017-07-25,start: changes row 299; end: changes row 196
+RJF,Raymond James Financial,Financials,2017-03-20,,start: changes row 210; end: current list
+RL,Ralph Lauren Corporation,Consumer Discretionary,,,start: before recorded history; end: current list
+RMD,ResMed,Health Care,2017-07-26,,start: changes row 199; end: current list
+ROK,Rockwell Automation,Industrials,,,start: before recorded history; end: current list
+ROL,"Rollins, Inc.",Industrials,2018-10-01,,start: changes row 173; end: current list
+ROP,Roper Technologies,Information Technology,,,start: before recorded history; end: current list
+ROST,Ross Stores,Consumer Discretionary,2009-12-18,,start: changes row 364; end: current list
+RRC,Range Resources,,2007-12-20,2018-06-17,start: changes row 381; end: changes row 178
+RRD,RR Donnelley,,,2012-12-10,start: before recorded history; end: changes row 313
+RSG,Republic Services,Industrials,,,start: before recorded history; end: current list
+RSH,RadioShack,,,2011-06-29,start: before recorded history; end: changes row 341
+RTN,Raytheon Company,,,2020-04-05,start: before recorded history; end: changes row 136
+RTX,RTX Corporation,Industrials,,,start: before recorded history; end: current list
+RVTY,Revvity,Health Care,,,start: before recorded history; end: current list
+RX,IMS Health,,,2010-02-25,start: before recorded history; end: changes row 359
+S,Sprint Nextel,,,2013-07-07,start: before recorded history; end: changes row 303
+SAI,SAIC,,2009-12-18,2013-09-19,start: changes row 363; end: changes row 301
+SBAC,SBA Communications,Real Estate,2017-09-01,,start: changes row 193; end: current list
+SBL,Symbol Technologies,,2000-12-05,2007-01-09,start: changes row 397; end: changes row 391
+SBNY,Signature Bank,,2021-12-20,2023-03-14,start: changes row 101; end: changes row 76
+SBUX,Starbucks,Consumer Discretionary,2000-06-07,,start: changes row 402; end: current list
+SCG,SCANA,,,2019-01-01,start: before recorded history; end: changes row 165
+SCHW,Charles Schwab Corporation,Financials,,,start: before recorded history; end: current list
+SE,Spectra Energy,,,2017-02-27,start: before recorded history; end: changes row 216
+SEDG,SolarEdge,,2021-12-20,2023-12-17,start: changes row 103; end: changes row 65
+SEE,Sealed Air,,,2023-12-17,start: before recorded history; end: changes row 63
+SGP,Schering-Plough,,,2009-11-02,start: before recorded history; end: changes row 365
+SHLD,Sears Holdings,,,2012-09-04,start: before recorded history; end: changes row 320
+SHW,Sherwin-Williams,Materials,,,start: before recorded history; end: current list
+SIAL,Sigma-Aldrich,,,2015-11-18,start: before recorded history; end: changes row 251
+SIG,Signet Jewelers,,2015-07-29,2018-03-18,start: changes row 260; end: changes row 184
+SII,Smith International,,,2010-08-25,start: before recorded history; end: changes row 354
+SIVB,SVB Financial Group,,2018-03-19,2023-03-14,start: changes row 185; end: changes row 77
+SJM,J.M. Smucker Company (The),Consumer Staples,,,start: before recorded history; end: current list
+SKYD,Skydance,Communication Services,,,start: before recorded history; end: current list
+SLB,Schlumberger,Energy,,,start: before recorded history; end: current list
+SLE,Sara Lee Corporation,,,2012-06-28,start: before recorded history; end: changes row 323
+SLG,SL Green Realty,,2015-03-23,2021-03-21,start: changes row 271; end: changes row 116
+SLM,SLM Corporation,,,2014-04-30,start: before recorded history; end: changes row 288
+SLR,Solectron,,,2007-10-01,start: before recorded history; end: changes row 384
+SMCI,Supermicro,Information Technology,2024-03-18,,start: changes row 60; end: current list
+SMS,Shared Medical Systems,,,2000-06-06,start: before recorded history; end: changes row 402
+SNA,Snap-on,Industrials,,,start: before recorded history; end: current list
+SNDK,SanDisk,Information Technology,,2016-05-12,start: before recorded history; end: changes row 233
+SNDK,Sandisk,Information Technology,2025-11-28,,start: changes row 26; end: current list
+SNI,Scripps Networks Interactive,,,2018-03-06,start: before recorded history; end: changes row 187
+SNPS,Synopsys,Information Technology,2017-03-16,,start: changes row 212; end: current list
+SO,Southern Company,Utilities,,,start: before recorded history; end: current list
+SOLS,Solstice Advanced Materials,,2025-10-30,2025-12-21,start: changes row 30; end: changes row 23
+SOLV,Solventum,Health Care,2024-04-01,,start: changes row 59; end: current list
+SPG,Simon Property Group,Real Estate,,,start: before recorded history; end: current list
+SPGI,S&P Global,Financials,,,start: before recorded history; end: current list
+SPLS,Staples,,,2017-09-17,start: before recorded history; end: changes row 191
+SRCL,Stericycle,,,2018-12-02,start: before recorded history; end: changes row 169
+SRE,Sempra,Utilities,,,start: before recorded history; end: current list
+STE,Steris,Health Care,2019-12-23,,start: changes row 144; end: current list
+STI,SunTrust Banks,,,2019-12-08,start: before recorded history; end: changes row 145
+STJ,St Jude Medical,,,2017-01-04,start: before recorded history; end: changes row 217
+STLD,Steel Dynamics,Materials,2022-12-22,,start: changes row 80; end: current list
+STR,Questar,,,2010-06-29,start: before recorded history; end: changes row 356
+STT,State Street Corporation,Financials,,,start: before recorded history; end: current list
+STX,Seagate Technology,Information Technology,2012-07-02,,start: changes row 322; end: current list
+STZ,Constellation Brands,Consumer Staples,2005-07-01,,start: changes row 394; end: current list
+SUN,Sunoco,,,2012-10-09,start: before recorded history; end: changes row 315
+SVU,Supervalu,,,2012-04-22,start: before recorded history; end: changes row 327
+SW,Smurfit Westrock,Materials,,,start: before recorded history; end: current list
+SWK,Stanley Black & Decker,Industrials,,,start: before recorded history; end: current list
+SWKS,Skyworks Solutions,Information Technology,2015-03-12,,start: changes row 274; end: current list
+SWN,Southwestern Energy,,,2017-04-03,start: before recorded history; end: changes row 208
+SWY,Safeway,,,2015-01-26,start: before recorded history; end: changes row 275
+SYF,Synchrony Financial,Financials,2015-11-18,,start: changes row 252; end: current list
+SYK,Stryker Corporation,Health Care,,,start: before recorded history; end: current list
+SYY,Sysco,Consumer Staples,,,start: before recorded history; end: current list
+T,AT&T,Communication Services,,,start: before recorded history; end: current list
+TAP,Molson Coors,,,2026-09-20,start: before recorded history; end: changes row 4
+TDC,Teradata,,2007-10-01,2017-06-18,start: changes row 385; end: changes row 203
+TDG,TransDigm Group,Industrials,2016-06-03,,start: changes row 229; end: current list
+TDY,Teledyne Technologies,Information Technology,2020-06-22,,start: changes row 130; end: current list
+TE,TECO Energy,,,2016-06-30,start: before recorded history; end: changes row 227
+TECH,Bio-Techne,Health Care,2021-08-30,,start: changes row 109; end: current list
+TEG,Integrys Energy Group,,,2015-06-30,start: before recorded history; end: changes row 265
+TEL,TE Connectivity,Information Technology,,2009-06-24,start: before recorded history; end: changes row 369
+TEL,TE Connectivity,Information Technology,2011-10-14,,start: changes row 338; end: current list
+TER,Teradyne,Information Technology,,2013-12-22,start: before recorded history; end: changes row 295
+TER,Teradyne,Information Technology,2020-09-21,,start: changes row 127; end: current list
+TFC,Truist Financial,Financials,,,start: before recorded history; end: current list
+TFX,Teleflex,,2019-01-18,2025-03-23,start: changes row 164; end: changes row 40
+TGNA,Tegna,,,2017-06-01,start: before recorded history; end: changes row 206
+TGT,Target Corporation,Consumer Staples,,,start: before recorded history; end: current list
+THC,Tenet Healthcare,,,2016-04-17,start: before recorded history; end: changes row 236
+TIE,Titanium Metals,,,2012-12-20,start: before recorded history; end: changes row 312
+TIF,Tiffany & Co,,,2021-01-06,start: before recorded history; end: changes row 121
+TJX,TJX Companies,Consumer Discretionary,,,start: before recorded history; end: current list
+TKO,TKO Group Holdings,Communication Services,2025-03-24,,start: changes row 40; end: current list
+TLAB,Tellabs,,,2011-12-19,start: before recorded history; end: changes row 331
+TMC,Times Mirror,,,2000-06-11,start: before recorded history; end: changes row 401
+TMO,Thermo Fisher Scientific,Health Care,,,start: before recorded history; end: current list
+TMUS,T-Mobile US,Communication Services,2019-07-15,,start: changes row 153; end: current list
+TPL,Texas Pacific Land Corporation,Energy,2024-11-26,,start: changes row 46; end: current list
+TPR,"Tapestry, Inc.",Consumer Discretionary,,,start: before recorded history; end: current list
+TRB,Tribune Media,,,2007-12-19,start: before recorded history; end: changes row 381
+TRGP,Targa Resources,Energy,2022-10-12,,start: changes row 85; end: current list
+TRIP,TripAdvisor,,2011-12-20,2019-12-22,start: changes row 331; end: changes row 143
+TRMB,Trimble Inc.,Information Technology,2021-01-21,,start: changes row 120; end: current list
+TROW,T. Rowe Price,Financials,,,start: before recorded history; end: current list
+TRV,Travelers Companies (The),Financials,,,start: before recorded history; end: current list
+TSCO,Tractor Supply,Consumer Discretionary,2014-01-24,,start: changes row 292; end: current list
+TSG,Sabre Corporation,,,2007-03-29,start: before recorded history; end: changes row 390
+TSLA,"Tesla, Inc.",Consumer Discretionary,2020-12-21,,start: changes row 122; end: current list
+TSN,Tyson Foods,Consumer Staples,,,start: before recorded history; end: current list
+TSS,TSYS,,,2019-09-22,start: before recorded history; end: changes row 150
+TT,Trane Technologies,Industrials,,,start: before recorded history; end: current list
+TTD,The Trade Desk,,2025-07-18,2026-09-20,start: changes row 36; end: changes row 5
+TTWO,Take-Two Interactive,Communication Services,2018-03-19,,start: changes row 184; end: current list
+TWC,Time Warner Cable,,,2016-05-17,start: before recorded history; end: changes row 232
+TWLO,Twilio,Information Technology,2026-10-06,,start: changes row 1; end: current list
+TWTR,Twitter,,2018-06-07,2022-10-31,start: changes row 180; end: changes row 84
+TWX,Time Warner,,,2018-06-19,start: before recorded history; end: changes row 177
+TXN,Texas Instruments,Information Technology,,,start: before recorded history; end: current list
+TXT,Textron,Industrials,,,start: before recorded history; end: current list
+TYC,Tyco International,,2010-08-26,2016-09-05,start: changes row 354; end: changes row 224
+TYL,Tyler Technologies,Information Technology,2020-06-22,,start: changes row 131; end: current list
+UA,Under Armour (Class C),,2016-04-08,2022-06-20,start: changes row 237; end: changes row 90
+UAA,Under Armour (Class A),,,2022-06-20,start: before recorded history; end: changes row 91
+UAL,United Airlines Holdings,Industrials,2015-09-02,,start: changes row 258; end: current list
+UBER,Uber,Industrials,2023-12-18,,start: changes row 63; end: current list
+UDR,"UDR, Inc.",Real Estate,2016-03-07,,start: changes row 241; end: current list
+UHS,Universal Health Services,Health Care,2014-09-20,,start: changes row 280; end: current list
+ULTA,Ulta Beauty,Consumer Discretionary,2016-04-18,,start: changes row 236; end: current list
+UNH,UnitedHealth Group,Health Care,,,start: before recorded history; end: current list
+UNM,Unum,,,2021-09-19,start: before recorded history; end: changes row 107
+UNP,Union Pacific Corporation,Industrials,,,start: before recorded history; end: current list
+UPS,United Parcel Service,Industrials,,,start: before recorded history; end: current list
+URBN,Urban Outfitters,,,2017-03-19,start: before recorded history; end: changes row 209
+URI,United Rentals,Industrials,2014-09-20,,start: changes row 279; end: current list
+USB,U.S. Bancorp,Financials,,,start: before recorded history; end: current list
+USL,USLife,,,1997-06-16,start: before recorded history; end: changes row 409
+V,Visa Inc.,Financials,2009-12-18,,start: changes row 360; end: current list
+VAR,Varian Medical Systems,,,2021-04-19,start: before recorded history; end: changes row 114
+VEEV,Veeva Systems,Health Care,2026-05-07,,start: changes row 15; end: current list
+VFC,VF Corporation,,,2024-04-02,start: before recorded history; end: changes row 57
+VIAB,Viacom,,,2019-12-04,start: before recorded history; end: changes row 146
+VICI,Vici Properties,Real Estate,2022-06-08,,start: changes row 93; end: current list
+VLO,Valero Energy,Energy,,,start: before recorded history; end: current list
+VLTO,Veralto,Industrials,2023-10-02,,start: changes row 69; end: current list
+VMC,Vulcan Materials Company,Materials,,,start: before recorded history; end: current list
+VMRK,Vivmark Residential,Real Estate,,,start: before recorded history; end: current list
+VNO,Vornado Realty Trust,,,2023-01-04,start: before recorded history; end: changes row 78
+VNT,Vontier,,2020-10-09,2021-03-21,start: changes row 124; end: changes row 118
+VRSK,Verisk Analytics,Industrials,2015-10-07,,start: changes row 254; end: current list
+VRSN,Verisign,Information Technology,,,start: before recorded history; end: current list
+VRT,Vertiv,Industrials,2026-03-23,,start: changes row 17; end: current list
+VRTX,Vertex Pharmaceuticals,Health Care,2013-09-20,,start: changes row 300; end: current list
+VST,Vistra Corp.,Utilities,2024-05-08,,start: changes row 55; end: current list
+VTR,Ventas,Real Estate,2009-03-03,,start: changes row 372; end: current list
+VTRS,Viatris,Health Care,,,start: before recorded history; end: current list
+VYLR,Vylor,Consumer Staples,2026-10-01,,start: changes row 3; end: current list
+VZ,Verizon,Communication Services,,,start: before recorded history; end: current list
+WAB,Wabtec,Industrials,2019-02-27,,start: changes row 162; end: current list
+WAT,Waters Corporation,Health Care,,,start: before recorded history; end: current list
+WB,Wachovia Bank,,,2008-12-30,start: before recorded history; end: changes row 373
+WBA,Walgreens Boots Alliance,,,2025-08-27,start: before recorded history; end: changes row 34
+WBD,Warner Bros. Discovery,,2022-04-11,2026-10-05,start: changes row 94; end: changes row 1
+WCG,WellCare,,2018-09-14,2020-01-27,start: changes row 174; end: changes row 141
+WDAY,"Workday, Inc.",Information Technology,2024-12-23,,start: changes row 44; end: current list
+WDC,Western Digital,Information Technology,,,start: before recorded history; end: current list
+WEC,WEC Energy Group,Utilities,,,start: before recorded history; end: current list
+WELL,Welltower,Real Estate,,,start: before recorded history; end: current list
+WFC,Wells Fargo,Financials,,,start: before recorded history; end: current list
+WFM,Whole Foods Market,,,2017-08-28,start: before recorded history; end: changes row 194
+WFR,MEMC Electronic Materials,,,2011-12-15,start: before recorded history; end: changes row 334
+WHR,Whirlpool Corporation,,,2024-03-17,start: before recorded history; end: changes row 60
+WIN,Windstream Communications,,,2015-04-06,start: before recorded history; end: changes row 268
+WLTW,Willis Towers Watson,,2016-01-05,2022-01-09,start: changes row 247; end: changes row 102
+WM,Waste Management,Industrials,,,start: before recorded history; end: current list
+WMB,Williams Companies,Energy,,,start: before recorded history; end: current list
+WMT,Walmart,Consumer Staples,,,start: before recorded history; end: current list
+WPX,WPX Energy,,2011-12-31,2014-03-20,start: changes row 330; end: changes row 291
+WRB,W. R. Berkley Corporation,Financials,2019-12-05,,start: changes row 146; end: current list
+WSM,"Williams-Sonoma, Inc.",Consumer Discretionary,2025-03-24,,start: changes row 41; end: current list
+WST,West Pharmaceutical Services,Health Care,2020-05-22,,start: changes row 132; end: current list
+WTW,Willis Towers Watson,Financials,2022-01-10,,start: changes row 102; end: current list
+WU,Western Union,,,2021-12-19,start: before recorded history; end: changes row 104
+WY,Weyerhaeuser,Real Estate,,,start: before recorded history; end: current list
+WYN,Wyndham Worldwide,,,2018-05-30,start: before recorded history; end: changes row 182
+WYNN,Wynn Resorts,Consumer Discretionary,,,start: before recorded history; end: current list
+X,United States Steel,,,2014-07-01,start: before recorded history; end: changes row 283
+XEC,Cimarex Energy,,2014-06-20,2020-03-01,start: changes row 285; end: changes row 140
+XEL,Xcel Energy,Utilities,,,start: before recorded history; end: current list
+XL,XL Group,,,2018-09-13,start: before recorded history; end: changes row 174
+XLNX,Xilinx,,,2022-02-14,start: before recorded history; end: changes row 98
+XOM,ExxonMobil,Energy,,,start: before recorded history; end: current list
+XRAY,Dentsply Sirona,,,2024-04-02,start: before recorded history; end: changes row 56
+XRX,Xerox,,,2021-03-21,start: before recorded history; end: changes row 117
+XTO,XTO Energy,,,2010-06-27,start: before recorded history; end: changes row 357
+XYL,Xylem Inc.,Industrials,2011-10-31,,start: changes row 337; end: current list
+XYZ,"Block, Inc.",Financials,2025-07-23,,start: changes row 35; end: current list
+YHOO,Yahoo!,,1999-12-08,2017-06-18,start: changes row 403; end: changes row 202
+YUM,Yum! Brands,Consumer Discretionary,,,start: before recorded history; end: current list
+ZBH,Zimmer Biomet,Health Care,,,start: before recorded history; end: current list
+ZBRA,Zebra Technologies,Information Technology,2019-12-23,,start: changes row 143; end: current list
+ZION,Zions Bancorporation,,,2024-03-17,start: before recorded history; end: changes row 61
+ZTS,Zoetis,Health Care,2013-06-21,,start: changes row 305; end: current list
