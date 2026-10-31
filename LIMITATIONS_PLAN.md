@@ -326,3 +326,45 @@ For each signal and each period, computed from the monthly cross-section of usab
 
 ### Deliverables
 New code in src/ (signal evaluation functions with unit tests using hand-made inputs) and new scripts at the repository root in the existing naming style, resumable where they download, plus the output files above. No README, HTML or LIMITATIONS_PLAN.md edits by Claude Code. Ronaldo commits. The dashboard is rebuilt around these results only after they exist.
+
+## Amendment 8 (2026-10-31, before any Phase 4 result existed and before the split check was written or run)
+
+Checks made while planning the Phase 4 code showed that the price-to-book ratio used by Value divides Yahoo's adjusted close, which is rewritten backwards for every later stock split and dividend, by book value per share as filed, which stays on the share count in force when it was filed. For a stock that splits after the filing, P/B is too low by the split ratio, so the stock looks cheap in the months before the split. This is a defect in how the frozen definition (negative P/B) was implemented and not a change of definition, in the same way as the timing correction recorded in OUT_OF_SAMPLE_PLAN.md, Amendment 1. Phase 3 is not affected, because it only counted whether data existed. Momentum is not affected, because it uses price ratios only.
+
+### What the planning checks found (no return and no strategy result was computed)
+- Splits and similar events since 2019 among the 17 study stocks, from yfinance: AAPL 4-for-1 on 2020-08-31, NEE 4-for-1 on 2020-10-27, RTX 1.589 on 2020-04-03 (a merger and spin-off effect, not an ordinary split), WMT 3-for-1 on 2024-02-26.
+- Effect on the published study: WMT shows a P/B about three times too low from January 2021 to March 2024, and was held by Value in 39 of the 48 in-sample months. NEE is affected in January and February 2021 only. AAPL and RTX are not affected, because the first filing after each event came after the 180-day limit or after the event.
+- The published Value and Combined results may therefore be affected. This has not been measured at the time of this amendment.
+- Using adjusted close also lowers older prices by later dividends, which shifts P/B for every dividend payer, including in the out-of-sample months. This is a second, smaller source of the same inconsistency.
+- HD's book value per share moves by up to 5.5 times in a month without any split, because its book equity is small. The fix below does not address this, and HD remains a known distortion for Value.
+
+### Split sensitivity on the 17 study stocks (a labelled sensitivity)
+- New script run_value_split_check.py and new tested functions in src/split_adjust.py. Split dates are downloaded once from yfinance and cached. No existing file or function is changed.
+- Restatement rule: each filed book value record is divided by the product of all splits dated after its filing date (not after its period end), and the existing 180-day forward fill is then applied unchanged. Price and book value are then on the same share basis, so the split ratio cancels and no information from after the date is used. Events reported by yfinance are applied mechanically and listed, including the RTX event.
+- Three versions of Value and Combined are reported side by side, in sample and out of sample, using the same top 5, monthly rebalancing, 10 bps costs and flat 2% rate as the published study: (1) published, as computed now; (2) restated book value with the adjusted close, which isolates the effect of splits; (3) restated book value with the split-adjusted close that is not adjusted for dividends, which also removes the dividend effect. All three are reported whatever the result.
+- Outputs, all new files: results/value_split_summary.csv, value_split_monthly_returns.csv, value_split_holdings.csv (both sets of top 5 each month, with a changed flag), value_split_pb.csv and value_split_events.csv.
+- The script stops without writing if: the published series rebuilt from the database differs from results/strategy_comparison_full_period.csv or results/oos_summary.csv by more than 1e-9; as-filed book value from the cached SEC facts, forward filled, differs from the book_value table by more than 1e-6 for any of the 17; or any stock without an event has a restated book value different from the as-filed one.
+- Scope: the published figures and the pre-registered out-of-sample test stand unchanged. Whether the published figures are corrected is decided after the result is seen and is recorded in its own dated entry before any rerun of the published pipeline.
+
+### Consequences for Phase 4
+1. Value and Combined in Phase 4 use the split-consistent definition (version 3 above) for every stock in the universe. Phase 4 never reports a Value or Combined result computed with the unrestated definition as evidence.
+2. Before Phase 4 uses the filing-date rule on the wider universe, it is checked on every stock with a split in the universe. A restated book value series that still moves by more than a factor of 2 in a month, with or without a split, is listed in an output file and reported. Such names are not excluded and no threshold is tuned.
+3. Reproduction gate 1 of the Phase 4 entry is run with the published (unrestated) definition on the 17 stocks, because it tests that the pipeline reproduces the published code. Its result is not reported as evidence.
+
+### Tolerances (these were not fixed in the Phase 4 entry)
+- Gate 2: for each of the 17 stocks, the ratio of the cached price to the existing prices table is constant within 1e-5 across the overlapping months, and all level differences are printed. A constant level difference is expected from dividend adjustment between downloads.
+- Gate 1: each gross Sharpe ratio is within 1e-4 of the published figure.
+
+### Readings of points the Phase 4 entry left open
+1. Timing: a score row dated t already uses data only through the end of t-1, and is paired with the return dated t. No extra lag is added.
+2. Month-end prices are prices on the last trading day of the month only.
+3. Combined: Momentum is restricted to names usable for Momentum and Value to names usable for Value before calculate_combined_score is called, as in the published treatment.
+4. Quintiles and deciles: names are assigned using all usable names at t-1, before any return is looked at, by average rank and the rule ceil(rank x q / N), so tied names share a group. Deciles use q = 10.
+5. A held name with no return in month t is dropped, and the month's portfolio return is the mean of the remaining holdings. Turnover uses the target weights.
+6. Benchmark: because the usable sets differ, there are two equal-weight benchmarks. Momentum is compared with its own usable universe, Value and Combined with theirs.
+7. Costs: every net figure is reported on both turnover bases of Amendment 2.
+8. Periods: one continuous run from January 2012, sliced afterwards. January 2021 is a rebalance and not a purchase from cash.
+9. The annualised spread is the mean monthly spread times 12, as in Amendment 3. Intervals use 5,000 resamples and seed 42.
+10. Fama-MacBeth: signals are standardised across all usable names at t-1, then an ordinary least squares regression with an intercept is run on the names that have a return. The two-signal version uses names with both signals, standardised over that joint set. Raw P/B is not winsorised, because the definition is frozen.
+11. Every output file carries a universe_note column stating that the universe consists of names with available data and is affected by survivorship.
+- Additions: SPY for 2012 to 2020 is downloaded once to a separate reference folder and checked against the saved 2021 to 2026 series. A new function bootstrap_sharpe_diff_tbill is added to src/risk.py for paired Sharpe differences with a Treasury bill rate, resampling the same months for strategy, benchmark and bill rate. No existing function changes.
