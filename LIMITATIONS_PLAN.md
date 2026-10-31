@@ -254,3 +254,75 @@ The Phase 3 implementation plan showed several points of the registered design t
 The first run of run_universe_membership.py stopped when it parsed the cached Wikipedia page, before any table was written to the database and before any gate preview had been printed. The cause is that Wikipedia no longer carries the table of changes on the page "List of S&P 500 companies". It now sits on the page "Historical components of the S&P 500". The table has the same id (changes), the same columns (Effective Date, Added with Ticker and Security, Removed with Ticker and Security, Reason, Refs) and the same date format as before. At the time of writing it lists 348 changes dated 2011 or later.
 
 Both pages are Wikipedia, so the registered source is unchanged in kind. This amendment changes where the second table is read from. Current constituents and their GICS sector still come from "List of S&P 500 companies". The table of changes comes from "Historical components of the S&P 500". Both pages are cached on first retrieval and the cached files are what the code reads. The cached copy of the second page was saved on 2026-10-28 with Invoke-WebRequest and the same User-Agent as the rest of the project. No other part of the Phase 3 design, Amendment 6 or the decision rules is changed.
+
+## Phase 4 detailed design: signal and portfolio tests on the rebuilt S&P 500 universe (2026-10-31, before any Phase 4 code was written or run)
+
+This entry replaces the Phase 4 outline above. It uses the coverage measured in Phase 3, which found at least 300 names usable for Value and Combined in every month from January 2012 to August 2026, and found every calendar year impaired by survivorship. This design is therefore built around what free data can and cannot support.
+
+### Question and hypothesis
+- Question: do the three signals of the published study (Momentum 12-1, Value as negative P/B, and Combined), with their definitions unchanged, show a measurable relationship with next-month returns across roughly 300 to 500 large US stocks over 2012 to 2026, and do portfolios built from them differ from an equal-weight benchmark of the same stocks?
+- The signal-level tests are the primary evidence. The portfolio tests are secondary, because a portfolio result depends on more assumptions than a signal result does.
+- Hypothesis recorded in advance: Momentum shows a small positive information coefficient. Value, as measured by P/B, may show a weak or negative one over 2012 to 2020, a period in which cheap-on-book stocks lagged. Combined lies between the two. Any of these could fail, and a failure is reported as found.
+
+### Hard constraints
+- Free data only. No paid source is used in this phase.
+- Survivorship bias is reduced and not removed. Companies that were acquired or went bankrupt mostly have no price history on Yahoo Finance (Phase 3: the share of members with usable data is 26% for removed names against 85% for names that stayed in 2012). The universe in every month therefore consists of the names that have data. This is stated on every output.
+- The direction of the bias is not known in advance. Portfolios and benchmark are both drawn from the same surviving names, so their difference is less affected than their levels. Absolute returns and Sharpe levels are not read as evidence of performance.
+- No signal definition, lookback, weighting, rebalancing rule or cost assumption of the published study is changed. Any change needs its own pre-registration.
+
+### Universe and data
+- Evaluation months: January 2012 to August 2026 (176 months), the window found in Phase 3.
+- Universe in month t: members at the end of month t-1, using the membership rebuilt in Phase 3, restricted to names usable under the Phase 3 definitions (month-end price and signal inputs at t-1 and t-12; for Value and Combined also a book value that meets the existing 6-month forward-fill rule).
+- A month is used for a signal only if at least 100 names are usable for it (Phase 3 rule 1). Every month met this.
+- Return of a stock in month t: the change in adjusted close from the end of t-1 to the end of t, with the same convention as the published study. A name with no price at the end of month t has no return and is dropped from that month's returns. The number of such names is reported every month, and no delisting return is imputed.
+- Risk-free rate: the actual monthly 3-month Treasury bill series already saved in results/tbill_3m_monthly.csv (it covers the whole period), used for all Sharpe ratios. A flat 2% is reported next to it for comparison with the published study, because a flat 2% would be wrong for 2012 to 2015, when bill rates were close to zero.
+- Names flagged in Phase 3 as having a price history that starts after their membership start are used only from the first month with a price. Ticker reuse that cannot be detected this way is a stated limitation.
+
+### Signals (frozen)
+- Momentum: price at t-1 divided by price at t-12, minus 1, from src/factors.py (calculate_momentum, 12 and 1).
+- Value: negative price-to-book at the end of t-1, from src/factors.py (calculate_value_score, with the published one-month lag).
+- Combined: the average of the cross-sectional z-scores of the two, from src/factors.py (calculate_combined_score). A name missing either signal has no Combined score in that month.
+- No sector adjustment. P/B differs systematically between sectors (asset-light technology against banks, for example), which is a limitation and is not corrected here.
+- The existing functions are reused, not re-implemented.
+
+### Periods
+- New test: January 2012 to December 2020 (108 months). This specification has never been run on these months, since the published study starts in 2021.
+- Re-test: January 2021 to August 2026 (68 months) on the larger universe. These months are already known from the published study, so this is reported as a re-test and not as out-of-sample evidence.
+- The full period is shown for reference. No result from any period is used to choose or change a specification.
+
+### Signal-level tests (primary evidence)
+For each signal and each period, computed from the monthly cross-section of usable names:
+1. Rank information coefficient (IC): the Spearman rank correlation between the signal at t-1 and the return in month t. Reported as the mean monthly IC, its 90% bootstrap interval (5,000 resamples, the same method as the rest of the project), the share of months with a positive IC and the number of months.
+2. Quintile spread: the equal-weight return of the top fifth of names by signal minus that of the bottom fifth, each month. Reported as the mean monthly spread, annualised, with a 90% bootstrap interval.
+3. Fama-MacBeth regressions: each month, the cross-sectional return on the standardised signal; the slopes are averaged over the period with a 90% bootstrap interval. Run for each signal alone, and for Momentum and Value together.
+
+### Portfolio tests (secondary)
+- Top decile (headline, because Phase 3 shows at least 200 usable names in every month) and top quintile, equal weight, monthly rebalancing, for Momentum, Value and Combined. Both sizes are always run and reported.
+- Benchmark: equal weight across all usable names in the same month, rebalanced monthly. SPY is shown as a reference only.
+- Costs: 10 bps one-way on turnover, as in the published study. Gross and net figures are both reported.
+- Metrics: total return, annualised return and volatility, Sharpe ratio (Treasury bill and flat 2%), maximum drawdown, average monthly turnover, and the Sharpe difference against the benchmark with a 90% paired bootstrap interval.
+- Survivorship diagnostic (descriptive): the average equal-weight monthly return of names that were later removed from the index against names that stayed, by period. It shows how much the missing names could matter. It is not a correction.
+
+### Outputs (new files only; existing files are never overwritten)
+- results/universe_study_monthly_counts.csv: per month, the universe size, the number usable for each signal, and the number of names with no return in the month.
+- results/universe_study_ic_monthly.csv and results/universe_study_spread_monthly.csv: the monthly series behind the signal tests.
+- results/universe_study_signal_summary.csv: IC, quintile spread and Fama-MacBeth results by signal and period.
+- results/universe_study_portfolio_returns.csv: monthly gross and net returns by strategy, portfolio size and benchmark.
+- results/universe_study_portfolio_summary.csv: portfolio metrics by period.
+- results/universe_study_survivorship.csv: the removed against stayed comparison.
+
+### Reproduction gates (the scripts stop without writing if any fails)
+1. Restricted to the 17 study stocks and January 2021 to December 2024, the new pipeline's Momentum, Value and Combined top-5 monthly portfolios must reproduce the published gross Sharpe ratios in results/strategy_comparison_full_period.csv.
+2. For the 17 stocks, the month-end prices used must equal the existing prices table.
+3. Hand-checked unit tests must cover the rank IC, the quintile assignment (including ties and months with fewer names), the quintile spread, the Fama-MacBeth slope, and the treatment of names with no return in month t.
+
+### Reading rules, fixed now
+1. A signal is said to show evidence of a relationship in a period if the 90% interval of its mean IC excludes zero. A signal is said to be consistent if the sign of its mean IC is the same in the new test and in the re-test. There are three signals and two periods, so six primary tests. No correction for multiple testing is applied, all six are reported, and none is read alone.
+2. Because of survivorship, a positive result is described as consistent with the signal having a relationship with returns among surviving large caps, and never as alpha, outperformance or evidence that a strategy works. A negative or null result is reported as found.
+3. The portfolio Sharpe differences are read only alongside the signal tests, and are not significant unless the 90% paired bootstrap interval excludes zero.
+4. Expectations recorded in advance, not targets: Value may be weak or negative over 2012 to 2020; Momentum and Combined have higher turnover than Value, so costs reduce their net results more; the Sharpe difference against the benchmark is small for the decile and quintile portfolios because both are diversified.
+5. The published 17-stock results, the pre-registered out-of-sample test and every earlier figure stand unchanged. Nothing in this phase replaces them.
+6. This phase will not be used to search for a better specification. If one is wanted, it needs a separate pre-registration, and a rank-based Combined, a sector-neutral Value or other variants will be labelled exploratory.
+
+### Deliverables
+New code in src/ (signal evaluation functions with unit tests using hand-made inputs) and new scripts at the repository root in the existing naming style, resumable where they download, plus the output files above. No README, HTML or LIMITATIONS_PLAN.md edits by Claude Code. Ronaldo commits. The dashboard is rebuilt around these results only after they exist.
