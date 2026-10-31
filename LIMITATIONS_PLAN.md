@@ -368,3 +368,29 @@ Checks made while planning the Phase 4 code showed that the price-to-book ratio 
 10. Fama-MacBeth: signals are standardised across all usable names at t-1, then an ordinary least squares regression with an intercept is run on the names that have a return. The two-signal version uses names with both signals, standardised over that joint set. Raw P/B is not winsorised, because the definition is frozen.
 11. Every output file carries a universe_note column stating that the universe consists of names with available data and is affected by survivorship.
 - Additions: SPY for 2012 to 2020 is downloaded once to a separate reference folder and checked against the saved 2021 to 2026 series. A new function bootstrap_sharpe_diff_tbill is added to src/risk.py for paired Sharpe differences with a Treasury bill rate, resampling the same months for strategy, benchmark and bill rate. No existing function changes.
+
+## Amendment 9 (2026-10-31, before any Phase 4 result existed and before any restated Value result had been seen)
+
+Gate 2 of the split check registered in Amendment 8 failed, and the script stopped without writing any result file. This amendment records the finding and fixes the rules that follow from it.
+
+### Finding
+- Rebuilding book value per share from the cached SEC facts, with the existing functions in src/fundamentals.py, does not reproduce the stored book_value table for 5 of the 17 study stocks over the 80 overlapping months: RTX (60 months differ, largest difference 6.0%), KO (26 months, 9.2%), LIN (14 months, 4.5%), LMT (9 months, 0.9%) and JNJ (3 months, 2.0%). Every month has a value on both sides, so coverage matches and only the values differ. WMT and NEE, the two stocks that the split restatement changes in the sample, pass.
+- The likely cause, found by read-only diagnostics and partly unproven, is two tie situations in the existing code that are resolved by row order. First, forward_fill_book_value sorts on filing date only, so two periods filed on the same date are not ordered. Taking the newest period reproduces JNJ's stored values exactly. Second, get_stockholders_equity keeps one of two equity series, standard stockholders' equity or equity including noncontrolling interest, when both are filed on the same date with different values, and the sort does not settle which. Neither fixed rule reproduces the stored table for the stocks with equity-tag ties, which suggests the stored table reflects an arbitrary row order. Why the order differs between the original download and the cached facts (a newer SEC file or the library version) was not established.
+- Consequence: the published Value and Combined results depend on an arbitrary choice in the stored book values, in addition to the split problem of Amendment 8. The published figures stand and remain reproducible from the stored database table, which is the input of record, but they cannot be rebuilt from the cached SEC facts. This will be disclosed as a limitation.
+
+### Split check (replaces the base book value of Amendment 8, nothing else changes)
+- The base for all three versions is the stored book_value table, not a rebuild from cached records, so that the comparison isolates the effect of the split restatement and of the Close price.
+- For each month, the filing in force is identified from the cached records with the existing forward-fill rule (the latest filing date on or before the month end, within 180 days). The stored value of that month is divided by the product of all splits dated after that filing date.
+- Gate 2 of Amendment 8 is replaced by: for each stock with an event that changes at least one month of the sample, the as-filed value of the filing in force, taken from the cached records, equals the stored table value within 1e-6 for the months it applies to. Mismatches for the other stocks are printed and reported, and do not stop the run. Gate 3 is unchanged: a stock with no event has a restated value equal to its stored value.
+- The three versions, the output files, the Gate 1 tolerance and the statement of scope are as in Amendment 8.
+
+### Book value rule for Phase 4 (fixed before Stage 2)
+1. When two filings have the same filing date, the one with the newest period end is used.
+2. Standard stockholders' equity is used. Equity including noncontrolling interest is used only when the standard series is absent for that filing. Reason: market capitalisation values the claim of the parent's common shareholders, so the per-share book value should exclude the minority interest.
+3. The rule is implemented as a new function used only by the universe study and tested with hand-made inputs. The existing functions in src/fundamentals.py are not changed.
+4. The same rule is used for every stock in the Phase 4 universe, together with the split restatement of Amendment 8.
+
+### Reproduction gate 1 of the Phase 4 entry, as amended
+- Gate 1a: with the stored book_value table as input, the Phase 4 pipeline's Momentum, Value and Combined top-5 portfolios for the 17 stocks reproduce the published gross Sharpe ratios within 1e-4. This tests the code path. Momentum and the benchmark do not depend on book value and must reproduce in any case.
+- Gate 1b (report only, no threshold): the book value per share from the fixed rule above against the stored table for the 17 stocks, by stock and month, and the number of months in which the Value top-5 holdings differ. This shows how much the published Value result depends on the arbitrary choice.
+- A failure of Gate 1a stops the run. Gate 1b cannot fail.
