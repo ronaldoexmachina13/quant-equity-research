@@ -18,11 +18,21 @@ from src.backtest import run_backtest
 from src.factors import calculate_momentum
 from src.portfolio import build_portfolio
 from src.risk import sharpe_ratio
-from src.universe import EVALUATION_START, EVALUATION_END, cache_dir
+from src.universe import EVALUATION_START, EVALUATION_END, cache_dir, shift_month
 
 GATE1A_TOLERANCE = 1e-4        # Amendment 8: gross Sharpe against the published figure
 GATE2_TOLERANCE = 1e-5         # Amendment 8: spread of the cached-to-stored price ratio
 PORTFOLIO_TOP_N = 5            # frozen size of the published portfolios
+
+NEW_TEST = "New test (2012-2020)"
+RE_TEST = "Re-test (2021-2026)"
+FULL_PERIOD = "Full period (2012-2026)"
+NEW_TEST_END = "2020-12"
+
+UNIVERSE_NOTE = (
+    "Universe: names with available data only, affected by survivorship. The no-return count is zero in "
+    "every month because delisted names have no price history at all; this must not be read as no delistings occurred."
+)
 
 
 def evaluation_dates(start: str = EVALUATION_START, end: str = EVALUATION_END) -> pd.DatetimeIndex:
@@ -160,3 +170,22 @@ def holdings_differences(weights: pd.DataFrame, published: pd.DataFrame) -> list
     held = {m: set(row.index[row > 0]) for m, (_, row) in zip(months, weights.iterrows())}
     stored = published.groupby(pd.to_datetime(published["date"]).dt.strftime("%Y-%m"))["ticker"].apply(set).to_dict()
     return [m for m in held if held[m] != stored.get(m, set())]
+
+
+# ---------------------------------------------------------------------------
+# Periods
+# ---------------------------------------------------------------------------
+
+def study_periods() -> dict:
+    """The registered windows as {label: dates}. No window is used to choose a specification."""
+    return {
+        NEW_TEST: evaluation_dates(end=NEW_TEST_END),
+        RE_TEST: evaluation_dates(start=shift_month(NEW_TEST_END, 1)),
+        FULL_PERIOD: evaluation_dates(),
+    }
+
+
+def period_labels(dates: pd.DatetimeIndex) -> pd.Series:
+    """New test or re-test for each date, for the monthly files."""
+    new_test_end = evaluation_dates(end=NEW_TEST_END)[-1]
+    return pd.Series([NEW_TEST if d <= new_test_end else RE_TEST for d in dates], index=dates)

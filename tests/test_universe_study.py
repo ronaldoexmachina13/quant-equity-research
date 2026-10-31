@@ -16,7 +16,7 @@ from src.backtest import calculate_monthly_returns
 from src.universe_study import (
     evaluation_dates, read_month_end_prices, cached_tickers, usable_mask, momentum_signal,
     count_mismatches, price_ratio_report, price_ratio_failures, top_n_returns, sharpe_failures,
-    holdings_differences,
+    holdings_differences, study_periods, period_labels, NEW_TEST, RE_TEST, FULL_PERIOD, UNIVERSE_NOTE,
 )
 from src.signal_eval import monthly_counts
 
@@ -190,3 +190,23 @@ def test_holdings_differences_lists_months_that_differ():
     weights = pd.DataFrame({"AAA": [1.0, 0.0], "BBB": [0.0, 1.0]}, index=dates)
     published = pd.DataFrame({"date": ["2020-01-31", "2020-02-29"], "ticker": ["AAA", "AAA"]})
     assert holdings_differences(weights, published) == ["2020-02"]
+
+
+def test_study_periods_are_the_registered_windows():
+    periods = study_periods()
+    assert list(periods) == [NEW_TEST, RE_TEST, FULL_PERIOD]
+    assert [len(d) for d in periods.values()] == [108, 68, 176]
+    assert periods[NEW_TEST][-1] == pd.Timestamp("2020-12-31")
+    assert periods[RE_TEST][0] == pd.Timestamp("2021-01-31")
+
+
+def test_period_labels_put_each_month_in_new_test_or_re_test():
+    labels = period_labels(pd.to_datetime(["2020-12-31", "2021-01-31"]))
+    assert labels.tolist() == [NEW_TEST, RE_TEST]
+
+
+def test_universe_note_states_the_required_points():
+    for phrase in ("available data", "survivorship", "zero in every month",
+                   "delisted names have no price history", "no delistings occurred"):
+        assert phrase in UNIVERSE_NOTE
+    assert "—" not in UNIVERSE_NOTE

@@ -10,9 +10,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from src.risk import bootstrap_statistic_ci
 from src.signal_eval import (
     rank_ic, assign_quintiles, quintile_spread, standardise, cross_section_slopes,
     monthly_cross_section, monthly_statistic, monthly_counts, fama_macbeth_slopes,
+    series_summary, summarize_signal,
     MIN_NAMES_PER_MONTH,
 )
 
@@ -262,3 +264,64 @@ def test_fama_macbeth_two_signals_count_names_with_both_for_the_minimum():
     slopes = fama_macbeth_slopes({"x1": x1, "x2": x2}, returns, min_names=4)
     assert slopes["x1"].iloc[0] == pytest.approx(0.01 * math.sqrt(20 / 3))
     assert slopes["x2"].iloc[0] == pytest.approx(0.03 * math.sqrt(4 / 3))
+
+
+# ---------------------------------------------------------------------------
+# Period summaries
+# ---------------------------------------------------------------------------
+
+def test_series_summary_mean_share_and_months():
+    # Mean of .02, -.01, 0, .03 is .01; two of four are strictly positive.
+    summary = series_summary(pd.Series([.02, -.01, 0.0, .03]), n_sims=100, seed=42)
+    assert summary["mean"] == pytest.approx(.01)
+    assert summary["share_positive"] == .5
+    assert summary["months"] == 4
+
+
+def test_series_summary_uses_the_project_bootstrap():
+    series = pd.Series([.02, -.01, 0.0, .03, .01, .04])
+    expected = bootstrap_statistic_ci(series, lambda s: s.mean(), n_sims=100, ci=0.90, seed=42)
+    summary = series_summary(series, n_sims=100, seed=42)
+    assert summary["ci_90_lower"] == expected["lower"]
+    assert summary["ci_90_upper"] == expected["upper"]
+
+
+def test_series_summary_drops_unused_months():
+    summary = series_summary(pd.Series([.02, np.nan, .04]), n_sims=100, seed=42)
+    assert summary["months"] == 2
+    assert summary["mean"] == pytest.approx(.03)
+
+
+def test_series_summary_flags_an_interval_that_excludes_zero():
+    # Every value is positive, so every resampled mean is too.
+    assert series_summary(pd.Series([.01, .02, .03, .04]), n_sims=100, seed=42)["excludes_zero"]
+    # Symmetric around zero: the interval straddles it.
+    assert not series_summary(pd.Series([-.02, -.01, .01, .02] * 3), n_sims=100, seed=42)["excludes_zero"]
+
+
+def test_summarize_signal_rows_and_annualised_spread():
+    dates = pd.date_range("2012-01-31", periods=6, freq="ME")
+    ic = pd.Series([.1, .2, .3, .1, .2, .3], index=dates)
+    spread = pd.Series([.01, .02, .03, .01, .02, .03], index=dates)
+    slopes = pd.Series([.001, .002, .003, .001, .002, .003], index=dates)
+    periods = {"First": (dates[:3]), "All": dates}
+    table = summarize_signal("Momentum", ic, spread, {"fama_macbeth_single": slopes}, periods, n_sims=100, seed=42)
+
+    assert len(table) == 6
+    assert table[["signal"]].eq("Momentum").all(axis=None)
+    row = table[(table["test"] == "quintile_spread") & (table["period"] == "First")].iloc[0]
+    # Mean of .01, .02, .03 is .02, times 12 is .24; the interval scales the same way.
+    assert row["mean"] == pytest.approx(.02)
+    assert row["annualised_mean"] == pytest.approx(.24)
+    assert row["annualised_ci_90_lower"] == pytest.approx(12 * row["ci_90_lower"])
+    assert row["annualised_ci_90_upper"] == pytest.approx(12 * row["ci_90_upper"])
+    assert row["months"] == 3
+
+
+def test_summarize_signal_annualises_only_the_spread():
+    dates = pd.date_range("2012-01-31", periods=3, freq="ME")
+    series = pd.Series([.1, .2, .3], index=dates)
+    table = summarize_signal("Momentum", series, series, {"fama_macbeth_single": series}, {"All": dates},
+                             n_sims=100, seed=42)
+    others = table[table["test"] != "quintile_spread"]
+    assert others["annualised_mean"].isna().all()

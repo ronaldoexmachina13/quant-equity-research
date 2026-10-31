@@ -17,7 +17,10 @@ import math
 import numpy as np
 import pandas as pd
 
+from src.risk import bootstrap_statistic_ci
+
 MIN_NAMES_PER_MONTH = 100  # Phase 3 rule 1: a month is used for a signal only with at least 100 usable names
+MONTHS_PER_YEAR = 12
 
 
 # ---------------------------------------------------------------------------
@@ -151,3 +154,42 @@ def fama_macbeth_slopes(signals: dict, returns: pd.DataFrame,
         month_returns = returns.loc[date] if date in returns.index else pd.Series(dtype=float)
         rows[date] = cross_section_slopes(row, month_returns)
     return pd.DataFrame.from_dict(rows, orient="index", columns=names).reindex(dates)
+
+
+# ---------------------------------------------------------------------------
+# Period summaries
+# ---------------------------------------------------------------------------
+
+def series_summary(series: pd.Series, n_sims: int = 5000, ci: float = 0.90, seed: int = 42) -> dict:
+    """Mean of a monthly series with its bootstrap interval, over the months that were used."""
+    used = series.dropna()
+    interval = bootstrap_statistic_ci(used, lambda s: s.mean(), n_sims=n_sims, ci=ci, seed=seed)
+    return {
+        "months": len(used),
+        "mean": interval["point"],
+        "ci_90_lower": interval["lower"],
+        "ci_90_upper": interval["upper"],
+        "share_positive": float((used > 0).mean()),
+        "excludes_zero": not (interval["lower"] <= 0 <= interval["upper"]),
+    }
+
+
+def summarize_signal(name: str, ic: pd.Series, spread: pd.Series, slopes: dict, periods: dict,
+                     n_sims: int = 5000, seed: int = 42) -> pd.DataFrame:
+    """
+    One row per test and period for a signal. `slopes` maps a test name to its
+    monthly slope series, and `periods` a label to its dates. Only the quintile
+    spread is annualised, as the mean monthly spread times 12 (Amendment 8,
+    reading 9). The same seed gives every series the same resampled months.
+    """
+    tests = {"rank_ic": ic, "quintile_spread": spread, **slopes}
+    rows = []
+    for period, dates in periods.items():
+        for test, series in tests.items():
+            row = {"test": test, "signal": name, "period": period}
+            row.update(series_summary(series.reindex(dates), n_sims=n_sims, seed=seed))
+            scale = MONTHS_PER_YEAR if test == "quintile_spread" else np.nan
+            for column in ["mean", "ci_90_lower", "ci_90_upper"]:
+                row[f"annualised_{column}"] = row[column] * scale
+            rows.append(row)
+    return pd.DataFrame(rows)
