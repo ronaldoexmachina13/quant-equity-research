@@ -1,0 +1,5 @@
+ticker,event_date,ratio,value_rows_changed,first_row_changed,last_row_changed,note
+AAPL,2020-08-31,4.0,0,,,
+WMT,2024-02-26,3.0,39,2021-01,2024-03,
+NEE,2020-10-27,4.0,2,2021-01,2021-02,
+RTX,2020-04-03,1.589,0,,,"merger and spin-off effect, not an ordinary split; applied mechanically"
