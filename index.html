@@ -38,6 +38,38 @@
     </div>
   </section>
 
+  <section class="home-results">
+    <div class="panel">
+      <h2>Growth of $1 <span>December 2020 to August 2026, before trading costs</span></h2>
+      <div class="chart-legend" style="display:flex; flex-wrap:wrap; gap:0.3rem 1.1rem; margin:0 0 0.75rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em;">
+        <span><i style="display:inline-block; width:9px; height:9px; margin-right:0.4rem; background:var(--momentum)"></i>Momentum</span>
+        <span><i style="display:inline-block; width:9px; height:9px; margin-right:0.4rem; background:var(--value)"></i>Value</span>
+        <span><i style="display:inline-block; width:9px; height:9px; margin-right:0.4rem; background:var(--combined)"></i>Combined</span>
+        <span><i style="display:inline-block; width:9px; height:9px; margin-right:0.4rem; background:var(--benchmark)"></i>Equal-weight benchmark</span>
+        <span id="homeSpyLegend" style="display:none; color:var(--muted);"><i style="display:inline-block; width:9px; height:9px; margin-right:0.4rem; background:#8A8A8A"></i>S&amp;P 500 (SPY), reference only</span>
+      </div>
+      <div style="position:relative; height:340px;"><canvas id="homeGrowthChart"></canvas></div>
+      <p class="caption">The dashed line marks the start of the out-of-sample period (January 2025). The strategy rules were fixed before that date. The two periods are chained here for display only and are reported separately everywhere else.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Drawdown <span>percentage below each series' previous high</span></h2>
+      <div style="position:relative; height:240px;"><canvas id="homeDrawdownChart"></canvas></div>
+      <p class="caption">Lines use the same colours as above. Because this chart runs across both periods, a drawdown that starts in one period can end in the next. The table below reports each period on its own.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Summary by period</h2>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table" id="homeSummaryTable">
+          <thead><tr><th>Strategy</th><th class="num">Total return</th><th class="num">Sharpe ratio</th><th class="num">Max drawdown</th><th class="num">Avg monthly turnover</th></tr></thead>
+          <tbody id="homeSummaryBody"></tbody>
+        </table>
+      </div>
+      <p class="caption">Returns are before trading costs. The Sharpe ratio uses a flat 2% risk-free rate, as in the pre-registered design. The highest Sharpe ratio among the four strategies in each period is shown in amber. The S&amp;P 500 line, when shown, is a reference only; the official benchmark remains the equal-weight basket of the 17 stocks. Turnover is the average share of the portfolio traded each month, and is not reported for the benchmark here. No difference between a strategy and the benchmark is statistically significant (see the Strategy Analysis page).</p>
+    </div>
+  </section>
+
   <div class="nav-cards">
     <a class="nav-card" href="strategies.html">
       <div class="nc-eyebrow">Page 2</div>
@@ -65,5 +97,101 @@
   </footer>
 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+Chart.defaults.font.family = '"DejaVu Sans Mono", "JetBrains Mono", Menlo, Consolas, ui-monospace, monospace';
+Chart.defaults.font.size = 11;
+Chart.defaults.color = "#8A8A8A";
+Chart.defaults.borderColor = "#2A2A2A";
+Chart.defaults.scale.grid.color = "#2A2A2A";
+Chart.defaults.scale.grid.lineWidth = 1;
+Object.assign(Chart.defaults.plugins.tooltip, {
+  backgroundColor: "#000000", borderColor: "#3A3A3A", borderWidth: 1, cornerRadius: 0,
+  titleColor: "#FFB000", bodyColor: "#E8E8E8", titleFont: { weight: "700" }
+});
+
+/* HOME_DATA is written by generate_dashboard_data.py from results/drawdown_series.csv,
+   oos_monthly_returns.csv, strategy_comparison_full_period.csv, oos_summary.csv and
+   transaction_cost_impact.csv. Do not edit by hand. */
+const HOME_DATA = {"dates":["Dec 2020","Jan 2021","Feb 2021","Mar 2021","Apr 2021","May 2021","Jun 2021","Jul 2021","Aug 2021","Sep 2021","Oct 2021","Nov 2021","Dec 2021","Jan 2022","Feb 2022","Mar 2022","Apr 2022","May 2022","Jun 2022","Jul 2022","Aug 2022","Sep 2022","Oct 2022","Nov 2022","Dec 2022","Jan 2023","Feb 2023","Mar 2023","Apr 2023","May 2023","Jun 2023","Jul 2023","Aug 2023","Sep 2023","Oct 2023","Nov 2023","Dec 2023","Jan 2024","Feb 2024","Mar 2024","Apr 2024","May 2024","Jun 2024","Jul 2024","Aug 2024","Sep 2024","Oct 2024","Nov 2024","Dec 2024","Jan 2025","Feb 2025","Mar 2025","Apr 2025","May 2025","Jun 2025","Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Jun 2026","Jul 2026","Aug 2026"],"split":49,"growth":{"Momentum":[1.0,0.9813,1.0255,1.0499,1.0728,1.0913,1.039,1.012,1.0172,1.0138,1.0847,1.0666,1.1116,1.0919,1.0526,1.091,1.0452,1.0373,1.02,1.0486,1.0288,0.9468,1.0911,1.1173,1.1238,1.1222,1.1166,1.0905,1.1263,1.1087,1.1828,1.2314,1.2099,1.168,1.1486,1.2328,1.2589,1.2721,1.333,1.3976,1.2929,1.3196,1.3313,1.3903,1.4647,1.4795,1.4721,1.5738,1.4772,1.5547,1.5689,1.4749,1.4766,1.5466,1.5834,1.5965,1.5856,1.6179,1.6996,1.7139,1.715,1.7792,1.9087,1.8271,1.8547,1.8389,1.9226,1.8576,1.8469],"Value":[1.0,1.0127,1.0736,1.1458,1.1846,1.2427,1.2296,1.2265,1.2418,1.2401,1.3229,1.2144,1.2593,1.2902,1.3285,1.3309,1.2546,1.2764,1.1626,1.2428,1.2465,1.1379,1.3358,1.3752,1.3215,1.4156,1.3796,1.3663,1.4254,1.3157,1.3867,1.3877,1.3653,1.3208,1.3586,1.4127,1.4379,1.5111,1.6046,1.734,1.726,1.814,1.7259,1.8244,1.8754,1.886,1.8828,2.0245,1.897,1.9888,2.0179,1.9649,1.8505,2.0145,2.1293,2.0639,2.1911,2.2653,2.2909,2.2859,2.3325,2.3717,2.4209,2.3828,2.6113,2.5069,2.5583,2.6623,2.6976],"Combined":[1.0,0.963,0.9927,1.0162,1.0281,1.0458,0.9957,0.9698,0.9786,0.9708,1.0215,0.9715,1.0227,1.038,1.0149,1.0518,1.0077,1.0001,0.9636,1.0082,0.9992,0.9282,1.0696,1.0953,1.0953,1.0938,1.0883,1.0628,1.0978,1.0665,1.1377,1.1844,1.1787,1.1665,1.1472,1.2377,1.2644,1.2777,1.3784,1.4497,1.3745,1.4029,1.4153,1.478,1.5571,1.5621,1.5543,1.6616,1.5597,1.6642,1.6294,1.577,1.5829,1.6518,1.7325,1.7813,1.7691,1.8321,1.8405,1.856,1.8572,2.0326,2.1955,2.1923,2.2253,2.1502,2.3219,2.2756,2.2624],"Benchmark":[1.0,0.9749,1.0075,1.0717,1.11,1.1253,1.1242,1.1493,1.1634,1.1207,1.1906,1.1585,1.2424,1.2245,1.2112,1.2536,1.2048,1.2093,1.1362,1.2066,1.1757,1.085,1.2255,1.2895,1.2523,1.2765,1.2466,1.2799,1.3197,1.2611,1.3379,1.3595,1.3381,1.2737,1.2816,1.3557,1.3854,1.4124,1.4648,1.5303,1.4869,1.5459,1.5455,1.6227,1.6911,1.7239,1.6856,1.7825,1.6802,1.7377,1.7552,1.7125,1.6602,1.7184,1.7609,1.7607,1.8363,1.9023,1.9273,1.9309,1.9502,2.0497,2.1349,2.0353,2.1363,2.1217,2.1812,2.2522,2.2721]},"drawdown":{"Momentum":[0.0,-0.0187,0.0,0.0,0.0,0.0,-0.0479,-0.0727,-0.0679,-0.071,-0.0061,-0.0227,0.0,-0.0177,-0.0531,-0.0186,-0.0597,-0.0669,-0.0824,-0.0567,-0.0745,-0.1482,-0.0185,0.0,0.0,-0.0014,-0.0064,-0.0296,0.0,-0.0156,0.0,0.0,-0.0175,-0.0515,-0.0672,0.0,0.0,0.0,0.0,0.0,-0.0749,-0.0558,-0.0474,-0.0052,0.0,0.0,-0.005,0.0,-0.0614,-0.0121,-0.0031,-0.0628,-0.0617,-0.0173,0.0,0.0,-0.0069,0.0,0.0,0.0,0.0,0.0,0.0,-0.0427,-0.0283,-0.0366,0.0,-0.0338,-0.0394],"Value":[0.0,0.0,0.0,0.0,0.0,0.0,-0.0105,-0.013,-0.0008,-0.0021,0.0,-0.082,-0.0481,-0.0247,0.0,0.0,-0.0573,-0.0409,-0.1265,-0.0662,-0.0634,-0.145,0.0,0.0,-0.039,0.0,-0.0254,-0.0348,0.0,-0.0769,-0.0272,-0.0264,-0.0421,-0.0734,-0.0469,-0.0089,0.0,0.0,0.0,0.0,-0.0046,0.0,-0.0485,0.0,0.0,0.0,-0.0017,0.0,-0.063,-0.0177,-0.0033,-0.0294,-0.086,-0.005,0.0,-0.0307,0.0,0.0,0.0,-0.0022,0.0,0.0,0.0,-0.0157,0.0,-0.04,-0.0203,0.0,0.0],"Combined":[0.0,-0.037,-0.0073,0.0,0.0,0.0,-0.0479,-0.0727,-0.0642,-0.0717,-0.0232,-0.0711,-0.0221,-0.0074,-0.0296,0.0,-0.0419,-0.0492,-0.0839,-0.0414,-0.05,-0.1175,0.0,0.0,-0.0,-0.0014,-0.0064,-0.0297,0.0,-0.0285,0.0,0.0,-0.0048,-0.0151,-0.0315,0.0,0.0,0.0,0.0,0.0,-0.0519,-0.0323,-0.0237,0.0,0.0,0.0,-0.005,0.0,-0.0614,0.0,-0.0209,-0.0524,-0.0489,-0.0075,0.0,0.0,-0.0069,0.0,0.0,0.0,0.0,0.0,0.0,-0.0015,0.0,-0.0338,0.0,-0.02,-0.0256],"Benchmark":[0.0,-0.0251,0.0,0.0,0.0,0.0,-0.001,0.0,0.0,-0.0367,0.0,-0.0269,0.0,-0.0144,-0.0251,0.0,-0.0389,-0.0354,-0.0937,-0.0375,-0.0622,-0.1345,-0.0224,0.0,-0.0288,-0.0101,-0.0333,-0.0074,0.0,-0.0444,0.0,0.0,-0.0158,-0.0631,-0.0573,-0.0028,0.0,0.0,0.0,0.0,-0.0284,0.0,-0.0003,0.0,0.0,0.0,-0.0222,0.0,-0.0574,-0.0251,-0.0153,-0.0393,-0.0686,-0.036,-0.0121,-0.0122,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-0.0467,0.0,-0.0068,0.0,0.0,0.0]},"table":[{"group":"In sample, 2021 to 2024","rows":[{"label":"Momentum","total":"47.7%","sharpe":"0.56","dd":"-14.8%","turnover":"23%"},{"label":"Value","total":"89.7%","sharpe":"0.86","dd":"-14.5%","turnover":"4%"},{"label":"Combined","total":"56.0%","sharpe":"0.65","dd":"-11.8%","turnover":"23%"},{"label":"Benchmark","total":"68.0%","sharpe":"0.81","dd":"-13.4%","turnover":"&ndash;"}]},{"group":"Out of sample, January 2025 to August 2026","rows":[{"label":"Momentum","total":"25.0%","sharpe":"1.05","dd":"-6.0%","turnover":"20%"},{"label":"Value","total":"42.2%","sharpe":"1.53","dd":"-8.3%","turnover":"1%"},{"label":"Combined","total":"45.1%","sharpe":"1.72","dd":"-5.2%","turnover":"16%"},{"label":"Benchmark","total":"35.2%","sharpe":"1.89","dd":"-5.4%","turnover":"&ndash;"}]}]};
+
+const HOME_COLORS = { Momentum: "#3ED88A", Value: "#29B6F6", Combined: "#FFB000", Benchmark: "#FFFFFF", SPY: "#8A8A8A" };
+
+/* Dashed vertical line where the out-of-sample period starts, with a small label on each side.
+   labelAtBottom puts the labels at the bottom of the chart, for charts whose lines run along the top. */
+function makeSplitLine(labelAtBottom) {
+  return {
+    id: "splitLine",
+    afterDraw(chart) {
+      const x = chart.scales.x.getPixelForValue(HOME_DATA.split);
+      const { ctx, chartArea } = chart;
+      const y = labelAtBottom ? chartArea.bottom - 6 : chartArea.top + 12;
+      ctx.save();
+      ctx.strokeStyle = "#8A8A8A";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#8A8A8A";
+      ctx.font = "700 10px " + Chart.defaults.font.family;
+      ctx.textAlign = "right"; ctx.fillText("IN SAMPLE", x - 6, y);
+      ctx.textAlign = "left"; ctx.fillText("OUT OF SAMPLE", x + 6, y);
+      ctx.restore();
+    }
+  };
+}
+
+function homeLineChart(canvasId, series, yTick, tooltipFmt, extraPlugins) {
+  return new Chart(document.getElementById(canvasId), {
+    type: "line",
+    data: {
+      labels: HOME_DATA.dates,
+      datasets: Object.keys(series).map(name => ({
+        label: name, data: series[name],
+        borderColor: HOME_COLORS[name], backgroundColor: HOME_COLORS[name],
+        borderWidth: name === "Benchmark" ? 3 : (name === "SPY" ? 1.5 : 2), borderDash: name === "SPY" ? [2, 3] : [], pointRadius: 0, fill: false, tension: 0.1
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (item) => item.dataset.label + ": " + tooltipFmt(item.parsed.y) } } },
+      scales: {
+        y: { ticks: { callback: yTick } },
+        x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { display: false } }
+      }
+    },
+    plugins: extraPlugins
+  });
+}
+
+function renderHomeSummary() {
+  const tbody = document.getElementById("homeSummaryBody");
+  tbody.innerHTML = "";
+  HOME_DATA.table.forEach(block => {
+    const head = document.createElement("tr");
+    head.innerHTML = '<td class="month-cell" colspan="5" style="color:var(--muted); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em;">' + block.group + "</td>";
+    tbody.appendChild(head);
+    const best = Math.max(...block.rows.filter(r => !r.reference).map(r => parseFloat(r.sharpe)));
+    block.rows.forEach(r => {
+      const tr = document.createElement("tr");
+      if (r.reference) tr.style.color = "var(--muted)";
+      tr.innerHTML = '<td class="month-cell"' + (r.reference ? ' style="color:var(--muted); font-weight:400;"' : "") + ">" + r.label + "</td>" +
+        '<td class="num">' + r.total + "</td>" +
+        '<td class="num' + (!r.reference && parseFloat(r.sharpe) === best ? " best" : "") + '">' + r.sharpe + "</td>" +
+        '<td class="num">' + r.dd + "</td>" +
+        '<td class="num">' + r.turnover + "</td>";
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+if (HOME_DATA.dates.length) {
+  if (HOME_DATA.growth.SPY) document.getElementById("homeSpyLegend").style.display = "";
+  homeLineChart("homeGrowthChart", HOME_DATA.growth, v => "$" + v.toFixed(2), v => "$" + v.toFixed(3), [makeSplitLine(false)]);
+  homeLineChart("homeDrawdownChart", HOME_DATA.drawdown, v => (v * 100).toFixed(0) + "%", v => (v * 100).toFixed(1) + "%", [makeSplitLine(true)]);
+  renderHomeSummary();
+}
+</script>
 </body>
 </html>

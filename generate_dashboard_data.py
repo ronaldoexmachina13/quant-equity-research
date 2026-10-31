@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from decimal import Decimal, ROUND_HALF_UP
 import pandas as pd
@@ -165,6 +166,103 @@ def update_index_html(path: str, full: pd.DataFrame, metadata: dict):
 
     print(f"Updated {path}:")
     print(f"  - stocks: {n_stocks}, strategies: {n_strategies}, months: {n_months}, benchmark Sharpe: {benchmark_sharpe}, OOS months: {n_oos_months}")
+
+
+def build_home_data(drawdown_path: str = "results/drawdown_series.csv",
+                    oos_path: str = "results/oos_monthly_returns.csv",
+                    full_path: str = "results/strategy_comparison_full_period.csv",
+                    oos_summary_path: str = "results/oos_summary.csv",
+                    cost_path: str = "results/transaction_cost_impact.csv",
+                    spy_returns_path: str = "results/spy_reference_monthly_returns.csv",
+                    spy_summary_path: str = "results/spy_reference_summary.csv") -> dict:
+    """
+    Data for the home page: growth of $1 and drawdown over 2021 to August 2026,
+    and a summary table for each period.
+
+    The two periods are reported separately everywhere else, because the
+    out-of-sample test was pre-registered. For the chart only, the monthly
+    returns are chained into one continuous series starting at 1.0 at the end
+    of December 2020. The table does NOT use the chained series: its figures
+    come from the published period files, so they match the rest of the site.
+    """
+    dd = pd.read_csv(drawdown_path, parse_dates=["date"])
+    in_sample = dd[dd["period"].str.startswith("In sample") & dd["monthly_return"].notna()]
+    in_returns = in_sample.pivot(index="date", columns="strategy", values="monthly_return")[ORDER]
+    oos_returns = pd.read_csv(oos_path, index_col="date", parse_dates=True)[ORDER]
+    returns = pd.concat([in_returns, oos_returns])
+
+    growth = (1 + returns).cumprod()
+    growth = pd.concat([pd.DataFrame([[1.0] * len(ORDER)], columns=ORDER, index=[pd.Timestamp("2020-12-31")]), growth])
+    # SPY is an optional, reference-only series. It appears only if
+    # run_spy_reference.py has been run, and never takes part in rankings.
+    has_spy = os.path.exists(spy_returns_path) and os.path.exists(spy_summary_path)
+    series_names = ORDER + (["SPY"] if has_spy else [])
+    if has_spy:
+        spy = pd.read_csv(spy_returns_path, index_col="date", parse_dates=True)["SPY"]
+        if not spy.index.equals(returns.index):
+            raise ValueError("SPY monthly returns do not cover the same months as the strategies.")
+        growth["SPY"] = (1 + spy).cumprod().reindex(growth.index)
+        growth.loc[pd.Timestamp("2020-12-31"), "SPY"] = 1.0
+    drawdown = growth / growth.cummax() - 1
+
+    dates = [d.strftime("%b %Y") for d in growth.index]
+    split = dates.index("Jan 2025")
+
+    full = load_period(full_path)
+    oos = pd.read_csv(oos_summary_path, index_col="label")
+    cost = pd.read_csv(cost_path, index_col="strategy")
+
+    def table_rows(summary: pd.DataFrame, turnover: pd.Series, spy_row: pd.Series = None) -> list:
+        rows = []
+        for name in ORDER:
+            t = turnover.get(name)
+            rows.append({
+                "label": name,
+                "total": pct(summary.loc[name, "total_return"]),
+                "sharpe": num(summary.loc[name, "sharpe_ratio"]),
+                "dd": pct(summary.loc[name, "max_drawdown"]),
+                "turnover": "&ndash;" if t is None or pd.isna(t) else pct(t, 0),
+            })
+        if spy_row is not None:
+            rows.append({
+                "label": "S&amp;P 500 (SPY), reference",
+                "total": pct(spy_row["total_return"]),
+                "sharpe": num(spy_row["sharpe_ratio"]),
+                "dd": pct(spy_row["max_drawdown"]),
+                "turnover": "&ndash;",
+                "reference": True,
+            })
+        return rows
+
+    spy_rows = {}
+    if has_spy:
+        spy_summary = pd.read_csv(spy_summary_path, index_col="period")
+        spy_rows = {"in": spy_summary.loc["In sample"], "out": spy_summary.loc["Out of sample"]}
+
+    return {
+        "dates": dates,
+        "split": split,
+        "growth": {n: [round_half_up(v, 4) for v in growth[n]] for n in series_names},
+        "drawdown": {n: [round_half_up(v, 4) for v in drawdown[n]] for n in series_names},
+        "table": [
+            {"group": "In sample, 2021 to 2024", "rows": table_rows(full, cost["avg_monthly_turnover"], spy_rows.get("in"))},
+            {"group": "Out of sample, January 2025 to August 2026", "rows": table_rows(oos, oos["avg_monthly_turnover"], spy_rows.get("out"))},
+        ],
+    }
+
+
+def update_home_data(path: str, data: dict):
+    """Inject HOME_DATA into index.html."""
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+    pattern = re.compile(r"const HOME_DATA = \{.*?\};", re.DOTALL)
+    if not pattern.search(html):
+        raise ValueError(f"Could not find the HOME_DATA placeholder in {path}.")
+    line = f"const HOME_DATA = {json.dumps(data, separators=(',', ':'))};"
+    html = pattern.sub(lambda m: line, html, count=1)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"Updated {path}: HOME_DATA ({len(data['dates'])} months, split at index {data['split']})")
 
 
 def update_portfolio_html(path: str, timeline: dict):
@@ -569,6 +667,7 @@ if __name__ == "__main__":
     with open("results/backtest_metadata.json") as f:
         metadata = json.load(f)
     update_index_html("index.html", full, metadata)
+    update_home_data("index.html", build_home_data())
 
     with open("results/portfolio_timeline.json") as f:
         timeline = json.load(f)
