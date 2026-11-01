@@ -432,3 +432,29 @@ The Stage 2 checks of the Value path passed all registered gates and wrote no re
 4. The sensitivity of Amendment 10 (item 5) is narrowed to the names that still move by more than a factor of 100 after decision 1. The longer jump list stays in the jump report and is not used to exclude names.
 5. Spin-offs: the listed ratios, including non-integer ones, are applied mechanically, as in Amendment 8. Stale pre-spin balance sheets after a spin-off are reported in the jump report and disclosed, and are not corrected.
 6. The stale rows in portfolio_weights are recorded as a known issue of the stored database. They will be cleaned up in a separate dated entry and do not affect any published figure.
+
+## Amendment 12 (2026-11-01, before any Value or Combined signal test, and before any Value or Combined return was computed)
+
+Amendment 11, decision 2, requires the jump report and the range of P/B to be recomputed after the validity rule, and any further rule to have its own amendment. This amendment records what that check found and adds one labelled test. No Value or Combined return was computed or looked at when this decision was taken.
+
+### Finding (no Value or Combined signal test and no Value or Combined return was computed)
+- After decision 1 of Amendment 11, the moves above a factor of 100 fall from 143 in 59 tickers to 40 in 24 tickers, and the name-months with P/B below 0.1 fall from 150 to 13 (SPG 6, FTI 4, CMG 3). All registered gates pass and the reconciliation closes exactly every month: 65,383 less 451 plus 614 equals 65,546 usable name-months.
+- The list of 24 names of Amendment 11, decision 4, does not cover every remaining extreme value. SPG has the lowest remaining P/B (about 0.0002), from a filing that reports 8,000 shares in one tag only. It has no neighbouring record, so it shows no move, and it is not on the list.
+- A read-only check of every valid book value record, as filed and before split restatement, compared each record with the median of the same ticker's valid records. 45 records in 33 tickers differ from that median by more than a factor of 100. Likely causes, from comparing equity and shares with their own medians: a share count in a filing with one share tag (26 records), equity (11), a share count in a filing with both tags (4), and neither input (4, which may be real moves or thin equity). Tickers with a single record cannot be tested in this way (9 tickers) and are not on the list. Among them, FOX and FOXA each have one record of about 8.6 billion dollars per share, filed on 2019-05-10, and neither has a name-month with P/B below 0.1.
+- The two lists overlap in 20 names, so together they hold 37 names.
+
+### Decisions
+1. Headline: Value and Combined are run as registered, after the validity rule of Amendment 11, decision 1, with raw P/B and nothing excluded. This amendment changes no headline.
+2. One further labelled test is added. The Value and Combined signal and portfolio tests are also run excluding the 37 names below in every month of their history. The names leave both the Momentum and the Value legs before Combined is standardised, and Combined is standardised over the names that remain. The periods and reading rules are those of the headline, and the test is reported whatever the result. The sensitivities of Amendment 11, decisions 3 and 4, remain as registered and are also reported.
+3. The list is fixed here and is not recomputed or changed:
+   - Moves above a factor of 100 after decision 1 (24): AA, AAP, AEP, ALK, AMCR, ANF, ATO, CCL, CHTR, CLF, CLX, CMG, CNX, COR, CRM, CSX, CTVA, FTI, GEN, LUV, PKG, SPGI, SW, WYNN.
+   - A record more than a factor of 100 from the ticker's own median (33): AA, AAP, AEP, ALK, AMCR, AMD, ANF, ATO, CB, CCL, CHTR, CIEN, CMG, CNX, CRM, CSX, CTVA, ENPH, EOG, FTI, FTNT, GEN, IDXX, LUV, MAR, NCLH, PKG, SLE, SPG, SPGI, URI, WST, WYNN.
+   - Names on the second list only (13): AMD, CB, CIEN, ENPH, EOG, FTNT, IDXX, MAR, NCLH, SLE, SPG, URI, WST. Names on the first list only (4): CLF, CLX, COR, SW.
+4. The list uses each ticker's full history, so it could not have been known during the sample, and some of its moves fall outside the evaluation months. It also includes names whose extreme value may be real. The test therefore measures how much the results depend on these names. It is not an investable rule and does not replace any headline.
+
+### Corrections to Amendment 11
+Earlier entries stand as written. These corrections apply to the items named here.
+1. The 177 suspected units errors are 177 tag pairs in 155 filings, across 73 tickers. Amendment 11 counted them as 177 filings.
+2. The lowest P/B before the validity rule was about 0.0000015, not about 0.00001.
+3. After the validity rule, the number of names usable for Value and Combined is between 295 and 426 in every month. The range of 300 to 426 in Amendment 11 was measured before the rule. No month is below the thresholds of 200 and 100.
+4. The wording of Amendment 11, "before any return was computed on the wider universe", was inaccurate, because the Momentum signal tests had already been committed. The same applies to its finding heading, "no signal test and no return on the wider universe was computed". Both statements hold only for Value and Combined.
