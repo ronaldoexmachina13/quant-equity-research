@@ -1,7 +1,8 @@
 """
-Value and Combined path for Phase 4 (LIMITATIONS_PLAN.md, Amendments 8 to 10).
+Value and Combined path for Phase 4 (LIMITATIONS_PLAN.md, Amendments 8 to 11).
 
-Book value per share follows the fixed rule in src/book_value_rule.py and is
+Book value per share follows the fixed rule in src/book_value_rule.py, with its
+validity rule for units errors (Amendment 11, decision 1), and is
 restated to the price's share basis by the filing-date rule in
 src/split_adjust.py. Value uses the split-adjusted close, which is not adjusted
 for dividends. calculate_value_score() and calculate_combined_score() are
@@ -15,7 +16,7 @@ from fractions import Fraction
 
 import pandas as pd
 
-from src.book_value_rule import fixed_book_value_records, suspected_units_errors
+from src.book_value_rule import valid_book_value_records, suspected_units_errors
 from src.factors import calculate_value_score, calculate_combined_score
 from src.split_adjust import restate_book_value
 from src.universe import cache_dir, write_bytes_atomic
@@ -23,6 +24,10 @@ from src.universe import cache_dir, write_bytes_atomic
 SPLIT_CUTOFF = "2026-10-28"   # Amendment 10, item 3: the cached closes carry adjustments up to this date
 JUMP_FACTOR = 2.0             # Amendment 8: a move above this in a month is listed
 MAX_DENOMINATOR = 20          # a ratio is read as an ordinary split if it is a simple fraction, such as 3:2 or 1:20
+EXTREME_MOVE_FACTOR = 100     # Amendment 11, decision 4: names above this are excluded in a labelled sensitivity
+WINSOR_LOWER = 0.01           # Amendment 11, decision 3: cross-sectional percentiles of P/B, sensitivity only
+WINSOR_UPPER = 0.99
+LOW_PB = 0.1                  # Amendment 11, finding: P/B below this is listed. Report only
 
 
 def split_path(ticker: str):
@@ -58,11 +63,11 @@ def apply_split_cutoff(history: dict, cutoff: str = SPLIT_CUTOFF) -> tuple[dict,
 
 
 def build_records(tickers: list[str], read_facts) -> tuple[dict, pd.DataFrame]:
-    """({ticker: fixed-rule records}, suspected units errors with their ticker) from a facts reader."""
+    """({ticker: valid records, blanks included}, suspected units errors with their ticker) from a facts reader."""
     records, errors = {}, []
     for ticker in tickers:
         facts = read_facts(ticker)
-        records[ticker] = fixed_book_value_records(facts)
+        records[ticker] = valid_book_value_records(facts)
         found = suspected_units_errors(facts)
         if not found.empty:
             errors.append(found.assign(ticker=ticker))
@@ -89,6 +94,46 @@ def value_signal(close: pd.DataFrame, book_value: pd.DataFrame, mask: pd.DataFra
 def combined_signal(momentum: pd.DataFrame, value: pd.DataFrame) -> pd.DataFrame:
     """calculate_combined_score() unchanged. Each leg is already masked to its own usable names (reading 3)."""
     return calculate_combined_score(momentum, value)
+
+
+# ---------------------------------------------------------------------------
+# Labelled sensitivities (Amendment 11, decisions 3 and 4). No headline uses these
+# ---------------------------------------------------------------------------
+
+def extreme_move_names(jumps: pd.DataFrame, factor: float = EXTREME_MOVE_FACTOR) -> list[str]:
+    """Names in the jump report with a move above `factor`. The rest of the report excludes nothing."""
+    return sorted(jumps.loc[jumps["factor"] > factor, "ticker"].unique())
+
+
+def winsorise_pb(value: pd.DataFrame, lower: float = WINSOR_LOWER, upper: float = WINSOR_UPPER) -> pd.DataFrame:
+    """
+    A Value score with P/B capped at the percentiles of each month's usable
+    names. Rows keep their timing: a row dated t holds P/B from t-1, and its
+    percentiles come from that row only. Ranks change only at the tails.
+    """
+    pb = -value
+    return -pb.clip(lower=pb.quantile(lower, axis=1), upper=pb.quantile(upper, axis=1), axis=0)
+
+
+def excluding_names(signal: pd.DataFrame, names: list[str]) -> pd.DataFrame:
+    """The signal with these names blank in every month, same shape. Must run before any standardising."""
+    return signal.drop(columns=names, errors="ignore").reindex(columns=signal.columns)
+
+
+def sensitivity_signals(momentum: pd.DataFrame, value: pd.DataFrame, extreme_names: list[str]) -> dict:
+    """
+    {sensitivity: {"Value": signal, "Combined": signal}}. Under winsorised_pb
+    the Value signal is for the Fama-MacBeth test, where raw P/B is standardised.
+    Under excluding_extreme_moves the names leave both legs before Combined is
+    standardised. That list is known only after the sample, so this version
+    measures dependence on those names and is not an investable rule.
+    """
+    winsorised = winsorise_pb(value)
+    kept_momentum, kept_value = excluding_names(momentum, extreme_names), excluding_names(value, extreme_names)
+    return {
+        "winsorised_pb": {"Value": winsorised, "Combined": combined_signal(momentum, winsorised)},
+        "excluding_extreme_moves": {"Value": kept_value, "Combined": combined_signal(kept_momentum, kept_value)},
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -159,6 +204,24 @@ def book_value_jumps(book_value: pd.DataFrame, factor: float = JUMP_FACTOR) -> p
     return pd.DataFrame(rows, columns=columns)
 
 
+def pb_range(value: pd.DataFrame, dates: pd.DatetimeIndex | None = None, low: float = LOW_PB) -> dict:
+    """Range of the P/B behind a Value signal, over all its months or only `dates`. Report only."""
+    rows = -(value if dates is None else value.loc[dates])
+    pb = rows.stack().dropna()
+    below = rows < low
+    return {"name_months": len(pb), "min": pb.min(), "p1": pb.quantile(0.01), "median": pb.median(),
+            "p99": pb.quantile(0.99), "max": pb.max(), "below_low": int(below.sum().sum()),
+            "months_below_low": int(below.any(axis=1).sum()), "months": len(rows)}
+
+
+def pb_cases(value: pd.DataFrame, low: float = LOW_PB, top: int = 20) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Name-months with P/B below `low`, and the `top` highest, lowest and highest first. Listed, never excluded."""
+    pb = (-value).stack().dropna().rename("pb").rename_axis(["date", "ticker"]).reset_index()
+    pb["month"] = pb["date"].dt.strftime("%Y-%m")
+    pb = pb[["month", "ticker", "pb"]]
+    return pb[pb["pb"] < low].sort_values("pb").reset_index(drop=True), pb.nlargest(top, "pb").reset_index(drop=True)
+
+
 def is_ordinary_ratio(ratio: float) -> bool:
     """False for ratios such as 1.589, which are usually a spin-off or merger adjustment and not a split."""
     return abs(float(Fraction(ratio).limit_denominator(MAX_DENOMINATOR)) - ratio) < 1e-6
@@ -173,6 +236,7 @@ def split_event_check(records: dict, splits: dict) -> pd.DataFrame:
     """
     rows = []
     for ticker, bv in records.items():
+        bv = bv.dropna(subset=["book_value_per_share"])  # a blank from the validity rule has no value to step from
         if bv.empty:
             continue
         restated = restate_book_value(bv, splits[ticker]).sort_values("filed_date", kind="stable")

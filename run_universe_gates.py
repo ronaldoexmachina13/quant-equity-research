@@ -1,6 +1,6 @@
 """
 Phase 4, Stage 2: reproduction gates (LIMITATIONS_PLAN.md, Phase 4 detailed
-design and Amendments 8 to 10).
+design and Amendments 8 to 11).
 
 Reads the Phase 3 cache and database/universe_feasibility.db, and opens
 database/quant_research.db through the existing loaders. It prints its checks
@@ -18,7 +18,13 @@ With --momentum-only it runs the part that needs no book value or split data:
 
 Without it, the script also runs the Value and Combined path:
 - every ticker has a saved split file and a cached book value source;
-- the filing-date rule on every split, and the jump report (Amendment 8);
+- the validity rule for units errors (Amendment 11, decision 1), already in
+  the book value records;
+- the filing-date rule on every split, and the jump report (Amendment 8),
+  with the names that still move by more than a factor of 100 (Amendment 11,
+  decisions 2 and 4);
+- the range of P/B after the validity rule, with the remaining cases listed
+  (Amendment 11, decision 2);
 - the usable set under the fixed rule, reconciled by name to the Phase 3
   coverage file, closing exactly every month, and the 200 and 100 name
   thresholds re-checked (Amendment 10, item 1);
@@ -46,12 +52,12 @@ from src.universe import (
 from src.universe_study import (
     evaluation_dates, load_calendar, load_usability, read_month_end_prices, momentum_signal, usable_mask,
     count_mismatches, price_ratio_report, price_ratio_failures, top_n_returns, sharpe_failures,
-    holdings_differences,
+    holdings_differences, study_periods,
 )
 from src.universe_value import (
     load_split_history, apply_split_cutoff, build_records, restate_all, value_usable_mask, value_signal,
     combined_signal, reconcile_usable, reconciliation_failures, book_value_jumps, split_event_check,
-    SPLIT_CUTOFF,
+    extreme_move_names, pb_range, pb_cases, SPLIT_CUTOFF, EXTREME_MOVE_FACTOR, LOW_PB,
 )
 
 COVERAGE_PATH = "results/universe_coverage_monthly.csv"
@@ -154,9 +160,32 @@ def print_jump_report(jumps: pd.DataFrame, units: pd.DataFrame, used: pd.DataFra
     print(f"\nJump report: {len(jumps)} moves above a factor of 2 in {jumps['ticker'].nunique()} tickers, "
           f"{int(jumps['ticker'].isin(in_universe).sum())} of them in tickers ever usable")
     print(jumps.round(4).to_string(index=False))
-    print(f"\nSuspected units errors: {len(units)} filings in {units['ticker'].nunique()} tickers")
+    filings = units[["ticker", "filed_date"]].drop_duplicates()
+    print(f"\nSuspected units errors, no book value under Amendment 11, decision 1: {len(units)} tag pairs "
+          f"in {len(filings)} filings and {units['ticker'].nunique()} tickers")
     if not units.empty:
         print(units.round(2).to_string(index=False))
+
+    extreme = jumps[jumps["factor"] > EXTREME_MOVE_FACTOR]
+    names = extreme_move_names(jumps)
+    print(f"\nStill above a factor of {EXTREME_MOVE_FACTOR}: {len(extreme)} moves in {len(names)} tickers, "
+          f"{int(pd.Index(names).isin(in_universe).sum())} of them ever usable")
+    print(extreme.round(4).to_string(index=False))
+    print(f"Names for the labelled sensitivity (Amendment 11, decision 4): {names}")
+
+
+def print_pb_range(value: pd.DataFrame):
+    """Printed before any signal test (Amendment 11, decision 2). No threshold here is a rule."""
+    print("\nRange of P/B after the validity rule, usable names:")
+    rows = {"All months": pb_range(value)}
+    rows.update({label: pb_range(value, dates) for label, dates in study_periods().items()})
+    print(pd.DataFrame(rows).T.to_string(float_format=lambda x: f"{x:.6g}"))
+
+    low, high = pb_cases(value)
+    print(f"\nName-months with P/B below {LOW_PB}: {len(low)} in {low['ticker'].nunique()} tickers")
+    print(low.to_string(index=False, float_format=lambda x: f"{x:.6g}"))
+    print(f"\nHighest P/B, {len(high)} name-months:")
+    print(high.to_string(index=False, float_format=lambda x: f"{x:.6g}"))
 
 
 def print_reconciliation(table: pd.DataFrame):
@@ -254,6 +283,7 @@ def run_value_path(calendar: pd.Series, prices: pd.DataFrame, usability: pd.Data
     combined = combined_signal(momentum, value)
 
     print_jump_report(book_value_jumps(restated), units, used)
+    print_pb_range(value)
 
     table = reconcile_usable(phase3, used)
     print_reconciliation(table)

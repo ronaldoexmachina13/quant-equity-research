@@ -1,5 +1,5 @@
 """
-Unit tests for src/book_value_rule.py (Amendments 9 and 10).
+Unit tests for src/book_value_rule.py (Amendments 9 to 11).
 
 All inputs are small invented examples whose answers were worked out by
 hand. No network, no real data.
@@ -8,8 +8,10 @@ import pandas as pd
 import pytest
 
 from src.book_value_rule import (
-    fixed_equity, fixed_shares, fixed_book_value_records, suspected_units_errors,
+    fixed_equity, fixed_shares, fixed_book_value_records, suspected_units_errors, invalid_filing_dates,
+    valid_book_value_records,
 )
+from src.split_adjust import filled_book_value, restate_book_value
 
 STANDARD = "StockholdersEquity"
 INCLUDING_NCI = "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"
@@ -178,3 +180,93 @@ def test_tags_in_different_filings_are_not_compared():
 
 def test_units_check_with_one_tag_only_is_empty():
     assert suspected_units_errors(make_facts(balance_sheet=[entry("2020-03-31", "2020-04-24", 100)])).empty
+
+
+def units_error_facts():
+    """Three quarters of 100 shares: the middle filing also has a cover count 125 times too high."""
+    return make_facts(standard=[entry("2020-03-31", "2020-04-24", 1000), entry("2020-06-30", "2020-07-24", 1100),
+                                entry("2020-09-30", "2020-10-24", 1200)],
+                      balance_sheet=[entry("2020-03-31", "2020-04-24", 100), entry("2020-06-30", "2020-07-24", 100),
+                                     entry("2020-09-30", "2020-10-24", 100)],
+                      cover_page=[entry("2020-07-20", "2020-07-24", 12_500)])
+
+
+def test_invalid_filing_dates_are_unique_and_sorted():
+    # Two balance sheet rows against one cover row in one filing give two pairs, and one filing.
+    facts = make_facts(balance_sheet=[entry("2020-03-31", "2020-07-24", 5_000_000), entry("2020-06-30", "2020-07-24", 5_000_000),
+                                      entry("2020-01-31", "2020-02-24", 5_000_000)],
+                       cover_page=[entry("2020-07-20", "2020-07-24", 40_000), entry("2020-02-20", "2020-02-24", 40_000)])
+    assert list(invalid_filing_dates(facts)) == [pd.Timestamp("2020-02-24"), pd.Timestamp("2020-07-24")]
+
+
+def test_no_invalid_filing_leaves_the_fixed_rule_records_unchanged():
+    facts = make_facts(standard=[entry("2020-03-31", "2020-04-24", 1000)],
+                       balance_sheet=[entry("2020-03-31", "2020-04-24", 100)],
+                       cover_page=[entry("2020-04-20", "2020-04-24", 90)])
+    pd.testing.assert_frame_equal(valid_book_value_records(facts), fixed_book_value_records(facts))
+
+
+def test_exactly_a_factor_of_100_stays_valid():
+    facts = make_facts(standard=[entry("2020-03-31", "2020-04-24", 1000)],
+                       balance_sheet=[entry("2020-03-31", "2020-04-24", 100)],
+                       cover_page=[entry("2020-04-20", "2020-04-24", 10_000)])
+    assert valid_book_value_records(facts)["book_value_per_share"].tolist() == [10.0]
+
+
+def test_an_invalid_filing_becomes_one_blank_and_keeps_the_valid_filings():
+    records = valid_book_value_records(units_error_facts())
+    assert records["filed_date"].tolist() == [pd.Timestamp("2020-04-24"), pd.Timestamp("2020-07-24"), pd.Timestamp("2020-10-24")]
+    assert records["book_value_per_share"].iloc[[0, 2]].tolist() == [10.0, 12.0]
+    assert pd.isna(records["book_value_per_share"].iloc[1])
+    assert pd.isna(records["end_date"].iloc[1])
+
+
+def test_the_previous_value_is_not_carried_through_an_invalid_filing():
+    # The point of the blank: the April value must stop in July, and only the October filing brings a value back.
+    months = pd.to_datetime(["2020-06-30", "2020-07-31", "2020-09-30", "2020-10-31"])
+    wide = filled_book_value({"AAA": valid_book_value_records(units_error_facts())}, months)
+    assert wide["AAA"].iloc[0] == 10.0
+    assert wide["AAA"].iloc[1:3].isna().all()
+    assert wide["AAA"].iloc[3] == 12.0
+
+
+def test_a_blank_survives_the_split_restatement():
+    splits = pd.Series([2.0], index=pd.to_datetime(["2021-01-15"]))
+    restated = restate_book_value(valid_book_value_records(units_error_facts()), splits)
+    assert restated["book_value_per_share"].iloc[[0, 2]].tolist() == [5.0, 6.0]
+    assert pd.isna(restated["book_value_per_share"].iloc[1])
+
+
+def test_a_clean_equity_figure_cannot_pair_with_a_share_count_from_an_invalid_filing():
+    # Equity from April is within 45 days of the bad May filing's share counts, its only figures.
+    facts = make_facts(standard=[entry("2020-03-31", "2020-04-24", 1000)],
+                       balance_sheet=[entry("2020-04-30", "2020-05-20", 100)],
+                       cover_page=[entry("2020-05-01", "2020-05-20", 12_500)])
+    records = valid_book_value_records(facts)
+    assert records["filed_date"].tolist() == [pd.Timestamp("2020-05-20")]
+    assert records["book_value_per_share"].isna().all()
+
+
+def test_the_rule_runs_before_the_share_preference():
+    # The balance sheet row is removed with its filing, so the cover figure from a clean filing can be used.
+    facts = make_facts(standard=[entry("2020-03-31", "2020-08-20", 1000)],
+                       balance_sheet=[entry("2020-03-31", "2020-07-24", 5_000_000)],
+                       cover_page=[entry("2020-03-31", "2020-08-20", 50), entry("2020-07-20", "2020-07-24", 40_000)])
+    valid = valid_book_value_records(facts).dropna(subset=["book_value_per_share"])
+    assert valid["book_value_per_share"].tolist() == [20.0]
+    assert valid["filed_date"].tolist() == [pd.Timestamp("2020-08-20")]
+
+
+def test_a_filing_is_judged_on_its_own_date():
+    # A July error cannot remove what April reported, so no later data reaches the April record.
+    records = valid_book_value_records(units_error_facts())
+    assert records.loc[records["filed_date"] == pd.Timestamp("2020-04-24"), "book_value_per_share"].tolist() == [10.0]
+
+
+def test_an_invalid_filing_with_nothing_else_gives_blanks_only():
+    facts = make_facts(balance_sheet=[entry("2020-03-31", "2020-04-24", 5_000_000)],
+                       cover_page=[entry("2020-04-20", "2020-04-24", 40_000)])
+    records = valid_book_value_records(facts)
+    assert len(records) == 1
+    assert list(records.columns) == ["end_date", "filed_date", "book_value_per_share"]
+    assert records["book_value_per_share"].isna().all()

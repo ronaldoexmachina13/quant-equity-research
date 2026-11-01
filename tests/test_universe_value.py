@@ -11,7 +11,8 @@ import pytest
 from src.universe_value import (
     SPLIT_CUTOFF, split_path, write_split_file, load_split_history, apply_split_cutoff, build_records,
     value_usable_mask, value_signal, combined_signal, reconcile_usable, reconciliation_failures,
-    book_value_jumps, split_event_check, is_ordinary_ratio,
+    book_value_jumps, split_event_check, is_ordinary_ratio, extreme_move_names, winsorise_pb, excluding_names,
+    sensitivity_signals, pb_range, pb_cases,
 )
 
 MONTHS = pd.to_datetime(["2020-01-31", "2020-02-29", "2020-03-31"])
@@ -66,7 +67,8 @@ def test_cut_off_keeps_the_day_itself_and_lists_later_splits():
     assert ignored.to_dict("records") == [{"ticker": "AAA", "date": pd.Timestamp("2026-10-29"), "ratio": 3.0}]
 
 
-def test_build_records_applies_the_rule_and_keeps_tickers_with_empty_facts():
+def test_build_records_applies_the_validity_rule_and_keeps_tickers_with_empty_facts():
+    # Share tags of 101 and 1 in one filing are a factor of 101: that filing has no book value.
     facts = {"AAA": {"facts": {
         "us-gaap": {"StockholdersEquity": {"units": {"USD": [{"end": "2020-03-31", "filed": "2020-04-24", "val": 1010}]}},
                     "CommonStockSharesOutstanding": {"units": {"shares": [
@@ -75,7 +77,8 @@ def test_build_records_applies_the_rule_and_keeps_tickers_with_empty_facts():
             {"end": "2020-04-20", "filed": "2020-04-24", "val": 1}]}}}}},
              "BBB": {}}
     result, units = build_records(["AAA", "BBB"], facts.get)
-    assert result["AAA"]["book_value_per_share"].tolist() == [10.0]
+    assert result["AAA"]["filed_date"].tolist() == [pd.Timestamp("2020-04-24")]
+    assert result["AAA"]["book_value_per_share"].isna().all()
     assert result["BBB"].empty
     assert units["ticker"].tolist() == ["AAA"]
     assert units["factor"].tolist() == [101.0]
@@ -227,3 +230,108 @@ def test_split_event_check_handles_a_split_with_no_filing_on_one_side():
 def test_split_event_check_skips_tickers_with_no_records():
     empty = pd.DataFrame(columns=["end_date", "filed_date", "book_value_per_share"])
     assert split_event_check({"AAA": empty}, {"AAA": splits(("2024-02-26", 3.0))}).empty
+
+
+def test_split_check_passes_over_a_blank_from_the_validity_rule():
+    # The filing before the split is a blank, so the step is measured from the last filing with a value.
+    bv = pd.concat([records(("2019-12-31", "2020-02-01", 100.0), ("2020-03-31", "2020-05-01", 50.0)),
+                    records((None, "2020-03-01", float("nan")))], ignore_index=True)
+    row = split_event_check({"AAA": bv}, {"AAA": splits(("2020-04-01", 2.0))}).iloc[0]
+    assert row["as_filed_before"] == 100.0
+    assert row["restated_step"] == 1.0
+
+
+def test_extreme_move_names_are_strictly_above_the_factor():
+    jumps = pd.DataFrame({"ticker": ["BBB", "AAA", "AAA", "CCC"], "factor": [150.0, 101.0, 300.0, 100.0]})
+    assert extreme_move_names(jumps) == ["AAA", "BBB"]
+
+
+def test_extreme_move_names_on_an_empty_report():
+    assert extreme_move_names(pd.DataFrame(columns=["ticker", "factor"])) == []
+
+
+def wide_scores(pb_values):
+    """One month of Value scores from a list of P/B values."""
+    names = [f"N{i:03d}" for i in range(len(pb_values))]
+    return pd.DataFrame([[-p for p in pb_values]], index=MONTHS[:1], columns=names, dtype=float)
+
+
+def test_winsorise_caps_both_tails_at_the_percentiles():
+    # P/B 1 to 101: position 0.01 * 100 = 1 is 2, and position 0.99 * 100 = 99 is 100.
+    result = -winsorise_pb(wide_scores(list(range(1, 102)))).iloc[0]
+    assert result.iloc[0] == 2.0
+    assert result.iloc[-1] == 100.0
+    assert result.iloc[1:-1].tolist() == list(range(2, 101))
+
+
+def test_winsorise_uses_each_month_on_its_own_and_skips_blanks():
+    frame = pd.DataFrame({"A": [-1.0, -100.0], "B": [-2.0, np.nan], "C": [-3.0, -300.0]}, index=MONTHS[:2])
+    result = winsorise_pb(frame, lower=0.5, upper=0.5)
+    # Month 1 has median 2. Month 2 has only A and C, median 200, and B stays blank.
+    assert result.iloc[0].tolist() == [-2.0, -2.0, -2.0]
+    assert result.loc[MONTHS[1], ["A", "C"]].tolist() == [-200.0, -200.0]
+    assert np.isnan(result.loc[MONTHS[1], "B"])
+
+
+def test_winsorise_stops_one_extreme_value_flattening_the_others():
+    # The reason for decision 3: with raw P/B the z-score gap between ordinary names nearly vanishes.
+    raw = wide_scores(list(range(1, 101)) + [1_000_000])
+    capped = winsorise_pb(raw)
+    # P/B 3 and 4 are one apart. The standard deviation is about 99,500 raw and about 29 capped.
+    gap = lambda frame: abs((frame.iloc[0, 2] - frame.iloc[0, 3]) / frame.iloc[0].std())
+    assert gap(raw) < 0.0001
+    assert gap(capped) > 0.03
+
+
+def test_excluding_names_blanks_every_month_and_keeps_the_shape():
+    frame = pd.DataFrame({"A": [1.0, 2.0], "B": [3.0, 4.0]}, index=MONTHS[:2])
+    result = excluding_names(frame, ["B", "NOT_THERE"])
+    assert list(result.columns) == ["A", "B"]
+    assert result["A"].tolist() == [1.0, 2.0]
+    assert result["B"].isna().all()
+
+
+def test_sensitivity_signals_leave_the_inputs_unchanged():
+    momentum = pd.DataFrame([[0.1, 0.2, 0.3, 0.4]], index=MONTHS[:1], columns=list("ABCD"))
+    value = pd.DataFrame([[-1.0, -2.0, -3.0, -4.0]], index=MONTHS[:1], columns=list("ABCD"))
+    before = value.copy()
+    sensitivity_signals(momentum, value, ["D"])
+    pd.testing.assert_frame_equal(value, before)
+
+
+def test_excluded_names_leave_combined_before_it_is_standardised():
+    # Without D, momentum 0.1, 0.2, 0.3 and P/B 3, 2, 1 have z-scores -1, 0, 1 in both legs.
+    momentum = pd.DataFrame([[0.1, 0.2, 0.3, 9.0]], index=MONTHS[:1], columns=list("ABCD"))
+    value = pd.DataFrame([[-3.0, -2.0, -1.0, -1000.0]], index=MONTHS[:1], columns=list("ABCD"))
+    combined = sensitivity_signals(momentum, value, ["D"])["excluding_extreme_moves"]["Combined"].iloc[0]
+    assert combined[list("ABC")].tolist() == pytest.approx([-1.0, 0.0, 1.0])
+    assert np.isnan(combined["D"])
+
+
+def test_winsorised_combined_uses_the_capped_value_leg():
+    names = [f"N{i:03d}" for i in range(101)]
+    momentum = pd.DataFrame([[float(i) for i in range(101)]], index=MONTHS[:1], columns=names)
+    value = wide_scores(list(range(1, 102)))
+    result = sensitivity_signals(momentum, value, [])["winsorised_pb"]
+    pd.testing.assert_frame_equal(result["Value"], winsorise_pb(value))
+    pd.testing.assert_frame_equal(result["Combined"], combined_signal(momentum, winsorise_pb(value)))
+
+
+def test_pb_range_counts_and_period_filter():
+    value = pd.DataFrame({"A": [-0.05, -2.0], "B": [-3.0, -0.01], "C": [-5.0, np.nan]}, index=MONTHS[:2])
+    report = pb_range(value)
+    assert report["name_months"] == 5
+    assert report["min"] == 0.01
+    assert report["max"] == 5.0
+    assert report["median"] == 2.0
+    assert report["below_low"] == 2
+    assert report["months_below_low"] == 2
+    assert pb_range(value, MONTHS[:1])["below_low"] == 1
+
+
+def test_pb_cases_lists_low_and_high_name_months():
+    value = pd.DataFrame({"A": [-0.05, -2.0], "B": [-3.0, -0.01]}, index=MONTHS[:2])
+    low, high = pb_cases(value, top=1)
+    assert low.to_dict("records") == [{"month": "2020-02", "ticker": "B", "pb": 0.01},
+                                      {"month": "2020-01", "ticker": "A", "pb": 0.05}]
+    assert high.to_dict("records") == [{"month": "2020-01", "ticker": "B", "pb": 3.0}]
