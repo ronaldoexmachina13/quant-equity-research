@@ -13,13 +13,19 @@ usable for Momentum with a book value at the end of t-1. It is reconciled to
 the Phase 3 coverage file by name, month by month (Amendment 10, item 1).
 """
 from fractions import Fraction
+from pathlib import Path
 
 import pandas as pd
 
 from src.book_value_rule import valid_book_value_records, suspected_units_errors
 from src.factors import calculate_value_score, calculate_combined_score
+from src.signal_eval import (
+    rank_ic, quintile_spread, monthly_statistic, monthly_counts, fama_macbeth_slopes, summarize_signal,
+    series_summary, MIN_NAMES_PER_MONTH,
+)
 from src.split_adjust import restate_book_value
 from src.universe import cache_dir, write_bytes_atomic
+from src.universe_study import counts_frame, series_frame
 
 SPLIT_CUTOFF = "2026-10-28"   # Amendment 10, item 3: the cached closes carry adjustments up to this date
 JUMP_FACTOR = 2.0             # Amendment 8: a move above this in a month is listed
@@ -28,6 +34,24 @@ EXTREME_MOVE_FACTOR = 100     # Amendment 11, decision 4: names above this are e
 WINSOR_LOWER = 0.01           # Amendment 11, decision 3: cross-sectional percentiles of P/B, sensitivity only
 WINSOR_UPPER = 0.99
 LOW_PB = 0.1                  # Amendment 11, finding: P/B below this is listed. Report only
+
+# Amendment 12, decision 3: both lists are fixed there and are never recomputed.
+EXTREME_MOVE_LIST = ["AA", "AAP", "AEP", "ALK", "AMCR", "ANF", "ATO", "CCL", "CHTR", "CLF", "CLX", "CMG", "CNX", "COR",
+                     "CRM", "CSX", "CTVA", "FTI", "GEN", "LUV", "PKG", "SPGI", "SW", "WYNN"]
+EXTREME_RECORD_LIST = ["AA", "AAP", "AEP", "ALK", "AMCR", "AMD", "ANF", "ATO", "CB", "CCL", "CHTR", "CIEN", "CMG", "CNX",
+                       "CRM", "CSX", "CTVA", "ENPH", "EOG", "FTI", "FTNT", "GEN", "IDXX", "LUV", "MAR", "NCLH", "PKG",
+                       "SLE", "SPG", "SPGI", "URI", "WST", "WYNN"]
+AMENDMENT_12_LIST = sorted(set(EXTREME_MOVE_LIST) | set(EXTREME_RECORD_LIST))
+
+HEADLINE, WINSORISED, EXCLUDING_24, EXCLUDING_37 = "headline", "winsorised_pb", "excl_24", "excl_37"
+SIGNAL_SETS = [HEADLINE, WINSORISED, EXCLUDING_24, EXCLUDING_37]
+OUTPUT_PARTS = ["monthly_counts", "ic_monthly", "spread_monthly", "signal_summary"]
+JUMP_REPORT = "bv_jumps"
+RESULTS_DIR = Path("results")
+SUMMARY_COLUMNS = ["test", "signal", "period", "months", "mean", "ci_90_lower", "ci_90_upper", "share_positive",
+                   "excludes_zero", "annualised_mean", "annualised_ci_90_lower", "annualised_ci_90_upper"]
+JUMP_REPORT_COLUMNS = ["record_type", "ticker", "month", "date", "previous", "value", "factor", "months_since_previous",
+                       "balance_sheet", "cover_page", "ratio", "restated_before", "restated_after"]
 
 
 def split_path(ticker: str):
@@ -134,6 +158,129 @@ def sensitivity_signals(momentum: pd.DataFrame, value: pd.DataFrame, extreme_nam
         "winsorised_pb": {"Value": winsorised, "Combined": combined_signal(momentum, winsorised)},
         "excluding_extreme_moves": {"Value": kept_value, "Combined": combined_signal(kept_momentum, kept_value)},
     }
+
+
+def signal_sets(momentum: pd.DataFrame, value: pd.DataFrame) -> dict:
+    """
+    {set: {"Momentum": signal, "Value": signal, "Combined": signal}} for the
+    headline and the three labelled extras. Excluded names leave both legs
+    before Combined is standardised, under both lists.
+    """
+    def excluded(names: list[str]) -> dict:
+        chosen = sensitivity_signals(momentum, value, names)["excluding_extreme_moves"]
+        return {"Momentum": excluding_names(momentum, names), **chosen}
+
+    return {
+        HEADLINE: {"Momentum": momentum, "Value": value, "Combined": combined_signal(momentum, value)},
+        WINSORISED: {"Momentum": momentum, **sensitivity_signals(momentum, value, [])["winsorised_pb"]},
+        EXCLUDING_24: excluded(EXTREME_MOVE_LIST),
+        EXCLUDING_37: excluded(AMENDMENT_12_LIST),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Stage 3 outputs and frames
+# ---------------------------------------------------------------------------
+
+def value_combined_outputs(folder: Path = RESULTS_DIR) -> dict:
+    """
+    {(set, part): path} for every file of the Value and Combined run: four
+    files for each set, and the jump report under its registered name.
+    """
+    paths = {}
+    for name in SIGNAL_SETS:
+        ending = "_value_combined" if name == HEADLINE else f"_value_combined_{name}"
+        paths.update({(name, part): folder / f"universe_study_{part}{ending}.csv" for part in OUTPUT_PARTS})
+    paths[("report", JUMP_REPORT)] = folder / f"universe_study_{JUMP_REPORT}.csv"
+    return paths
+
+
+def existing_outputs(paths) -> list[str]:
+    return sorted(str(path) for path in paths if Path(path).exists())
+
+
+def slope_summary(signal: str, slopes: dict, periods: dict, n_sims: int = 5000, seed: int = 42) -> pd.DataFrame:
+    """One row per test and period for slope series, in the layout of summarize_signal()."""
+    rows = [{"test": test, "signal": signal, "period": period,
+             **series_summary(series.reindex(dates), n_sims=n_sims, seed=seed)}
+            for period, dates in periods.items() for test, series in slopes.items()]
+    return pd.DataFrame(rows).reindex(columns=SUMMARY_COLUMNS)
+
+
+def signal_set_frames(signals: dict, returns: pd.DataFrame, coverage: pd.DataFrame, periods: dict,
+                      value_slopes_only: bool = False, n_sims: int = 5000, seed: int = 42,
+                      min_names: int = MIN_NAMES_PER_MONTH) -> dict:
+    """
+    The four output frames of one signal set. Value and Combined each get rank
+    IC, quintile spread and single-signal Fama-MacBeth, and Momentum and Value
+    together get the joint Fama-MacBeth. With value_slopes_only, Value keeps its
+    two Fama-MacBeth tests only (Amendment 11, decision 3, as answered).
+    """
+    joint = fama_macbeth_slopes({name: signals[name] for name in ("Momentum", "Value")}, returns, min_names)
+    extra_slopes = {"Value": {"fama_macbeth_joint": joint["Value"]}, "Combined": {}}
+
+    ic_frames, spread_frames, summaries = [], [], []
+    for name in ("Value", "Combined"):
+        slopes = {"fama_macbeth_single": fama_macbeth_slopes({name: signals[name]}, returns, min_names)[name],
+                  **extra_slopes[name]}
+        if name == "Value" and value_slopes_only:
+            summaries.append(slope_summary(name, slopes, periods, n_sims, seed))
+            continue
+        ic = monthly_statistic(signals[name], returns, rank_ic, min_names)
+        spread = monthly_statistic(signals[name], returns, quintile_spread, min_names)
+        ic_frames.append(series_frame(ic, name, "rank_ic"))
+        spread_frames.append(series_frame(spread, name, "quintile_spread"))
+        summaries.append(summarize_signal(name, ic, spread, slopes, periods, n_sims=n_sims, seed=seed)[SUMMARY_COLUMNS])
+    summaries.append(slope_summary("Momentum", {"fama_macbeth_joint": joint["Momentum"]}, periods, n_sims, seed))
+
+    return {
+        "monthly_counts": counts_frame(monthly_counts(signals["Value"], returns), coverage, "value_combined"),
+        "ic_monthly": pd.concat(ic_frames, ignore_index=True),
+        "spread_monthly": pd.concat(spread_frames, ignore_index=True),
+        "signal_summary": pd.concat(summaries, ignore_index=True),
+    }
+
+
+def signal_set_failures(label: str, signals: dict, returns: pd.DataFrame,
+                        min_names: int = MIN_NAMES_PER_MONTH) -> list[str]:
+    """Every month: enough names, Value and Combined on the same names, and no name without a return."""
+    counts = monthly_counts(signals["Value"], returns)
+    combined = signals["Combined"].notna().sum(axis=1)
+    failures = []
+    for date, row in counts.iterrows():
+        month = date.strftime("%Y-%m")
+        if row["usable"] < min_names:
+            failures.append(f"{label} {month}: {row['usable']} usable names, below {min_names}")
+        if row["usable"] != combined[date]:
+            failures.append(f"{label} {month}: Value has {row['usable']} names, Combined {combined[date]}")
+        if row["no_return"] != 0:
+            failures.append(f"{label} {month}: {row['no_return']} names with no return, so the universe note would be false")
+    return failures
+
+
+def registered_list_failures(jumps: pd.DataFrame) -> list[str]:
+    """The names recomputed from the jump report must equal the list fixed in Amendment 12. A check, never a new list."""
+    found = extreme_move_names(jumps)
+    return [] if found == EXTREME_MOVE_LIST else [f"found {found}, registered {EXTREME_MOVE_LIST}"]
+
+
+def jump_report_frame(jumps: pd.DataFrame, units: pd.DataFrame, checks: pd.DataFrame) -> pd.DataFrame:
+    """
+    The jump report: every move, every suspected units error, and large
+    restated steps at events with a non-simple ratio, which are the spin-offs
+    of Amendment 11, decision 5. Reported, never corrected or excluded.
+    """
+    steps = checks[checks["large_step"] & ~checks["ordinary_ratio"]]
+    size = steps["restated_step"].where(steps["restated_step"] >= 1, 1 / steps["restated_step"])
+    frames = [
+        jumps.assign(record_type="move"),
+        units.assign(record_type="units_error", date=pd.to_datetime(units["filed_date"]).dt.strftime("%Y-%m-%d")),
+        steps.assign(record_type="spin_off_step", factor=size),
+    ]
+    frames = [frame for frame in frames if not frame.empty]
+    if not frames:
+        return pd.DataFrame(columns=JUMP_REPORT_COLUMNS)
+    return pd.concat(frames, ignore_index=True).reindex(columns=JUMP_REPORT_COLUMNS)
 
 
 # ---------------------------------------------------------------------------

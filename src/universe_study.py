@@ -189,3 +189,28 @@ def period_labels(dates: pd.DatetimeIndex) -> pd.Series:
     """New test or re-test for each date, for the monthly files."""
     new_test_end = evaluation_dates(end=NEW_TEST_END)[-1]
     return pd.Series([NEW_TEST if d <= new_test_end else RE_TEST for d in dates], index=dates)
+
+
+# ---------------------------------------------------------------------------
+# Monthly output frames
+# ---------------------------------------------------------------------------
+
+def monthly_frame(dates: pd.DatetimeIndex) -> pd.DataFrame:
+    return pd.DataFrame({"date": dates, "period": period_labels(dates).values})
+
+
+def counts_frame(counts: pd.DataFrame, coverage: pd.DataFrame, label: str) -> pd.DataFrame:
+    """Output of monthly_counts() with the universe size, and columns named after the signal group."""
+    frame = monthly_frame(counts.index)
+    frame["universe_size"] = coverage["members"].values
+    frame[f"usable_{label}"] = counts["usable"].values
+    frame[f"no_return_{label}"] = counts["no_return"].values
+    return frame
+
+
+def series_frame(series: pd.Series, signal: str, column: str) -> pd.DataFrame:
+    """A monthly series with its period and signal name."""
+    frame = monthly_frame(series.index)
+    frame.insert(2, "signal", signal)
+    frame[column] = series.values
+    return frame

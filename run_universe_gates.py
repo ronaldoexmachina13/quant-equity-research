@@ -251,7 +251,8 @@ def run_gate1b(prices: pd.DataFrame, usability: pd.DataFrame, stored: pd.DataFra
           f"and {int(differs[~in_sample].sum())} of {int((~in_sample).sum())} later months: {list(months[differs])}")
 
 
-def run_value_path(calendar: pd.Series, prices: pd.DataFrame, usability: pd.DataFrame):
+def run_value_path(calendar: pd.Series, prices: pd.DataFrame, usability: pd.DataFrame) -> dict:
+    """Builds and checks the Value and Combined path, and returns what the signal tests need."""
     conn = sqlite3.connect(f"file:{FEASIBILITY_DB_PATH}?mode=ro", uri=True)
     ciks = dict(conn.execute("SELECT ticker, cik FROM ticker_cik WHERE cik IS NOT NULL").fetchall())
     conn.close()
@@ -268,7 +269,8 @@ def run_value_path(calendar: pd.Series, prices: pd.DataFrame, usability: pd.Data
     run_gate1b(prices, usability, stored, records)
 
     restated_records = restate_all(records, splits)
-    print_split_check(split_event_check(records, splits))
+    checks = split_event_check(records, splits)
+    print_split_check(checks)
 
     month_ends = evaluation_dates(FIRST_PRICE_MONTH, EVALUATION_END)
     restated = filled_book_value(restated_records, month_ends)
@@ -282,7 +284,8 @@ def run_value_path(calendar: pd.Series, prices: pd.DataFrame, usability: pd.Data
     value = value_signal(close, restated, used)
     combined = combined_signal(momentum, value)
 
-    print_jump_report(book_value_jumps(restated), units, used)
+    jumps = book_value_jumps(restated)
+    print_jump_report(jumps, units, used)
     print_pb_range(value)
 
     table = reconcile_usable(phase3, used)
@@ -298,6 +301,7 @@ def run_value_path(calendar: pd.Series, prices: pd.DataFrame, usability: pd.Data
           f"months below {MIN_NAMES_PER_MONTH}: {int((table['used'] < MIN_NAMES_PER_MONTH).sum())}")
     extreme = -value.to_numpy()[np.isfinite(value.to_numpy())]
     print(f"Check of finite P/B: {extreme.size} name-months, all positive: {bool((extreme > 0).all())}")
+    return {"momentum": momentum, "value": value, "jumps": jumps, "units": units, "checks": checks}
 
 
 def main():

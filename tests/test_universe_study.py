@@ -17,6 +17,7 @@ from src.universe_study import (
     evaluation_dates, read_month_end_prices, cached_tickers, usable_mask, momentum_signal,
     count_mismatches, price_ratio_report, price_ratio_failures, top_n_returns, sharpe_failures,
     holdings_differences, study_periods, period_labels, NEW_TEST, RE_TEST, FULL_PERIOD, UNIVERSE_NOTE,
+    counts_frame, series_frame,
 )
 from src.signal_eval import monthly_counts
 
@@ -210,3 +211,27 @@ def test_universe_note_states_the_required_points():
                    "delisted names have no price history", "no delistings occurred"):
         assert phrase in UNIVERSE_NOTE
     assert "—" not in UNIVERSE_NOTE
+
+
+def test_counts_frame_keeps_the_momentum_layout():
+    dates = pd.to_datetime(["2020-12-31", "2021-01-31"])
+    counts = pd.DataFrame({"usable": [300, 301], "no_return": [0, 1]}, index=dates)
+    frame = counts_frame(counts, pd.DataFrame({"members": [500, 501]}), "momentum")
+    assert list(frame.columns) == ["date", "period", "universe_size", "usable_momentum", "no_return_momentum"]
+    assert frame["period"].tolist() == [NEW_TEST, RE_TEST]
+    assert frame["universe_size"].tolist() == [500, 501]
+
+
+def test_counts_frame_names_its_columns_after_the_label():
+    counts = pd.DataFrame({"usable": [300], "no_return": [0]}, index=pd.to_datetime(["2020-12-31"]))
+    frame = counts_frame(counts, pd.DataFrame({"members": [500]}), "value_combined")
+    assert frame["usable_value_combined"].tolist() == [300]
+    assert frame["no_return_value_combined"].tolist() == [0]
+
+
+def test_series_frame_keeps_the_momentum_layout():
+    series = pd.Series([0.1, 0.2], index=pd.to_datetime(["2020-12-31", "2021-01-31"]))
+    frame = series_frame(series, "Momentum", "rank_ic")
+    assert list(frame.columns) == ["date", "period", "signal", "rank_ic"]
+    assert frame["signal"].tolist() == ["Momentum", "Momentum"]
+    assert frame["rank_ic"].tolist() == [0.1, 0.2]
