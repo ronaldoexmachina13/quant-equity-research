@@ -19,8 +19,8 @@ import sqlite3
 
 import pandas as pd
 
-from run_universe_gates import run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures
-from run_universe_signals import load_inputs, stop_if_outputs_exist
+from scripts.universe.run_universe_gates import run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures
+from scripts.universe.run_universe_signals import load_inputs, stop_if_outputs_exist
 from src.backtest import calculate_monthly_returns
 from src.universe import FEASIBILITY_DB_PATH, survivor_group
 from src.universe_study import read_month_end_prices

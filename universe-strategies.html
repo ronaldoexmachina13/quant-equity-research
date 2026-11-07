@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Strategy Analysis | Equity Factor Research</title>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="assets/styles.css?v=3">
 </head>
 <body>
 <nav class="topnav">
@@ -23,7 +23,7 @@
 
   <section class="hero">
     <h1>Strategy analysis</h1>
-    <p class="lede">Each signal on its own: how it is built, what the tests say, whether the reading survives other reasonable choices, and what trading costs do. Select a strategy.</p>
+    <p class="lede">Construction, evidence, sensitivity to the book-value treatment and cost drag, one signal at a time.</p>
   </section>
 
   <div class="strategy-bar" id="strategyBar"></div>
@@ -48,7 +48,7 @@
     <h2>Rolling three-year excess return <span>portfolio minus its benchmark, annualised</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="rollSize"></div></div>
     <div style="position:relative; height:260px;"><canvas id="rollChart"></canvas></div>
-    <p class="caption">Each point compares the geometric return of the portfolio with its benchmark over the previous 36 months, before costs. A signal that works would sit mostly above zero. Long stretches on both sides mean the result depends on the period chosen, which is what a 90% interval that includes zero is telling us.</p>
+    <p class="caption">Each point is the annualised geometric return of the portfolio minus that of its benchmark over the trailing 36 months, before costs. A persistent signal would sit mostly above zero. Sign changes across windows indicate period dependence, which is what an interval that includes zero reflects.</p>
   </div>
 
   <div class="panel">
@@ -90,9 +90,9 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="universe_data.js"></script>
-<script src="universe_sens_data.js"></script>
-<script src="dashboard.js"></script>
+<script src="assets/universe_data.js"></script>
+<script src="assets/universe_sens_data.js"></script>
+<script src="assets/dashboard.js"></script>
 <script>
 const S = UNIVERSE_SENS;
 let sig = "Value", size = "top_decile", sensKey = "rank_ic", costSz = "top_decile";
@@ -100,15 +100,15 @@ let rollChart;
 
 const DEFS = {
   Momentum: {
-    body: "<p><b>How it is built.</b> The signal is the return from 12 months ago to one month ago. The most recent month is skipped, which avoids the short-term reversal in the latest month. Each month the stocks with usable prices are ranked, and the top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Why it might work.</b> Prices may react slowly to news, so recent winners can keep outperforming for a while.</p><p><b>Where it can fail.</b> Momentum can reverse sharply when markets turn, and the holdings change from month to month, so trading costs matter.</p>",
+    body: "<p><b>How it is built.</b> The signal is the return from 12 months ago to one month ago. The latest month is skipped to avoid the one-month reversal effect. Each month the stocks with usable prices are ranked, and the top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Why it might work.</b> Candidate explanations are slow incorporation of news and investor under-reaction, so recent winners may keep outperforming for a while.</p><p><b>Where it can fail.</b> Momentum is exposed to sharp reversals at market turning points, and its holdings turn over quickly, so costs matter.</p>",
     note: "Momentum uses prices only, so the book-value sensitivities below do not apply to it."
   },
   Value: {
-    body: "<p><b>How it is built.</b> The signal is minus the price-to-book ratio: the month-end price from the previous month divided by book value per share from SEC filings, aligned to the date each filing became public. Stocks with a low ratio rank highest, and the top decile or quintile is held at equal weight.</p><p><b>Why it might work.</b> Cheap stocks may compensate investors for risk, or the market may be too pessimistic about them.</p><p><b>Where it can fail.</b> Price-to-book is not adjusted for sector, understates firms whose assets are intangible, and cheap stocks can stay cheap. Share splits and share-count errors in the filings had to be corrected, which is why the sensitivities below exist.</p>",
+    body: "<p><b>How it is built.</b> The signal is minus the price-to-book ratio: the month-end price from the previous month divided by book value per share from SEC filings, aligned to the date each filing became public. Stocks with a low ratio rank highest, and the top decile or quintile is held at equal weight.</p><p><b>Why it might work.</b> Candidate explanations are compensation for distress risk and investor over-pessimism about cheap names.</p><p><b>Where it can fail.</b> Price-to-book is not sector-adjusted, is a poor measure for firms with large intangible assets, and cheap stocks can stay cheap for long periods. Share splits and share-count errors in the filings had to be corrected, which is why the sensitivities below exist.</p>",
     note: ""
   },
   Combined: {
-    body: "<p><b>How it is built.</b> The average of the Momentum and Value z-scores, each standardised across stocks every month. The 50/50 weighting was fixed before testing and was not tuned.</p><p><b>Why it might work.</b> The two signals are often weakly related, so combining them may give a steadier ranking than either alone.</p><p><b>Where it can fail.</b> It inherits the weaknesses of both signals, and it is only available for stocks with both a price history and a book value.</p>",
+    body: "<p><b>How it is built.</b> The average of the Momentum and Value z-scores, each standardised across stocks every month. The 50/50 weighting was fixed before testing and was not tuned.</p><p><b>Why it might work.</b> The two signals are typically weakly correlated, so the average may rank more stably than either alone.</p><p><b>Where it can fail.</b> It inherits the weaknesses of both signals, and it is only available for stocks with both a price history and a book value.</p>",
     note: ""
   }
 };

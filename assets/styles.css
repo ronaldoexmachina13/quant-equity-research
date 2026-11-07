@@ -380,3 +380,13 @@ footer a:hover { color: var(--amber); }
 .stocks-table th, .stocks-table td { padding-left: 0.45rem; padding-right: 0.45rem; }
 .stocks-table td.name { max-width: 128px; }
 .filter-row input { min-width: 150px; }
+
+/* monthly return heatmap */
+.heatmap { width: 100%; border-collapse: separate; border-spacing: 2px; font-size: 0.72rem; table-layout: fixed; }
+.heatmap th { color: var(--muted); font-weight: 400; text-align: center; padding: 0.25rem 0; }
+.heatmap tbody th { text-align: left; padding-right: 0.4rem; }
+.heatmap td { text-align: center; padding: 0.35rem 0; color: var(--text); font-variant-numeric: tabular-nums; }
+.heatmap .hm-empty { background: transparent; }
+.heatmap .hm-year, .heatmap th.hm-year { border-left: 1px solid var(--line); font-weight: 700; }
+.heatmap-wrap { overflow-x: auto; }
+.heatmap-wrap .heatmap { min-width: 640px; }

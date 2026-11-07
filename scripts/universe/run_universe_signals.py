@@ -44,7 +44,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from run_universe_gates import (
+from scripts.universe.run_universe_gates import (
     COVERAGE_PATH, run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures,
 )
 from src.backtest import calculate_monthly_returns

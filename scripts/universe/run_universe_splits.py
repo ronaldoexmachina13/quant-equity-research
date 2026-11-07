@@ -13,7 +13,7 @@ import time
 
 import yfinance as yf
 
-from run_value_split_check import fetch_splits
+from scripts.first_study.run_value_split_check import fetch_splits
 from src.universe import cache_dir, download_with_retries
 from src.universe_study import cached_tickers
 from src.universe_value import split_path, write_split_file

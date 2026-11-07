@@ -41,7 +41,7 @@ from src.risk import (
     minimum_detectable_effect,
     months_needed_to_detect,
 )
-from run_rf_sensitivity import build_return_series
+from scripts.first_study.run_rf_sensitivity import build_return_series
 
 OUTPUT_PATH = "results/power_analysis.csv"
 

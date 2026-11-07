@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portfolio Timeline | Equity Factor Research</title>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="assets/styles.css?v=3">
 </head>
 <body>
 <nav class="topnav">
@@ -41,7 +41,7 @@
       <span><i style="background:#FFFFFF"></i>Equal-weight benchmark (Value and Combined usable)</span>
     </div>
     <div style="position:relative; height:260px;"><canvas id="growthChart"></canvas></div>
-    <p class="caption">Holdings for a month are chosen using data up to the end of the previous month and earn that month's return, so nothing in the list was known to be a winner or loser when it was bought. Names with no price history, which include most delisted companies, cannot appear.</p>
+    <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased.</p>
   </div>
 
   <div class="grid3" id="cols"></div>
@@ -53,10 +53,10 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="universe_data.js"></script>
-<script src="universe_stocks_data.js"></script>
-<script src="universe_holdings_data.js"></script>
-<script src="dashboard.js"></script>
+<script src="assets/universe_data.js"></script>
+<script src="assets/universe_stocks_data.js"></script>
+<script src="assets/universe_holdings_data.js"></script>
+<script src="assets/dashboard.js"></script>
 <script>
 const H = UNIVERSE_HOLDINGS;
 const COMPANY = Object.fromEntries(UNIVERSE_STOCKS.rows.map(r => [r[0], r[1]]));

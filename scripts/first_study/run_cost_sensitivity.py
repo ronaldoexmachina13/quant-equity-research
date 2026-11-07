@@ -40,7 +40,7 @@ from src.backtest import (
     find_break_even_cost,
 )
 from src.risk import total_return, annualized_return, sharpe_ratio
-from run_strategy_comparison import compute_all_scores, backtest_strategy_with_weights
+from scripts.first_study.run_strategy_comparison import compute_all_scores, backtest_strategy_with_weights
 
 OUTPUT_PATH = "results/cost_sensitivity.csv"
 

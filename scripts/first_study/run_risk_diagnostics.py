@@ -35,7 +35,7 @@ from src.risk import (
     hit_rate_vs_benchmark,
     drawdown_series,
 )
-from run_rf_sensitivity import build_return_series
+from scripts.first_study.run_rf_sensitivity import build_return_series
 
 DIAGNOSTICS_PATH = "results/risk_diagnostics.csv"
 DRAWDOWN_PATH = "results/drawdown_series.csv"

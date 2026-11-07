@@ -51,7 +51,7 @@ from src.split_adjust import (
 from src.universe import (
     PRICE_START, cache_dir, make_cached_company_facts, download_with_retries, write_bytes_atomic,
 )
-from run_strategy_comparison import backtest_strategy_with_weights
+from scripts.first_study.run_strategy_comparison import backtest_strategy_with_weights
 
 OUTPUTS = {name: Path("results") / f"value_split_{name}.csv"
            for name in ["summary", "monthly_returns", "holdings", "pb", "events"]}

@@ -17,10 +17,10 @@ from pathlib import Path
 import pandas as pd
 
 RESULTS = Path("results")
-OUT = Path("universe_data.js")
-SENS_OUT = Path("universe_sens_data.js")
-STOCKS_OUT = Path("universe_stocks_data.js")
-HOLDINGS_OUT = Path("universe_holdings_data.js")
+OUT = Path("assets/universe_data.js")
+SENS_OUT = Path("assets/universe_sens_data.js")
+STOCKS_OUT = Path("assets/universe_stocks_data.js")
+HOLDINGS_OUT = Path("assets/universe_holdings_data.js")
 
 
 def clean(value):

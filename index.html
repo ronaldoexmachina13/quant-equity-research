@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Equity Factor Research | Quant Equity Research</title>
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="assets/styles.css?v=3">
 </head>
 <body>
 <nav class="topnav">
@@ -22,20 +22,20 @@
 <div class="wrap">
 
   <section class="hero">
-    <h1>Do momentum and value predict stock returns?</h1>
-    <p class="lede">A pre-registered test on about 500 S&amp;P 500 stocks from 2012 to 2026. Do simple momentum and value signals predict next-month returns, and do portfolios built from them beat an equal-weight benchmark? The evidence is a null result, shown here with its confidence intervals and the limits of free, survivor-biased data.</p>
+    <h1>Momentum and value in S&amp;P 500 stocks</h1>
+    <p class="lede">Pre-registered test of 12-1 momentum, price-to-book value and their average on about 500 S&amp;P 500 members, January 2012 to August 2026. Signals are judged on rank IC, quintile spread and Fama-MacBeth slopes. Top-decile and top-quintile equal-weight portfolios are secondary evidence. Every interval is a 90% bootstrap interval.</p>
 
     <div class="mini-stats">
       <div class="mini-stat"><div class="ms-value" id="kMonths">176</div><div class="ms-label">months tested</div></div>
       <div class="mini-stat"><div class="ms-value" id="kMembers">~500</div><div class="ms-label">index members each month</div></div>
       <div class="mini-stat"><div class="ms-value" id="kIc">0 of 6</div><div class="ms-label">rank IC intervals exclude zero</div></div>
       <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio intervals exclude zero</div></div>
-      <div class="mini-stat"><div class="ms-value">0.055</div><div class="ms-label">smallest mean rank IC detectable in 108 months</div></div>
+      <div class="mini-stat"><div class="ms-value">0.055</div><div class="ms-label">minimum detectable mean IC, 108 months</div></div>
     </div>
 
     <div class="hero-finding" style="margin-top:1.5rem;">
       <b class="box-label">Bottom line</b>
-      None of the three signals showed a statistically detectable relationship with next-month returns in the primary tests. The two portfolio intervals that exclude zero are the same finding measured twice (Value, 2012 to 2020, top decile and top quintile), and about two of 18 would be expected by chance. Because the first test period has 108 months, the test could only detect a mean rank correlation of about 0.055 or more, so the result means &ldquo;not enough evidence&rdquo;, not &ldquo;no effect&rdquo;. The data are free and survivor-biased: differences between portfolios are worth reading, return levels are not.
+      No signal shows a detectable cross-sectional relationship with next-month returns in the primary tests: none of the six rank IC intervals excludes zero. Two of 18 portfolio Sharpe-difference intervals do, both Value in 2012 to 2020 and both the same overlapping bet; about 1.8 would be expected under the null at the 90% level. With 108 months and a monthly IC standard deviation of up to about 0.23, the minimum detectable mean IC is about 0.055, so the evidence is consistent with no effect and with a small one. The data are free and survivor-biased: relative comparisons are informative, return levels are not.
     </div>
   </section>
 
@@ -56,7 +56,29 @@
       <span><i style="background:var(--combined)"></i>Combined</span>
     </div>
     <div style="position:relative; height:260px;"><canvas id="icChart"></canvas></div>
-    <p class="caption">A signal with real predictive power would drift steadily upward. These lines wander without a persistent trend. The dashed line marks the end of the first test period (December 2020); the later months were already known from the first study, so they are a re-test, not out-of-sample evidence.</p>
+    <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Signal statistics <span>monthly rank IC by period</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Period</th><th class="num">Months</th><th class="num">Mean IC</th><th class="num">SD</th><th class="num">Mean / SD</th><th class="num">Hit rate</th></tr></thead>
+        <tbody id="icStatBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">Mean / SD is the monthly information ratio of the signal. Hit rate is the share of months with a positive IC. A mean IC of 0.03 with an SD of 0.23 has a ratio of about 0.13 and would not be separable from zero in 108 months.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Rolling 36-month mean rank IC <span>stability of the signal through time</span></h2>
+    <div class="legend-row">
+      <span><i style="background:var(--momentum)"></i>Momentum</span>
+      <span><i style="background:var(--value)"></i>Value</span>
+      <span><i style="background:var(--combined)"></i>Combined</span>
+    </div>
+    <div style="position:relative; height:240px;"><canvas id="icRollChart"></canvas></div>
+    <p class="caption" id="icRollCaption"></p>
   </div>
 
   <div class="section-label">2 &middot; Portfolios <span>do top-ranked stocks beat the benchmark?</span></div>
@@ -69,10 +91,24 @@
     <h2 id="growthTitle">Growth of $1</h2>
     <div class="legend-row" id="portLegend"></div>
     <div style="position:relative; height:340px;"><canvas id="growthChart"></canvas></div>
-    <p class="caption">Equal-weight holdings of the highest-ranked names, rebalanced monthly. The benchmark is the equal-weight average of every name that had usable data for that signal, so the comparison isolates the signal from the universe. The two test periods are chained for display only and are reported separately in the table. Levels are inflated by survivorship; differences are the informative part.</p>
+    <p class="caption">Equal-weight holdings of the highest-ranked names, rebalanced monthly. The benchmark is the equal-weight average of every name with usable data for that signal, which isolates the signal from the universe. The two test periods are chained for display and reported separately in the table. Levels are inflated by survivorship; differences are the informative part.</p>
 
     <h2 style="margin-top:1.5rem;">Drawdown <span>percentage below each series' previous high</span></h2>
     <div style="position:relative; height:220px;"><canvas id="ddChart"></canvas></div>
+
+    <h2 style="margin-top:1.5rem;">Deepest drawdowns <span>selected portfolio, five largest episodes</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Peak</th><th>Trough</th><th>Recovery</th><th class="num">Depth</th><th class="num">Months to trough</th><th class="num">Months underwater</th></tr></thead>
+        <tbody id="ddBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">Peak-to-trough episodes of the monthly series above. Monthly data understate intramonth drawdowns. A trailing plus sign marks an episode still open at the end of the sample.</p>
+
+    <h2 style="margin-top:1.5rem;">Monthly returns <span>percent, selected portfolio</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="hmTabs"></div></div>
+    <div class="heatmap-wrap" id="heatmap"></div>
+    <p class="caption" id="hmCaption"></p>
 
     <h2 style="margin-top:1.5rem;">Performance by period</h2>
     <div class="timeline-table-wrap" style="max-height:none;">
@@ -81,14 +117,14 @@
         <tbody id="perfBody"></tbody>
       </table>
     </div>
-    <p class="caption">Sharpe ratios use the Treasury bill rate. Turnover is the average share of the portfolio traded each month, including drift. After costs means 10 bps charged on each one-way trade. A difference counts as significant only when the 90% paired bootstrap interval excludes zero (red).</p>
+    <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is flagged (red) only when its 90% paired bootstrap interval excludes zero.</p>
   </div>
 
   <div class="panel">
     <h2>Sharpe difference against the benchmark <span>all 18 headline portfolio comparisons, before costs</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="periodTabs"></div></div>
     <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe difference confidence intervals"></svg>
-    <p class="caption">Each bar is the paired bootstrap interval for the difference in Sharpe ratio between a portfolio and its benchmark (5,000 resamples). Eighteen intervals at the 90% level mean about 1.8 would exclude zero by chance alone. Two do: Value in 2012 to 2020, where the portfolio had a lower Sharpe ratio than the benchmark. They are one finding, because the decile and quintile portfolios overlap, and it does not appear in the re-test or the full period. Some secondary signal tests lean the same way, but they use the same months and stocks, so they are not independent evidence.</p>
+    <p class="caption">Each bar is the paired bootstrap interval for the difference in Sharpe ratio between a portfolio and its benchmark (5,000 resamples). At the 90% level, about 1.8 of 18 intervals would exclude zero under the null. Two do: Value in 2012 to 2020, where the portfolio Sharpe ratio is below the benchmark. They are one finding, since the decile and quintile portfolios overlap, and it is absent from the re-test and the full period. Some secondary signal tests lean the same way, but they share the same months and stocks and are not independent evidence.</p>
   </div>
 
   <div class="section-label">3 &middot; Data quality <span>what the free data can and cannot support</span></div>
@@ -154,8 +190,8 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="universe_data.js"></script>
-<script src="dashboard.js"></script>
+<script src="assets/universe_data.js"></script>
+<script src="assets/dashboard.js"></script>
 <script>
 /* ---------- header figures, all computed from the data ---------- */
 (function headerFigures() {
@@ -191,9 +227,28 @@ drawSignalForest();
   lineChart("icChart", sets, v => v.toFixed(1), v => v.toFixed(2), true);
 })();
 
+/* signal statistics and rolling IC */
+icStatisticsTable("icStatBody");
+(function rollingIc() {
+  const sets = SIGNALS.map(sig => ({ label: sig, data: rollingMean(U.ic[sig], 36), borderColor: COLORS[sig], backgroundColor: COLORS[sig] }));
+  lineChart("icRollChart", sets, v => v.toFixed(2), v => v === null ? "" : v.toFixed(3), true);
+  const sd = SIGNALS.map(s => icStatistics(s, 0, U.dates.length).sd).reduce((a, b) => a + b, 0) / SIGNALS.length;
+  document.getElementById("icRollCaption").textContent =
+    "With a monthly IC standard deviation near " + sd.toFixed(2) + ", one standard error of a 36-month mean is about " + (sd / 6).toFixed(3) +
+    ". Excursions of that size are consistent with noise. The windows overlap, so adjacent points are not independent.";
+})();
+
 /* ---------- 2. portfolios ---------- */
 let sig = "Value", size = "top_decile", basis = "gross";
-let growthChart, ddChart;
+let growthChart, ddChart, currentSeries = null, hmMode = "active";
+function drawHeatmap() {
+  if (!currentSeries) return;
+  const active = hmMode === "active";
+  monthlyHeatmap("heatmap", currentSeries.strat, active ? currentSeries.bench : null, active ? 0.04 : 0.08);
+  document.getElementById("hmCaption").textContent = active
+    ? "Monthly return of the portfolio minus the benchmark, in percentage points; the last column compounds each calendar year. Green is outperformance. Shading saturates at 4 points."
+    : "Monthly portfolio return; the last column compounds each calendar year. Shading saturates at 8%.";
+}
 function benchmarkKey() { return sig === "Momentum" ? "Momentum" : "Value and Combined"; }
 function benchmarkName() { return sig === "Momentum" ? "Benchmark (Momentum usable)" : "Benchmark (Value and Combined usable)"; }
 function drawPortfolios() {
@@ -209,6 +264,9 @@ function drawPortfolios() {
   if (ddChart) ddChart.destroy();
   growthChart = lineChart("growthChart", sets(g), v => "$" + v.toFixed(0), v => "$" + v.toFixed(2), true);
   ddChart = lineChart("ddChart", sets(g.map(drawdown)), v => (v * 100).toFixed(0) + "%", v => pct(v, 1), true, true);
+  drawdownTable("ddBody", strat, 5);
+  currentSeries = { strat, bench };
+  drawHeatmap();
 
   const body = document.getElementById("perfBody");
   body.innerHTML = "";
@@ -239,6 +297,7 @@ function drawPortfolios() {
 buttons("sigTabs", SIGNALS.map(s => ({ key: s, label: s })), sig, k => { sig = k; drawPortfolios(); });
 buttons("sizeTabs", [{ key: "top_decile", label: "Top decile" }, { key: "top_quintile", label: "Top quintile" }], size, k => { size = k; drawPortfolios(); });
 buttons("basisTabs", [{ key: "gross", label: "Before costs" }, { key: "net", label: "After 10 bps costs" }], basis, k => { basis = k; drawPortfolios(); });
+buttons("hmTabs", [{ key: "active", label: "Active vs benchmark" }, { key: "absolute", label: "Absolute" }], hmMode, k => { hmMode = k; drawHeatmap(); });
 drawPortfolios();
 
 /* ---------- Sharpe difference forest ---------- */

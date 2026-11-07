@@ -21,7 +21,7 @@ import gzip
 
 import yfinance as yf
 
-from run_universe_prices import fetch_prices, is_yfinance_missing
+from scripts.universe.run_universe_prices import fetch_prices, is_yfinance_missing
 from src.universe import PRICE_START, PRICE_END, download_with_retries
 from src.universe_portfolio import spy_cache_path
 

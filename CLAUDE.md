@@ -10,7 +10,7 @@ Owner: Ronaldo. Strong in finance, beginner to early-intermediate in Python and 
 ## Hard rules (research integrity)
 1. NEVER overwrite or regenerate existing result files (`results/*.csv`, `results/*.json`, `results/*.png`) unless the task explicitly says so. New analyses write to NEW files.
 2. NEVER let out-of-sample data (2025-01 onward) leak into in-sample outputs. In-sample scripts filter `common_dates <= IN_SAMPLE_END` from `config.py`.
-3. `OUT_OF_SAMPLE_PLAN.md` and `LIMITATIONS_PLAN.md` are pre-registrations. Never edit an existing entry. Changes are appended as dated amendments, and only when I ask.
+3. `docs/OUT_OF_SAMPLE_PLAN.md` and `docs/LIMITATIONS_PLAN.md` are pre-registrations. Never edit an existing entry. Changes are appended as dated amendments, and only when I ask.
 4. Do not tune parameters to improve results. Every variant that is run must be reported, not only the best one.
 5. No dummy or invented data anywhere, except hand-made inputs inside unit tests.
 6. Check for look-ahead bias on every new signal: a value dated t may only use information available at the close of t-1.
@@ -30,5 +30,6 @@ Owner: Ronaldo. Strong in finance, beginner to early-intermediate in Python and 
 ## Repo map
 - `config.py`: UNIVERSE, START_DATE, END_DATE (exclusive in yfinance), IN_SAMPLE_START/END, OUT_OF_SAMPLE_START/END.
 - `src/`: `factors.py`, `portfolio.py`, `backtest.py`, `risk.py`, `database.py`, `fundamentals.py`.
-- Pipeline order: `run_data_pipeline.py`, `run_fundamentals_pipeline.py`, `run_strategy_comparison.py`, `test_significance.py`, `test_transaction_costs.py`, `generate_portfolio_timeline.py`, `generate_stocks_data.py`, `generate_dashboard_data.py`. Then `run_out_of_sample.py` (out-of-sample only).
+- Layout: scripts live in `scripts/universe/` (500-stock study) and `scripts/first_study/` (17-stock study) and run from the repository root as modules, for example `python -m scripts.universe.run_universe_signals`. Dashboard pages are in the root, their script, style and data files in `assets/`.
+- First-study order: `run_data_pipeline`, `run_fundamentals_pipeline`, `run_strategy_comparison`, `test_significance`, `test_transaction_costs`, then `run_out_of_sample` (out-of-sample only). The first-study dashboard generators were removed when its pages were retired.
 - Dashboard is static HTML plus Chart.js. Do not move it to Streamlit.

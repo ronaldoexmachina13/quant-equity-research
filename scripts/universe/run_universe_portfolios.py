@@ -56,9 +56,9 @@ import sqlite3
 
 import pandas as pd
 
-from run_rf_sensitivity import TBILL_PATH, load_tbill_yields, rf_on_return_dates
-from run_universe_gates import run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures
-from run_universe_signals import load_inputs, stop_if_outputs_exist
+from scripts.first_study.run_rf_sensitivity import TBILL_PATH, load_tbill_yields, rf_on_return_dates
+from scripts.universe.run_universe_gates import run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures
+from scripts.universe.run_universe_signals import load_inputs, stop_if_outputs_exist
 from src.backtest import calculate_monthly_returns
 from src.universe import FEASIBILITY_DB_PATH, survivor_group
 from src.universe_study import read_month_end_prices, evaluation_dates, study_periods, UNIVERSE_NOTE

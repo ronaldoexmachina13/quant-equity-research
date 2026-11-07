@@ -39,7 +39,7 @@ from src.risk import (
     sortino_ratio_tbill,
     alpha_regression_tbill,
 )
-from run_strategy_comparison import compute_all_scores, backtest_strategy
+from scripts.first_study.run_strategy_comparison import compute_all_scores, backtest_strategy
 
 TBILL_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=TB3MS"
 TBILL_PATH = "results/tbill_3m_monthly.csv"

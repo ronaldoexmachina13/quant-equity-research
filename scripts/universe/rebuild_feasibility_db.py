@@ -19,7 +19,7 @@ import sqlite3
 
 import pandas as pd
 
-from run_universe_coverage import check_inputs, fill_month_and_group_tables, run_gate1, run_gate2
+from scripts.universe.run_universe_coverage import check_inputs, fill_month_and_group_tables, run_gate1, run_gate2
 from src.universe import (
     FEASIBILITY_DB_PATH, create_feasibility_tables, build_member_month_flags, mark_reliable_months, coverage_query,
 )

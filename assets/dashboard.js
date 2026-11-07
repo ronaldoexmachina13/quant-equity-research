@@ -115,3 +115,90 @@ function summaryRow(period, strategy, sz, b) {
   return U.summary.find(r => r.period === period && r.strategy === strategy && (r.size || null) === (sz || null) && r.basis === b) ||
          U.summary.find(r => r.period === period && r.strategy === strategy && (r.size || null) === (sz || null) && r.basis === "gross");
 }
+
+/* ---------- reading aids for quant readers: drawdown episodes, monthly heatmap, IC statistics ---------- */
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function ymLabel(ym) { return MONTH_NAMES[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4); }
+
+/* Deepest peak-to-trough episodes of a monthly return series. The first peak is the start of the sample. */
+function drawdownEpisodes(returns, count) {
+  let g = 1, peak = 1, peakIdx = -1, cur = null;
+  const eps = [];
+  returns.forEach((r, i) => {
+    g *= 1 + r;
+    if (g >= peak) {
+      if (cur) { cur.recovery = i; eps.push(cur); cur = null; }
+      peak = g; peakIdx = i;
+    } else {
+      const dd = g / peak - 1;
+      if (!cur) cur = { peak: peakIdx, trough: i, depth: dd, recovery: null };
+      else if (dd < cur.depth) { cur.depth = dd; cur.trough = i; }
+    }
+  });
+  if (cur) eps.push(cur);
+  return eps.sort((a, b) => a.depth - b.depth).slice(0, count);
+}
+function drawdownTable(bodyId, returns, count) {
+  const body = document.getElementById(bodyId);
+  const last = returns.length - 1;
+  body.innerHTML = drawdownEpisodes(returns, count).map(e => {
+    const under = (e.recovery === null ? last : e.recovery) - e.peak;
+    return `<tr><td>${e.peak < 0 ? "Start of sample" : ymLabel(U.dates[e.peak])}</td><td>${ymLabel(U.dates[e.trough])}</td>` +
+           `<td>${e.recovery === null ? "Not recovered" : ymLabel(U.dates[e.recovery])}</td>` +
+           `<td class="num">${pct(e.depth, 1)}</td><td class="num">${e.trough - e.peak}</td><td class="num">${under}${e.recovery === null ? "+" : ""}</td></tr>`;
+  }).join("");
+}
+
+/* Year by month grid. With a benchmark it shows the active return (strategy minus benchmark) month by month. */
+function monthlyHeatmap(containerId, returns, bench, scale) {
+  const years = [...new Set(U.dates.map(d => d.slice(0, 4)))];
+  const cell = v => {
+    if (v === null) return `<td class="hm-empty"></td>`;
+    const a = 0.08 + 0.62 * Math.min(Math.abs(v) / scale, 1);
+    const bg = v < 0 ? `rgba(255,90,90,${a.toFixed(2)})` : `rgba(62,216,138,${a.toFixed(2)})`;
+    const txt = (v * 100).toFixed(1).replace(/^-0\.0$/, "0.0");
+    return `<td class="hm-cell" style="background:${bg}">${txt}</td>`;
+  };
+  let html = `<table class="heatmap"><thead><tr><th></th>${MONTH_NAMES.map(m => `<th>${m}</th>`).join("")}<th class="hm-year">Year</th></tr></thead><tbody>`;
+  years.forEach(y => {
+    const row = Array(12).fill(null);
+    let compS = 1, compB = 1, n = 0;
+    U.dates.forEach((d, i) => {
+      if (d.slice(0, 4) !== y) return;
+      const v = bench ? returns[i] - bench[i] : returns[i];
+      row[+d.slice(5, 7) - 1] = v;
+      compS *= 1 + returns[i]; if (bench) compB *= 1 + bench[i]; n++;
+    });
+    const total = bench ? compS - compB : compS - 1;
+    html += `<tr><th>${y}</th>${row.map(cell).join("")}${cell(total).replace("hm-cell", "hm-cell hm-year")}</tr>`;
+  });
+  document.getElementById(containerId).innerHTML = html + "</tbody></table>";
+}
+
+/* Mean, dispersion and hit rate of the monthly rank IC for one signal over one slice of months. */
+function icStatistics(signal, from, to) {
+  const x = U.ic[signal].slice(from, to), n = x.length;
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+  const sd = Math.sqrt(x.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (n - 1));
+  return { n, mean, sd, ir: mean / sd, hit: x.filter(v => v > 0).length / n };
+}
+function icStatisticsTable(bodyId) {
+  const cuts = [[0, U.split], [U.split, U.dates.length], [0, U.dates.length]];
+  const body = document.getElementById(bodyId);
+  body.innerHTML = "";
+  SIGNALS.forEach(sig => {
+    const head = document.createElement("tr");
+    head.className = "tbl-group";
+    head.innerHTML = `<td colspan="6">${sig}</td>`;
+    body.appendChild(head);
+    PERIODS.forEach((p, k) => {
+      const s = icStatistics(sig, cuts[k][0], cuts[k][1]);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${p.label}</td><td class="num">${s.n}</td><td class="num">${sgn(s.mean, 3)}</td><td class="num">${s.sd.toFixed(3)}</td><td class="num">${sgn(s.ir, 2)}</td><td class="num">${pct(s.hit, 0)}</td>`;
+      body.appendChild(tr);
+    });
+  });
+}
+function rollingMean(series, window) {
+  return series.map((_, i) => i < window - 1 ? null : series.slice(i - window + 1, i + 1).reduce((a, b) => a + b, 0) / window);
+}
