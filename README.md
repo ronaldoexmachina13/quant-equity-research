@@ -80,14 +80,16 @@ Momentum is the trailing 12-month return excluding the most recent month, which 
 
 ## Dashboard
 
-Four static pages, built from the files in `results/`. Chart.js is loaded from a CDN; there is no server.
+Six static pages, built from the files in `results/`. Chart.js is loaded from a CDN; there is no server. The Signals and Portfolios pages share one selection (signal, size, costs) that carries across pages.
 
 | Page | Question it answers |
 |---|---|
-| Overview | Do the signals rank stocks by next-month return? Rank IC with intervals, IC statistics and rolling stability, portfolio growth and drawdown against the benchmark, deepest drawdown episodes, monthly active-return heatmap, Sharpe differences, coverage and survivorship. |
-| Strategy Analysis | Per signal: construction, rolling three-year excess return, all signal tests, sensitivity to the book-value treatment, and cost drag. |
-| Stock Analysis | Which of the 861 tickers ever in the index have data, and which names contributed or detracted in the top-decile portfolios. |
-| Portfolio Timeline | Month by month: holdings, returns, contributions and trades of each top-decile portfolio. |
+| Summary | What is the answer? Bottom line, headline figures and a scorecard of every primary test with its 90% interval. |
+| Signals | Do the rankings predict next-month returns? Interval plots by test, cumulative and rolling rank IC, IC statistics, per-signal construction and sensitivity to the book-value treatment. |
+| Portfolios | Do top-ranked stocks beat the benchmark? Growth, drawdowns, deepest drawdown episodes, monthly return heatmap (absolute or active), rolling excess return, cost drag and Sharpe differences. |
+| Holdings | Which names drove the results? Contributors and detractors, month-by-month holdings and trades, and the 861-ticker table. |
+| Data | Can the data be trusted? Sources, coverage, survivorship and the corrections log. |
+| Method | What was done? The design in order, the pre-registration log, the power curve and the limitations. |
 
 ## Reproducing
 
@@ -115,7 +117,8 @@ Rerunning a result-writing script in a fresh clone stops at the first existing f
 ## Repository layout
 
 ```
-index.html, universe-*.html   dashboard pages (GitHub Pages serves the repository root)
+index.html, signals.html, portfolios.html, holdings.html, data.html, method.html
+                              dashboard pages (GitHub Pages serves the repository root)
 assets/                       dashboard.js, styles.css and the generated universe_*_data.js files
 config.py                     17-stock universe and evaluation windows (earlier study)
 src/                          library code: data loading, SQLite storage, factors, backtest, risk, universe

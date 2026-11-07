@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Method | Equity Factor Research</title>
+<link rel="stylesheet" href="assets/styles.css?v=4">
+</head>
+<body>
+<div id="chrome"></div>
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Method</h1>
+    <p class="lede">What was done, in what order, and what the design could and could not detect. The design and every later change were recorded before the code that depends on them.</p>
+  </section>
+
+  <div class="section-label">1 &middot; Design <span>in the order it was applied</span></div>
+  <div class="panel">
+    <ol class="step-list">
+      <li><div><b>Question.</b> Do simple momentum and value signals rank large US stocks by next-month return, and do portfolios built from them beat an equal-weight benchmark?</div></li>
+      <li><div><b>Signals.</b> Momentum is the trailing 12-month return excluding the latest month. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied.</div></li>
+      <li><div><b>Timing.</b> A signal dated t uses data up to the end of month t-1 and is paired with the return in month t. Book value is aligned to the date each filing became public.</div></li>
+      <li><div><b>Primary evidence.</b> Rank IC, quintile spread and Fama-MacBeth slopes, each with a 90% bootstrap interval (5,000 resamples, seed 42). Two test periods are reported separately, 2012 to 2020 and 2021 to 2026, plus the full sample.</div></li>
+      <li><div><b>Secondary evidence.</b> Top-decile and top-quintile portfolios at equal weight, rebalanced monthly, with 10 bps one-way costs charged on drift-inclusive turnover. The Sharpe difference against the benchmark is tested with a paired bootstrap using the Treasury bill rate.</div></li>
+      <li><div><b>Reading rule.</b> A difference counts only if its 90% interval excludes zero, and portfolio results are read only next to the signal tests. The headline holds 18 intervals, so about two would exclude zero by chance.</div></li>
+    </ol>
+  </div>
+
+  <div class="section-label">2 &middot; Pre-registration <span>dated entries, each written before the code or result it concerns</span></div>
+  <div class="panel">
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table">
+        <thead><tr><th>Date</th><th>Entry</th><th>Written before</th></tr></thead>
+        <tbody id="regBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">Entries are appended and never edited. There is no Amendment 4: the Phase 2 design took that slot, and the label Amendment 5 was kept as written. The full text is in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/LIMITATIONS_PLAN.md" target="_blank">LIMITATIONS_PLAN.md</a> and <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/OUT_OF_SAMPLE_PLAN.md" target="_blank">OUT_OF_SAMPLE_PLAN.md</a>. Amendments 8 to 11 came from findings during the work, not from results on the signals.</p>
+  </div>
+
+  <div class="section-label">3 &middot; Power <span>what the sample could have detected</span></div>
+  <div class="panel">
+    <h2>Minimum detectable mean rank IC <span>90% two-sided interval, 80% power</span></h2>
+    <div class="legend-row" id="powerLegend"></div>
+    <div style="position:relative; height:280px;"><canvas id="powerChart"></canvas></div>
+    <p class="caption" id="powerCaption"></p>
+  </div>
+
+  <div class="section-label">4 &middot; Limitations</div>
+  <div class="panel">
+    <ol class="step-list">
+      <li><div><b>Survivorship.</b> Acquired and bankrupt companies mostly have no free price history. A delisting-aware source such as CRSP is the real fix.</div></li>
+      <li><div><b>Free data.</b> Wikipedia membership is approximate early on. Some book values rest on share counts that may carry unit errors the validity rule cannot detect. Ticker reuse is not fully detectable.</div></li>
+      <li><div><b>Universe.</b> Large, liquid S&amp;P 500 names are the hardest place to find a factor premium.</div></li>
+      <li><div><b>Signals.</b> Price-to-book is not sector-adjusted, Momentum is not volatility-scaled, and there is no quality factor.</div></li>
+      <li><div><b>Costs.</b> A flat 10 bps one way, with no market impact or capacity analysis.</div></li>
+      <li><div><b>Multiplicity.</b> 18 headline portfolio intervals at the 90% level, so about two would exclude zero by chance.</div></li>
+      <li><div><b>Inference.</b> No Fama-French controls and no Newey-West errors on the Fama-MacBeth slopes.</div></li>
+    </ol>
+  </div>
+
+  <div id="foot"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/universe_data.js"></script>
+<script src="assets/dashboard.js"></script>
+<script>
+renderChrome("method.html", "Pre-registered design &middot; frozen signals &middot; no tuning &middot; every variant reported");
+
+/* pre-registration log: dates and headings as written in the plan files */
+const REG = [
+  ["2026-09-24", "Out-of-sample plan, Amendment 1", "any data after 31 December 2024 was downloaded (Value look-ahead fix)"],
+  ["2026-09-24", "Out-of-sample plan, Amendment 2", "any out-of-sample result was computed (missing final trading day)"],
+  ["2026-10-23", "Amendment 1", "any Phase 1 code was written or run"],
+  ["2026-10-23", "Amendment 2", "any Phase 1B code was written or run"],
+  ["2026-10-23", "Amendment 3", "any Phase 1C code was written or run"],
+  ["2026-10-23", "Phase 2 detailed design: robustness grid", "any Phase 2 code was written or run"],
+  ["2026-10-23", "Amendment 5", "any Phase 2 code was written or run"],
+  ["2026-10-23", "Phase 3 detailed design: data feasibility, larger universe", "any Phase 3 code was written or run"],
+  ["2026-10-23", "Phase 2B detailed design: risk diagnostics", "any Phase 2B code was written or run"],
+  ["2026-10-28", "Amendment 6", "any Phase 3 code was written or run"],
+  ["2026-10-28", "Amendment 7", "any Phase 3 result existed"],
+  ["2026-10-31", "Phase 4 detailed design: signal and portfolio tests on the rebuilt universe", "any Phase 4 code was written or run"],
+  ["2026-10-31", "Amendment 8", "any Phase 4 result existed (split-consistent book value)"],
+  ["2026-10-31", "Amendment 9", "any restated Value result had been seen"],
+  ["2026-10-31", "Amendment 10", "the book value, share count or split code was built"],
+  ["2026-10-31", "Amendment 11", "any Value or Combined signal test (share-count validity rule; corrections are appended to the entry)"],
+  ["2026-11-01", "Amendment 12", "any Value or Combined signal test or return was computed (labelled sensitivity)"],
+  ["2026-11-07", "Amendment 13", "any Stage 4 code was written or run and before any portfolio result existed"]
+];
+document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="month-cell">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+
+/* power: (z_alpha + z_power) * sd / sqrt(n), with z_alpha = 1.645 (90% two-sided) and z_power = 0.842 (80%) */
+(function power() {
+  const Z = 1.645 + 0.842;
+  const sds = SIGNALS.map(s => ({ s, sd: icStatistics(s, 0, U.split).sd }));
+  const lo = sds.reduce((a, b) => a.sd < b.sd ? a : b), hi = sds.reduce((a, b) => a.sd > b.sd ? a : b);
+  const months = []; for (let n = 24; n <= 240; n += 4) months.push(n);
+  const curve = sd => months.map(n => Z * sd / Math.sqrt(n));
+  const sets = [
+    { label: `SD ${hi.sd.toFixed(2)} (${hi.s}, 2012 to 2020)`, data: curve(hi.sd), borderColor: "#FFB000", backgroundColor: "#FFB000" },
+    { label: `SD ${lo.sd.toFixed(2)} (${lo.s}, 2012 to 2020)`, data: curve(lo.sd), borderColor: "#29B6F6", backgroundColor: "#29B6F6" }
+  ];
+  document.getElementById("powerLegend").innerHTML = sets.map(s => `<span><i style="background:${s.borderColor}"></i>${s.label}</span>`).join("");
+  const marks = { id: "marks", afterDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    [[108, "108 months: first test period"], [176, "176 months: full sample"]].forEach(([n, label]) => {
+      const x = scales.x.getPixelForValue(months.indexOf(n));
+      ctx.save(); ctx.strokeStyle = "#8A8A8A"; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle = "#8A8A8A"; ctx.font = "700 10px " + Chart.defaults.font.family; ctx.textAlign = "left";
+      ctx.fillText(label, x + 6, chartArea.top + 12); ctx.restore();
+    });
+  } };
+  new Chart(document.getElementById("powerChart"), {
+    type: "line",
+    data: { labels: months, datasets: sets.map(d => Object.assign({ pointRadius: 0, borderWidth: 2.5, fill: false, tension: 0.1 }, d)) },
+    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { title: i => i[0].label + " months", label: i => i.dataset.label + ": " + i.parsed.y.toFixed(3) } } },
+      scales: { y: { min: 0, ticks: { callback: v => v.toFixed(2), maxTicksLimit: 7 } }, x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { display: false }, title: { display: true, text: "months of data" } } } },
+    plugins: [marks]
+  });
+  const mde = (sd, n) => (Z * sd / Math.sqrt(n)).toFixed(3);
+  const need = (m, sd) => Math.ceil(Math.pow(Z * sd / m, 2));
+  document.getElementById("powerCaption").textContent =
+    `With 108 months the minimum detectable mean IC is ${mde(lo.sd, 108)} to ${mde(hi.sd, 108)}, and with the full 176 months ${mde(lo.sd, 176)} to ${mde(hi.sd, 176)}. A true mean IC of 0.03 would need roughly ${need(0.03, lo.sd)} to ${need(0.03, hi.sd)} months, about ${Math.round(need(0.03, lo.sd) / 12)} to ${Math.round(need(0.03, hi.sd) / 12)} years of data. The study therefore could not have found a small real effect, and an interval that includes zero does not show that the effect is zero.`;
+})();
+</script>
+</body>
+</html>

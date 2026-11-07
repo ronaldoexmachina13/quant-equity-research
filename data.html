@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data | Equity Factor Research</title>
+<link rel="stylesheet" href="assets/styles.css?v=4">
+</head>
+<body>
+<div id="chrome"></div>
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Data and integrity</h1>
+    <p class="lede">Can the data be trusted? What the free sources provide, how much of the index they cover, how survivorship bias shows up, and the errors the project found in its own work.</p>
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="ms-value" id="kAll">&ndash;</div><div class="ms-label">tickers ever in the index</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPrice">&ndash;</div><div class="ms-label">with price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kNone">&ndash;</div><div class="ms-label">with no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kRemShare">&ndash;</div><div class="ms-label">of removed names have no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kStayShare">&ndash;</div><div class="ms-label">of names that stayed have none</div></div>
+    </div>
+  </section>
+
+  <div class="section-label">1 &middot; Sources <span>all free</span></div>
+  <div class="panel">
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table">
+        <thead><tr><th>Item</th><th>Source and treatment</th></tr></thead>
+        <tbody>
+          <tr><td class="month-cell">Universe</td><td>S&amp;P 500 membership rebuilt month by month from Wikipedia.</td></tr>
+          <tr><td class="month-cell">Prices</td><td>Yahoo Finance via <code>yfinance</code>, adjusted close.</td></tr>
+          <tr><td class="month-cell">Book value</td><td>SEC EDGAR filings, aligned to the date each filing became public. Book value per share is restated for later splits.</td></tr>
+          <tr><td class="month-cell">Risk-free rate</td><td>Three-month Treasury bill, FRED.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">2 &middot; Coverage <span>how much of the index each signal can use</span></div>
+  <div class="panel">
+    <h2>Usable names per month</h2>
+    <div class="legend-row">
+      <span><i style="background:#FFFFFF"></i>Index members</span>
+      <span><i style="background:var(--momentum)"></i>Usable for Momentum</span>
+      <span><i style="background:var(--value)"></i>Usable for Value and Combined</span>
+    </div>
+    <div style="position:relative; height:260px;"><canvas id="covChart"></canvas></div>
+    <p class="caption">A name is usable when it has the price history (and, for Value, the book value) the signal needs. Companies that were acquired or went bankrupt mostly have no free price history, so the gap is largest in the early years. Membership is approximate early on: up to about 12 names may be overstated in 2012.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Coverage by status <span>why survivorship matters</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Status</th><th class="num">Tickers</th><th class="num">With price history</th><th class="num">Without</th><th class="num">Share without</th></tr></thead>
+        <tbody id="covBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">&ldquo;Removed&rdquo; means the company left the index at some point in the sample (acquired, merged, bankrupt or dropped for size). Free providers mostly keep no price history for names that no longer trade, so removed companies are far more likely to be missing. The study can use only names that have data, which is why levels are inflated and only differences are read.</p>
+  </div>
+
+  <div class="section-label">3 &middot; Survivorship <span>names later removed from the index against names that stayed</span></div>
+  <div class="panel">
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table surv-table">
+        <thead><tr><th>Period</th><th class="num">Removed names</th><th class="num">Stayed names</th><th class="num">Removed return</th><th class="num">Stayed return</th></tr></thead>
+        <tbody id="survBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">Names per month and annualised mean monthly return. Descriptive only, not a correction. Names later removed that still had a price history earned a lower average return than names that stayed, so the delisted names missing from the data plausibly did worse still. The size of that effect cannot be measured without delisting data.</p>
+  </div>
+
+  <div class="section-label">4 &middot; Corrections <span>errors the project found in its own work</span></div>
+  <div class="panel">
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table">
+        <thead><tr><th>When</th><th>Defect</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td class="month-cell">Sep 2026</td><td>Value used the month-end price instead of the previous month-end, a one-month look-ahead.</td><td>17-stock study: Value Sharpe moved from 0.75 to 0.85, before the split fix below. The bug had penalised Value.</td></tr>
+          <tr><td class="month-cell">Sep 2026</td><td>The first download missed 31 December 2024 because the Yahoo Finance end date is exclusive.</td><td>About 0.01 of Sharpe.</td></tr>
+          <tr><td class="month-cell">Oct 2026</td><td>Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split while SEC book value per share does not change.</td><td>17-stock study: in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. See the <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/STUDY_17_STOCKS.md" target="_blank">write-up</a>.</td></tr>
+          <tr><td class="month-cell">Oct 2026</td><td>Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios.</td><td>Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">The design, the reading rules and every later change were written into the repository as dated, append-only amendments before the code that depends on them.</p>
+  </div>
+
+  <div id="foot"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/universe_data.js"></script>
+<script src="assets/universe_stocks_data.js"></script>
+<script src="assets/dashboard.js"></script>
+<script>
+renderChrome("data.html", "Free data &middot; survivor-biased &middot; membership, prices, book value and risk-free rate");
+const stockCols = UNIVERSE_STOCKS.columns;
+const STOCKS = UNIVERSE_STOCKS.rows.map(r => Object.fromEntries(stockCols.map((c, k) => [c, r[k]])));
+
+(function summary() {
+  const has = STOCKS.filter(s => s.has_price_history).length;
+  const grp = g => STOCKS.filter(s => s.group === g);
+  const share = g => grp(g).filter(s => !s.has_price_history).length / grp(g).length;
+  document.getElementById("kAll").textContent = STOCKS.length;
+  document.getElementById("kPrice").textContent = has;
+  document.getElementById("kNone").textContent = STOCKS.length - has;
+  document.getElementById("kRemShare").textContent = pct(share("removed"), 0);
+  document.getElementById("kStayShare").textContent = pct(share("stayed"), 0);
+  const body = document.getElementById("covBody");
+  [["stayed", "Stayed in the index"], ["removed", "Removed from the index"]].forEach(([g, label]) => {
+    const n = grp(g).length, w = grp(g).filter(s => s.has_price_history).length;
+    body.insertAdjacentHTML("beforeend", `<tr><td>${label}</td><td class="num">${n}</td><td class="num">${w}</td><td class="num">${n - w}</td><td class="num">${pct((n - w) / n, 0)}</td></tr>`);
+  });
+})();
+
+lineChart("covChart", [
+  { label: "Index members", data: U.coverage.members, borderColor: "#FFFFFF", backgroundColor: "#FFFFFF", borderDash: [3, 3], borderWidth: 1.5 },
+  { label: "Usable for Momentum", data: U.coverage.momentum, borderColor: COLORS.Momentum, backgroundColor: COLORS.Momentum },
+  { label: "Usable for Value and Combined", data: U.coverage.value_combined, borderColor: COLORS.Value, backgroundColor: COLORS.Value }
+], v => v, v => v, false);
+
+(function survivorship() {
+  const body = document.getElementById("survBody");
+  ["Momentum usable", "Value and Combined usable"].forEach(setName => {
+    const head = document.createElement("tr");
+    head.className = "tbl-group";
+    head.innerHTML = `<td colspan="5">${setName.replace(" usable", "")}</td>`;
+    body.appendChild(head);
+    PERIODS.forEach(p => {
+      const get = g => U.survivorship.find(r => r.universe_set === setName && r.period === p.key && r.group === g);
+      const rem = get("removed"), stay = get("stayed");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${p.label}</td><td class="num">${rem.names_per_month_avg.toFixed(0)}</td><td class="num">${stay.names_per_month_avg.toFixed(0)}</td><td class="num">${pct(rem.annualised_mean, 1)}</td><td class="num">${pct(stay.annualised_mean, 1)}</td>`;
+      body.appendChild(tr);
+    });
+  });
+})();
+</script>
+</body>
+</html>

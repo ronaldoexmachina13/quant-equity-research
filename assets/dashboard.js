@@ -202,3 +202,85 @@ function icStatisticsTable(bodyId) {
 function rollingMean(series, window) {
   return series.map((_, i) => i < window - 1 ? null : series.slice(i - window + 1, i + 1).reduce((a, b) => a + b, 0) / window);
 }
+
+/* ---------- page chrome, shared selection and shared helpers ---------- */
+const PAGES = [
+  { href: "index.html", label: "Summary" },
+  { href: "signals.html", label: "Signals" },
+  { href: "portfolios.html", label: "Portfolios" },
+  { href: "holdings.html", label: "Holdings" },
+  { href: "data.html", label: "Data" },
+  { href: "method.html", label: "Method" }
+];
+const REPO_URL = "https://github.com/ronaldoexmachina13/quant-equity-research";
+function renderChrome(active, subtitle) {
+  document.getElementById("chrome").innerHTML =
+    `<nav class="topnav"><div class="topnav-inner"><a class="brand" href="index.html">Quant Equity Research</a><div class="links">` +
+    PAGES.map(p => `<a href="${p.href}"${p.href === active ? ' class="active"' : ""}>${p.label}</a>`).join("") +
+    `</div></div></nav><div class="subtitle-bar">${subtitle}</div>`;
+  document.getElementById("foot").innerHTML =
+    `<footer><div class="facts"><span>About 500 S&amp;P 500 members</span><span>Jan 2012 &ndash; Aug 2026</span><span>Free data, survivor-biased</span></div>` +
+    `<div class="repo">Quant Equity Research &middot; <a href="${REPO_URL}" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div></footer>`;
+}
+
+const SIZE_LABEL = { top_decile: "Top decile", top_quintile: "Top quintile" };
+const BASIS_LABEL = { gross: "Before costs", net: "After 10 bps costs" };
+const SEL = { sig: "Value", size: "top_decile", basis: "gross" };
+(function loadSelection() {
+  try {
+    const s = JSON.parse(localStorage.getItem("qer-selection") || "null");
+    if (!s) return;
+    if (SIGNALS.includes(s.sig)) SEL.sig = s.sig;
+    if (SIZE_LABEL[s.size]) SEL.size = s.size;
+    if (BASIS_LABEL[s.basis]) SEL.basis = s.basis;
+  } catch (e) { /* storage unavailable: defaults apply */ }
+})();
+function saveSelection() { try { localStorage.setItem("qer-selection", JSON.stringify(SEL)); } catch (e) { /* ignore */ } }
+
+/* Selection bar. fields is a subset of ["sig", "size", "basis"]. sticky keeps it in view while scrolling. */
+function contextStrip(containerId, fields, onChange, sticky) {
+  const box = document.getElementById(containerId);
+  box.className = "ctx-bar" + (sticky ? " sticky" : "");
+  box.innerHTML = `<div class="ctx-controls">` + fields.map(f => `<div class="ctrl-group" id="${containerId}-${f}"></div>`).join("") + `</div><div class="ctx-readout" id="${containerId}-readout"></div>`;
+  const options = {
+    sig: SIGNALS.map(s => ({ key: s, label: s })),
+    size: Object.keys(SIZE_LABEL).map(k => ({ key: k, label: SIZE_LABEL[k] })),
+    basis: Object.keys(BASIS_LABEL).map(k => ({ key: k, label: BASIS_LABEL[k] }))
+  };
+  const readout = () => {
+    const parts = [];
+    if (fields.includes("sig")) parts.push(SEL.sig);
+    if (fields.includes("size")) parts.push(SIZE_LABEL[SEL.size]);
+    if (fields.includes("basis")) parts.push(BASIS_LABEL[SEL.basis]);
+    document.getElementById(containerId + "-readout").textContent = parts.join(" · ").toUpperCase();
+  };
+  fields.forEach(f => buttons(containerId + "-" + f, options[f], SEL[f], k => { SEL[f] = k; saveSelection(); readout(); onChange(f); }));
+  readout();
+}
+function selectionText(fields) {
+  const parts = [];
+  if (fields.includes("sig")) parts.push(SEL.sig);
+  if (fields.includes("size")) parts.push(SIZE_LABEL[SEL.size].toLowerCase());
+  if (fields.includes("basis")) parts.push(BASIS_LABEL[SEL.basis].toLowerCase());
+  return parts.join(", ");
+}
+
+function benchmarkKey(sig) { return sig === "Momentum" ? "Momentum" : "Value and Combined"; }
+function benchmarkName(sig) { return sig === "Momentum" ? "Benchmark (Momentum usable)" : "Benchmark (Value and Combined usable)"; }
+function flagText(t, excludes) { return excludes ? `<span class="neg">${t}</span>` : t; }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+const DEFINITIONS = {
+  Momentum: {
+    body: "<p><b>Construction.</b> The signal is the trailing 12-month return excluding the most recent month, which is skipped to avoid the one-month reversal effect. Each month the stocks with usable prices are ranked. The top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Hypothesis.</b> Candidate explanations are slow incorporation of news and investor under-reaction, so recent winners may keep outperforming for a while.</p><p><b>Failure modes.</b> Momentum is exposed to sharp reversals at market turning points, and its holdings turn over quickly, so costs matter.</p>",
+    note: "Momentum uses prices only, so the book-value sensitivities do not apply to it."
+  },
+  Value: {
+    body: "<p><b>Construction.</b> The signal is minus the price-to-book ratio: the previous month-end price divided by book value per share from SEC filings, aligned to the date each filing became public. Low ratios rank highest. The top decile or quintile is held at equal weight.</p><p><b>Hypothesis.</b> Candidate explanations are compensation for distress risk and investor over-pessimism about cheap names.</p><p><b>Failure modes.</b> Price-to-book is not sector-adjusted, is a poor measure for firms with large intangible assets, and cheap stocks can stay cheap for long periods. Share splits and share-count errors in the filings had to be corrected, which is why the sensitivities exist.</p>",
+    note: ""
+  },
+  Combined: {
+    body: "<p><b>Construction.</b> The average of the Momentum and Value z-scores, each standardised across stocks every month. The 50/50 weighting was fixed before testing and was not tuned.</p><p><b>Hypothesis.</b> The two signals are typically weakly correlated, so the average may rank more stably than either alone.</p><p><b>Failure modes.</b> It inherits the weaknesses of both signals, and it exists only for stocks with both a price history and a book value.</p>",
+    note: ""
+  }
+};

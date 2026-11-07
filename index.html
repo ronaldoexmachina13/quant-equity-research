@@ -3,22 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Equity Factor Research | Quant Equity Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=3">
+<title>Summary | Equity Factor Research</title>
+<link rel="stylesheet" href="assets/styles.css?v=4">
 </head>
 <body>
-<nav class="topnav">
-  <div class="topnav-inner">
-    <a class="brand" href="index.html">Quant Equity Research</a>
-    <div class="links">
-      <a href="index.html" class="active">Overview</a>
-      <a href="universe-strategies.html">Strategy Analysis</a>
-      <a href="universe-stocks.html">Stock Analysis</a>
-      <a href="universe-timeline.html">Portfolio Timeline</a>
-    </div>
-  </div>
-</nav>
-<div class="subtitle-bar">S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (12-1) &middot; Value (P/B) &middot; Combined</div>
+<div id="chrome"></div>
 <div class="wrap">
 
   <section class="hero">
@@ -39,304 +28,64 @@
     </div>
   </section>
 
-  <div class="section-label">1 &middot; Signal tests <span>do the signals rank stocks by next-month return?</span></div>
-  <div class="panel">
-    <div class="ctrl-row">
-      <div class="ctrl-group" id="testTabs"></div>
-    </div>
-    <svg class="forest" id="signalForest" role="img" aria-label="Signal test confidence intervals"></svg>
-    <p class="caption" id="signalCaption"></p>
-  </div>
-
-  <div class="panel">
-    <h2>Cumulative rank IC <span>running sum of the monthly rank correlation, 2012 to 2026</span></h2>
-    <div class="legend-row">
-      <span><i style="background:var(--momentum)"></i>Momentum</span>
-      <span><i style="background:var(--value)"></i>Value</span>
-      <span><i style="background:var(--combined)"></i>Combined</span>
-    </div>
-    <div style="position:relative; height:260px;"><canvas id="icChart"></canvas></div>
-    <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
-  </div>
-
-  <div class="panel">
-    <h2>Signal statistics <span>monthly rank IC by period</span></h2>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table perf-table">
-        <thead><tr><th>Period</th><th class="num">Months</th><th class="num">Mean IC</th><th class="num">SD</th><th class="num">Mean / SD</th><th class="num">Hit rate</th></tr></thead>
-        <tbody id="icStatBody"></tbody>
-      </table>
-    </div>
-    <p class="caption">Mean / SD is the monthly information ratio of the signal. Hit rate is the share of months with a positive IC. A mean IC of 0.03 with an SD of 0.23 has a ratio of about 0.13 and would not be separable from zero in 108 months.</p>
-  </div>
-
-  <div class="panel">
-    <h2>Rolling 36-month mean rank IC <span>stability of the signal through time</span></h2>
-    <div class="legend-row">
-      <span><i style="background:var(--momentum)"></i>Momentum</span>
-      <span><i style="background:var(--value)"></i>Value</span>
-      <span><i style="background:var(--combined)"></i>Combined</span>
-    </div>
-    <div style="position:relative; height:240px;"><canvas id="icRollChart"></canvas></div>
-    <p class="caption" id="icRollCaption"></p>
-  </div>
-
-  <div class="section-label">2 &middot; Portfolios <span>do top-ranked stocks beat the benchmark?</span></div>
-  <div class="panel">
-    <div class="ctrl-row">
-      <div class="ctrl-group" id="sigTabs"></div>
-      <div class="ctrl-group" id="sizeTabs"></div>
-      <div class="ctrl-group" id="basisTabs"></div>
-    </div>
-    <h2 id="growthTitle">Growth of $1</h2>
-    <div class="legend-row" id="portLegend"></div>
-    <div style="position:relative; height:340px;"><canvas id="growthChart"></canvas></div>
-    <p class="caption">Equal-weight holdings of the highest-ranked names, rebalanced monthly. The benchmark is the equal-weight average of every name with usable data for that signal, which isolates the signal from the universe. The two test periods are chained for display and reported separately in the table. Levels are inflated by survivorship; differences are the informative part.</p>
-
-    <h2 style="margin-top:1.5rem;">Drawdown <span>percentage below each series' previous high</span></h2>
-    <div style="position:relative; height:220px;"><canvas id="ddChart"></canvas></div>
-
-    <h2 style="margin-top:1.5rem;">Deepest drawdowns <span>selected portfolio, five largest episodes</span></h2>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table perf-table">
-        <thead><tr><th>Peak</th><th>Trough</th><th>Recovery</th><th class="num">Depth</th><th class="num">Months to trough</th><th class="num">Months underwater</th></tr></thead>
-        <tbody id="ddBody"></tbody>
-      </table>
-    </div>
-    <p class="caption">Peak-to-trough episodes of the monthly series above. Monthly data understate intramonth drawdowns. A trailing plus sign marks an episode still open at the end of the sample.</p>
-
-    <h2 style="margin-top:1.5rem;">Monthly returns <span>percent, selected portfolio</span></h2>
-    <div class="ctrl-row"><div class="ctrl-group" id="hmTabs"></div></div>
-    <div class="heatmap-wrap" id="heatmap"></div>
-    <p class="caption" id="hmCaption"></p>
-
-    <h2 style="margin-top:1.5rem;">Performance by period</h2>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table perf-table">
-        <thead><tr><th>Series</th><th class="num">Total return</th><th class="num">Ann. return</th><th class="num">Ann. vol.</th><th class="num">Sharpe</th><th class="num">Max DD</th><th class="num">Turnover</th><th class="num">Sharpe diff, 90% CI</th></tr></thead>
-        <tbody id="perfBody"></tbody>
-      </table>
-    </div>
-    <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is flagged (red) only when its 90% paired bootstrap interval excludes zero.</p>
-  </div>
-
-  <div class="panel">
-    <h2>Sharpe difference against the benchmark <span>all 18 headline portfolio comparisons, before costs</span></h2>
-    <div class="ctrl-row"><div class="ctrl-group" id="periodTabs"></div></div>
-    <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe difference confidence intervals"></svg>
-    <p class="caption">Each bar is the paired bootstrap interval for the difference in Sharpe ratio between a portfolio and its benchmark (5,000 resamples). At the 90% level, about 1.8 of 18 intervals would exclude zero under the null. Two do: Value in 2012 to 2020, where the portfolio Sharpe ratio is below the benchmark. They are one finding, since the decile and quintile portfolios overlap, and it is absent from the re-test and the full period. Some secondary signal tests lean the same way, but they share the same months and stocks and are not independent evidence.</p>
-  </div>
-
-  <div class="section-label">3 &middot; Data quality <span>what the free data can and cannot support</span></div>
-  <div>
-    <div class="panel">
-      <h2>Usable names per month</h2>
-      <div class="legend-row">
-        <span><i style="background:#FFFFFF"></i>Index members</span>
-        <span><i style="background:var(--momentum)"></i>Usable for Momentum</span>
-        <span><i style="background:var(--value)"></i>Usable for Value and Combined</span>
-      </div>
-      <div style="position:relative; height:260px;"><canvas id="covChart"></canvas></div>
-      <p class="caption">Membership is rebuilt month by month from Wikipedia. A name is usable when it has the price history (and, for Value, the book value) the signal needs. Companies that were acquired or went bankrupt mostly have no free price history, so the gap is largest in the early years.</p>
-    </div>
-    <div class="panel">
-      <h2>Survivorship <span>names later removed from the index vs names that stayed</span></h2>
-      <div class="timeline-table-wrap" style="max-height:none;">
-        <table class="timeline-table surv-table">
-          <thead><tr><th>Period</th><th class="num">Removed names</th><th class="num">Stayed names</th><th class="num">Removed return</th><th class="num">Stayed return</th></tr></thead>
-          <tbody id="survBody"></tbody>
-        </table>
-      </div>
-      <p class="caption">Names per month and annualised mean monthly return. Descriptive only, not a correction. Names later removed from the index that still had a price history earned a lower average return than names that stayed, so the delisted names missing from the data plausibly did worse still. The size of that effect cannot be measured without delisting data.</p>
-    </div>
-  </div>
-
-  <div class="section-label">4 &middot; Corrections <span>errors the project found in its own work</span></div>
+  <div class="section-label">Scorecard <span>estimate and 90% bootstrap interval, before costs</span></div>
   <div class="panel">
     <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table">
-        <thead><tr><th>When</th><th>What was wrong</th><th>Effect</th></tr></thead>
-        <tbody>
-          <tr><td class="month-cell">Sep 2026</td><td>The Value signal used the month-end price instead of the previous month-end, a one-month look-ahead.</td><td>First study: Value Sharpe moved from 0.75 to 0.85 before the split fix below.</td></tr>
-          <tr><td class="month-cell">Sep 2026</td><td>The first download missed 31 December 2024 because the Yahoo Finance end date is exclusive.</td><td>About 0.01 of Sharpe.</td></tr>
-          <tr><td class="month-cell">Oct 2026</td><td>Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020), because Yahoo rewrites old prices after a split while SEC book value per share does not change.</td><td>First study: Value in-sample Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. See the <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/STUDY_17_STOCKS.md" target="_blank">write-up</a>.</td></tr>
-          <tr><td class="month-cell">Oct 2026</td><td>Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios.</td><td>Such filings have no book value. Results were also tested with winsorised P/B and with 24 and 37 names excluded.</td></tr>
-        </tbody>
-      </table>
+      <table class="timeline-table scorecard" id="scorecard"></table>
     </div>
-    <p class="caption">The design, the reading rules and every later change were written into the repository as dated, append-only amendments before the code that depends on them.</p>
+    <p class="caption">Rank IC, quintile spread and Fama-MacBeth slope are the primary tests of whether a signal ranks stocks by next-month return. The Sharpe difference is the top-decile portfolio against its equal-weight benchmark and is secondary evidence. Red marks an interval that excludes zero. The 2021 to 2026 months were known from the 17-stock study, so they are a re-test and not out-of-sample evidence.</p>
   </div>
 
+  <div class="section-label">Where to look <span>one question per page</span></div>
   <div class="nav-cards">
-    <a class="nav-card" href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">
-      <div class="nc-eyebrow">Repository</div>
-      <h3>Method, code and limitations</h3>
-      <p>The README sets out the method, the pre-registration, the limitations and how to reproduce every number on this page.</p>
-      <div class="nc-arrow">Open on GitHub &rarr;</div>
-    </a>
-    <a class="nav-card" href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/STUDY_17_STOCKS.md" target="_blank">
-      <div class="nc-eyebrow">First study</div>
-      <h3>17 stocks, 2021 to 2026</h3>
-      <p>The original small-universe study and its out-of-sample test, as a full write-up in the repository, including the Value correction.</p>
-      <div class="nc-arrow">Read the write-up &rarr;</div>
-    </a>
+    <a class="nav-card" href="signals.html"><div class="nc-eyebrow">Primary evidence</div><h3>Signals</h3><p>Do the rankings predict next-month returns? Interval plots, rank IC stability, sensitivity to the book-value treatment.</p><div class="nc-arrow">Open &rarr;</div></a>
+    <a class="nav-card" href="portfolios.html"><div class="nc-eyebrow">Secondary evidence</div><h3>Portfolios</h3><p>Do top-ranked stocks beat the benchmark? Growth, drawdowns, monthly active returns, costs and Sharpe differences.</p><div class="nc-arrow">Open &rarr;</div></a>
+    <a class="nav-card" href="holdings.html"><div class="nc-eyebrow">Attribution</div><h3>Holdings</h3><p>Which names drove the results? Contributors, month-by-month holdings and trades, and the 861-ticker table.</p><div class="nc-arrow">Open &rarr;</div></a>
+    <a class="nav-card" href="data.html"><div class="nc-eyebrow">Provenance</div><h3>Data and integrity</h3><p>Can the data be trusted? Coverage, survivorship and the errors the project found in its own work.</p><div class="nc-arrow">Open &rarr;</div></a>
+    <a class="nav-card" href="method.html"><div class="nc-eyebrow">Design</div><h3>Method</h3><p>What was done and in what order: the pre-registration, the power calculation and the limitations.</p><div class="nc-arrow">Open &rarr;</div></a>
+    <a class="nav-card" href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank"><div class="nc-eyebrow">Repository</div><h3>Code and results</h3><p>Every number on these pages is reproducible from the files in the repository.</p><div class="nc-arrow">Open on GitHub &rarr;</div></a>
   </div>
 
-  <footer>
-    <div class="facts"><span>About 500 S&amp;P 500 members</span><span>Jan 2012 &ndash; Aug 2026</span><span>Free data, survivor-biased</span></div>
-    <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
-  </footer>
-
+  <div id="foot"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
-/* ---------- header figures, all computed from the data ---------- */
+renderChrome("index.html", "S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (12-1) &middot; Value (P/B) &middot; Combined");
+
+/* header figures, all computed from the data */
 (function headerFigures() {
   document.getElementById("kMonths").textContent = U.dates.length;
   const avg = U.coverage.members.reduce((a, b) => a + b, 0) / U.coverage.members.length;
   document.getElementById("kMembers").textContent = "~" + Math.round(avg / 50) * 50;
-  const ic = U.signalTests.filter(r => r.test === "rank_ic" && r.period !== "Full period (2012-2026)");
+  const ic = U.signalTests.filter(r => r.test === "rank_ic" && r.period !== PERIODS[2].key);
   document.getElementById("kIc").textContent = ic.filter(r => r.excludes_zero).length + " of " + ic.length;
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null);
   document.getElementById("kPort").textContent = head.filter(r => r.sig).length + " of " + head.length;
 })();
 
-let testKey = "rank_ic";
-function drawSignalForest() {
-  const t = TESTS.find(x => x.key === testKey);
-  const rows = [];
-  SIGNALS.forEach(sig => PERIODS.forEach(p => {
-    const r = U.signalTests.find(x => x.test === testKey && x.signal === sig && x.period === p.key);
-    if (r) rows.push({ label: sig + " · " + p.label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, color: sig, group: sig, excl: r.excludes_zero });
-  }));
-  forest("signalForest", rows, t.fmt);
-  document.getElementById("signalCaption").textContent = t.text;
-}
-buttons("testTabs", TESTS, testKey, k => { testKey = k; drawSignalForest(); });
-drawSignalForest();
-
-/* cumulative IC */
-(function cumulativeIc() {
-  const sets = SIGNALS.map(sig => {
-    let c = 0;
-    return { label: sig, data: U.ic[sig].map(v => (c += v)), borderColor: COLORS[sig], backgroundColor: COLORS[sig] };
+/* scorecard: three signals by four tests by two periods */
+(function scorecard() {
+  const periods = [PERIODS[0], PERIODS[1]];
+  const columns = [
+    { label: "Rank IC", get: (s, p) => { const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero, f: v => sgn(v, 3) }; } },
+    { label: "Quintile spread, %", get: (s, p) => { const r = U.signalTests.find(x => x.test === "quintile_spread" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero, f: v => (v < 0 ? MINUS : "+") + Math.abs(v * 100).toFixed(2) }; } },
+    { label: "Fama-MacBeth slope", get: (s, p) => { const r = U.signalTests.find(x => x.test === "fama_macbeth_single" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero, f: v => sgn(v, 4) }; } },
+    { label: "Sharpe diff, top decile", get: (s, p) => { const r = U.summary.find(x => x.period === p.key && x.strategy === s && x.size === "top_decile" && x.basis === "gross" && x.diff !== null); return r && { m: r.diff, lo: r.lo, hi: r.hi, x: r.sig, f: v => sgn(v, 2) }; } }
+  ];
+  let html = `<thead><tr><th class="sig-name" rowspan="2">Signal</th>` + columns.map(c => `<th class="grp" colspan="2">${c.label}</th>`).join("") + `</tr><tr>` +
+    columns.map(() => periods.map((p, k) => `<th class="${k === 0 ? "grp" : ""}">${p.label}</th>`).join("")).join("") + `</tr></thead><tbody>`;
+  SIGNALS.forEach(s => {
+    html += `<tr><td class="sig-name"><span class="swatch" style="background:${COLORS[s]};margin-right:0.5rem"></span><b>${s}</b></td>`;
+    columns.forEach(c => periods.forEach((p, k) => {
+      const r = c.get(s, p);
+      html += r ? `<td class="${k === 0 ? "grp" : ""}${r.x ? " neg" : ""}">${r.f(r.m)}<small>[${r.f(r.lo)}, ${r.f(r.hi)}]</small></td>` : `<td class="${k === 0 ? "grp" : ""}">&ndash;</td>`;
+    }));
+    html += `</tr>`;
   });
-  lineChart("icChart", sets, v => v.toFixed(1), v => v.toFixed(2), true);
-})();
-
-/* signal statistics and rolling IC */
-icStatisticsTable("icStatBody");
-(function rollingIc() {
-  const sets = SIGNALS.map(sig => ({ label: sig, data: rollingMean(U.ic[sig], 36), borderColor: COLORS[sig], backgroundColor: COLORS[sig] }));
-  lineChart("icRollChart", sets, v => v.toFixed(2), v => v === null ? "" : v.toFixed(3), true);
-  const sd = SIGNALS.map(s => icStatistics(s, 0, U.dates.length).sd).reduce((a, b) => a + b, 0) / SIGNALS.length;
-  document.getElementById("icRollCaption").textContent =
-    "With a monthly IC standard deviation near " + sd.toFixed(2) + ", one standard error of a 36-month mean is about " + (sd / 6).toFixed(3) +
-    ". Excursions of that size are consistent with noise. The windows overlap, so adjacent points are not independent.";
-})();
-
-/* ---------- 2. portfolios ---------- */
-let sig = "Value", size = "top_decile", basis = "gross";
-let growthChart, ddChart, currentSeries = null, hmMode = "active";
-function drawHeatmap() {
-  if (!currentSeries) return;
-  const active = hmMode === "active";
-  monthlyHeatmap("heatmap", currentSeries.strat, active ? currentSeries.bench : null, active ? 0.04 : 0.08);
-  document.getElementById("hmCaption").textContent = active
-    ? "Monthly return of the portfolio minus the benchmark, in percentage points; the last column compounds each calendar year. Green is outperformance. Shading saturates at 4 points."
-    : "Monthly portfolio return; the last column compounds each calendar year. Shading saturates at 8%.";
-}
-function benchmarkKey() { return sig === "Momentum" ? "Momentum" : "Value and Combined"; }
-function benchmarkName() { return sig === "Momentum" ? "Benchmark (Momentum usable)" : "Benchmark (Value and Combined usable)"; }
-function drawPortfolios() {
-  const b = basis === "gross" ? "gross" : "net";
-  const strat = U.series[sig][size][b], bench = U.benchmarks[benchmarkKey()][b], spy = U.spy;
-  const g = [growth(strat), growth(bench), growth(spy)];
-  const names = [sig + ", " + (size === "top_decile" ? "top decile" : "top quintile"), "Equal-weight benchmark", "S&P 500 (SPY), reference"];
-  const cols = [COLORS[sig], COLORS.Benchmark, COLORS.SPY];
-  document.getElementById("growthTitle").innerHTML = "Growth of $1 <span>" + names[0] + (basis === "gross" ? ", before costs" : ", after 10 bps costs") + "</span>";
-  document.getElementById("portLegend").innerHTML = names.map((n, i) => `<span><i style="background:${cols[i]}"></i>${n}</span>`).join("");
-  const sets = (arr) => arr.map((d, i) => ({ label: names[i], data: d, borderColor: cols[i], backgroundColor: cols[i], borderWidth: i === 0 ? 2.5 : (i === 1 ? 2 : 1.5), borderDash: i === 2 ? [2, 3] : [] }));
-  if (growthChart) growthChart.destroy();
-  if (ddChart) ddChart.destroy();
-  growthChart = lineChart("growthChart", sets(g), v => "$" + v.toFixed(0), v => "$" + v.toFixed(2), true);
-  ddChart = lineChart("ddChart", sets(g.map(drawdown)), v => (v * 100).toFixed(0) + "%", v => pct(v, 1), true, true);
-  drawdownTable("ddBody", strat, 5);
-  currentSeries = { strat, bench };
-  drawHeatmap();
-
-  const body = document.getElementById("perfBody");
-  body.innerHTML = "";
-  PERIODS.forEach(p => {
-    const head = document.createElement("tr");
-    head.className = "tbl-group";
-    head.innerHTML = `<td colspan="8">${p.label}</td>`;
-    body.appendChild(head);
-    const items = [
-      { name: names[0], row: summaryRow(p.key, sig, size, b), cls: "tbl-strat", strat: true },
-      { name: "Equal-weight benchmark", row: summaryRow(p.key, benchmarkName(), null, b), cls: "" },
-      { name: "S&P 500 (SPY), ref.", row: summaryRow(p.key, "SPY (reference)", null, "gross"), cls: "tbl-ref" }
-    ];
-    items.forEach(it => {
-      const r = it.row; if (!r) return;
-      let diff = "–";
-      if (it.strat && r.diff !== null) {
-        const t = `${sgn(r.diff, 2)} [${sgn(r.lo, 2)}, ${sgn(r.hi, 2)}]`;
-        diff = r.sig ? `<span class="neg">${t}</span>` : t;
-      }
-      const tr = document.createElement("tr");
-      tr.className = it.cls;
-      tr.innerHTML = `<td>${it.name}</td><td class="num">${pct(r.total, 0)}</td><td class="num">${pct(r.ann, 1)}</td><td class="num">${pct(r.vol, 1)}</td><td class="num">${r.sharpe.toFixed(2)}</td><td class="num">${pct(r.dd, 1)}</td><td class="num">${r.turnover === null || it.cls === "tbl-ref" ? "–" : pct(r.turnover, 0)}</td><td class="num">${diff}</td>`;
-      body.appendChild(tr);
-    });
-  });
-}
-buttons("sigTabs", SIGNALS.map(s => ({ key: s, label: s })), sig, k => { sig = k; drawPortfolios(); });
-buttons("sizeTabs", [{ key: "top_decile", label: "Top decile" }, { key: "top_quintile", label: "Top quintile" }], size, k => { size = k; drawPortfolios(); });
-buttons("basisTabs", [{ key: "gross", label: "Before costs" }, { key: "net", label: "After 10 bps costs" }], basis, k => { basis = k; drawPortfolios(); });
-buttons("hmTabs", [{ key: "active", label: "Active vs benchmark" }, { key: "absolute", label: "Absolute" }], hmMode, k => { hmMode = k; drawHeatmap(); });
-drawPortfolios();
-
-/* ---------- Sharpe difference forest ---------- */
-let periodKey = PERIODS[0].key;
-function drawSharpeForest() {
-  const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null);
-  const dom = [Math.min(0, ...head.map(r => r.lo)), Math.max(0, ...head.map(r => r.hi))];
-  const rows = [];
-  SIGNALS.forEach(s => ["top_decile", "top_quintile"].forEach(z => {
-    const r = head.find(x => x.period === periodKey && x.strategy === s && x.size === z);
-    if (r) rows.push({ label: s + " · " + (z === "top_decile" ? "top decile" : "top quintile"), mean: r.diff, lo: r.lo, hi: r.hi, color: s, group: s, excl: r.sig });
-  }));
-  forest("sharpeForest", rows, { axis: v => v.toFixed(1), val: v => sgn(v, 2) }, dom);
-}
-buttons("periodTabs", PERIODS.map(p => ({ key: p.key, label: p.label })), periodKey, k => { periodKey = k; drawSharpeForest(); });
-drawSharpeForest();
-
-/* ---------- 3. data quality ---------- */
-lineChart("covChart", [
-  { label: "Index members", data: U.coverage.members, borderColor: "#FFFFFF", backgroundColor: "#FFFFFF", borderDash: [3, 3], borderWidth: 1.5 },
-  { label: "Usable for Momentum", data: U.coverage.momentum, borderColor: COLORS.Momentum, backgroundColor: COLORS.Momentum },
-  { label: "Usable for Value and Combined", data: U.coverage.value_combined, borderColor: COLORS.Value, backgroundColor: COLORS.Value }
-], v => v, v => v, false);
-
-(function survivorship() {
-  const body = document.getElementById("survBody");
-  ["Momentum usable", "Value and Combined usable"].forEach(setName => {
-    const head = document.createElement("tr");
-    head.className = "tbl-group";
-    head.innerHTML = `<td colspan="5">${setName.replace(" usable", "")}</td>`;
-    body.appendChild(head);
-    PERIODS.forEach(p => {
-      const get = g => U.survivorship.find(r => r.universe_set === setName && r.period === p.key && r.group === g);
-      const rem = get("removed"), stay = get("stayed");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${p.label}</td><td class="num">${rem.names_per_month_avg.toFixed(0)}</td><td class="num">${stay.names_per_month_avg.toFixed(0)}</td><td class="num">${pct(rem.annualised_mean, 1)}</td><td class="num">${pct(stay.annualised_mean, 1)}</td>`;
-      body.appendChild(tr);
-    });
-  });
+  document.getElementById("scorecard").innerHTML = html + "</tbody>";
 })();
 </script>
 </body>

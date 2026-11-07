@@ -390,3 +390,25 @@ footer a:hover { color: var(--amber); }
 .heatmap .hm-year, .heatmap th.hm-year { border-left: 1px solid var(--line); font-weight: 700; }
 .heatmap-wrap { overflow-x: auto; }
 .heatmap-wrap .heatmap { min-width: 640px; }
+
+/* selection bar */
+.ctx-bar { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center; background: #000; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 0.6rem 0; margin: 1.25rem 0 1.5rem; }
+.ctx-bar.sticky { position: sticky; top: 0; z-index: 20; }
+.ctx-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+.ctx-controls .ctrl-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.ctx-readout { margin-left: auto; color: var(--amber); font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 700; }
+/* scorecard */
+.scorecard th, .scorecard td { text-align: center; }
+.scorecard thead th { padding: 0.45rem 0.4rem; }
+.scorecard td { padding: 0.5rem 0.4rem; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.scorecard td small { display: block; color: var(--muted); font-size: 0.66rem; margin-top: 0.1rem; }
+.scorecard td.neg small { color: var(--neg); }
+.scorecard th.grp, .scorecard td.grp { border-left: 1px solid var(--line); }
+.scorecard td.sig-name, .scorecard th.sig-name { text-align: left; white-space: nowrap; }
+.scorecard td small { white-space: nowrap; }
+/* method page */
+.step-list { counter-reset: step; list-style: none; margin: 0; padding: 0; }
+.step-list li { counter-increment: step; display: grid; grid-template-columns: 2.2rem 1fr; gap: 0.25rem 0.75rem; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); font-size: 0.84rem; line-height: 1.6; }
+.step-list li:last-child { border-bottom: none; }
+.step-list li::before { content: counter(step); color: var(--amber); font-weight: 700; }
+.step-list b { color: #fff; }

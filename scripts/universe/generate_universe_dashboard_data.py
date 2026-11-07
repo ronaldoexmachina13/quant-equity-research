@@ -1,9 +1,9 @@
 """Build the data files behind the large-universe dashboard.
 
   universe_data.js         headline results (index.html and the pages that read it)
-  universe_sens_data.js    sensitivity results (universe-strategies.html)
-  universe_stocks_data.js  one row per ticker ever in the index (universe-stocks.html, universe-timeline.html)
-  universe_holdings_data.js  top-decile holdings by month (universe-timeline.html)
+  universe_sens_data.js    sensitivity results (signals.html)
+  universe_stocks_data.js  one row per ticker ever in the index (holdings.html, data.html)
+  universe_holdings_data.js  top-decile holdings by month (holdings.html)
 
 Reads only the committed result files in results/. An output that already exists
 is left alone and reported, in line with the project's rule that files are never
