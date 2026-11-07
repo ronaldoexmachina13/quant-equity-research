@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strategy Analysis | Equity Factor Research</title>
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html">Quant Equity Research</a>
+    <div class="links">
+      <a href="index.html">Overview</a>
+      <a href="universe-strategies.html" class="active">Strategy Analysis</a>
+      <a href="universe-stocks.html">Stock Analysis</a>
+      <a href="universe-timeline.html">Portfolio Timeline</a>
+    </div>
+  </div>
+</nav>
+<div class="subtitle-bar">S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (12-1) &middot; Value (P/B) &middot; Combined</div>
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Strategy analysis</h1>
+    <p class="lede">Each signal on its own: how it is built, what the tests say, whether the reading survives other reasonable choices, and what trading costs do. Select a strategy.</p>
+  </section>
+
+  <div class="strategy-bar" id="strategyBar"></div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2 id="defTitle">What is this strategy?</h2>
+      <div class="definition-body" id="defBody"></div>
+    </div>
+    <div class="panel">
+      <h2>At a glance <span>top decile, before costs</span></h2>
+      <div class="stat-grid" id="glance" style="grid-template-columns:repeat(2,1fr); margin-top:0;"></div>
+    </div>
+  </div>
+
+  <div class="hero-finding" style="max-width:none;">
+    <b class="box-label">Reading the evidence</b>
+    <div id="reading"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Rolling three-year excess return <span>portfolio minus its benchmark, annualised</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="rollSize"></div></div>
+    <div style="position:relative; height:260px;"><canvas id="rollChart"></canvas></div>
+    <p class="caption">Each point compares the geometric return of the portfolio with its benchmark over the previous 36 months, before costs. A signal that works would sit mostly above zero. Long stretches on both sides mean the result depends on the period chosen, which is what a 90% interval that includes zero is telling us.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Signal tests <span>do the rankings predict next-month returns?</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Test</th><th>Period</th><th class="num">Mean</th><th class="num">90% interval</th><th class="num">Excludes zero</th></tr></thead>
+        <tbody id="testBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">Intervals are 90% bootstrap intervals (5,000 resamples). Rank IC is the monthly Spearman correlation between the signal and the next month's return; the quintile spread is the top fifth minus the bottom fifth; Fama-MacBeth is the average slope of monthly cross-sectional regressions (joint: Momentum and Value together). Red marks an interval that excludes zero.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Does the reading survive other choices? <span>same tests, different treatments of the book-value data</span></h2>
+    <div class="ctrl-row">
+      <div class="ctrl-group" id="sensTabs"></div>
+    </div>
+    <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
+    <p class="caption" id="sensCaption"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Trading costs <span>10 bps charged on each one-way trade</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="costSize"></div></div>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Period</th><th>Costs</th><th class="num">Total return</th><th class="num">Ann. return</th><th class="num">Sharpe</th><th class="num">Turnover</th><th class="num">Sharpe diff, 90% CI</th></tr></thead>
+        <tbody id="costBody"></tbody>
+      </table>
+    </div>
+    <p class="caption" id="costCaption"></p>
+  </div>
+
+  <footer>
+    <div class="facts"><span>About 500 S&amp;P 500 members</span><span>Jan 2012 &ndash; Aug 2026</span><span>Free data, survivor-biased</span></div>
+    <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="universe_data.js"></script>
+<script src="universe_sens_data.js"></script>
+<script src="dashboard.js"></script>
+<script>
+const S = UNIVERSE_SENS;
+let sig = "Value", size = "top_decile", sensKey = "rank_ic", costSz = "top_decile";
+let rollChart;
+
+const DEFS = {
+  Momentum: {
+    body: "<p><b>How it is built.</b> The signal is the return from 12 months ago to one month ago. The most recent month is skipped, which avoids the short-term reversal in the latest month. Each month the stocks with usable prices are ranked, and the top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Why it might work.</b> Prices may react slowly to news, so recent winners can keep outperforming for a while.</p><p><b>Where it can fail.</b> Momentum can reverse sharply when markets turn, and the holdings change from month to month, so trading costs matter.</p>",
+    note: "Momentum uses prices only, so the book-value sensitivities below do not apply to it."
+  },
+  Value: {
+    body: "<p><b>How it is built.</b> The signal is minus the price-to-book ratio: the month-end price from the previous month divided by book value per share from SEC filings, aligned to the date each filing became public. Stocks with a low ratio rank highest, and the top decile or quintile is held at equal weight.</p><p><b>Why it might work.</b> Cheap stocks may compensate investors for risk, or the market may be too pessimistic about them.</p><p><b>Where it can fail.</b> Price-to-book is not adjusted for sector, understates firms whose assets are intangible, and cheap stocks can stay cheap. Share splits and share-count errors in the filings had to be corrected, which is why the sensitivities below exist.</p>",
+    note: ""
+  },
+  Combined: {
+    body: "<p><b>How it is built.</b> The average of the Momentum and Value z-scores, each standardised across stocks every month. The 50/50 weighting was fixed before testing and was not tuned.</p><p><b>Why it might work.</b> The two signals are often weakly related, so combining them may give a steadier ranking than either alone.</p><p><b>Where it can fail.</b> It inherits the weaknesses of both signals, and it is only available for stocks with both a price history and a book value.</p>",
+    note: ""
+  }
+};
+const SENS_VARIANTS = {
+  Headline: { label: "Headline", tests: () => U.signalTests, sum: () => U.summary },
+  Winsorised: { label: "Winsorised P/B", tests: () => S.signalTests.winsorised, sum: null },
+  Excl24: { label: "Excluding 24 names", tests: () => S.signalTests.excl_24, sum: () => S.summary.excl_24 },
+  Excl37: { label: "Excluding 37 names", tests: () => S.signalTests.excl_37, sum: () => S.summary.excl_37 }
+};
+const SENS_METRICS = [
+  { key: "rank_ic", label: "Rank IC", kind: "test", fmt: TESTS[0].fmt },
+  { key: "quintile_spread", label: "Quintile spread", kind: "test", fmt: TESTS[1].fmt },
+  { key: "fama_macbeth_single", label: "Fama-MacBeth", kind: "test", fmt: TESTS[2].fmt },
+  { key: "top_decile", label: "Sharpe diff, top decile", kind: "sum", fmt: { axis: v => v.toFixed(1), val: v => sgn(v, 2) } },
+  { key: "top_quintile", label: "Sharpe diff, top quintile", kind: "sum", fmt: { axis: v => v.toFixed(1), val: v => sgn(v, 2) } }
+];
+const SIZE_LABEL = { top_decile: "top decile", top_quintile: "top quintile" };
+
+function benchName() { return sig === "Momentum" ? "Benchmark (Momentum usable)" : "Benchmark (Value and Combined usable)"; }
+function benchKey() { return sig === "Momentum" ? "Momentum" : "Value and Combined"; }
+function flag(t, excl) { return excl ? `<span class="neg">${t}</span>` : t; }
+
+/* ---------- strategy pills ---------- */
+function drawBar() {
+  const bar = document.getElementById("strategyBar");
+  bar.innerHTML = "";
+  SIGNALS.forEach(s => {
+    const b = document.createElement("button");
+    b.className = "strategy-btn" + (s === sig ? " active" : "");
+    b.innerHTML = `<span class="dot" style="background:${COLORS[s]}"></span>${s}`;
+    b.onclick = () => { sig = s; drawAll(); };
+    bar.appendChild(b);
+  });
+}
+
+/* ---------- definition and at a glance ---------- */
+function drawDefinition() {
+  document.getElementById("defTitle").textContent = sig + ": what is this strategy?";
+  document.getElementById("defBody").innerHTML = DEFS[sig].body;
+  const p = PERIODS[0].key, full = PERIODS[2].key;
+  const r = summaryRow(p, sig, "top_decile", "gross"), b = summaryRow(p, benchName(), null, "gross");
+  const f = summaryRow(full, sig, "top_decile", "gross");
+  const ic = U.signalTests.find(x => x.test === "rank_ic" && x.signal === sig && x.period === p);
+  const cards = [
+    ["Sharpe, 2012–2020", r.sharpe.toFixed(2)],
+    ["Benchmark Sharpe, 2012–2020", b.sharpe.toFixed(2)],
+    ["Difference [90% CI]", `<span style="font-size:0.85rem;${r.sig ? "color:var(--neg)" : ""}">${sgn(r.diff, 2)} [${sgn(r.lo, 2)}, ${sgn(r.hi, 2)}]</span>`],
+    ["Rank IC, 2012–2020", `<span style="font-size:0.85rem;">${sgn(ic.mean, 3)} [${sgn(ic.ci_90_lower, 3)}, ${sgn(ic.ci_90_upper, 3)}]</span>`],
+    ["Max drawdown, 2012–2026", pct(f.dd, 1)],
+    ["Avg monthly turnover", pct(f.turnover, 0)]
+  ];
+  document.getElementById("glance").innerHTML = cards.map(c => `<div class="stat-card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div></div>`).join("");
+}
+
+/* ---------- reading, written from the numbers ---------- */
+function drawReading() {
+  const lines = [];
+  [PERIODS[0], PERIODS[1]].forEach(p => {
+    SIZE_ORDER.forEach(z => {
+      const r = summaryRow(p.key, sig, z, "gross"), b = summaryRow(p.key, benchName(), null, "gross");
+      const verdict = r.sig ? "excludes zero" : "includes zero";
+      lines.push(`<li><b>${p.label}, ${SIZE_LABEL[z]}:</b> Sharpe ratio ${r.sharpe.toFixed(2)} against the benchmark's ${b.sharpe.toFixed(2)}. The difference is ${sgn(r.diff, 2)} with a 90% interval of ${sgn(r.lo, 2)} to ${sgn(r.hi, 2)}, which ${verdict}.</li>`);
+    });
+  });
+  const ic = U.signalTests.filter(x => x.test === "rank_ic" && x.signal === sig && x.period !== PERIODS[2].key);
+  lines.push(`<li><b>Rank IC:</b> ${ic.map(x => `${PERIOD_LABEL[x.period]} ${sgn(x.mean, 3)} [${sgn(x.ci_90_lower, 3)}, ${sgn(x.ci_90_upper, 3)}]`).join("; ")}. ${ic.every(x => !x.excludes_zero) ? "Both intervals include zero." : "At least one interval excludes zero."}</li>`);
+  document.getElementById("reading").innerHTML = "<ul style='margin:0.25rem 0 0.5rem 1.1rem; padding:0;'>" + lines.join("") + "</ul>" +
+    "<p style='margin:0;'>The portfolio tests are secondary evidence: they are read only next to the signal tests, and with 18 headline intervals about two would exclude zero by chance. The 2021 to 2026 months were already known from the first study, so they are a re-test, not out-of-sample evidence.</p>";
+}
+const SIZE_ORDER = ["top_decile", "top_quintile"];
+
+/* ---------- rolling excess return ---------- */
+function drawRoll() {
+  const strat = U.series[sig][size].gross, bench = U.benchmarks[benchKey()].gross, W = 36;
+  const ann = (arr, i) => { let g = 1; for (let k = i - W + 1; k <= i; k++) g *= 1 + arr[k]; return Math.pow(g, 12 / W) - 1; };
+  const data = strat.map((_, i) => i < W - 1 ? null : ann(strat, i) - ann(bench, i));
+  if (rollChart) rollChart.destroy();
+  rollChart = lineChart("rollChart", [
+    { label: sig + ", " + SIZE_LABEL[size] + " minus benchmark", data, borderColor: COLORS[sig], backgroundColor: COLORS[sig], borderWidth: 2.5 },
+    { label: "Zero", data: strat.map(() => 0), borderColor: "#8A8A8A", backgroundColor: "#8A8A8A", borderWidth: 1, borderDash: [4, 4] }
+  ], v => (v * 100).toFixed(0) + "%", v => spct(v, 1), true);
+}
+
+/* ---------- signal test table ---------- */
+function drawTests() {
+  const body = document.getElementById("testBody");
+  body.innerHTML = "";
+  TESTS.forEach(t => {
+    PERIODS.forEach(p => {
+      const r = U.signalTests.find(x => x.test === t.key && x.signal === sig && x.period === p.key);
+      if (!r) return;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${t.label}</td><td>${p.label}</td><td class="num">${t.fmt.val(r.mean)}</td><td class="num">${flag(`[${t.fmt.val(r.ci_90_lower)}, ${t.fmt.val(r.ci_90_upper)}]`, r.excludes_zero)}</td><td class="num">${r.excludes_zero ? '<span class="neg">yes</span>' : "no"}</td>`;
+      body.appendChild(tr);
+    });
+  });
+}
+
+/* ---------- sensitivities ---------- */
+function drawSens() {
+  const m = SENS_METRICS.find(x => x.key === sensKey);
+  const variants = sig === "Momentum" ? ["Headline"] : ["Headline", "Winsorised", "Excl24", "Excl37"];
+  const rows = [];
+  variants.forEach(v => {
+    const def = SENS_VARIANTS[v];
+    PERIODS.forEach(p => {
+      let r = null;
+      if (m.kind === "test") {
+        const t = def.tests().find(x => x.test === m.key && x.signal === sig && x.period === p.key);
+        if (t) r = { mean: t.mean, lo: t.ci_90_lower, hi: t.ci_90_upper, excl: t.excludes_zero };
+      } else if (def.sum) {
+        const t = def.sum().find(x => x.period === p.key && x.strategy === sig && x.size === m.key && x.basis === "gross" && x.diff !== null);
+        if (t) r = { mean: t.diff, lo: t.lo, hi: t.hi, excl: t.sig };
+      }
+      if (r) rows.push({ label: def.label + " · " + p.label, mean: r.mean, lo: r.lo, hi: r.hi, color: sig, group: v, excl: r.excl });
+    });
+  });
+  forest("sensForest", rows, m.fmt);
+  const notes = [];
+  if (sig === "Momentum") notes.push(DEFS.Momentum.note);
+  else {
+    notes.push("Winsorised P/B caps extreme price-to-book values and was run for the signal tests only, so it has no portfolio rows. Excluding 24 or 37 names removes stocks whose book values looked unreliable (split or share-count problems); each portfolio is then compared with the equal-weight portfolio of the names that remain.");
+  }
+  notes.push("Red marks an interval that excludes zero. Variants use the same months and stocks, so they are not independent confirmations.");
+  document.getElementById("sensCaption").textContent = notes.join(" ");
+}
+
+/* ---------- costs ---------- */
+function drawCosts() {
+  const body = document.getElementById("costBody");
+  body.innerHTML = "";
+  const BASIS = [["gross", "None"], ["net_drift", "10 bps, drift turnover"], ["net_existing", "10 bps, existing turnover"]];
+  let fullGross = null, fullNet = null;
+  PERIODS.forEach(p => {
+    BASIS.forEach(([b, label], i) => {
+      const r = U.summary.find(x => x.period === p.key && x.strategy === sig && x.size === costSz && x.basis === b);
+      if (!r) return;
+      if (p.key === PERIODS[2].key) { if (b === "gross") fullGross = r; if (b === "net_drift") fullNet = r; }
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${i === 0 ? p.label : ""}</td><td>${label}</td><td class="num">${pct(r.total, 0)}</td><td class="num">${pct(r.ann, 1)}</td><td class="num">${r.sharpe.toFixed(2)}</td><td class="num">${pct(r.turnover, 0)}</td><td class="num">${r.diff === null ? "–" : flag(`${sgn(r.diff, 2)} [${sgn(r.lo, 2)}, ${sgn(r.hi, 2)}]`, r.sig)}</td>`;
+      body.appendChild(tr);
+    });
+  });
+  document.getElementById("costCaption").textContent =
+    `Over 2012 to 2026 the ${SIZE_LABEL[costSz]} portfolio's Sharpe ratio is ${fullGross.sharpe.toFixed(2)} before costs and ${fullNet.sharpe.toFixed(2)} after 10 bps on the drift-inclusive turnover. Drift turnover counts the trading needed to bring weights back to equal each month; existing turnover counts only changes in the holdings. The benchmark is always charged on the drift basis. The headline tests are read before costs, and charging costs does not change which intervals include zero.`;
+}
+
+function drawAll() {
+  drawBar(); drawDefinition(); drawReading(); drawRoll(); drawTests(); drawSens(); drawCosts();
+}
+buttons("rollSize", SIZE_ORDER.map(z => ({ key: z, label: SIZE_LABEL[z][0].toUpperCase() + SIZE_LABEL[z].slice(1) })), size, k => { size = k; drawRoll(); });
+buttons("sensTabs", SENS_METRICS.map(m => ({ key: m.key, label: m.label })), sensKey, k => { sensKey = k; drawSens(); });
+buttons("costSize", SIZE_ORDER.map(z => ({ key: z, label: SIZE_LABEL[z][0].toUpperCase() + SIZE_LABEL[z].slice(1) })), costSz, k => { costSz = k; drawCosts(); });
+drawAll();
+</script>
+</body>
+</html>

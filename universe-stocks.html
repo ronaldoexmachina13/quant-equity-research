@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stock Analysis | Equity Factor Research</title>
+<link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="index.html">Quant Equity Research</a>
+    <div class="links">
+      <a href="index.html">Overview</a>
+      <a href="universe-strategies.html">Strategy Analysis</a>
+      <a href="universe-stocks.html" class="active">Stock Analysis</a>
+      <a href="universe-timeline.html">Portfolio Timeline</a>
+    </div>
+  </div>
+</nav>
+<div class="subtitle-bar">S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; every ticker that was in the index</div>
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Stock analysis</h1>
+    <p class="lede">Every company that was in the S&amp;P 500 at any point from 2012 to 2026: whether the free data covers it, how long it was usable for each signal, and how much it contributed when a top-decile portfolio held it.</p>
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="ms-value" id="kAll">&ndash;</div><div class="ms-label">tickers ever in the index</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPrice">&ndash;</div><div class="ms-label">with price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kNone">&ndash;</div><div class="ms-label">with no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kRemShare">&ndash;</div><div class="ms-label">of removed names have no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kStayShare">&ndash;</div><div class="ms-label">of names that stayed have none</div></div>
+    </div>
+  </section>
+
+  <div class="panel">
+    <h2>Coverage by status <span>why survivorship matters</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Status</th><th class="num">Tickers</th><th class="num">With price history</th><th class="num">Without</th><th class="num">Share without</th></tr></thead>
+        <tbody id="covBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">&ldquo;Removed&rdquo; means the company left the index at some point in the period (acquired, merged, bankrupt or dropped for size). Free data providers mostly keep no price history for names that no longer trade, so removed companies are far more likely to be missing. The study can only use the names that have data, which is why levels are inflated and only differences are read.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Largest contributors and detractors <span>top-decile portfolios, 2012 to 2026</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="contribTabs"></div></div>
+    <div class="two-col">
+      <div><div class="section-label" style="margin-top:0">Largest contributors</div><div id="topList"></div></div>
+      <div><div class="section-label" style="margin-top:0">Largest detractors</div><div id="botList"></div></div>
+    </div>
+    <p class="caption" id="contribCaption"></p>
+  </div>
+
+  <div class="panel">
+    <h2>All stocks</h2>
+    <div class="filter-row">
+      <input id="fSearch" type="search" placeholder="Search stocks">
+      <select id="fSector"></select>
+      <select id="fStatus"><option value="">All statuses</option><option value="stayed">Stayed in the index</option><option value="removed">Removed from the index</option></select>
+      <select id="fData"><option value="">All data</option><option value="yes">Has price history</option><option value="no">No price history</option></select>
+      <select id="fStrategy"><option>Momentum</option><option>Value</option><option>Combined</option></select>
+      <label style="font-size:0.74rem; color:var(--muted);"><input type="checkbox" id="fHeld"> held at least once</label>
+    </div>
+    <div class="timeline-table-wrap" style="max-height:620px;">
+      <table class="timeline-table stocks-table">
+        <thead><tr id="stocksHead"></tr></thead>
+        <tbody id="stocksBody"></tbody>
+      </table>
+    </div>
+    <p class="caption" id="stocksCaption"></p>
+  </div>
+
+  <footer>
+    <div class="facts"><span>861 tickers</span><span>Jan 2012 &ndash; Aug 2026</span><span>Free data, survivor-biased</span></div>
+    <div class="repo">Quant Equity Research &middot; <a href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div>
+  </footer>
+</div>
+
+<script src="universe_stocks_data.js"></script>
+<script>
+const MINUS = "−";
+function pct(x, d) { return (x * 100).toFixed(d) + "%"; }
+function spct(x, d) { return (x < 0 ? MINUS : "+") + Math.abs(x * 100).toFixed(d) + "%"; }
+const COLORS = { Momentum: "#3ED88A", Value: "#29B6F6", Combined: "#FFB000" };
+const cols = UNIVERSE_STOCKS.columns;
+const STOCKS = UNIVERSE_STOCKS.rows.map(r => Object.fromEntries(cols.map((c, i) => [c, r[i]])));
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+/* ---------- header and coverage ---------- */
+(function summary() {
+  const has = STOCKS.filter(s => s.has_price_history).length;
+  const grp = g => STOCKS.filter(s => s.group === g);
+  const share = g => grp(g).filter(s => !s.has_price_history).length / grp(g).length;
+  document.getElementById("kAll").textContent = STOCKS.length;
+  document.getElementById("kPrice").textContent = has;
+  document.getElementById("kNone").textContent = STOCKS.length - has;
+  document.getElementById("kRemShare").textContent = pct(share("removed"), 0);
+  document.getElementById("kStayShare").textContent = pct(share("stayed"), 0);
+  const body = document.getElementById("covBody");
+  [["stayed", "Stayed in the index"], ["removed", "Removed from the index"]].forEach(([g, label]) => {
+    const n = grp(g).length, w = grp(g).filter(s => s.has_price_history).length;
+    body.insertAdjacentHTML("beforeend", `<tr><td>${label}</td><td class="num">${n}</td><td class="num">${w}</td><td class="num">${n - w}</td><td class="num">${pct((n - w) / n, 0)}</td></tr>`);
+  });
+})();
+
+/* ---------- contributors ---------- */
+let cStrat = "Value";
+function drawContrib() {
+  const key = "contribution_" + cStrat.toLowerCase(), held = "months_held_" + cStrat.toLowerCase();
+  const pool = STOCKS.filter(s => s[key] !== null).sort((a, b) => b[key] - a[key]);
+  const top = pool.slice(0, 10), bot = pool.slice(-10).reverse();
+  const max = Math.max(...top.map(s => Math.abs(s[key])), ...bot.map(s => Math.abs(s[key])));
+  const row = s => `<div class="bar-row" title="${esc(s.company || s.ticker)}"><span><b>${esc(s.ticker)}</b></span><span class="bar-track"><span class="bar-fill" style="background:${s[key] >= 0 ? COLORS[cStrat] : "#FF5A5A"}; left:0; width:${Math.abs(s[key]) / max * 100}%"></span></span><span style="text-align:right">${spct(s[key], 1)}</span></div>`;
+  document.getElementById("topList").innerHTML = top.map(row).join("");
+  document.getElementById("botList").innerHTML = bot.map(row).join("");
+  const total = pool.reduce((a, s) => a + s[key], 0), topShare = top.reduce((a, s) => a + s[key], 0) / total;
+  document.getElementById("contribCaption").textContent =
+    `Contribution is the sum over months of weight times monthly return while a stock was held (a simple attribution, not compounded). ${pool.length} names were held at least once. The ten largest contributors account for ${pct(topShare, 0)} of the summed contribution, so ${topShare > 0.4 ? "the result leans on a small number of names" : "the result is spread across many names"}. Hover a ticker for the company name.`;
+}
+(function () {
+  const box = document.getElementById("contribTabs");
+  ["Momentum", "Value", "Combined"].forEach(s => {
+    const b = document.createElement("button");
+    b.className = "metric-btn" + (s === cStrat ? " active" : "");
+    b.textContent = s;
+    b.onclick = () => { cStrat = s; [...box.children].forEach(c => c.classList.toggle("active", c.textContent === s)); drawContrib(); };
+    box.appendChild(b);
+  });
+  drawContrib();
+})();
+
+/* ---------- stock table ---------- */
+const COLS = [
+  { k: "ticker", label: "Ticker" }, { k: "company", label: "Company" }, { k: "gics_sector", label: "Sector" },
+  { k: "group", label: "Status" }, { k: "start_date", label: "In index" }, { k: "has_price_history", label: "Price data" },
+  { k: "months_usable_momentum", label: "Mom. data", num: true }, { k: "months_usable_value", label: "Value data", num: true },
+  { k: "_held", label: "Held", num: true }, { k: "_contrib", label: "Contrib.", num: true }
+];
+let sortKey = "ticker", sortDir = 1;
+const sectors = [...new Set(STOCKS.map(s => s.gics_sector).filter(Boolean))].sort();
+document.getElementById("fSector").innerHTML = '<option value="">All sectors</option>' + sectors.map(s => `<option>${esc(s)}</option>`).join("") + '<option value="__none">Sector not recorded</option>';
+document.getElementById("stocksHead").innerHTML = COLS.map(c => `<th class="sortable${c.num ? " num" : ""}" data-k="${c.k}">${c.label}</th>`).join("");
+document.querySelectorAll("#stocksHead th").forEach(th => th.onclick = () => {
+  const k = th.dataset.k; if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = (k === "ticker" || k === "company") ? 1 : -1; } drawTable();
+});
+["fSearch", "fSector", "fStatus", "fData", "fStrategy", "fHeld"].forEach(id => document.getElementById(id).addEventListener("input", drawTable));
+
+function drawTable() {
+  const strat = document.getElementById("fStrategy").value.toLowerCase();
+  const q = document.getElementById("fSearch").value.trim().toLowerCase();
+  const sec = document.getElementById("fSector").value, st = document.getElementById("fStatus").value, dt = document.getElementById("fData").value;
+  const heldOnly = document.getElementById("fHeld").checked;
+  let rows = STOCKS.map(s => Object.assign({}, s, { _held: s["months_held_" + strat], _contrib: s["contribution_" + strat] }));
+  rows = rows.filter(s =>
+    (!q || s.ticker.toLowerCase().includes(q) || (s.company || "").toLowerCase().includes(q)) &&
+    (!sec || (sec === "__none" ? !s.gics_sector : s.gics_sector === sec)) &&
+    (!st || s.group === st) &&
+    (!dt || (dt === "yes") === s.has_price_history) &&
+    (!heldOnly || s._held > 0));
+  rows.sort((a, b) => {
+    let x = a[sortKey], y = b[sortKey];
+    if (x === null || x === undefined) return 1; if (y === null || y === undefined) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir;
+  });
+  document.getElementById("stocksBody").innerHTML = rows.map(s => {
+    const start = s.start_date ? s.start_date.slice(0, 7) : "pre-2012", end = s.end_date ? s.end_date.slice(0, 7) : "now";
+    return `<tr><td class="month-cell">${esc(s.ticker)}</td><td class="name" title="${esc(s.company || "")}">${esc(s.company || "")}</td>` +
+      `<td class="name" style="max-width:120px" title="${esc(s.gics_sector || "")}">${s.gics_sector ? esc(s.gics_sector) : '<span style="color:var(--muted)">not recorded</span>'}</td>` +
+      `<td>${s.group === "removed" ? '<span class="tag warn">removed</span>' : '<span class="tag">stayed</span>'}</td>` +
+      `<td>${start} \u2013 ${end}</td>` +
+      `<td>${s.has_price_history ? "yes" : '<span class="neg">none</span>'}</td>` +
+      `<td class="num">${s.months_usable_momentum}</td><td class="num">${s.months_usable_value}</td>` +
+      `<td class="num">${s._held}</td><td class="num">${s._contrib === null ? "–" : spct(s._contrib, 1)}</td></tr>`;
+  }).join("");
+  document.getElementById("stocksCaption").textContent =
+    `Showing ${rows.length} of ${STOCKS.length}. Mom. data and Value data count the months (out of 176) in which the stock had the data that signal needs. Held is the number of months in the top-decile ${document.getElementById("fStrategy").value} portfolio and Contrib. is its summed contribution while held. Sector is recorded only for current members. Click a column heading to sort.`;
+}
+drawTable();
+</script>
+</body>
+</html>

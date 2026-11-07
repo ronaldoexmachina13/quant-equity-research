@@ -1,5 +1,7 @@
 # Study 1: the 17-stock study (full write-up)
 
+> **Note (7 November 2026):** the four dashboard pages described in this write-up (`index.html`, `strategies.html`, `stocks.html`, `portfolio.html` as they were then) were retired from the live site, because they plotted the uncorrected Value series. They remain in the Git history. The site now shows the large-universe study.
+
 > This is the complete write-up of the first study, kept as published. It is summarised in the [main README](../README.md). The correction below applies to every Value figure in this document.
 
 # Quantitative Equity Strategy Research & Backtesting Framework

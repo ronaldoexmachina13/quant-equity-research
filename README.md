@@ -87,7 +87,14 @@ A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-regi
 
 ## Dashboard
 
-The dashboard front page presents the large-universe study: signal tests with confidence intervals, cumulative rank IC, growth and drawdown of the decile and quintile portfolios against the benchmark (before and after costs), Sharpe differences with intervals, data coverage and survivorship. The first study (17 stocks) is kept as published, with its erratum, on the second page. The dashboard reads `universe_data.js`, which `generate_universe_dashboard_data.py` builds from the files in `results/`.
+The dashboard has four pages, all for the large-universe study.
+
+- **Overview** (`index.html`): signal tests with confidence intervals, cumulative rank IC, growth and drawdown of the decile and quintile portfolios against the benchmark (before and after costs), Sharpe differences with intervals, data coverage and survivorship.
+- **Strategy Analysis**: each signal's definition, a reading of the evidence, rolling excess return, the signal tests, the book-value sensitivities and the cost table.
+- **Stock Analysis**: all 861 tickers that were ever in the index, with data coverage by status, largest contributors and detractors, and a filterable table.
+- **Portfolio Timeline**: a month-by-month view of the top-decile holdings, returns, contributions and trades.
+
+The first study (17 stocks) has no dashboard pages: its full write-up, with the Value correction, is [`docs/STUDY_17_STOCKS.md`](docs/STUDY_17_STOCKS.md). The pages read `universe_*_data.js` files, which `generate_universe_dashboard_data.py` builds from the files in `results/`.
 
 ## Reproducing the large-universe study
 
@@ -105,7 +112,8 @@ python run_universe_signals.py --value-combined
 python run_universe_spy.py                   # SPY reference prices, downloaded once
 python run_universe_portfolios.py            # portfolio tests: three headline files and two sensitivities
 python make_universe_charts.py               # the charts and table on this page, from the result files
-python generate_universe_dashboard_data.py   # universe_data.js for the dashboard (refuses to overwrite)
+python run_universe_holdings.py              # holdings and per-stock summary, checked against the committed portfolio returns
+python generate_universe_dashboard_data.py   # the universe_*_data.js files for the dashboard (never overwrites)
 python -m pytest tests/ -q                   # about 300 tests, no network needed
 ```
 
@@ -160,7 +168,8 @@ quant-equity-research/
 ├── run_universe_spy.py                  SPY reference download
 ├── run_universe_portfolios.py           portfolio tests
 ├── make_universe_charts.py              charts and headline table for this page
-├── generate_universe_dashboard_data.py  builds universe_data.js from the result files
+├── run_universe_holdings.py             top-decile holdings and per-stock summary, verified against the committed returns
+├── generate_universe_dashboard_data.py  builds the universe_*_data.js files from the result files
 │
 │   First study (17 stocks) and its sensitivities
 ├── run_data_pipeline.py   run_fundamentals_pipeline.py   run_strategy_comparison.py
@@ -170,8 +179,9 @@ quant-equity-research/
 ├── test_significance.py   test_transaction_costs.py   check_data.py
 ├── generate_portfolio_timeline.py   generate_stocks_data.py   generate_dashboard_data.py
 ├── make_oos_chart.py   make_terrain.py
-├── index.html   universe_data.js         dashboard front page: the large-universe study
-└── first-study.html   strategies.html   portfolio.html   stocks.html   styles.css     the dashboard pages for the first study
+├── index.html   universe-strategies.html   universe-stocks.html   universe-timeline.html   the dashboard
+├── dashboard.js   universe_data.js   universe_sens_data.js   universe_stocks_data.js   universe_holdings_data.js   shared script and generated data
+└── styles.css                           dashboard styling
 ```
 
 ## Future work
