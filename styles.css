@@ -323,3 +323,16 @@ footer a:hover { color: var(--amber); }
   .interp-table { display: block; overflow-x: auto; }
   footer .facts { flex-direction: column; }
 }
+
+/* Errata strip: amber tag, tabular before/after, no decoration */
+.errata { margin: 1.25rem 0 1.75rem; border: 1px solid var(--line); border-left: 4px solid var(--amber); background: #0d0d0d; max-width: 820px; }
+.errata-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; padding: 0.5rem 0.85rem; border-bottom: 1px solid var(--rule); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.errata-tag { background: var(--amber); color: #000; font-weight: 700; padding: 0.1rem 0.5rem; }
+.errata-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.errata-table th, .errata-table td { padding: 0.35rem 0.85rem; text-align: right; border-bottom: 1px solid var(--rule); }
+.errata-table th:first-child, .errata-table td:first-child { text-align: left; color: var(--muted); }
+.errata-table th { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+.errata-table td.old { color: var(--muted); text-decoration: line-through; }
+.errata-table td.new { color: var(--text); font-weight: 700; }
+.errata-table td.dn { color: var(--neg); font-weight: 700; }
+.errata-note { margin: 0; padding: 0.55rem 0.85rem; font-size: 0.78rem; color: var(--muted); line-height: 1.55; }
