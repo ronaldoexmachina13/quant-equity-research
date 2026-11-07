@@ -17,6 +17,13 @@
 | **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
 | **Is the data good enough?** | For comparing strategies, yes. For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
 
+### Reading guide
+
+- **Rank IC (information coefficient).** Each month, rank the stocks by the signal and by the return they earned next month, then take the correlation of the two rankings. +1 means the signal ordered returns perfectly, 0 means it told you nothing, and -1 means it was backwards. Useful signals usually score only a few hundredths.
+- **90% interval.** The range of values the data are consistent with. If it contains zero, the result cannot be told apart from no effect.
+- **Sharpe ratio.** Return above the risk-free rate per unit of volatility. A Sharpe difference compares a portfolio with its benchmark, and a negative value means the portfolio did worse.
+- **Group (quintile).** One fifth of the stocks, ranked on the signal. Group 5 has the highest signal.
+
 ## Why a null result is worth reporting
 
 Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 447 published anomalies with methods that limit the weight of tiny stocks and found that 286 of them (64%) were statistically insignificant at the 5% level ([summary](https://alphaarchitect.com/replicating-anomalies/)). Large, liquid stocks such as the S&P 500 are a hard place to find a premium, so a null here is a plausible and informative outcome. What matters is whether the test was honest enough to be believed.
@@ -160,3 +167,7 @@ A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-regi
 ## Next steps
 
 A delisting-aware data source, a delisting-return sensitivity, a Fama-French factor regression, sector-neutral Value and a quality factor.
+
+## Licence
+
+MIT. See [`LICENSE`](LICENSE). This is research code, not investment advice.
