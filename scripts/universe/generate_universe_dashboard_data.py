@@ -4,6 +4,7 @@
   universe_sens_data.js    sensitivity results (signals.html)
   universe_stocks_data.js  one row per ticker ever in the index (holdings.html, data.html)
   universe_holdings_data.js  top-decile holdings by month (holdings.html)
+  universe_extras_data.js  quintile returns and interval robustness (signals.html, Amendment 14)
 
 Reads only the committed result files in results/. An output that already exists
 is left alone and reported, in line with the project's rule that files are never
@@ -21,6 +22,7 @@ OUT = Path("assets/universe_data.js")
 SENS_OUT = Path("assets/universe_sens_data.js")
 STOCKS_OUT = Path("assets/universe_stocks_data.js")
 HOLDINGS_OUT = Path("assets/universe_holdings_data.js")
+EXTRAS_OUT = Path("assets/universe_extras_data.js")
 
 
 def clean(value):
@@ -219,11 +221,30 @@ def write_holdings():
                                                   "holdings": holdings}, str(source))
 
 
+def write_extras():
+    quintiles = RESULTS / "universe_study_quintile_returns.csv"
+    robustness = RESULTS / "universe_study_inference_robustness.csv"
+    if EXTRAS_OUT.exists():
+        print(f"{EXTRAS_OUT} already exists, left unchanged.")
+        return
+    missing = [p for p in (quintiles, robustness) if not p.exists()]
+    if missing:
+        print(f"{missing[0]} is missing; run run_universe_extras.py first. Skipping {EXTRAS_OUT}.")
+        return
+    q_keys = ["signal", "period", "quintile", "months", "mean_monthly", "mean_annualised", "monotonicity"]
+    r_keys = ["test", "signal", "period", "months", "mean", "autocorrelation_lag1", "nw_lags", "nw_t_stat", "block_length",
+              "iid_ci_90_lower", "iid_ci_90_upper", "iid_excludes_zero", "nw_ci_90_lower", "nw_ci_90_upper", "nw_excludes_zero",
+              "block_ci_90_lower", "block_ci_90_upper", "block_excludes_zero"]
+    data = {"quintiles": sens_rows(quintiles, q_keys), "robustness": sens_rows(robustness, r_keys)}
+    write_js(EXTRAS_OUT, "UNIVERSE_EXTRAS", data, "the quintile and robustness files in results/")
+
+
 def main():
     write_main()
     write_sens()
     write_stocks()
     write_holdings()
+    write_extras()
 
 
 if __name__ == "__main__":

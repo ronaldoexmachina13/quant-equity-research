@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Method | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=4">
+<link rel="stylesheet" href="assets/styles.css?v=5">
 </head>
 <body>
 <div id="chrome"></div>
@@ -55,7 +55,7 @@
       <li><div><b>Signals.</b> Price-to-book is not sector-adjusted, Momentum is not volatility-scaled, and there is no quality factor.</div></li>
       <li><div><b>Costs.</b> A flat 10 bps one way, with no market impact or capacity analysis.</div></li>
       <li><div><b>Multiplicity.</b> 18 headline portfolio intervals at the 90% level, so about two would exclude zero by chance.</div></li>
-      <li><div><b>Inference.</b> No Fama-French controls and no Newey-West errors on the Fama-MacBeth slopes.</div></li>
+      <li><div><b>Inference.</b> No Fama-French controls. Newey-West and block-bootstrap intervals were added after the results (Amendment 14) and agree with the registered ones: none of the 33 signal tests excludes zero under any method.</div></li>
     </ol>
   </div>
 
@@ -87,7 +87,8 @@ const REG = [
   ["2026-10-31", "Amendment 10", "the book value, share count or split code was built"],
   ["2026-10-31", "Amendment 11", "any Value or Combined signal test (share-count validity rule; corrections are appended to the entry)"],
   ["2026-11-01", "Amendment 12", "any Value or Combined signal test or return was computed (labelled sensitivity)"],
-  ["2026-11-07", "Amendment 13", "any Stage 4 code was written or run and before any portfolio result existed"]
+  ["2026-11-07", "Amendment 13", "any Stage 4 code was written or run and before any portfolio result existed"],
+  ["2026-11-07", "Amendment 14", "any code for the additions was written; exploratory and after every registered result existed (group returns, interval robustness, book value check, data manifest)"]
 ];
 document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="month-cell">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
 

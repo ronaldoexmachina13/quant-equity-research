@@ -1,5 +1,5 @@
 """
-Unit tests for src/book_value_rule.py (Amendments 9 to 11).
+Unit tests for src/book_value_rule.py (Amendments 9 to 11 and 14, decision 3).
 
 All inputs are small invented examples whose answers were worked out by
 hand. No network, no real data.
@@ -11,6 +11,7 @@ from src.book_value_rule import (
     fixed_equity, fixed_shares, fixed_book_value_records, suspected_units_errors, invalid_filing_dates,
     valid_book_value_records,
 )
+from src.fundamentals import forward_fill_book_value, get_stockholders_equity
 from src.split_adjust import filled_book_value, restate_book_value
 
 STANDARD = "StockholdersEquity"
@@ -270,3 +271,46 @@ def test_an_invalid_filing_with_nothing_else_gives_blanks_only():
     assert len(records) == 1
     assert list(records.columns) == ["end_date", "filed_date", "book_value_per_share"]
     assert records["book_value_per_share"].isna().all()
+
+
+# ---------------------------------------------------------------------------
+# Restated figures and filing dates (Amendment 14, decision 3)
+# ---------------------------------------------------------------------------
+
+def restated_equity_facts():
+    # March 2020 equity first filed as 18 in April, then re-filed as 17 in December.
+    return make_facts(standard=[entry("2020-03-31", "2020-04-24", 18), entry("2020-03-31", "2020-12-10", 17)],
+                      balance_sheet=[entry("2020-03-31", "2020-04-24", 1)])
+
+
+def test_a_restated_figure_never_replaces_the_first_disclosed_one():
+    records = fixed_book_value_records(restated_equity_facts())
+    assert records["book_value_per_share"].tolist() == [18.0]
+    assert records["filed_date"].tolist() == [pd.Timestamp("2020-04-24")]
+
+
+def test_no_record_is_usable_before_its_filing_date():
+    facts = make_facts(standard=[entry("2020-03-31", "2020-04-24", 18), entry("2020-06-30", "2020-07-24", 20)],
+                       balance_sheet=[entry("2020-03-31", "2020-04-24", 1), entry("2020-06-30", "2020-07-24", 1)])
+    targets = [pd.Timestamp(d) for d in ["2020-04-23", "2020-04-24", "2020-07-23", "2020-07-24"]]
+    filled = forward_fill_book_value(fixed_book_value_records(facts), targets)
+    assert pd.isna(filled["book_value_per_share"].iloc[0])
+    assert filled["book_value_per_share"].iloc[1:].tolist() == [18.0, 18.0, 20.0]
+
+
+def test_a_restatement_filed_later_does_not_change_the_value_in_force():
+    targets = [pd.Timestamp(d) for d in ["2020-08-31", "2020-12-31"]]
+    filled = forward_fill_book_value(fixed_book_value_records(restated_equity_facts()), targets)
+    assert filled["book_value_per_share"].iloc[0] == 18.0   # 129 days after April 24: still in force
+    assert pd.isna(filled["book_value_per_share"].iloc[1])  # older than 6 months, so missing, not replaced by 17
+
+
+def test_the_old_combination_keeps_the_later_filing_and_dates_it_that_day():
+    # src/fundamentals.py, first study only. Where the two equity tags share a period end it keeps the
+    # later-filed figure. Its filing date is that later day, so the figure is usable only from then:
+    # a delay and the loss of the first-disclosed figure, not look-ahead.
+    facts = make_facts(standard=[entry("2020-03-31", "2020-04-24", 18)],
+                       including_nci=[entry("2020-03-31", "2020-12-10", 20)])
+    legacy = get_stockholders_equity(facts)
+    assert legacy["value"].tolist() == [20]
+    assert legacy["filed_date"].tolist() == [pd.Timestamp("2020-12-10")]

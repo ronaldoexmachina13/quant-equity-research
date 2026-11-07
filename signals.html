@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=4">
+<link rel="stylesheet" href="assets/styles.css?v=5">
 </head>
 <body>
 <div id="chrome"></div>
@@ -76,6 +76,24 @@
   </div>
 
   <div class="panel">
+    <h2 id="quintTitle">Return by group <span>does the return rise step by step with the signal?</span></h2>
+    <div class="legend-row" id="quintLegend"></div>
+    <div style="position:relative; height:240px;"><canvas id="quintChart"></canvas></div>
+    <p class="caption" id="quintCaption"></p>
+  </div>
+
+  <div class="panel">
+    <h2 id="robustTitle">Interval robustness <span>do the conclusions survive months that are not independent?</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Test</th><th>Period</th><th class="num">Mean</th><th class="num">Registered 90%</th><th class="num">Newey-West 90%</th><th class="num">Block bootstrap 90%</th><th class="num">Lag-1 autocorr.</th></tr></thead>
+        <tbody id="robustBody"></tbody>
+      </table>
+    </div>
+    <p class="caption" id="robustCaption"></p>
+  </div>
+
+  <div class="panel">
     <h2 id="sensTitle">Sensitivity <span>same tests, different treatments of the book-value data</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="sensTabs"></div></div>
     <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
@@ -88,10 +106,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_sens_data.js"></script>
+<script src="assets/universe_extras_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;
+const X = UNIVERSE_EXTRAS;
+let quintChart = null;
 
 /* 1. signal tests */
 let testKey = "rank_ic";
@@ -157,6 +178,57 @@ function drawTests() {
     body.appendChild(tr);
   }));
 }
+function drawRobust() {
+  document.getElementById("robustTitle").innerHTML = "Interval robustness <span>" + SEL.sig + ": do the conclusions survive months that are not independent?</span>";
+  const body = document.getElementById("robustBody");
+  body.innerHTML = "";
+  let rows = 0, autoSum = 0, flipped = 0;
+  TESTS.forEach(t => PERIODS.forEach(p => {
+    const r = X.robustness.find(x => x.test === t.key && x.signal === SEL.sig && x.period === p.key);
+    if (!r) return;
+    rows++; autoSum += r.autocorrelation_lag1;
+    if (r.iid_excludes_zero && !(r.nw_excludes_zero && r.block_excludes_zero)) flipped++;
+    const iv = (lo, hi, ex) => flagText(`[${t.fmt.val(lo)}, ${t.fmt.val(hi)}]`, ex);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${t.label}</td><td>${p.label}</td><td class="num">${t.fmt.val(r.mean)}</td>` +
+      `<td class="num">${iv(r.iid_ci_90_lower, r.iid_ci_90_upper, r.iid_excludes_zero)}</td>` +
+      `<td class="num">${iv(r.nw_ci_90_lower, r.nw_ci_90_upper, r.nw_excludes_zero)}</td>` +
+      `<td class="num">${iv(r.block_ci_90_lower, r.block_ci_90_upper, r.block_excludes_zero)}</td>` +
+      `<td class="num">${sgn(r.autocorrelation_lag1, 2)}</td>`;
+    body.appendChild(tr);
+  }));
+  const all = X.robustness, total = all.length;
+  const excl = all.filter(r => r.iid_excludes_zero).length;
+  const robust = all.filter(r => r.iid_excludes_zero && r.nw_excludes_zero && r.block_excludes_zero).length;
+  document.getElementById("robustCaption").textContent =
+    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. Red marks an interval that excludes zero. " +
+    (excl === 0 ? "Across all " + total + " signal tests, no interval excludes zero under any of the three methods. " :
+      "Across all " + total + " signal tests, the registered interval excludes zero in " + excl + " and all three intervals do in " + robust + ". ") +
+    (rows ? "For " + SEL.sig + ", " + (flipped ? flipped + " of the registered exclusions do not hold under both new intervals." : "the new intervals change no reading.") : "");
+}
+function drawQuintiles() {
+  document.getElementById("quintTitle").innerHTML = "Return by group <span>" + SEL.sig + ": does the return rise step by step with the signal?</span>";
+  const shades = ["55", "AA", "FF"];
+  const sets = PERIODS.map((p, i) => ({
+    label: p.label,
+    data: [1, 2, 3, 4, 5].map(q => { const r = X.quintiles.find(x => x.signal === SEL.sig && x.period === p.key && x.quintile === q); return r ? r.mean_annualised : null; }),
+    backgroundColor: COLORS[SEL.sig] + shades[i], borderColor: COLORS[SEL.sig], borderWidth: 1
+  }));
+  if (quintChart) quintChart.destroy();
+  quintChart = new Chart(document.getElementById("quintChart"), {
+    type: "bar",
+    data: { labels: ["1 (lowest)", "2", "3", "4", "5 (highest)"], datasets: sets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + spct(i.parsed.y, 1) } } },
+      scales: { y: { ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 7 } }, x: { grid: { display: false } } }
+    }
+  });
+  document.getElementById("quintLegend").innerHTML = PERIODS.map((p, i) => `<span><i style="background:${COLORS[SEL.sig]}${shades[i]}"></i>${p.label}</span>`).join("");
+  const mono = PERIODS.map(p => { const r = X.quintiles.find(x => x.signal === SEL.sig && x.period === p.key && x.quintile === 1); return p.label + ": " + (r ? r.monotonicity.toFixed(2) : "n/a"); }).join(", ");
+  document.getElementById("quintCaption").textContent =
+    "Annualised mean return (monthly mean times 12) of each fifth of stocks, ranked on the signal at the start of the month, equal-weighted. Group 5 minus group 1 is the quintile spread. Monotonicity is the rank correlation between group number and return, from -1 to 1 (" + mono + "). A working signal rises from left to right; a single large bar at one end is not the same as a trend.";
+}
 function drawSens() {
   document.getElementById("sensTitle").innerHTML = "Sensitivity <span>" + SEL.sig + ": same tests, different treatments of the book-value data</span>";
   const m = SENS_METRICS.find(x => x.key === sensKey);
@@ -184,8 +256,8 @@ function drawSens() {
   document.getElementById("sensCaption").textContent = notes.join(" ");
 }
 buttons("sensTabs", SENS_METRICS.map(m => ({ key: m.key, label: m.label })), sensKey, k => { sensKey = k; drawSens(); });
-contextStrip("profileCtx", ["sig"], () => { drawDefinition(); drawTests(); drawSens(); }, false);
-drawDefinition(); drawTests(); drawSens();
+contextStrip("profileCtx", ["sig"], () => { drawDefinition(); drawTests(); drawRobust(); drawQuintiles(); drawSens(); }, false);
+drawDefinition(); drawTests(); drawRobust(); drawQuintiles(); drawSens();
 </script>
 </body>
 </html>

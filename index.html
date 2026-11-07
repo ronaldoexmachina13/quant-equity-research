@@ -4,37 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Summary | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=4">
+<link rel="stylesheet" href="assets/styles.css?v=5">
 </head>
 <body>
 <div id="chrome"></div>
 <div class="wrap">
 
   <section class="hero">
-    <h1>Momentum and value in S&amp;P 500 stocks</h1>
-    <p class="lede">Pre-registered test of 12-1 momentum, price-to-book value and their average on about 500 S&amp;P 500 members, January 2012 to August 2026. Signals are judged on rank IC, quintile spread and Fama-MacBeth slopes. Top-decile and top-quintile equal-weight portfolios are secondary evidence. Every interval is a 90% bootstrap interval.</p>
+    <h1>Do momentum and value still work in the S&amp;P 500?</h1>
+    <p class="lede">A pre-registered test of 12-1 momentum, price-to-book value and their average on about 500 large US stocks, January 2012 to August 2026.</p>
 
-    <div class="mini-stats">
-      <div class="mini-stat"><div class="ms-value" id="kMonths">176</div><div class="ms-label">months tested</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kMembers">~500</div><div class="ms-label">index members each month</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kIc">0 of 6</div><div class="ms-label">rank IC intervals exclude zero</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio intervals exclude zero</div></div>
-      <div class="mini-stat"><div class="ms-value">0.055</div><div class="ms-label">minimum detectable mean IC, 108 months</div></div>
+    <div class="hero-finding" style="margin-top:1.25rem;">
+      <b class="box-label">Short answer</b>
+      Not detectably. None of the three signals ranks next-month returns better than chance, and the portfolios built on them do not reliably beat an equal-weight benchmark. The test was built so that this is a credible answer: it was pre-registered, it counts every test it ran, and it states how small an effect it could have found.
     </div>
 
-    <div class="hero-finding" style="margin-top:1.5rem;">
-      <b class="box-label">Bottom line</b>
-      No signal shows a detectable cross-sectional relationship with next-month returns in the primary tests: none of the six rank IC intervals excludes zero. Two of 18 portfolio Sharpe-difference intervals do, both Value in 2012 to 2020 and both the same overlapping bet; about 1.8 would be expected under the null at the 90% level. With 108 months and a monthly IC standard deviation of up to about 0.23, the minimum detectable mean IC is about 0.055, so the evidence is consistent with no effect and with a small one. The data are free and survivor-biased: relative comparisons are informative, return levels are not.
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="ms-value" id="kTests">0 of 33</div><div class="ms-label">signal tests exclude zero, under three interval methods</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio comparisons exclude zero: one Value bet, counted twice, that lagged the benchmark</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPower">0.055</div><div class="ms-label">smallest mean rank IC the test could reliably detect</div></div>
     </div>
   </section>
 
-  <div class="section-label">Scorecard <span>estimate and 90% bootstrap interval, before costs</span></div>
+  <div class="section-label">Exhibit 1 <span>rank IC: do the rankings predict next-month returns?</span></div>
   <div class="panel">
+    <h2>No signal's rank IC is distinguishable from zero</h2>
+    <svg class="forest" id="icForest" role="img" aria-label="Rank IC intervals"></svg>
+    <p class="caption">Mean monthly rank correlation between the signal and next month's return, with a 90% bootstrap interval. Zero means no ranking power, and an interval that crosses zero cannot be told apart from it. The 2021 to 2026 months were known from an earlier study, so they are a re-test, not out-of-sample evidence.</p>
+  </div>
+
+  <div class="section-label">Exhibit 2 <span>return by group: does return rise as the signal improves?</span></div>
+  <div class="panel">
+    <h2>Returns do not climb in steps as the signal improves</h2>
+    <div class="grp-grid">
+      <div><div class="grp-title"><b style="color:var(--momentum)">Momentum</b><span id="monoMomentum"></span></div><div class="grp-canvas"><canvas id="grpMomentum"></canvas></div></div>
+      <div><div class="grp-title"><b style="color:var(--value)">Value</b><span id="monoValue"></span></div><div class="grp-canvas"><canvas id="grpValue"></canvas></div></div>
+      <div><div class="grp-title"><b style="color:var(--combined)">Combined</b><span id="monoCombined"></span></div><div class="grp-canvas"><canvas id="grpCombined"></canvas></div></div>
+    </div>
+    <p class="caption">Annualised return of each fifth of stocks, ranked on the signal at the start of the month, 2012 to 2026. A working signal would rise from group 1 (lowest) to group 5 (highest). Momentum's top group is best, but the others are not ordered. Value is not monotonic.</p>
+  </div>
+
+  <div class="section-label">Exhibit 3 <span>portfolios: do the top-ranked stocks beat the benchmark?</span></div>
+  <div class="panel">
+    <h2>Only one bet stands out, and it lagged the benchmark</h2>
+    <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe ratio difference intervals"></svg>
+    <p class="caption">Top-decile portfolios against the equal-weight benchmark of the same stocks: difference in Sharpe ratio before costs, with a 90% paired bootstrap interval. Red marks an interval that excludes zero. Across 18 comparisons (three signals, two portfolio sizes, three periods) about two would do so by chance alone. The Portfolios page has the top-quintile versions.</p>
+  </div>
+
+  <div class="section-label">Why believe it <span>how the study avoids fooling itself</span></div>
+  <div class="trust-grid">
+    <div class="trust"><b>Pre-registered</b><p>The design and every later change are dated, append-only amendments, committed before the code that depends on them.</p></div>
+    <div class="trust"><b>No look-ahead, no tuning</b><p>Signals use data to the end of the previous month, book values enter on the filing date, and nothing was varied to improve a result.</p></div>
+    <div class="trust"><b>Power is stated</b><p>With 108 months the test finds only a fairly large effect. A null here means "no evidence of an effect", not "proof of none".</p></div>
+    <div class="trust"><b>It found its own errors</b><p>A split bug that flattered Value and unit errors in SEC share counts were caught, fixed and logged on the Data page.</p></div>
+  </div>
+
+  <div class="section-label">Every test <span>the full scorecard, for readers who want the numbers</span></div>
+  <details class="panel fold">
+    <summary>Show the scorecard: three signals, four tests, two periods</summary>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table scorecard" id="scorecard"></table>
     </div>
-    <p class="caption">Rank IC, quintile spread and Fama-MacBeth slope are the primary tests of whether a signal ranks stocks by next-month return. The Sharpe difference is the top-decile portfolio against its equal-weight benchmark and is secondary evidence. Red marks an interval that excludes zero. The 2021 to 2026 months were known from the 17-stock study, so they are a re-test and not out-of-sample evidence.</p>
-  </div>
+    <p class="caption">Estimate and 90% bootstrap interval, before costs. Rank IC, quintile spread and Fama-MacBeth slope are the primary tests. The Sharpe difference is the top-decile portfolio against its benchmark and is secondary evidence. Red marks an interval that excludes zero.</p>
+  </details>
 
   <div class="section-label">Where to look <span>one question per page</span></div>
   <div class="nav-cards">
@@ -51,19 +83,58 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
+<script src="assets/universe_extras_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("index.html", "S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (12-1) &middot; Value (P/B) &middot; Combined");
+const X = UNIVERSE_EXTRAS;
 
 /* header figures, all computed from the data */
 (function headerFigures() {
-  document.getElementById("kMonths").textContent = U.dates.length;
-  const avg = U.coverage.members.reduce((a, b) => a + b, 0) / U.coverage.members.length;
-  document.getElementById("kMembers").textContent = "~" + Math.round(avg / 50) * 50;
-  const ic = U.signalTests.filter(r => r.test === "rank_ic" && r.period !== PERIODS[2].key);
-  document.getElementById("kIc").textContent = ic.filter(r => r.excludes_zero).length + " of " + ic.length;
+  const tests = U.signalTests, robust = X.robustness;
+  const failing = tests.filter(r => r.excludes_zero).length + robust.filter(r => r.nw_excludes_zero || r.block_excludes_zero).length;
+  document.getElementById("kTests").textContent = failing === 0 ? "0 of " + tests.length : "some of " + tests.length;
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null);
   document.getElementById("kPort").textContent = head.filter(r => r.sig).length + " of " + head.length;
+  const Z = 1.645 + 0.842, sd = Math.max(...SIGNALS.map(s => icStatistics(s, 0, U.split).sd));
+  document.getElementById("kPower").textContent = (Z * sd / Math.sqrt(U.split)).toFixed(3);
+})();
+
+/* exhibit 1: rank IC */
+(function exhibit1() {
+  const rows = [];
+  SIGNALS.forEach(sig => PERIODS.slice(0, 2).forEach(p => {
+    const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === sig && x.period === p.key);
+    rows.push({ label: sig + " · " + p.label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, color: sig, group: sig, excl: r.excludes_zero });
+  }));
+  forest("icForest", rows, TESTS[0].fmt);
+})();
+
+/* exhibit 2: return by group, full period */
+(function exhibit2() {
+  SIGNALS.forEach(sig => {
+    const rows = [1, 2, 3, 4, 5].map(q => X.quintiles.find(r => r.signal === sig && r.period === PERIODS[2].key && r.quintile === q));
+    document.getElementById("mono" + sig).textContent = "rank corr. " + sgn(rows[0].monotonicity, 1);
+    new Chart(document.getElementById("grp" + sig), {
+      type: "bar",
+      data: { labels: ["1 low", "2", "3", "4", "5 high"], datasets: [{ data: rows.map(r => r.mean_annualised), backgroundColor: COLORS[sig] }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => (i.parsed.y * 100).toFixed(1) + "% a year" } } },
+        scales: { y: { min: 0, suggestedMax: 0.2, ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 5 } }, x: { grid: { display: false } } }
+      }
+    });
+  });
+})();
+
+/* exhibit 3: Sharpe differences, top decile, gross */
+(function exhibit3() {
+  const rows = [];
+  SIGNALS.forEach(sig => PERIODS.forEach(p => {
+    const r = U.summary.find(x => x.period === p.key && x.strategy === sig && x.size === "top_decile" && x.basis === "gross" && x.diff !== null);
+    if (r) rows.push({ label: sig + " · " + p.label, mean: r.diff, lo: r.lo, hi: r.hi, color: sig, group: sig, excl: r.sig });
+  }));
+  forest("sharpeForest", rows, { axis: v => v.toFixed(1), val: v => sgn(v, 2) });
 })();
 
 /* scorecard: three signals by four tests by two periods */

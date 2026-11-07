@@ -1,54 +1,67 @@
-# Momentum and Value in S&P 500 Stocks
+# Do Momentum and Value Still Work in the S&P 500?
 
 [![tests](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml/badge.svg)](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml)
 
-A pre-registered cross-sectional test of 12-1 momentum, price-to-book value and their average on about 500 S&P 500 members, January 2012 to August 2026. [Live dashboard](https://ronaldoexmachina13.github.io/quant-equity-research/). The study is complete and no further development is planned.
+**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, 12-1 momentum and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them ranks next-month returns better than chance. The study is built so that this is a credible answer and not a bug.
 
-## Abstract
+[**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-registration](docs/LIMITATIONS_PLAN.md)
 
-None of the three signals shows a statistically detectable relationship with next-month returns in the primary tests: all six mean rank IC intervals include zero. Two of 18 portfolio Sharpe-difference intervals exclude zero, both Value in 2012 to 2020 and both the same overlapping bet, against about 1.8 expected under the null at the 90% level. The first test period has 108 months and a monthly IC standard deviation of up to about 0.23, so the minimum detectable mean IC is about 0.055. The evidence is consistent with no effect and with a small one. The data are free and survivor-biased, so relative comparisons are informative and return levels are not.
+![Exhibit 1: rank IC by signal](results/exhibit_1_rank_ic.png)
 
-## Evidence
+## Findings
 
-All intervals are 90% bootstrap intervals (5,000 resamples, seed 42). IC is the monthly Spearman rank correlation between a signal and the next month's return. Sharpe differences are paired, against an equal-weight benchmark of the names with usable data for that signal, using the three-month Treasury bill as the risk-free rate.
+| Question | Answer |
+|---|---|
+| **Do the rankings predict returns?** | No. None of 33 signal tests (3 signals, 4 kinds of test, 3 periods) excludes zero, whichever of three methods builds the interval. |
+| **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020, both are the same bet, and the bet lagged the benchmark. Chance alone gives about 1.8. |
+| **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
+| **Is the data good enough?** | For comparing strategies, yes. For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
 
-| Test | 2012 to 2020 | 2021 to 2026 | Reading |
-|---|---:|---:|---|
-| Momentum: mean rank IC | +0.007 (-0.029 to +0.042) | +0.009 (-0.032 to +0.047) | Includes zero in both periods |
-| Value: mean rank IC | -0.017 (-0.043 to +0.010) | +0.020 (-0.018 to +0.057) | Includes zero in both periods |
-| Combined: mean rank IC | -0.002 (-0.036 to +0.032) | +0.015 (-0.023 to +0.051) | Includes zero in both periods |
-| Momentum: Sharpe difference, top decile | +0.28 (-0.12 to +0.63) | +0.06 (-0.50 to +0.54) | Includes zero in both periods |
-| Value: Sharpe difference, top decile | **-0.44 (-0.73 to -0.15)** | +0.17 (-0.24 to +0.61) | **Excludes zero in 2012 to 2020 only** |
-| Combined: Sharpe difference, top decile | +0.14 (-0.23 to +0.48) | +0.22 (-0.27 to +0.68) | Includes zero in both periods |
+## Why a null result is worth reporting
 
-The 2021 to 2026 months were already known from an earlier 17-stock study, so they are a re-test and not out-of-sample evidence. Quintile spreads, Fama-MacBeth regressions and top-quintile portfolios are in `results/` and on the dashboard.
+Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 447 published anomalies with methods that limit the weight of tiny stocks and found that 286 of them (64%) were statistically insignificant at the 5% level ([summary](https://alphaarchitect.com/replicating-anomalies/)). Large, liquid stocks such as the S&P 500 are a hard place to find a premium, so a null here is a plausible and informative outcome. What matters is whether the test was honest enough to be believed.
 
-![Mean monthly rank IC by signal and period, with 90% bootstrap intervals. All six intervals include zero.](results/universe_study_ic_intervals.png)
+![Exhibit 2: return by group](results/exhibit_2_return_by_group.png)
 
-### Value, 2012 to 2020
+If a signal worked, the five groups would earn more in steps from left to right. Momentum's top group is the best in every period, but the groups below it are not ordered, and Value's pattern is not monotonic at all.
 
-Two of the 18 headline portfolio comparisons exclude zero, both for Value in 2012 to 2020 (top decile and top quintile). The two portfolios overlap, so this is one finding measured twice. It is absent from the re-test and from the full period. The rank IC, quintile spread and Fama-MacBeth intervals for the same signal and period all include zero, although the Fama-MacBeth slope falls just below zero under three secondary sensitivities (winsorised P/B, and with the 24 or 37 suspect names excluded). Those tests share the same months and stocks and are not independent evidence. No explanation has been tested.
+![Exhibit 3: portfolio Sharpe differences](results/exhibit_3_sharpe_difference.png)
 
-![Sharpe ratio difference against the equal-weight benchmark, by strategy, portfolio size and period, with 90% paired bootstrap intervals. Two intervals exclude zero, both Value in 2012 to 2020.](results/universe_study_sharpe_diff_intervals.png)
+The one interval that stands out is Value in 2012 to 2020, measured twice (top decile and top quintile). It is absent from the re-test and from the full period, it points the wrong way for a value premium, and the tests of the signal itself for the same period all include zero (the Fama-MacBeth slope falls just below zero under three secondary sensitivities, which share the same months and stocks). Costs of 10 bps one way change none of these readings. No explanation has been tested.
 
-Portfolios hold the top decile or quintile of names by signal at equal weight, rebalanced monthly, with 10 bps one-way costs charged on drift-inclusive turnover. Costs do not change which intervals include zero. Excluding the 24 or 37 suspect names moves the Value and Combined point estimates slightly and leaves the same two intervals excluding zero.
+The 2021 to 2026 months were already known from an earlier 17-stock study, so they are a re-test and not out-of-sample evidence.
 
-## Hypotheses
+## How the study avoids fooling itself
+
+- **Pre-registered.** The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. Post-hoc additions are labelled as such.
+- **No look-ahead.** A signal dated t uses data up to the end of month t-1 and is paired with the return in month t. Book values enter on the date the filing became public.
+- **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
+- **Honest intervals.** 90% bootstrap intervals, re-checked with Newey-West errors and a block bootstrap. Every test is counted, and the expected number of false alarms is stated.
+- **It found and fixed its own errors.** A split-adjustment bug had flattered Value (17-stock Sharpe fell from 0.86 to about 0.61 once fixed), and unit errors in SEC share counts had produced absurd price-to-book ratios. Both are logged below.
+- **Tested and reproducible.** About 330 unit tests with hand-worked cases run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
+
+## Limits
+
+- **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix.
+- **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect.
+- **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, and there are no Fama-French controls.
+- **Power.** The test cannot rule out a small premium.
+
+## Explore
+
+| Page | Question it answers |
+|---|---|
+| Summary | What is the answer, and why believe it? |
+| Signals | Do the rankings predict next-month returns? |
+| Portfolios | Do top-ranked stocks beat the benchmark? |
+| Holdings | Which names drove the results? |
+| Data | Can the data be trusted? |
+| Method | What was done, in what order? |
+
+<details>
+<summary><b>Hypotheses and method</b></summary>
 
 Momentum is the trailing 12-month return excluding the most recent month, which avoids the one-month reversal effect. Candidate explanations in the literature are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
-
-## Data
-
-| Item | Source and treatment |
-|---|---|
-| Universe | S&P 500 membership rebuilt month by month from Wikipedia. Between 353 and 499 names are usable for Momentum each month and between 295 and 426 for Value and Combined. |
-| Prices | Yahoo Finance via `yfinance`, adjusted close. |
-| Book value | SEC EDGAR filings, aligned to the filing date. Book value per share is restated for later splits. |
-| Risk-free rate | Three-month Treasury bill, FRED. |
-
-**Survivorship.** Acquired and bankrupt companies mostly have no free price history, so each month's universe is the set of names that have data. In 2012, for Value and Combined, 26% of names later removed from the index had usable data against 85% of names that stayed. Names later removed that did have data earned an annualised mean monthly return of about 3% to 4% over 2012 to 2026, against about 16% for names that stayed. This is descriptive and not a correction.
-
-## Method
 
 1. **Timing.** A signal dated t uses data up to the end of month t-1 and is paired with the return in month t.
 2. **Primary evidence.** Rank IC, quintile spread and Fama-MacBeth slopes (single and joint), each with a bootstrap interval.
@@ -59,7 +72,24 @@ Momentum is the trailing 12-month return excluding the most recent month, which 
 
 **Power.** The monthly rank IC has a standard deviation of up to about 0.23. With 108 months the minimum detectable mean IC is about 0.055, above the 0.02 to 0.03 often cited for large-cap momentum. The test could not have found a small real effect, so an interval that includes zero does not show the effect is zero.
 
-## Data integrity log
+</details>
+
+<details>
+<summary><b>Data</b></summary>
+
+| Item | Source and treatment |
+|---|---|
+| Universe | S&P 500 membership rebuilt month by month from Wikipedia. Between 353 and 499 names are usable for Momentum each month and between 295 and 426 for Value and Combined. |
+| Prices | Yahoo Finance via `yfinance`, adjusted close. |
+| Book value | SEC EDGAR filings, aligned to the filing date. Book value per share is restated for later splits. |
+| Risk-free rate | Three-month Treasury bill, FRED. |
+
+**Survivorship.** Acquired and bankrupt companies mostly have no free price history, so each month's universe is the set of names that have data. In 2012, for Value and Combined, 26% of names later removed from the index had usable data against 85% of names that stayed. Names later removed that did have data earned an annualised mean monthly return of about 3% to 4% over 2012 to 2026, against about 16% for names that stayed. This is descriptive and not a correction.
+
+</details>
+
+<details>
+<summary><b>Data integrity log</b></summary>
 
 | When | Defect | Effect |
 |---|---|---|
@@ -68,32 +98,12 @@ Momentum is the trailing 12-month return excluding the most recent month, which 
 | Oct 2026 | Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split and SEC book value per share does not change. | 17-stock in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. Alpha moved from +2.9% (t = 0.62) to about -0.9% (t = -0.17). Out-of-sample results are essentially unchanged. See `results/value_split_*.csv` and Amendment 8. |
 | Oct 2026 | Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios. | Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded. |
 
-## Limitations
+</details>
 
-- **Survivorship.** A delisting-aware source such as CRSP is the real fix.
-- **Free data.** Wikipedia membership is approximate early on (up to about 12 names overstated in 2012). Some book values rest on share counts that may carry unit errors the rule cannot detect. Ticker reuse is not fully detectable.
-- **Universe.** Large, liquid S&P 500 names are the hardest place to find a factor premium.
-- **Signals.** P/B is not sector-adjusted, Momentum is not volatility-scaled, and there is no quality factor.
-- **Costs.** A flat 10 bps one way, with no market impact or capacity analysis.
-- **Multiplicity.** 18 headline portfolio intervals at the 90% level, so about two would exclude zero by chance.
-- **Inference.** No Fama-French controls and no Newey-West errors on the Fama-MacBeth slopes.
+<details>
+<summary><b>Reproducing the results</b></summary>
 
-## Dashboard
-
-Six static pages, built from the files in `results/`. Chart.js is loaded from a CDN; there is no server. The Signals and Portfolios pages share one selection (signal, size, costs) that carries across pages.
-
-| Page | Question it answers |
-|---|---|
-| Summary | What is the answer? Bottom line, headline figures and a scorecard of every primary test with its 90% interval. |
-| Signals | Do the rankings predict next-month returns? Interval plots by test, cumulative and rolling rank IC, IC statistics, per-signal construction and sensitivity to the book-value treatment. |
-| Portfolios | Do top-ranked stocks beat the benchmark? Growth, drawdowns, deepest drawdown episodes, monthly return heatmap (absolute or active), rolling excess return, cost drag and Sharpe differences. |
-| Holdings | Which names drove the results? Contributors and detractors, month-by-month holdings and trades, and the 861-ticker table. |
-| Data | Can the data be trusted? Sources, coverage, survivorship and the corrections log. |
-| Method | What was done? The design in order, the pre-registration log, the power curve and the limitations. |
-
-## Reproducing
-
-Python 3.13 and the pinned packages (`pip install -r requirements.txt`). Raw downloads are cached outside Git in the folder named by the environment variable `UNIVERSE_CACHE_DIR`. The SQLite file `database/universe_feasibility.db` is not committed. Result files are never overwritten: each script stops if its output exists, and the committed `results/` files already exist in a fresh clone. Run everything from the repository root, as modules.
+Python 3.13 and the pinned packages (`pip install -r requirements.txt`). Raw downloads are cached outside Git in the folder named by the environment variable `UNIVERSE_CACHE_DIR`. The SQLite file `database/universe_feasibility.db` is not committed. `results/data_manifest.csv` lists the size and SHA-256 checksum of every cached download (`make_data_manifest --verify` compares). Result files are never overwritten: each script stops if its output exists, and the committed `results/` files already exist in a fresh clone. Run everything from the repository root, as modules.
 
 ```bash
 python -m scripts.universe.run_universe_membership      # S&P 500 membership from Wikipedia (database only)
@@ -106,15 +116,20 @@ python -m scripts.universe.run_universe_signals --momentum-only
 python -m scripts.universe.run_universe_signals --value-combined
 python -m scripts.universe.run_universe_spy             # SPY reference prices
 python -m scripts.universe.run_universe_portfolios      # portfolio tests and sensitivities
+python -m scripts.universe.run_universe_extras          # quintile returns and Newey-West and block-bootstrap intervals (Amendment 14)
+python -m scripts.universe.make_data_manifest           # checksums of the raw-data cache; add --verify to compare later
 python -m scripts.universe.make_universe_charts         # the charts and table on this page
 python -m scripts.universe.run_universe_holdings        # holdings and per-stock summary, checked against committed returns
 python -m scripts.universe.generate_universe_dashboard_data   # assets/universe_*_data.js (never overwrites)
-python -m pytest tests/ -q                              # about 300 tests, no network needed
+python -m pytest tests/ -q                              # about 330 tests, no network needed
 ```
 
 Rerunning a result-writing script in a fresh clone stops at the first existing file. To regenerate a result, write it to a new folder or move the old file first.
 
-## Repository layout
+</details>
+
+<details>
+<summary><b>Repository layout</b></summary>
 
 ```
 index.html, signals.html, portfolios.html, holdings.html, data.html, method.html
@@ -122,7 +137,7 @@ index.html, signals.html, portfolios.html, holdings.html, data.html, method.html
 assets/                       dashboard.js, styles.css and the generated universe_*_data.js files
 config.py                     17-stock universe and evaluation windows (earlier study)
 src/                          library code: data loading, SQLite storage, factors, backtest, risk, universe
-                              construction, book value rules, split adjustment, signal evaluation, portfolios
+                              construction, book value rules, split adjustment, signal evaluation, portfolios, data manifest
 scripts/universe/             the large-universe pipeline, one script per stage (see Reproducing)
 scripts/first_study/          the 17-stock study and its sensitivities
 tests/                        unit tests checked against hand-worked cases, run on every push
@@ -133,10 +148,15 @@ database/                     SQLite files, generated and not committed
 CLAUDE.md                     standing rules for the AI coding assistant used on this project
 ```
 
-## Earlier study: 17 stocks
+</details>
+
+<details>
+<summary><b>Earlier study: 17 stocks</b></summary>
 
 A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-registered months it had not seen (January 2025 to August 2026). The benchmark had the highest out-of-sample Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum) and no strategy could be statistically distinguished from it. Value's in-sample edge does not survive the split correction. The write-up is in [`docs/STUDY_17_STOCKS.md`](docs/STUDY_17_STOCKS.md).
 
-## Extensions not undertaken
+</details>
 
-Sector-neutral Value, a quality factor, a Fama-French factor regression, Newey-West errors, and a delisting-aware data source.
+## Next steps
+
+A delisting-aware data source, a delisting-return sensitivity, a Fama-French factor regression, sector-neutral Value and a quality factor.
