@@ -29,9 +29,7 @@
   <div class="section-label">2 &middot; Month by month <span>top-decile holdings, returns, contributions and trades, before costs</span></div>
   <div class="panel">
     <div class="month-ctrl">
-      <button class="metric-btn" id="prev">&larr; Prev</button>
       <span class="month-label" id="monthLabel"></span>
-      <button class="metric-btn" id="next">Next &rarr;</button>
     </div>
     <div class="ctrl-row"><span class="pick-label">Year</span><div class="ctrl-group" id="yearRow"></div></div>
     <div class="ctrl-row"><span class="pick-label">Month</span><div class="ctrl-group" id="monthRow"></div></div>
@@ -182,8 +180,6 @@ document.getElementById("growthChart").addEventListener("click", ev => {
   drawMonth();
 });
 document.getElementById("growthChart").style.cursor = "pointer";
-document.getElementById("prev").onclick = () => { if (i > 0) { i--; drawMonth(); } };
-document.getElementById("next").onclick = () => { if (i < U.dates.length - 1) { i++; drawMonth(); } };
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
   if (e.key === "ArrowLeft" && i > 0) { i--; drawMonth(); } else if (e.key === "ArrowRight" && i < U.dates.length - 1) { i++; drawMonth(); }
