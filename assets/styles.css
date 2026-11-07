@@ -412,3 +412,9 @@ footer a:hover { color: var(--amber); }
 .step-list li:last-child { border-bottom: none; }
 .step-list li::before { content: counter(step); color: var(--amber); font-weight: 700; }
 .step-list b { color: #fff; }
+
+.metric-btn:disabled { opacity: 0.3; cursor: default; }
+.metric-btn:disabled:hover { color: var(--muted); border-color: var(--line); }
+.pick-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; min-width: 3.2rem; }
+#yearRow .metric-btn { padding: 0.3rem 0.5rem; }
+#yearRow { gap: 0.3rem; }

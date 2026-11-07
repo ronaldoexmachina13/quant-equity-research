@@ -34,6 +34,8 @@
       <button class="metric-btn" id="next">Next &rarr;</button>
       <input type="range" id="slider" min="0" value="0" step="1" aria-label="Month">
     </div>
+    <div class="ctrl-row"><span class="pick-label">Year</span><div class="ctrl-group" id="yearRow"></div></div>
+    <div class="ctrl-row"><span class="pick-label">Month</span><div class="ctrl-group" id="monthRow"></div></div>
     <h2>Growth of $1 <span>top decile, before costs, with the selected month marked</span></h2>
     <div class="legend-row">
       <span><i style="background:var(--momentum)"></i>Momentum</span>
@@ -42,7 +44,7 @@
       <span><i style="background:#FFFFFF"></i>Equal-weight benchmark (Value and Combined usable)</span>
     </div>
     <div style="position:relative; height:260px;"><canvas id="growthChart"></canvas></div>
-    <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased. The left and right arrow keys step through the months.</p>
+    <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased. Pick a year and month above, click the chart, drag the slider, or use the left and right arrow keys.</p>
   </div>
   <div class="grid3" id="cols"></div>
 
@@ -116,8 +118,9 @@ chart.options.animation = false;
 chart.update();
 function heldNames(sig, k) { return new Set((H.holdings[sig][k] || []).map(h => h[0])); }
 function drawMonth() {
-  document.getElementById("monthLabel").textContent = U.dates[i];
+  document.getElementById("monthLabel").textContent = ymLabel(U.dates[i]);
   document.getElementById("slider").value = i;
+  drawPickers();
   chart.draw();
   const box = document.getElementById("cols");
   box.innerHTML = "";
@@ -146,6 +149,41 @@ function drawMonth() {
     box.appendChild(div);
   });
 }
+/* year and month pickers: two clicks reach any month */
+const YEARS = [...new Set(U.dates.map(d => d.slice(0, 4)))];
+function jumpTo(year, month) {
+  const target = year + "-" + String(month).padStart(2, "0");
+  let k = U.dates.indexOf(target);
+  if (k < 0) k = year === YEARS[0] ? 0 : U.dates.length - 1;
+  i = k; drawMonth();
+}
+function drawPickers() {
+  const cur = U.dates[i], cy = cur.slice(0, 4), cm = +cur.slice(5, 7);
+  const yr = document.getElementById("yearRow"), mr = document.getElementById("monthRow");
+  yr.innerHTML = ""; mr.innerHTML = "";
+  YEARS.forEach(y => {
+    const b = document.createElement("button");
+    b.className = "metric-btn" + (y === cy ? " active" : "");
+    b.textContent = y;
+    b.onclick = () => { const first = U.dates.find(d => d.startsWith(y)); jumpTo(y, Math.min(Math.max(cm, +first.slice(5, 7)), 12)); };
+    yr.appendChild(b);
+  });
+  MONTH_NAMES.forEach((m, k) => {
+    const b = document.createElement("button");
+    const exists = U.dates.includes(cy + "-" + String(k + 1).padStart(2, "0"));
+    b.className = "metric-btn" + (k + 1 === cm ? " active" : "");
+    b.textContent = m; b.disabled = !exists;
+    b.onclick = () => jumpTo(cy, k + 1);
+    mr.appendChild(b);
+  });
+}
+document.getElementById("growthChart").addEventListener("click", ev => {
+  const x = ev.offsetX, area = chart.chartArea;
+  if (x < area.left || x > area.right) return;
+  i = Math.min(Math.max(Math.round(chart.scales.x.getValueForPixel(x)), 0), U.dates.length - 1);
+  drawMonth();
+});
+document.getElementById("growthChart").style.cursor = "pointer";
 const slider = document.getElementById("slider");
 slider.max = U.dates.length - 1;
 slider.oninput = () => { i = +slider.value; drawMonth(); };
