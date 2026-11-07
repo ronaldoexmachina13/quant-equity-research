@@ -87,7 +87,7 @@ A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-regi
 
 ## Dashboard
 
-The live dashboard presents the 17-stock study. Results for the 500-stock study are in the `universe_study_*` files under `results/` and on this page.
+The dashboard front page presents the large-universe study: signal tests with confidence intervals, cumulative rank IC, growth and drawdown of the decile and quintile portfolios against the benchmark (before and after costs), Sharpe differences with intervals, data coverage and survivorship. The first study (17 stocks) is kept as published, with its erratum, on the second page. The dashboard reads `universe_data.js`, which `generate_universe_dashboard_data.py` builds from the files in `results/`.
 
 ## Reproducing the large-universe study
 
@@ -105,6 +105,7 @@ python run_universe_signals.py --value-combined
 python run_universe_spy.py                   # SPY reference prices, downloaded once
 python run_universe_portfolios.py            # portfolio tests: three headline files and two sensitivities
 python make_universe_charts.py               # the charts and table on this page, from the result files
+python generate_universe_dashboard_data.py   # universe_data.js for the dashboard (refuses to overwrite)
 python -m pytest tests/ -q                   # about 300 tests, no network needed
 ```
 
@@ -159,6 +160,7 @@ quant-equity-research/
 ├── run_universe_spy.py                  SPY reference download
 ├── run_universe_portfolios.py           portfolio tests
 ├── make_universe_charts.py              charts and headline table for this page
+├── generate_universe_dashboard_data.py  builds universe_data.js from the result files
 │
 │   First study (17 stocks) and its sensitivities
 ├── run_data_pipeline.py   run_fundamentals_pipeline.py   run_strategy_comparison.py
@@ -168,7 +170,8 @@ quant-equity-research/
 ├── test_significance.py   test_transaction_costs.py   check_data.py
 ├── generate_portfolio_timeline.py   generate_stocks_data.py   generate_dashboard_data.py
 ├── make_oos_chart.py   make_terrain.py
-└── index.html   strategies.html   portfolio.html   stocks.html   styles.css     the dashboard
+├── index.html   universe_data.js         dashboard front page: the large-universe study
+└── first-study.html   strategies.html   portfolio.html   stocks.html   styles.css     the dashboard pages for the first study
 ```
 
 ## Future work
