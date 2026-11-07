@@ -11,6 +11,7 @@ import pytest
 
 from src.risk import annualized_return, annualized_volatility, max_drawdown, sharpe_ratio, bootstrap_sharpe_diff, downside_deviation, sortino_ratio, beta, alpha, alpha_regression
 from src.risk import tbill_yield_to_monthly, align_risk_free, annualized_risk_free, sharpe_ratio_tbill, downside_deviation_tbill, sortino_ratio_tbill, alpha_regression_tbill
+from src.risk import bootstrap_sharpe_diff_tbill
 from src.risk import power_z_values, minimum_detectable_effect, months_needed_to_detect
 from src.risk import historical_var, expected_shortfall, bootstrap_statistic_ci, hit_rate, hit_rate_vs_benchmark, drawdown_series
 
@@ -276,6 +277,63 @@ def test_alpha_regression_tbill_constant_outperformance():
     result = alpha_regression_tbill(BENCH_12M + 0.005, BENCH_12M, rf)
     assert result["beta"] == pytest.approx(1.0, rel=1e-9)
     assert result["alpha"] == pytest.approx(0.06, rel=1e-9)
+
+
+def test_bootstrap_sharpe_diff_tbill_reproduces_flat_version_at_constant_2pct():
+    """
+    Amendment 13, decision 3. sharpe_ratio() subtracts 0.02 a year and
+    sharpe_ratio_tbill() subtracts the compounded rate series. A constant
+    (1.02)^(1/12) - 1 compounds back to 0.02, so with the same seed the
+    point, both bounds and the flag must match bootstrap_sharpe_diff().
+    """
+    a = pd.Series([0.01, -0.02, 0.03, 0.00, 0.02, -0.01, 0.01, 0.02, -0.03, 0.01, 0.02, 0.00] * 2)
+    b = pd.Series([0.005, -0.01, 0.02, 0.01, 0.01, -0.02, 0.00, 0.01, -0.01, 0.02, 0.01, 0.00] * 2)
+    rf = pd.Series([FLAT_2PCT_MONTHLY] * len(a))
+    flat = bootstrap_sharpe_diff(a, b, n_sims=500, seed=42)
+    tbill = bootstrap_sharpe_diff_tbill(a, b, rf, n_sims=500, seed=42)
+    for key in ["point_diff", "lower", "upper"]:
+        assert tbill[key] == pytest.approx(flat[key], abs=1e-12)
+    assert tbill["significant"] == flat["significant"]
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+def test_bootstrap_sharpe_diff_tbill_point_is_hand_calculation():
+    """
+    Two months, rates 0.1% and 0.3%. Strategy 2% and 0%, benchmark 1% and
+    0.5%. Each Sharpe is (compounded return annualised - compounded rate
+    annualised) / (sample std x sqrt(12)), with n_years = 2/12. Only the
+    point is checked: with two months, a draw of the same month twice has
+    zero volatility, which is why the warning is ignored here.
+    """
+    a, b = pd.Series([0.02, 0.0]), pd.Series([0.01, 0.005])
+    rf = pd.Series([0.001, 0.003])
+    rf_ann = (1.001 * 1.003) ** 6 - 1
+    sharpe_a = ((1.02 * 1.0) ** 6 - 1 - rf_ann) / (np.std([0.02, 0.0], ddof=1) * 12 ** 0.5)
+    sharpe_b = ((1.01 * 1.005) ** 6 - 1 - rf_ann) / (np.std([0.01, 0.005], ddof=1) * 12 ** 0.5)
+    result = bootstrap_sharpe_diff_tbill(a, b, rf, n_sims=10, seed=1)
+    assert result["point_diff"] == pytest.approx(sharpe_a - sharpe_b, rel=1e-12)
+
+
+def test_bootstrap_sharpe_diff_tbill_identical_series_give_zero_in_every_draw():
+    """
+    Strategy and benchmark share every drawn month and its rate, so an
+    identical pair gives exactly zero in every draw, whatever the rate path.
+    """
+    returns = pd.Series([0.01, -0.02, 0.03, 0.00, 0.02, -0.01] * 4)
+    rf = pd.Series([0.000, 0.001, 0.002, 0.003, 0.004, 0.005] * 4)
+    result = bootstrap_sharpe_diff_tbill(returns, returns.copy(), rf, n_sims=200, seed=3)
+    assert result["point_diff"] == 0
+    assert result["lower"] == 0 and result["upper"] == 0
+    assert result["significant"] is False
+
+
+def test_bootstrap_sharpe_diff_tbill_rejects_different_dates_and_missing_rate():
+    dates = pd.to_datetime(["2025-01-31", "2025-02-28", "2025-03-31"])
+    a = pd.Series([0.01, 0.02, 0.03], index=dates)
+    with pytest.raises(ValueError):
+        bootstrap_sharpe_diff_tbill(a, a.iloc[:2], pd.Series(0.001, index=dates))
+    with pytest.raises(ValueError):
+        bootstrap_sharpe_diff_tbill(a, a.copy(), pd.Series(0.001, index=dates[:2]))
 
 
 def test_align_risk_free_raises_on_missing_month():

@@ -329,6 +329,43 @@ def alpha_regression_tbill(returns: pd.Series, benchmark_returns: pd.Series, rf_
     }
 
 
+def bootstrap_sharpe_diff_tbill(returns_a: pd.Series, returns_b: pd.Series, rf_monthly: pd.Series, n_sims: int = 5000, ci: float = 0.90, seed: int | None = None) -> dict:
+    """
+    Paired bootstrap interval on Sharpe_a - Sharpe_b, both measured with
+    sharpe_ratio_tbill() (LIMITATIONS_PLAN.md, Amendment 8, Additions, and
+    Amendment 13, decisions 1 and 3).
+
+    Each simulation draws one set of month positions and applies it to the
+    strategy, the benchmark and the risk-free rate together, so that month
+    t's rate stays with month t's returns. The draws are made exactly as in
+    bootstrap_sharpe_diff(), so with a constant rate of (1.02)^(1/12) - 1 and
+    the same seed the two give the same interval, up to floating-point error.
+    """
+    if not returns_a.index.equals(returns_b.index):
+        raise ValueError("returns_a and returns_b must have the same dates.")
+    rf = align_risk_free(returns_a, rf_monthly)
+    rng = np.random.default_rng(seed)
+    n = len(returns_a)
+    a_vals, b_vals, rf_vals = returns_a.values, returns_b.values, rf.values
+    diffs = np.empty(n_sims)
+    for i in range(n_sims):
+        idx = rng.integers(0, n, size=n)
+        rf_draw = pd.Series(rf_vals[idx])
+        diffs[i] = (sharpe_ratio_tbill(pd.Series(a_vals[idx]), rf_draw)
+                    - sharpe_ratio_tbill(pd.Series(b_vals[idx]), rf_draw))
+    lower = float(np.percentile(diffs, (1 - ci) / 2 * 100))
+    upper = float(np.percentile(diffs, (1 + ci) / 2 * 100))
+    point = sharpe_ratio_tbill(returns_a, rf) - sharpe_ratio_tbill(returns_b, rf)
+    return {
+        "point_diff": point,
+        "lower": lower,
+        "upper": upper,
+        "ci": ci,
+        "n_sims": n_sims,
+        "significant": not (lower <= 0 <= upper),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Statistical power (LIMITATIONS_PLAN.md, Phase 1C, Amendments 1 and 3).
 #
