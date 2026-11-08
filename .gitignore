@@ -221,3 +221,7 @@ database/*.db
 quicktest.py
 .claude/
 data_cache/
+
+# Local working files, not part of the published project
+claude/
+results/linkedin/

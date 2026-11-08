@@ -17,7 +17,7 @@ def build_book_value_table(tickers: list[str], target_dates: pd.DatetimeIndex) -
     tickers : list[str]
         Tickers to fetch (normally config.UNIVERSE).
     target_dates : pd.DatetimeIndex
-        Month-end dates to align book value onto — must match the dates
+        Month-end dates to align book value onto; must match the dates
         factors.calculate_value_score() will later use, so book value and
         prices line up exactly.
 
@@ -41,7 +41,7 @@ def build_book_value_table(tickers: list[str], target_dates: pd.DatetimeIndex) -
             usable = filled.notna().sum()
             print(f"  {ticker}: {usable} of {len(target_dates)} target dates covered")
         except Exception as e:
-            print(f"  {ticker}: FAILED — {e}")
+            print(f"  {ticker}: FAILED: {e}")
             columns[ticker] = pd.Series(index=target_dates, dtype="float64")
 
     bv_df = pd.DataFrame(columns)

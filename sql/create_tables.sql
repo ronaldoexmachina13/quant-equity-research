@@ -28,7 +28,7 @@ CREATE INDEX IF NOT EXISTS idx_prices_ticker     ON prices(ticker);
 CREATE INDEX IF NOT EXISTS idx_book_value_ticker ON book_value(ticker);
 
 -- ----------------------------------------------------------------------------
--- Tier B additions (require src/database.py to be patched — see
+-- Tier B additions (require src/database.py to be patched; see
 -- src_patch/database_py_additions.md). Not yet in the live database until
 -- run_strategy_comparison.py is re-run after that patch is applied.
 -- ----------------------------------------------------------------------------

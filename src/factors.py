@@ -5,7 +5,7 @@ from src.database import get_connection
 def load_prices() -> pd.DataFrame:
     """
     Load all stored adjusted close prices from the database,
-    reshaped into wide format (Date index, one column per ticker) —
+    reshaped into wide format (Date index, one column per ticker),
     this is the format most convenient for return calculations.
 
     Returns
@@ -43,7 +43,7 @@ def calculate_momentum(prices: pd.DataFrame, lookback_months: int = 12, skip_mon
     pd.DataFrame
         Momentum scores, same shape as input, with NaN where insufficient history exists.
     """
-    # Resample to month-end prices — momentum is conventionally measured
+    # Resample to month-end prices; momentum is conventionally measured
     # on monthly, not daily, price snapshots.
     monthly_prices = prices.resample("ME").last()
 
@@ -133,5 +133,5 @@ if __name__ == "__main__":
     print(f"Date range: {prices.index.min().date()} to {prices.index.max().date()}\n")
 
     momentum = calculate_momentum(prices)
-    print("Momentum scores — most recent 5 months, all tickers:")
+    print("Momentum scores: most recent 5 months, all tickers:")
     print(momentum.tail(5).round(3))

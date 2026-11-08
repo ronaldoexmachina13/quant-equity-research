@@ -16,7 +16,7 @@ def create_tables():
     """
     Create the prices, book_value, portfolio_weights, and performance tables
     if they do not already exist.
-    Safe to run multiple times — will not duplicate or overwrite tables.
+    Safe to run multiple times; will not duplicate or overwrite tables.
     """
     conn = get_connection()
     cursor = conn.cursor()
@@ -66,7 +66,7 @@ def create_tables():
 def save_prices(prices_df):
     """
     Save a wide-format prices DataFrame (Date index, one column per ticker)
-    into the prices table. Safe to run multiple times — existing
+    into the prices table. Safe to run multiple times; existing
     (date, ticker) rows are overwritten, not duplicated.
 
     Parameters
@@ -79,7 +79,7 @@ def save_prices(prices_df):
     cursor = conn.cursor()
 
     # Reshape from wide format (one column per ticker) to long format
-    # (one row per date-ticker pair) — this matches our table structure.
+    # (one row per date-ticker pair); this matches our table structure.
     long_df = prices_df.reset_index().melt(
         id_vars=prices_df.index.name or "Date",
         var_name="ticker",
@@ -105,7 +105,7 @@ def save_book_value(bv_df):
     """
     Save a wide-format book-value-per-share DataFrame (Date index, one
     column per ticker) into the book_value table. Same idempotent pattern
-    as save_prices() — existing (date, ticker) rows are overwritten, not
+    as save_prices(); existing (date, ticker) rows are overwritten, not
     duplicated.
 
     Parameters
@@ -145,7 +145,7 @@ def save_portfolio_weights(weights_df):
     """
     Save a long-format portfolio weights DataFrame into the
     portfolio_weights table. Expects columns: date, ticker, strategy, weight.
-    Safe to run multiple times — existing (date, ticker, strategy) rows are
+    Safe to run multiple times; existing (date, ticker, strategy) rows are
     overwritten, not duplicated, same pattern as save_prices().
 
     Parameters
@@ -177,7 +177,7 @@ def save_performance(performance_df):
     """
     Save a long-format strategy performance DataFrame into the performance
     table. Expects columns: date, strategy, portfolio_value, daily_return.
-    Safe to run multiple times — existing (date, strategy) rows are
+    Safe to run multiple times; existing (date, strategy) rows are
     overwritten, not duplicated.
 
     Parameters
@@ -206,7 +206,7 @@ def save_performance(performance_df):
 def load_book_value():
     """
     Load all stored book value per share from the database, reshaped into
-    wide format (Date index, one column per ticker) — matches the format
+    wide format (Date index, one column per ticker); matches the format
     factors.load_prices() returns, so the two can be combined directly.
 
     Returns

@@ -1,6 +1,6 @@
 # CLAUDE.md: standing rules for this repository
 
-Project: Quantitative Equity Strategy Research & Backtesting Framework (version 0.5 complete, 0.6 in planning).
+Project: Quantitative Equity Strategy Research & Backtesting Framework (17-stock study and 500-stock study complete).
 Owner: Ronaldo. Strong in finance, beginner to early-intermediate in Python and SQL. Explain what you are doing and why, in financial terms, before the code.
 
 ## Environment

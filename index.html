@@ -16,7 +16,7 @@
 
     <div class="hero-finding" style="margin-top:1.25rem;">
       <b class="box-label">Short answer</b>
-      Not detectably. None of the three signals ranks next-month returns better than chance, and the portfolios built on them do not reliably beat an equal-weight benchmark. The test was built so that this is a credible answer: it was pre-registered, it counts every test it ran, and it states how small an effect it could have found.
+      Not detectably. None of the three signals can be shown to rank next-month returns better than chance, and the portfolios built on them do not reliably beat an equal-weight benchmark. The test was built so that this is a credible answer: it was pre-registered, it counts every test it ran, and it states how small an effect it could have found.
     </div>
 
     <div class="mini-stats">
@@ -69,7 +69,7 @@
 
   <div class="section-label">Every test <span>the full scorecard, for readers who want the numbers</span></div>
   <details class="panel fold">
-    <summary>Show the scorecard: three signals, four tests, two periods</summary>
+    <summary>Show the scorecard: three signals, four measures, the two test periods (the full sample is on the Signals page)</summary>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table scorecard" id="scorecard"></table>
     </div>
@@ -145,7 +145,7 @@ const X = UNIVERSE_EXTRAS;
   forest("sharpeForest", rows, { axis: v => v.toFixed(1), val: v => sgn(v, 2) });
 })();
 
-/* scorecard: three signals by four tests by two periods */
+/* scorecard: three signals by four measures by two test periods */
 (function scorecard() {
   const periods = [PERIODS[0], PERIODS[1]];
   const columns = [

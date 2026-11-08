@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml/badge.svg)](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml)
 
-**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, 12-1 momentum and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them ranks next-month returns better than chance. The study is built so that this is a credible answer and not a bug.
+**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, 12-1 momentum and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The study is built so that this is a credible answer and not a bug.
 
 [**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-registration](docs/LIMITATIONS_PLAN.md)
 
@@ -12,7 +12,7 @@
 
 | Question | Answer |
 |---|---|
-| **Do the rankings predict returns?** | No. None of 33 signal tests (3 signals, 4 kinds of test, 3 periods) excludes zero, whichever of three methods builds the interval. |
+| **Do the rankings predict returns?** | Not detectably. None of 33 signal tests (three signals over three periods, with up to four tests each) excludes zero, whichever of three methods builds the interval. |
 | **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020, both are the same bet, and the bet lagged the benchmark. Chance alone gives about 1.8. |
 | **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
 | **Is the data good enough?** | For comparing strategies, yes. For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
@@ -110,7 +110,7 @@ Momentum is the trailing 12-month return excluding the most recent month, which 
 <details>
 <summary><b>Reproducing the results</b></summary>
 
-Python 3.13 and the pinned packages (`pip install -r requirements.txt`). Raw downloads are cached outside Git in the folder named by the environment variable `UNIVERSE_CACHE_DIR`. The SQLite file `database/universe_feasibility.db` is not committed. `results/data_manifest.csv` lists the size and SHA-256 checksum of every cached download (`make_data_manifest --verify` compares). Result files are never overwritten: each script stops if its output exists, and the committed `results/` files already exist in a fresh clone. Run everything from the repository root, as modules.
+Python 3.13 and the pinned packages (`pip install -r requirements.txt`). Raw downloads are cached outside Git in the folder named by the environment variable `UNIVERSE_CACHE_DIR`. SEC EDGAR and Wikipedia ask automated clients to identify themselves, so set `SEC_CONTACT_EMAIL` to your own address before running the download scripts. The SQLite file `database/universe_feasibility.db` is not committed. `results/data_manifest.csv` lists the size and SHA-256 checksum of every cached download (`make_data_manifest --verify` compares). Result files are never overwritten: each script stops if its output exists, and the committed `results/` files already exist in a fresh clone. Run everything from the repository root, as modules.
 
 ```bash
 python -m scripts.universe.run_universe_membership      # S&P 500 membership from Wikipedia (database only)

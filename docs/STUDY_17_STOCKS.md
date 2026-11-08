@@ -1,10 +1,12 @@
 # Study 1: the 17-stock study (full write-up)
 
+> **Correction (7 November 2026): Value results in this document are overstated.** After this study was published, I found that the price-to-book ratio used by the Value signal was too low for stocks that split their shares (Walmart in 2024 and NextEra in 2020). Yahoo Finance rewrites old prices after a split, while SEC book value per share does not change. With splits handled, Value's in-sample (2021-2024) Sharpe ratio is about 0.61, not 0.86, which is below the benchmark's 0.81, and its alpha is about -0.9% a year (t = -0.17), not +2.9% (t = 0.62). The statements below that Value had a slightly higher Sharpe ratio than the benchmark, or edged it in 2021-2022, are therefore not supported. The pre-registered out-of-sample reading that Value "passes the sign test but faded" also rests on the uncorrected in-sample alpha. With the correction the in-sample alpha is negative, so that reading no longer holds as written. The out-of-sample figures themselves are essentially unchanged (Value 1.53, or 1.57 on the variant that does not adjust prices for dividends), and nothing is statistically significant in either version. The tables and text below are left as originally published. The summary, the key findings and the out-of-sample reading are marked **[uncorrected]** where they depend on the old Value figures, and the same applies to every in-sample Value figure in the detailed sections. The corrected figures are in `results/value_split_*.csv` and the method is in `LIMITATIONS_PLAN.md` (Amendment 8).
+
 > **Note (7 November 2026):** the four dashboard pages described in this write-up (`index.html`, `strategies.html`, `stocks.html`, `portfolio.html` as they were then) were retired from the live site, because they plotted the uncorrected Value series. They remain in the Git history. The site now shows the large-universe study.
 
 > **Note on file locations (7 November 2026):** the scripts named below now live in `scripts/first_study/` and run from the repository root as modules (for example `python -m scripts.first_study.run_out_of_sample`). The plan files are in `docs/`. The dashboard generators (`generate_dashboard_data.py`, `generate_portfolio_timeline.py`, `generate_stocks_data.py`), `make_terrain.py` and `check_data.py` were removed together with the retired pages and the files only they used (`results/portfolio_timeline*.json`, `results/stocks_data.json`, `results/momentum_vs_value_regime_split.png`). All remain in Git history at commit 9f53208.
 
-> This is the complete write-up of the first study, kept as published. It is summarised in the [main README](../README.md). The correction below applies to every Value figure in this document.
+> This is the complete write-up of the first study, kept as published. It is summarised in the [main README](../README.md). The correction at the top applies to every in-sample Value figure in this document.
 
 # Quantitative Equity Strategy Research & Backtesting Framework
 
@@ -16,12 +18,12 @@
 
 ### Result at a glance
 
-> **Bottom line.** No strategy could be statistically distinguished from the equal-weight benchmark, either in sample (2021-2024) or on 20 pre-registered months the strategies had never seen (January 2025 to August 2026). On those unseen months the benchmark had the highest Sharpe ratio. Value's in-sample edge faded; Combined's alpha kept its sign but is not significant.
+> **Bottom line.** No strategy could be statistically distinguished from the equal-weight benchmark, either in sample (2021-2024) or on 20 pre-registered months the strategies had never seen (January 2025 to August 2026). On those unseen months the benchmark had the highest Sharpe ratio. Value's apparent in-sample edge (**[uncorrected]**) disappears once the split error described above is fixed; Combined's alpha kept its sign but is not significant.
 
 | Strategy | Sharpe, in sample (2021-2024) | Sharpe, out of sample (Jan 2025 - Aug 2026) | Out-of-sample alpha a year (t-stat) |
 |---|---:|---:|---:|
 | Momentum | 0.56 | 1.05 | -0.7% (-0.08) |
-| Value | 0.86 | 1.53 | +0.6% (0.08) |
+| Value | 0.86 **[uncorrected; about 0.61 after the split fix]** | 1.53 | +0.6% (0.08) |
 | Combined | 0.65 | 1.72 | +8.1% (0.82) |
 | Equal-weight benchmark (17 stocks) | 0.81 | **1.89** | n/a |
 
@@ -35,8 +37,6 @@
 
 > **Status:** Version 0.5 (complete). Momentum, value and a combined factor are fully tested, with a pre-registered out-of-sample test on 2025–2026, two robustness checks (portfolio concentration and a two-period split), bootstrap significance testing, transaction-cost modeling, a Sortino ratio alongside Sharpe, and beta and alpha against the benchmark. The pipeline is reproducible end to end (see "Reproducing this project end-to-end").
 >
-> **Correction (7 November 2026): Value results below are overstated.** After this study was published, I found that the price-to-book ratio used by the Value signal was too low for stocks that split their shares (Walmart in 2024 and NextEra in 2020). Yahoo Finance rewrites old prices after a split, while SEC book value per share does not change. With splits handled, Value's in-sample (2021-2024) Sharpe ratio is about 0.61, not 0.86, which is below the benchmark's 0.81, and its alpha is about -0.9% a year (t = -0.17), not +2.9% (t = 0.62). The statements below that Value had a slightly higher Sharpe ratio than the benchmark, or edged it in 2021-2022, are therefore not supported. Out-of-sample results are essentially unchanged, and nothing is statistically significant in either version. The tables and text below are left as originally published. The corrected figures are in `results/value_split_*.csv` and the method is in `LIMITATIONS_PLAN.md` (Amendment 8).
->
 > **Correction (September 2026):** the value signal contained a one-month look-ahead, and the original price download had missed the final trading day of 2024. Both were fixed and every figure in this README was regenerated. The look-ahead fix was recorded before any out-of-sample data was downloaded, and the data fix before any out-of-sample result was computed. See "Correction: look-ahead in the value signal" for what changed and why.
 
 ---
@@ -49,11 +49,11 @@
 
 **Key findings**
 
-- **Out of sample (Jan 2025 – Aug 2026, pre-registered):** the benchmark had the highest Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum). Value's in-sample alpha faded to +0.6% a year (t = 0.08). Combined's alpha held its sign and rose to +8.1% (t = 0.82), the only in-sample finding that held in meaningful size on unseen data. Split by year, the benchmark led on Sharpe in both 2025 and 2026 (Jan–Aug), and Combined's alpha was positive in both (+6.8%, then +10.9%). Nothing is statistically significant.
-- **In-sample full period (2021–2024):** Value has the highest Sharpe ratio (0.86, against 0.81 for the benchmark, 0.56 for Momentum and 0.65 for Combined) and the highest total return (89.7% vs 68.0%), but also the highest volatility (17.8% vs 14.5%). Its Sharpe lead over the benchmark is 0.05, far inside the noise band.
-- **Sub-periods:** Value edged the benchmark on Sharpe in 2021–2022 (0.64 vs 0.59) and edged it again in 2023–2024 (1.15 vs 1.13). Combined led in 2023–2024 (1.27 vs 1.13) after trailing badly in 2021–2022 (0.16).
+- **Out of sample (Jan 2025 – Aug 2026, pre-registered):** the benchmark had the highest Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum). Value's in-sample alpha faded to +0.6% a year (t = 0.08) **[the +2.9% in-sample alpha it fades from is uncorrected]**. Combined's alpha held its sign and rose to +8.1% (t = 0.82), the only in-sample finding that held in meaningful size on unseen data. Split by year, the benchmark led on Sharpe in both 2025 and 2026 (Jan–Aug), and Combined's alpha was positive in both (+6.8%, then +10.9%). Nothing is statistically significant.
+- **In-sample full period (2021–2024) [uncorrected for Value]:** Value has the highest Sharpe ratio (0.86, against 0.81 for the benchmark, 0.56 for Momentum and 0.65 for Combined) and the highest total return (89.7% vs 68.0%), but also the highest volatility (17.8% vs 14.5%). Its Sharpe lead over the benchmark is 0.05, far inside the noise band.
+- **Sub-periods [uncorrected for Value]:** Value edged the benchmark on Sharpe in 2021–2022 (0.64 vs 0.59) and edged it again in 2023–2024 (1.15 vs 1.13). Combined led in 2023–2024 (1.27 vs 1.13) after trailing badly in 2021–2022 (0.16).
 - **Downside risk:** on the Sortino ratio, which counts only downside volatility, Value and the benchmark are almost level over the full period (1.47 vs 1.43), and Value's 2021–2022 lead nearly disappears (1.09 vs 1.08) because more of its volatility was on the downside. Combined's 2023–2024 lead widens (2.59 vs 1.91).
-- **Exposure versus selection:** Value's beta to the universe was 1.06, so part of its higher return came from greater exposure. Its remaining alpha was about +2.9% a year, similar in both sub-periods, but it turns slightly negative (-0.4%) with 8 holdings instead of 5. Combined's 2023–2024 lead came with a beta of 0.94 and an alpha of +4.0%. None of the nine alphas is statistically significant (OLS regression; largest |t| = 0.94, against roughly 1.65 needed at the 90% level).
+- **Exposure versus selection [uncorrected for Value]:** Value's beta to the universe was 1.06, so part of its higher return came from greater exposure. Its remaining alpha was about +2.9% a year, similar in both sub-periods, but it turns slightly negative (-0.4%) with 8 holdings instead of 5. Combined's 2023–2024 lead came with a beta of 0.94 and an alpha of +4.0%. None of the nine alphas is statistically significant (OLS regression; largest |t| = 0.94, against roughly 1.65 needed at the 90% level).
 - **Significance:** none of the nine strategy-versus-benchmark Sharpe differences is statistically significant (paired bootstrap, 90% confidence intervals all include zero), and an independent test on alpha reaches the same conclusion. No strategy can be distinguished from the benchmark on this sample.
 - **Trading costs:** at 10 bps one-way, Value (4.2% monthly turnover) is almost unaffected; Momentum and Combined (22–23% turnover) each lose about 0.04 of Sharpe.
 - **Portfolio construction:** Combined shared on average 4.4 of its 5 holdings with Momentum and only 2.1 with Value, so in practice it behaved as a momentum portfolio with a slight value tilt.
@@ -338,8 +338,8 @@ Everything above was measured on 2021–2024, the period in which the strategies
 
 **Reading the result against the pre-registered rules:**
 
-- **The main conclusion holds, and more clearly than in-sample.** The benchmark had the highest Sharpe ratio of the four (1.89). In-sample, Value had edged it by a noise-sized 0.05; out of sample, no strategy did.
-- **The Value finding passes the sign test but did not carry over in any meaningful size.** Its alpha stayed positive, as the rule requires, but fell from +2.9% a year to +0.6% (t = 0.08). With a beta of 1.18, Value's higher return is almost entirely explained by its greater market exposure. The accurate summary is that the in-sample edge faded.
+- **The main conclusion holds, and more clearly than in-sample.** The benchmark had the highest Sharpe ratio of the four (1.89). In-sample, Value had edged it by a noise-sized 0.05; out of sample, no strategy did. **[The in-sample Value comparison is uncorrected.]**
+- **The Value finding passes the sign test but did not carry over in any meaningful size.** Its alpha stayed positive, as the rule requires, but fell from +2.9% a year to +0.6% (t = 0.08). With a beta of 1.18, Value's higher return is almost entirely explained by its greater market exposure. The accurate summary is that the in-sample edge faded. **[Uncorrected: with the split fix the in-sample alpha is negative, so this reading no longer holds as written.]**
 - **The Combined finding is supported, and is the strongest result in the project.** Its alpha kept its sign and rose, from +4.0% in 2023–2024 to +8.1%, with a beta of only 0.79. It had the highest total return, the highest Sortino ratio and the shallowest drawdown. It still trailed the benchmark on Sharpe, because the benchmark was unusually calm (9.5% volatility) and because most of Combined's risk was specific to its five holdings: the benchmark explains only 31% of its monthly variation (R²). Alpha measures return beyond market exposure; Sharpe charges for all volatility, including the stock-specific part.
 - **Nothing is statistically significant**, as the plan anticipated. With 20 monthly returns every confidence interval is very wide, and the largest alpha t-statistic is 0.82. The test checks direction and consistency, not significance.
 - **Momentum trailed again**, with the lowest Sharpe and a negative alpha, consistent with the in-sample result.

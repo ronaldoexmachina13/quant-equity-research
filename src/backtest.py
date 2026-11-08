@@ -26,7 +26,7 @@ def run_backtest(weights: pd.DataFrame, returns: pd.DataFrame) -> pd.Series:
 
 
 def calculate_benchmark_returns(returns: pd.DataFrame) -> pd.Series:
-    """Equal-weight return across all tickers — our passive comparison."""
+    """Equal-weight return across all tickers; our passive comparison."""
     return returns.mean(axis=1)
 
 

@@ -41,7 +41,7 @@ if __name__ == "__main__":
     momentum = calculate_momentum(prices)
     weights = build_portfolio(momentum, top_n=5)
 
-    print("Portfolio weights — most recent 3 months:")
+    print("Portfolio weights: most recent 3 months:")
     print(weights.tail(3).round(3))
 
     print("\nHoldings for most recent month:")

@@ -1,7 +1,12 @@
+import os
+
 import requests
 import pandas as pd
 
-HEADERS = {"User-Agent": "Ronaldo ronaldothexz@gmail.com"}
+# SEC EDGAR and Wikipedia ask automated clients to identify themselves with a contact address.
+# Set SEC_CONTACT_EMAIL in your environment. No address is stored in the repository.
+_CONTACT = os.environ.get("SEC_CONTACT_EMAIL", "contact-not-set")
+HEADERS = {"User-Agent": f"quant-equity-research {_CONTACT}"}
 
 # Ticker -> CIK mapping, fetched once and reused
 _TICKER_CIK_MAP = None
@@ -94,7 +99,7 @@ def get_shares_outstanding(facts: dict) -> pd.DataFrame:
     value for any overlapping dates) gives materially better coverage
     than trying one tag and only falling back if it's completely empty.
 
-    Rows with a non-positive share count are dropped as invalid data —
+    Rows with a non-positive share count are dropped as invalid data,
     a company can never legitimately report zero or negative shares
     outstanding, so such values reflect a filing/tagging error rather
     than a real state.
@@ -244,7 +249,7 @@ def get_book_value_for_universe(tickers: list[str]) -> dict:
     Returns
     -------
     dict
-        {ticker: DataFrame} — one book-value-per-share DataFrame per ticker.
+        {ticker: DataFrame}; one book-value-per-share DataFrame per ticker.
         Tickers that fail to fetch (e.g. missing EDGAR data) are skipped,
         with a warning printed rather than halting the whole run.
     """
@@ -255,7 +260,7 @@ def get_book_value_for_universe(tickers: list[str]) -> dict:
             results[ticker] = bvps
             print(f"{ticker}: {len(bvps)} book value data points")
         except Exception as e:
-            print(f"{ticker}: FAILED — {e}")
+            print(f"{ticker}: FAILED: {e}")
     return results
 
 
