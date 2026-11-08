@@ -20,9 +20,9 @@
     </div>
 
     <div class="mini-stats">
-      <div class="mini-stat"><div class="ms-value" id="kTests">0 of 33</div><div class="ms-label">signal tests exclude zero, under three interval methods</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio comparisons exclude zero: one Value bet, counted twice, that lagged the benchmark</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kPower">0.055</div><div class="ms-label">smallest mean rank IC the test could reliably detect</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kTests">0 of 6</div><div class="ms-label" id="kTestsLabel">main tests find a real relationship (rank IC, three signals, two test periods). The 27 other tests ask the same question in other ways and agree</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio comparisons stood out: one Value bet, counted twice, that did worse than the benchmark</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPower">0.055</div><div class="ms-label">smallest average rank IC the test could reliably detect. Smaller effects would be missed</div></div>
     </div>
   </section>
 
@@ -73,7 +73,7 @@
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table scorecard" id="scorecard"></table>
     </div>
-    <p class="caption">Estimate and 90% bootstrap interval, before costs. Rank IC, quintile spread and Fama-MacBeth slope are the primary tests. The Sharpe difference is the top-decile portfolio against its benchmark and is secondary evidence. Red marks an interval that excludes zero.</p>
+    <p class="caption">Estimate and 90% bootstrap interval, before costs. Rank IC, quintile spread and Fama-MacBeth slope are the primary tests. The Sharpe difference is the top-decile portfolio against its benchmark and is secondary evidence. Red marks an interval that excludes zero. Quintile spread is the return of the top fifth of stocks minus the bottom fifth. A Fama-MacBeth slope is the average monthly effect of the signal on next-month returns.</p>
   </details>
 
   <div class="section-label">Where to look <span>one question per page</span></div>
@@ -101,7 +101,11 @@ const X = UNIVERSE_EXTRAS;
 (function headerFigures() {
   const tests = U.signalTests, robust = X.robustness;
   const failing = tests.filter(r => r.excludes_zero).length + robust.filter(r => r.nw_excludes_zero || r.block_excludes_zero).length;
-  document.getElementById("kTests").textContent = failing === 0 ? "0 of " + tests.length : "some of " + tests.length;
+  const main = tests.filter(r => r.test === "rank_ic" && (r.period === PERIODS[0].key || r.period === PERIODS[1].key));
+  const mainFail = main.filter(r => r.excludes_zero).length;
+  document.getElementById("kTests").textContent = mainFail + " of " + main.length;
+  document.getElementById("kTestsLabel").textContent = "main tests find a real relationship (rank IC, three signals, two test periods). " +
+    (failing === 0 ? "The " + (tests.length - main.length) + " other tests ask the same question in other ways and agree" : "See the scorecard below for the other " + (tests.length - main.length) + " tests");
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null);
   document.getElementById("kPort").textContent = head.filter(r => r.sig).length + " of " + head.length;
   const Z = 1.645 + 0.842, sd = Math.max(...SIGNALS.map(s => icStatistics(s, 0, U.split).sd));

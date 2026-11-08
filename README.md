@@ -12,7 +12,7 @@
 
 | Question | Answer |
 |---|---|
-| **Do the rankings predict returns?** | Not detectably. None of 33 signal tests (three signals over three periods, with up to four tests each) excludes zero, whichever of three methods builds the interval. |
+| **Do the rankings predict returns?** | Not detectably. In the six main tests (rank IC for each of three signals over two test periods) every interval includes zero. Another 27 tests ask the same question in other ways, so they are not independent evidence, and none of them excludes zero either. |
 | **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020, both are the same bet, and the bet lagged the benchmark. Chance alone gives about 1.8. |
 | **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
 | **Is the data good enough?** | For comparing strategies, yes. For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
@@ -50,7 +50,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 ## Limits
 
 - **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix.
-- **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect.
+- **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.
 - **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, and there are no Fama-French controls.
 - **Power.** The test cannot rule out a small premium.
 
