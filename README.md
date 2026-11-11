@@ -45,7 +45,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
 - **Honest intervals.** 90% bootstrap intervals, re-checked with Newey-West errors and a block bootstrap. Every test is counted, and the expected number of false alarms is stated.
 - **It found and fixed its own errors.** A split-adjustment bug had flattered Value (17-stock Sharpe fell from 0.86 to about 0.61 once fixed), and unit errors in SEC share counts had produced absurd price-to-book ratios. Both are logged below.
-- **Tested and reproducible.** About 330 unit tests with hand-worked cases run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
+- **Tested and reproducible.** More than 400 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
 ## Limits
 
@@ -159,11 +159,12 @@ python -m scripts.universe.run_universe_signals --value-combined
 python -m scripts.universe.run_universe_spy             # SPY reference prices
 python -m scripts.universe.run_universe_portfolios      # portfolio tests and sensitivities
 python -m scripts.universe.run_universe_extras          # quintile returns and Newey-West and block-bootstrap intervals (Amendment 14)
+python -m scripts.universe.run_universe_skip_month --write   # true 12-1 sensitivity and survivorship by year (Amendment 15); --dry-run writes nothing
 python -m scripts.universe.make_data_manifest           # checksums of the raw-data cache; add --verify to compare later
 python -m scripts.universe.make_universe_charts         # the charts and table on this page
 python -m scripts.universe.run_universe_holdings        # holdings and per-stock summary, checked against committed returns
 python -m scripts.universe.generate_universe_dashboard_data   # assets/universe_*_data.js (never overwrites)
-python -m pytest tests/ -q                              # about 330 tests, no network needed
+python -m pytest tests/ -q                              # more than 400 tests, no network needed
 ```
 
 Rerunning a result-writing script in a fresh clone stops at the first existing file. To regenerate a result, write it to a new folder or move the old file first.
