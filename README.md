@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml/badge.svg)](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml)
 
-**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, momentum (the return over the 11 months to the end of the previous month) and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The study is built so that this is a credible answer and not a bug.
+**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, momentum (the return over the 11 months to the end of the previous month) and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The sections below show how the test was built to avoid look-ahead and tuning, and where it still falls short.
 
 [**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-registration](docs/LIMITATIONS_PLAN.md)
 
@@ -13,9 +13,9 @@
 | Question | Answer |
 |---|---|
 | **Do the rankings predict returns?** | Not detectably. In the six main tests (rank IC for each of three signals over two test periods) every interval includes zero. Another 27 tests ask the same question in other ways, so they are not independent evidence, and none of them excludes zero either. |
-| **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020, both are the same bet, and the bet lagged the benchmark. Chance alone gives about 1.8. |
+| **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020 (the top decile and the top quintile, so the holdings overlap), and in both Value did worse than the benchmark on a risk-adjusted basis. Chance alone gives about 1.8. |
 | **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
-| **Is the data good enough?** | For return levels, no. For comparing strategies, only with care: the missing names are missing from both a portfolio and its benchmark, so differences are biased too, in a direction that depends on the signal. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
+| **Is the data good enough?** | For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. Differences between a portfolio and its benchmark are affected too, because the missing names are missing from both, in a direction that depends on the signal. |
 
 ### Reading guide
 
@@ -26,7 +26,7 @@
 
 ## Why a null result is worth reporting
 
-Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 452 published anomalies with methods that limit the weight of tiny stocks and found that 65% of them could not clear the usual significance hurdle, a t-statistic of 1.96 ([Review of Financial Studies, 2020](https://doi.org/10.1093/rfs/hhy131)). Large, liquid stocks such as the S&P 500 are a hard place to find a premium, so a null here is a plausible and informative outcome. What matters is whether the test was honest enough to be believed.
+Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 452 published anomalies with methods that limit the weight of tiny stocks and found that 65% of them could not clear the usual significance hurdle, a t-statistic of 1.96 ([Review of Financial Studies, 2020](https://doi.org/10.1093/rfs/hhy131)). Large, liquid stocks such as the S&P 500 are a hard place to find a premium, so a null here is a plausible and informative outcome. What matters is whether the test is reliable enough to trust that answer.
 
 ![Exhibit 2: return by group](results/exhibit_2_return_by_group.png)
 
@@ -34,7 +34,9 @@ If a signal worked, the five groups would earn more in steps from left to right.
 
 ![Exhibit 3: portfolio Sharpe differences](results/exhibit_3_sharpe_difference.png)
 
-The one interval that stands out is Value in 2012 to 2020, measured twice (top decile and top quintile). It is absent from the re-test and from the full period, it points the wrong way for a value premium, and the tests of the signal itself for the same period all include zero (the Fama-MacBeth slope falls just below zero under three secondary sensitivities, which share the same months and stocks). Costs of 10 bps one way change none of these readings. No explanation has been tested.
+The one interval that stands out is Value in 2012 to 2020, measured twice (top decile and top quintile). It is absent from the re-test and from the full period, and it points the wrong way for a value premium. The tests of the signal itself for the same period all include zero (the Fama-MacBeth slope falls just below zero under three secondary sensitivities, which share the same months and stocks).
+
+Costs of 10 bps one way change none of these readings. No explanation has been tested.
 
 The 2021 to 2026 months were already known from an earlier 17-stock study, so they are a re-test and not out-of-sample evidence.
 
