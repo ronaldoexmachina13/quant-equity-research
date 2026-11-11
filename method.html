@@ -19,7 +19,7 @@
   <div class="panel">
     <ol class="step-list">
       <li><div><b>Question.</b> Do simple momentum and value signals rank large US stocks by next-month return, and do portfolios built from them beat an equal-weight benchmark?</div></li>
-      <li><div><b>Signals.</b> Momentum is the trailing 12-month return excluding the latest month. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied.</div></li>
+      <li><div><b>Signals.</b> Momentum is the return from 12 months before the trade date to the end of the previous month, with no month skipped. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied.</div></li>
       <li><div><b>Timing.</b> A signal dated t uses data up to the end of month t-1 and is paired with the return in month t. Book value is aligned to the date each filing became public.</div></li>
       <li><div><b>Primary evidence.</b> Rank IC, quintile spread and Fama-MacBeth slopes, each with a 90% bootstrap interval (5,000 resamples, seed 42). Two test periods are reported separately, 2012 to 2020 and 2021 to 2026, plus the full sample.</div></li>
       <li><div><b>Secondary evidence.</b> Top-decile and top-quintile portfolios at equal weight, rebalanced monthly, with 10 bps one-way costs charged on drift-inclusive turnover. The Sharpe difference against the benchmark is tested with a paired bootstrap using the Treasury bill rate.</div></li>

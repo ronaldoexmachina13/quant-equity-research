@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml/badge.svg)](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml)
 
-**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, 12-1 momentum and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The study is built so that this is a credible answer and not a bug.
+**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, momentum (the return over the 11 months to the end of the previous month) and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The study is built so that this is a credible answer and not a bug.
 
 [**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-registration](docs/LIMITATIONS_PLAN.md)
 
@@ -15,7 +15,7 @@
 | **Do the rankings predict returns?** | Not detectably. In the six main tests (rank IC for each of three signals over two test periods) every interval includes zero. Another 27 tests ask the same question in other ways, so they are not independent evidence, and none of them excludes zero either. |
 | **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020, both are the same bet, and the bet lagged the benchmark. Chance alone gives about 1.8. |
 | **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
-| **Is the data good enough?** | For comparing strategies, yes. For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
+| **Is the data good enough?** | For return levels, no. For comparing strategies, only with care: the missing names are missing from both a portfolio and its benchmark, so differences are biased too, in a direction that depends on the signal. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. |
 
 ### Reading guide
 
@@ -68,7 +68,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 <details>
 <summary><b>Hypotheses and method</b></summary>
 
-Momentum is the trailing 12-month return excluding the most recent month, which avoids the one-month reversal effect. Candidate explanations in the literature are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
+Momentum is the return from the close 12 months before the trade date to the close of the previous month. No month is skipped, so the most recent month, whose return tends to reverse, is part of the signal. A true 12-1 version, which does skip it, was run as a labelled sensitivity (Amendment 15): its mean rank IC over the 175 usable months is +0.005 (90% interval -0.021 to +0.031), against +0.008 for the registered signal, and the two monthly series have a correlation of 0.97. No interval excludes zero in either version, so no reading changes. Candidate explanations in the literature are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
 
 1. **Timing.** A signal dated t uses data up to the end of month t-1 and is paired with the return in month t.
 2. **Primary evidence.** Rank IC, quintile spread and Fama-MacBeth slopes (single and joint), each with a bootstrap interval.
@@ -104,6 +104,7 @@ Momentum is the trailing 12-month return excluding the most recent month, which 
 | Sep 2026 | The first download missed 31 December 2024, because the `yfinance` end date is exclusive. | About 0.01 of Sharpe. |
 | Oct 2026 | Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split and SEC book value per share does not change. | 17-stock in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. Alpha moved from +2.9% (t = 0.62) to about -0.9% (t = -0.17). Out-of-sample results are essentially unchanged. See `results/value_split_*.csv` and Amendment 8. |
 | Oct 2026 | Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios. | Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded. |
+| Nov 2026 | Momentum was described as 12-1, skipping the most recent month. The code uses the return from 12 months before the trade date to the end of the previous month, with no month skipped. | No reading changes. A true 12-1 version gives a similar rank IC (mean +0.005 against +0.008, monthly series correlation 0.97, no interval excluding zero). The description was corrected; see Amendment 15 and the `_momentum_skip_month` files. |
 
 </details>
 

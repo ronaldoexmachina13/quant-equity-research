@@ -6,6 +6,8 @@
 
 > **Note on file locations (7 November 2026):** the scripts named below now live in `scripts/first_study/` and run from the repository root as modules (for example `python -m scripts.first_study.run_out_of_sample`). The plan files are in `docs/`. The dashboard generators (`generate_dashboard_data.py`, `generate_portfolio_timeline.py`, `generate_stocks_data.py`), `make_terrain.py` and `check_data.py` were removed together with the retired pages and the files only they used (`results/portfolio_timeline*.json`, `results/stocks_data.json`, `results/momentum_vs_value_regime_split.png`). All remain in Git history at commit 9f53208.
 
+> **Note (11 November 2026):** the Momentum signal in this study is described as "12-1", the trailing 12-month return excluding the most recent month. The code (`calculate_momentum()`) returns the return from 12 months before the trade date to the end of the previous month, with no month skipped, so it is an 11-month return. The robustness grid labels (6-1, 9-1, 12-1) have the same issue, because every cell uses the same skip setting. No figure in this document changes. On the 500-stock study, a true 12-1 version changes no reading (see Amendment 15 in [`LIMITATIONS_PLAN.md`](LIMITATIONS_PLAN.md) and the README data integrity log).
+
 > This is the complete write-up of the first study, kept as published. It is summarised in the [main README](../README.md). The correction at the top applies to every in-sample Value figure in this document.
 
 # Quantitative Equity Strategy Research & Backtesting Framework

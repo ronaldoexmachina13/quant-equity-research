@@ -272,7 +272,7 @@ function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 const DEFINITIONS = {
   Momentum: {
-    body: "<p><b>Construction.</b> The signal is the trailing 12-month return excluding the most recent month, which is skipped to avoid the one-month reversal effect. Each month the stocks with usable prices are ranked. The top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Hypothesis.</b> Candidate explanations are slow incorporation of news and investor under-reaction, so recent winners may keep outperforming for a while.</p><p><b>Failure modes.</b> Momentum is exposed to sharp reversals at market turning points, and its holdings turn over quickly, so costs matter.</p>",
+    body: "<p><b>Construction.</b> The signal is the return from 12 months before the trade date to the end of the previous month. No month is skipped, so the latest month's return, which tends to reverse, is included. Each month the stocks with usable prices are ranked. The top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Hypothesis.</b> Candidate explanations are slow incorporation of news and investor under-reaction, so recent winners may keep outperforming for a while.</p><p><b>Failure modes.</b> Momentum is exposed to sharp reversals at market turning points, and its holdings turn over quickly, so costs matter.</p>",
     note: "Momentum uses prices only, so the book-value sensitivities do not apply to it."
   },
   Value: {
