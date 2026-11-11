@@ -71,12 +71,12 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 <details>
 <summary><b>Hypotheses and method</b></summary>
 
-Momentum is the return from the close 12 months before the trade date to the close of the previous month. No month is skipped, so the most recent month, whose return tends to reverse, is part of the signal. A true 12-1 version, which does skip it, was run as a labelled sensitivity (Amendment 15): its mean rank IC over the 175 usable months is +0.005 (90% interval -0.021 to +0.031), against +0.008 for the registered signal, and the two monthly series have a correlation of 0.97. No interval excludes zero in either version, so no reading changes. Candidate explanations in the literature are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
+Momentum is the return from the close 12 months before the trade date to the close of the previous month. No month is skipped, so the most recent month, whose return tends to reverse, is part of the signal. A true 12-1 version, which does skip it, was run as a labelled sensitivity (Amendment 15, shown below) and changes no reading. Candidate explanations in the literature are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
 
-1. **Timing.** A signal dated t uses data up to the end of month t-1 and is paired with the return in month t.
+1. **Timing.** A signal dated t uses only information available at the end of month t-1 and is held through month t.
 2. **Primary evidence.** Rank IC, quintile spread and Fama-MacBeth slopes (single and joint), each with a bootstrap interval.
 3. **Secondary evidence.** Top-decile and top-quintile portfolios, with a paired bootstrap interval for each Sharpe difference. A difference counts only if the 90% interval excludes zero, and portfolio results are read alongside the signal tests.
-4. **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied.
+4. **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
 
 **Pre-specification.** The design, the reading rules and every later change are recorded as dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. The earlier study's out-of-sample test follows [`docs/OUT_OF_SAMPLE_PLAN.md`](docs/OUT_OF_SAMPLE_PLAN.md).
 
@@ -94,7 +94,7 @@ Momentum is the return from the close 12 months before the trade date to the clo
 | Book value | SEC EDGAR filings, aligned to the filing date. Book value per share is restated for later splits. |
 | Risk-free rate | Three-month Treasury bill, FRED. |
 
-**Survivorship.** Acquired and bankrupt companies mostly have no free price history, so each month's universe is the set of names that have data. In 2012, for Value and Combined, 26% of names later removed from the index had usable data against 85% of names that stayed. Names later removed that did have data earned an annualised mean monthly return of about 3% to 4% over 2012 to 2026, against about 16% for names that stayed. This is descriptive and not a correction.
+**Survivorship.** Acquired and bankrupt companies mostly have no free price history, so each month's universe is the set of names that have data. In 2012, for Value and Combined, 26% of names later removed from the index had usable data against 85% of names that stayed. Names later removed that did have data earned an annualised mean return of about 3% to 4% over 2012 to 2026, against about 16% for names that stayed. This is descriptive and not a correction.
 
 </details>
 
