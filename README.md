@@ -96,6 +96,40 @@ Momentum is the return from the close 12 months before the trade date to the clo
 </details>
 
 <details>
+<summary><b>Sensitivities: true 12-1 momentum and survivorship by year</b></summary>
+
+**True 12-1 momentum.** The registered Momentum signal ends at the close of the previous month and skips no month (see the data integrity log). A true 12-1 version, which ends one month earlier, was run as a labelled sensitivity (Amendment 15). It does not replace the registered result.
+
+- **Signal tests.** The mean rank IC over the 175 usable months is +0.005 (90% interval -0.021 to +0.031), against +0.008 for the registered signal, and the two monthly series have a correlation of 0.97. The previous month's return on its own has a mean rank IC of -0.024 in 2012 to 2020 (interval -0.051 to +0.002). That is the direction the short-term reversal effect would predict, but it cannot be told apart from zero.
+- **Portfolios.** Sharpe differences against the benchmark, gross of costs, Treasury bill rate, with 90% intervals:
+
+| Portfolio | Period | Registered | True 12-1 |
+|---|---|---|---|
+| Momentum, top decile | 2012 to 2020 | +0.28 (-0.12 to +0.63) | +0.09 (-0.29 to +0.42) |
+| Momentum, top decile | 2021 to 2026 | +0.06 (-0.50 to +0.54) | +0.04 (-0.52 to +0.54) |
+| Momentum, top decile | Full period | +0.12 (-0.22 to +0.42) | +0.03 (-0.31 to +0.32) |
+| Momentum, top quintile | 2012 to 2020 | +0.24 (-0.09 to +0.55) | +0.21 (-0.09 to +0.50) |
+| Momentum, top quintile | 2021 to 2026 | +0.11 (-0.30 to +0.47) | +0.06 (-0.34 to +0.41) |
+| Momentum, top quintile | Full period | +0.15 (-0.11 to +0.38) | +0.12 (-0.13 to +0.34) |
+| Combined, top decile | 2012 to 2020 | +0.14 (-0.23 to +0.48) | +0.02 (-0.37 to +0.36) |
+| Combined, top decile | 2021 to 2026 | +0.22 (-0.27 to +0.68) | +0.17 (-0.32 to +0.62) |
+| Combined, top decile | Full period | +0.13 (-0.17 to +0.41) | +0.05 (-0.26 to +0.32) |
+| Combined, top quintile | 2012 to 2020 | +0.17 (-0.17 to +0.48) | +0.09 (-0.22 to +0.37) |
+| Combined, top quintile | 2021 to 2026 | +0.19 (-0.18 to +0.54) | +0.19 (-0.17 to +0.52) |
+| Combined, top quintile | Full period | +0.15 (-0.10 to +0.38) | +0.11 (-0.12 to +0.33) |
+
+The 2021 to 2026 months were already known from the 17-stock study, so they are a re-test and not out-of-sample evidence. The true 12-1 point estimates are lower than the registered ones in 11 of the 12 rows and the same in the twelfth, by up to about 0.19, so the unskipped month may have helped the registered signal slightly in this sample. The intervals overlap almost entirely, and none of the 36 portfolio comparisons (two strategies, two group sizes, three periods and three cost bases) has an interval that excludes zero, with the Treasury bill rate or with the flat 2%. With 12 headline intervals, about 1.2 would be expected to exclude zero by chance alone. No reading changes.
+
+**Survivorship by year.** A descriptive table for the registered signals, one row per year and signal. It adds no test.
+
+- The share of index member-months usable for Value rises from 61% in 2012 to 84% in 2026, and for Momentum from 71% to 99%. Among names later removed from the index, the usable share for Value rises from 26% to 63%.
+- The yearly Sharpe differences have mixed signs, and no pattern with coverage is visible. Two of the 45 yearly intervals exclude zero (Value in 2017 and Momentum in 2020), against about 4.5 expected by chance. Each interval rests on 8 to 12 months and is very wide, so the table is context and not evidence.
+
+The files are `results/universe_study_*_momentum_skip_month.csv` and `results/universe_study_survivorship_by_year.csv`.
+
+</details>
+
+<details>
 <summary><b>Data integrity log</b></summary>
 
 | When | Defect | Effect |
