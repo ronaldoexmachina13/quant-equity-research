@@ -43,10 +43,10 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 ## How the study avoids fooling itself
 
 - **Pre-specified.** The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. They are dated Git commits made by the author, not entries in an independent registry. Post-hoc additions are labelled as such.
-- **No look-ahead.** A signal dated t uses data up to the end of month t-1 and is paired with the return in month t. Book values enter on the date the filing became public.
+- **No look-ahead.** A signal dated t uses only information available at the end of month t-1 and is held through month t. Book values enter on the date the filing became public.
 - **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
-- **Honest intervals.** 90% bootstrap intervals, re-checked with Newey-West errors and a block bootstrap. Every test is counted, and the expected number of false alarms is stated.
-- **It found and fixed its own errors.** A split-adjustment bug had flattered Value (17-stock Sharpe fell from 0.86 to about 0.61 once fixed), and unit errors in SEC share counts had produced absurd price-to-book ratios. Both are logged below.
+- **Honest intervals.** 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of false positives expected by chance is stated beside the result.
+- **It found and fixed its own errors.** These were corrected and are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
 - **Tested and reproducible.** More than 400 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
 ## Limits
@@ -54,7 +54,8 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them: acquired companies often earned a premium and bankrupt ones lost most of their value, and both are missing. Coverage is lowest from 2012 to 2015 (61% to 66% of index member-months usable for Value), so the early years of the 2012 to 2020 test rest on the weakest data.
 - **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.
 - **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, and there are no Fama-French controls.
-- **Power.** The test cannot rule out a small premium.
+- **Sharpe convention.** The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. This was checked after the results and is not one of the registered tests.
+- **Power.** With 108 months the test detects a mean rank IC of about 0.055 (80% power), so a smaller premium cannot be ruled out.
 
 ## Explore
 
