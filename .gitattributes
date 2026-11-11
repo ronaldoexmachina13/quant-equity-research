@@ -1,0 +1,4 @@
+# Store text files with LF line endings. Binary files are left untouched.
+* text=auto eol=lf
+*.png binary
+*.db binary
