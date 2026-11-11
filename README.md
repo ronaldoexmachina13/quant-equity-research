@@ -26,7 +26,7 @@
 
 ## Why a null result is worth reporting
 
-Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 447 published anomalies with methods that limit the weight of tiny stocks and found that 286 of them (64%) were statistically insignificant at the 5% level ([summary](https://alphaarchitect.com/replicating-anomalies/)). Large, liquid stocks such as the S&P 500 are a hard place to find a premium, so a null here is a plausible and informative outcome. What matters is whether the test was honest enough to be believed.
+Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 452 published anomalies with methods that limit the weight of tiny stocks and found that 65% of them could not clear the usual significance hurdle, a t-statistic of 1.96 ([Review of Financial Studies, 2020](https://doi.org/10.1093/rfs/hhy131)). Large, liquid stocks such as the S&P 500 are a hard place to find a premium, so a null here is a plausible and informative outcome. What matters is whether the test was honest enough to be believed.
 
 ![Exhibit 2: return by group](results/exhibit_2_return_by_group.png)
 
