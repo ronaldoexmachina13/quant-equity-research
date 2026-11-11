@@ -7,7 +7,9 @@ hand-checkable synthetic inputs rather than touching real market data.
 import pandas as pd
 import pytest
 
-from src.factors import calculate_momentum, calculate_value_score, calculate_combined_score
+from src.factors import (
+    calculate_momentum, calculate_momentum_skip_month, calculate_value_score, calculate_combined_score,
+)
 from src.portfolio import build_portfolio
 
 
@@ -43,6 +45,67 @@ def test_calculate_momentum_skips_most_recent_month():
     momentum_b = calculate_momentum(prices_b)
 
     assert momentum_a["A"].iloc[13] == pytest.approx(momentum_b["A"].iloc[13], rel=1e-9)
+
+
+def skip_month_prices() -> pd.DataFrame:
+    """
+    15 month-end prices, rows 0 to 14, with t = row 14. The rows that matter:
+    t-14 = 70, t-13 = 80, t-12 = 125, t-2 = 100, t-1 = 200, t = 50. The other
+    rows are distinct values that none of the checked windows use.
+    """
+    dates = pd.date_range("2020-01-31", periods=15, freq="ME")
+    values = [70, 80, 125, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 200, 50]
+    return pd.DataFrame({"A": values}, index=dates)
+
+
+def test_calculate_momentum_skip_month_matches_formula_by_hand():
+    """
+    Row 14 must be price[t-2] / price[t-13] - 1 = 100 / 80 - 1 = +0.25.
+    A wrong end point gives 200 / 80 - 1 = +1.5 (t-1) or 50 / 80 - 1 = -0.375 (t),
+    and a wrong start point gives 100 / 125 - 1 = -0.2 (t-12).
+    """
+    momentum = calculate_momentum_skip_month(skip_month_prices())
+    assert momentum["A"].iloc[14] == pytest.approx(100 / 80 - 1, rel=1e-12)
+
+
+def test_calculate_momentum_skip_month_ignores_price_at_t():
+    prices = skip_month_prices()
+    changed = prices.copy()
+    changed.iloc[14, 0] = 9999
+    assert calculate_momentum_skip_month(changed)["A"].iloc[14] == pytest.approx(
+        calculate_momentum_skip_month(prices)["A"].iloc[14], rel=1e-12)
+
+
+def test_calculate_momentum_skip_month_ignores_price_at_t_minus_1():
+    """This is the difference from the registered signal, which ends at t-1."""
+    prices = skip_month_prices()
+    changed = prices.copy()
+    changed.iloc[13, 0] = 9999
+    assert calculate_momentum_skip_month(changed)["A"].iloc[14] == pytest.approx(
+        calculate_momentum_skip_month(prices)["A"].iloc[14], rel=1e-12)
+
+
+def test_calculate_momentum_skip_month_uses_t_minus_2_and_t_minus_13():
+    """Changing t-2 or t-13 moves row 14. Changing t-14 does not."""
+    prices = skip_month_prices()
+    base = calculate_momentum_skip_month(prices)["A"].iloc[14]
+    for row, should_change in [(12, True), (1, True), (0, False)]:
+        changed = prices.copy()
+        changed.iloc[row, 0] = 9999
+        value = calculate_momentum_skip_month(changed)["A"].iloc[14]
+        assert (value != pytest.approx(base, rel=1e-12)) is should_change, f"row {row}"
+
+
+def test_calculate_momentum_skip_month_needs_13_months_of_history():
+    momentum = calculate_momentum_skip_month(skip_month_prices())["A"]
+    assert momentum.iloc[:13].isna().all()
+    assert momentum.iloc[13:].notna().all()
+
+
+def test_calculate_momentum_skip_month_is_registered_signal_one_month_later():
+    """With no gaps in the prices, the 12-1 row dated t is the registered row dated t-1."""
+    prices = skip_month_prices()
+    pd.testing.assert_frame_equal(calculate_momentum_skip_month(prices), calculate_momentum(prices).shift(1))
 
 
 def test_calculate_value_score_lower_pb_scores_higher():

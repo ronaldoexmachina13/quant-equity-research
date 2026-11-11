@@ -54,6 +54,41 @@ def calculate_momentum(prices: pd.DataFrame, lookback_months: int = 12, skip_mon
     return momentum
 
 
+def calculate_momentum_skip_month(prices: pd.DataFrame, lookback_months: int = 12, skip_months: int = 1) -> pd.DataFrame:
+    """
+    True 12-1 momentum, the sensitivity of LIMITATIONS_PLAN.md, Amendment 15,
+    decision 2. It is not the registered signal.
+
+    momentum = price[t - 1 - skip_months] / price[t - 1 - lookback_months] - 1
+
+    With the defaults, the row dated t is the price at the end of t-2 divided
+    by the price at the end of t-13, minus 1. The row dated t is paired with
+    the return of month t (close of t-1 to close of t), so one full month,
+    t-2 to t-1, lies between the end of the signal and the start of the
+    holding month. calculate_momentum() instead ends at t-1 and skips no month.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Wide-format adjusted close prices (Date index, tickers as columns).
+    lookback_months : int
+        Months from the start of the window to the last close before the trade date (default 12).
+    skip_months : int
+        Months skipped between the end of the window and the last close before the trade date (default 1).
+
+    Returns
+    -------
+    pd.DataFrame
+        Momentum scores on month-end dates, NaN where the history is too short.
+    """
+    monthly_prices = prices.resample("ME").last()
+
+    end_price = monthly_prices.shift(skip_months + 1)
+    start_price = monthly_prices.shift(lookback_months + 1)
+
+    return (end_price / start_price) - 1
+
+
 def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate a Value factor score from Price-to-Book ratio.
