@@ -49,7 +49,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 
 ## Limits
 
-- **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix.
+- **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them: acquired companies often earned a premium and bankrupt ones lost most of their value, and both are missing. Coverage is lowest from 2012 to 2015 (61% to 66% of index member-months usable for Value), so the early years of the 2012 to 2020 test rest on the weakest data.
 - **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.
 - **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, and there are no Fama-French controls.
 - **Power.** The test cannot rule out a small premium.
