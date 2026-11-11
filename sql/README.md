@@ -5,7 +5,7 @@ The SQLite database stores the raw inputs (`prices`, `book_value`) and the backt
 ## Files
 
 - `create_tables.sql`: schema reference for all four tables, matching `src/database.py`.
-- `factor_construction_in_sql.sql`: 12-1 momentum and Price-to-Book computed from `prices` and `book_value` with window functions and a join, plus a data-coverage diagnostic. Output matches `src/factors.py` (for example, AAPL 12-1 momentum at the end of December 2024: 0.2387 in SQL, 0.23873 in pandas).
+- `factor_construction_in_sql.sql`: Momentum (return from 12 months ago to the previous month-end, no month skipped, so an 11-month return) and Price-to-Book computed from `prices` and `book_value` with window functions and a join, plus a data-coverage diagnostic. Output matches `src/factors.py` (for example, AAPL momentum at the end of December 2024: 0.2387 in SQL, 0.23873 in pandas).
 - `portfolio_and_regime_queries.sql`: monthly turnover by strategy, regime-split (2021–2022 vs 2023–2024) Sharpe ratio and maximum drawdown, and month-by-month holdings overlap between Momentum and Value.
 
 ## How to run

@@ -14,8 +14,10 @@
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- 1. Momentum signal: 12-month return, skipping the most recent month ("12-1"),
---    computed at each month-end. This is the same signal src/factors.py builds
+-- 1. Momentum signal: return from the close 12 months ago to the close of the
+--    previous month, computed at each month-end. No month is skipped, so this
+--    is an 11-month return and not a true 12-1 signal (see the note in
+--    docs/STUDY_17_STOCKS.md). It is the same signal src/factors.py builds
 --    in pandas -- this query is meant as an independent verification of it,
 --    not a replacement. If the two disagree, that's worth knowing before an
 --    interview, not after.
@@ -50,7 +52,7 @@ SELECT
     date,
     price_12m_ago,
     price_1m_ago,
-    ROUND((price_1m_ago / price_12m_ago) - 1, 4) AS momentum_12_1
+    ROUND((price_1m_ago / price_12m_ago) - 1, 4) AS momentum_12m_to_prev_month
 FROM lagged
 WHERE price_1m_ago IS NOT NULL
   AND price_12m_ago IS NOT NULL
