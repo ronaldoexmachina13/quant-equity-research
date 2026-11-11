@@ -1,7 +1,7 @@
 """
-Amendment 15 (LIMITATIONS_PLAN.md): the true 12-1 Momentum sensitivity and
-the reversal diagnostic. The 12-1 portfolios and the survivorship-by-year
-table are added in later steps.
+Amendment 15 (LIMITATIONS_PLAN.md): the true 12-1 Momentum sensitivity, the
+reversal diagnostic and the 12-1 portfolios. The survivorship-by-year table is
+added in a later step.
 
 The registered Momentum signal ends at the close of t-1 and skips no month.
 The 12-1 signal runs from the close of t-13 to the close of t-2. It is tested
@@ -13,19 +13,28 @@ registered interval only. The usable set is the registered Momentum set with
 a price at t-13, so 2012-01 is not used. Intervals: 5,000 resamples, seed 42,
 90%, and the Newey-West and block-bootstrap intervals of Amendment 14.
 
+Portfolios: the top decile and top quintile of Momentum 12-1 and of Combined
+(12-1 leg), equal weight, held one month, from 2012-02. The weights start in
+2012-02, so that month is the purchase from cash. Each is tested against the
+registered benchmark series from 2012-02 onward, which are not restarted from
+cash, gross and net on both turnover bases, with the paired Sharpe difference
+on the Treasury bill rate (headline basis: gross) and the flat 2% (comparison
+only). A month with fewer than 200 names in either set stops the run.
+
 Nothing here replaces a registered result. The re-test months are already
 known from the published study, so they are not out-of-sample evidence.
 
 Before anything new is built, the gates rerun and the registered Momentum and
-Combined counts, monthly series and summaries are recomputed and compared with
-the saved files. Any difference above 1e-9 stops the run.
+Combined counts, monthly series, signal summaries, portfolio returns and the 12
+gross headline portfolio rows are recomputed and compared with the saved files.
+Any difference above 1e-9 stops the run.
 
 Run from the repository root:
   python -m scripts.universe.run_universe_skip_month --dry-run
 The dry run runs every check, builds every frame in memory, prints everything
 and writes nothing. Writing is not available yet: all eight files of
 Amendment 15, decision 9 are written in one run, with mode "x", once the
-portfolio and survivorship parts exist.
+survivorship part exists and steps 2 to 4 are approved.
 """
 import argparse
 
@@ -33,12 +42,14 @@ import pandas as pd
 
 from scripts.universe.run_universe_extras import robustness_table
 from scripts.universe.run_universe_gates import (
-    COVERAGE_PATH, run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures,
+    COVERAGE_PATH, TOP_DECILE_MINIMUM, run_gate2, run_gate1a_momentum, run_count_check, run_value_path,
+    stop_on_failures,
 )
+from scripts.universe.run_universe_portfolios import load_rf, build_set, returns_long, held_without_return_failures
 from scripts.universe.run_universe_signals import load_inputs, stop_if_outputs_exist, N_SIMS, SEED
 from src.backtest import calculate_monthly_returns
 from src.signal_eval import rank_ic, quintile_spread, monthly_statistic, fama_macbeth_slopes, summarize_signal
-from src.universe_portfolio import stage3_count_failures
+from src.universe_portfolio import stage3_count_failures, HEADLINE_BASIS
 from src.universe_study import read_month_end_prices, evaluation_dates, usable_mask, study_periods
 from src.universe_value import registered_list_failures, combined_signal, slope_summary, SUMMARY_COLUMNS
 from src.universe_skip_month import (
@@ -46,7 +57,10 @@ from src.universe_skip_month import (
     skip_month_signal_set, skip_month_set_failures, months_failures, series_failures, summary_failures,
     skip_month_series, skip_month_summary, monthly_series_frame, skip_month_counts_frame, without_first_month,
     ic_correlation, reading_rule_flags, skip_month_outputs,
+    portfolio_dates, decile_minimum_failures, skip_month_portfolios, benchmarks_from, portfolio_summary_frame,
+    portfolio_months_failures, portfolio_returns_failures, portfolio_summary_failures, portfolio_flags,
     SENSITIVITY, MOMENTUM_12_1, COMBINED_12_1, LAST_MONTH, VALUE_JOINT_12_1, REGISTERED_NAME,
+    SKIP_MONTH_BENCHMARK, REGISTERED_BENCHMARK, REGISTERED_STRATEGY, PORTFOLIO_KEYS,
 )
 
 MOMENTUM_COUNTS_PATH = "results/universe_study_monthly_counts_momentum.csv"
@@ -60,7 +74,11 @@ SAVED_MONTHLY = {
 SAVED_SUMMARIES = ["results/universe_study_signal_summary_momentum.csv",
                    "results/universe_study_signal_summary_value_combined.csv"]
 SAVED_ROBUSTNESS = "results/universe_study_inference_robustness.csv"
-STEP_2_PARTS = ["monthly_counts", "ic_monthly", "spread_monthly", "signal_summary", "inference_robustness"]
+SAVED_PORTFOLIO_RETURNS = "results/universe_study_portfolio_returns.csv"
+SAVED_PORTFOLIO_SUMMARY = "results/universe_study_portfolio_summary.csv"
+REGISTERED_HEADLINE_ROWS = 12   # Momentum and Combined, two sizes, three periods, gross
+BUILT_PARTS = ["monthly_counts", "ic_monthly", "spread_monthly", "signal_summary", "inference_robustness",
+               "portfolio_returns", "portfolio_summary"]
 
 
 # ---------------------------------------------------------------------------
@@ -118,13 +136,42 @@ def run_reproduction_checks(path: dict, returns: pd.DataFrame, periods: dict) ->
     return series, robustness
 
 
+def run_portfolio_reproduction(path: dict, returns: pd.DataFrame, rf: pd.Series,
+                               periods: dict) -> tuple[dict, dict, pd.DataFrame]:
+    """
+    The registered Momentum and Combined portfolios and both benchmarks, rebuilt
+    with build_set() and checked against the saved returns, then the 12 gross
+    headline rows recomputed and checked against the saved summary. Returns the
+    registered portfolios, benchmarks and the saved summary.
+    """
+    signals = {"Momentum": path["momentum"], "Value": path["value"],
+               "Combined": combined_signal(path["momentum"], path["value"])}
+    portfolios, benchmarks = build_set(signals, ["Momentum", "Combined"], returns)
+    stop_on_failures("Registered held names with a return",
+                     held_without_return_failures({"registered": (portfolios, benchmarks)}))
+    found = returns_long(portfolios, benchmarks, rf)
+    stop_on_failures("Registered portfolio returns", portfolio_returns_failures(found, pd.read_csv(SAVED_PORTFOLIO_RETURNS)))
+
+    print("  Recomputing the registered gross headline portfolio rows")
+    recomputed = portfolio_summary_frame(portfolios, benchmarks, REGISTERED_BENCHMARK, rf, periods,
+                                         n_sims=N_SIMS, seed=SEED, include_benchmarks=False)
+    headline = recomputed[recomputed["basis"] == HEADLINE_BASIS]
+    saved = pd.read_csv(SAVED_PORTFOLIO_SUMMARY)
+    failures = [] if len(headline) == REGISTERED_HEADLINE_ROWS else [
+        f"{len(headline)} gross rows recomputed, expected {REGISTERED_HEADLINE_ROWS}"]
+    stop_on_failures("Registered gross headline rows", failures + portfolio_summary_failures(headline, saved))
+    print(f"Reproduction: {len(portfolios) + len(benchmarks)} registered portfolio series x {len(found) // 6} months "
+          f"and {len(headline)} gross headline rows match the saved files within 1e-9.")
+    return portfolios, benchmarks, saved
+
+
 # ---------------------------------------------------------------------------
 # The 12-1 sensitivity and the reversal diagnostic
 # ---------------------------------------------------------------------------
 
 def build_skip_month(prices: pd.DataFrame, usability: pd.DataFrame, path: dict, returns: pd.DataFrame,
-                     periods: dict) -> tuple[dict, dict]:
-    """Every step 2 frame, keyed by output part, and the monthly series. Nothing is written here."""
+                     periods: dict) -> tuple[dict, dict, dict]:
+    """Every signal-level frame keyed by output part, the monthly series and the 12-1 signal set. Nothing is written."""
     momentum_mask = usable_mask(usability, "usable_momentum", evaluation_dates(), list(prices.columns))
     mask = skip_month_usable_mask(momentum_mask, prices)
     skip = skip_month_signal(prices, mask)
@@ -146,7 +193,25 @@ def build_skip_month(prices: pd.DataFrame, usability: pd.DataFrame, path: dict, 
         "signal_summary": summary,
         "inference_robustness": robust,
     }
-    return {part: frame.assign(sensitivity=SENSITIVITY) for part, frame in frames.items()}, series
+    return {part: frame.assign(sensitivity=SENSITIVITY) for part, frame in frames.items()}, series, signals
+
+
+def build_skip_month_portfolios(signals: dict, returns: pd.DataFrame, rf: pd.Series, registered_benchmarks: dict,
+                                periods: dict) -> tuple[dict, dict, dict]:
+    """The two portfolio frames keyed by output part, and the 12-1 portfolios and sliced benchmarks. Nothing is written."""
+    trimmed = without_first_month(periods)
+    dates = portfolio_dates(trimmed)
+    stop_on_failures("Decile minimum", decile_minimum_failures(signals, dates, TOP_DECILE_MINIMUM))
+
+    portfolios = skip_month_portfolios(signals, returns, dates)
+    benchmarks = benchmarks_from(registered_benchmarks, dates)
+    stop_on_failures("12-1 held names with a return", held_without_return_failures({"12-1": (portfolios, benchmarks)}))
+
+    summary = portfolio_summary_frame(portfolios, benchmarks, SKIP_MONTH_BENCHMARK, rf, trimmed,
+                                      n_sims=N_SIMS, seed=SEED)
+    stop_on_failures("Portfolio months", portfolio_months_failures(summary))
+    frames = {"portfolio_returns": returns_long(portfolios, benchmarks, rf), "portfolio_summary": summary}
+    return {part: frame.assign(sensitivity=SENSITIVITY) for part, frame in frames.items()}, portfolios, benchmarks
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +290,82 @@ def print_report(frames: dict, series: dict, registered: dict, saved_robust: pd.
           f"out-of-sample evidence.")
 
 
+PORTFOLIO_TESTS = ["sharpe_tbill", "benchmark_sharpe_tbill", "sharpe_diff_tbill", "ci_90_lower_tbill",
+                   "ci_90_upper_tbill", "significant_tbill", "sharpe_diff_flat_2pct", "ci_90_lower_flat_2pct",
+                   "ci_90_upper_flat_2pct"]
+PORTFOLIO_LEVELS = ["period", "strategy", "size", "basis", "months", "total_return", "annualized_return",
+                    "annualized_volatility", "sharpe_tbill", "sharpe_flat_2pct", "max_drawdown",
+                    "avg_turnover_existing", "avg_turnover_drift"]
+
+
+def portfolio_side_by_side(new: pd.DataFrame, registered: pd.DataFrame, bases: list[str] | None = None) -> pd.DataFrame:
+    """12-1 strategy rows next to the registered rows of the same strategy, size, period and basis."""
+    rows = new[new["strategy"].isin(list(REGISTERED_STRATEGY))]
+    if bases is not None:
+        rows = rows[rows["basis"].isin(bases)]
+    rows = rows.assign(registered_strategy=rows["strategy"].map(REGISTERED_STRATEGY))
+    merged = rows.merge(registered[PORTFOLIO_KEYS + ["months"] + PORTFOLIO_TESTS],
+                        left_on=["period", "registered_strategy", "size", "basis"],
+                        right_on=PORTFOLIO_KEYS, suffixes=("", "_reg"))
+    return merged[["period", "strategy", "size", "basis", "months_reg", "sharpe_tbill_reg", "sharpe_diff_tbill_reg",
+                   "ci_90_lower_tbill_reg", "ci_90_upper_tbill_reg", "significant_tbill_reg", "months"]
+                  + PORTFOLIO_TESTS]
+
+
+def print_portfolio_report(frames: dict, portfolios: dict, benchmarks: dict, registered_portfolios: dict,
+                           registered_benchmarks: dict, saved_summary: pd.DataFrame, rf: pd.Series, periods: dict):
+    summary = frames["portfolio_summary"]
+    first = next(iter(portfolios.values())).index[0]
+    print(f"\nFirst month {first:%Y-%m}: purchase from cash for each 12-1 portfolio (Amendment 13, decision 9)")
+    for key, series in portfolios.items():
+        print(f"  {str(key):45s} turnover existing {series.loc[first, 'turnover_existing']:.4f}, "
+              f"drift {series.loc[first, 'turnover_drift']:.4f}")
+    for name, series in benchmarks.items():
+        print(f"  {name:45s} turnover existing {series.loc[first, 'turnover_existing']:.4f}, "
+              f"drift {series.loc[first, 'turnover_drift']:.4f}")
+    print(f"The benchmark's {first:%Y-%m} month is a rebalance of the registered series, not a purchase from cash, so "
+          f"its purchase from cash is not charged on the net bases. The 12-1 portfolios are charged a full purchase "
+          f"in {first:%Y-%m}.")
+    print("The benchmarks hold the registered usable names, including those lost to the t-13 rule, which the 12-1 "
+          "strategies cannot hold.")
+
+    print("\nNames held per month (min, median, max):")
+    for key, series in {**portfolios, **benchmarks}.items():
+        held = series["names_held"]
+        print(f"  {str(key):45s} {held.min()}, {held.median():.0f}, {held.max()}")
+
+    with pd.option_context("display.width", 300, "display.max_columns", 40, "display.max_rows", 200):
+        print("\nSharpe differences against the benchmark. Registered (_reg, saved file, 2012-01 included) next to 12-1 "
+              "(from 2012-02). Gross with the Treasury bill rate is the headline basis; net bases and the flat 2% "
+              "are shown for comparison:")
+        print(portfolio_side_by_side(summary, saved_summary).round(4).to_string(index=False))
+
+        print("\nLevels and turnover, 12-1 portfolios and the sliced benchmarks:")
+        print(summary[PORTFOLIO_LEVELS].round(4).to_string(index=False))
+
+        flags = portfolio_flags(summary, saved_summary)
+        print("\nDecision 6 (portfolios, gross, Treasury bill interval only): rows where the 12-1 interval excludes "
+              "zero while the registered interval does not:")
+        print(flags.round(4).to_string(index=False) if len(flags) else "  none")
+
+        print("\nNot registered, like-for-like: registered portfolios without 2012-01, gross basis only, against the "
+              "registered benchmarks over the same months. Printout only, not written.")
+        trimmed = without_first_month(periods)
+        like = portfolio_summary_frame(registered_portfolios, benchmarks_from(registered_benchmarks, portfolio_dates(trimmed)),
+                                       REGISTERED_BENCHMARK, rf, trimmed, n_sims=N_SIMS, seed=SEED,
+                                       include_benchmarks=False)
+        like = like[like["basis"] == HEADLINE_BASIS]
+        print(portfolio_side_by_side(summary, like, bases=[HEADLINE_BASIS]).round(4).to_string(index=False))
+
+    headline = summary[summary["headline_test"]]
+    print(f"\nHeadline tests: {len(headline)} intervals at the 90% level (gross, Treasury bill rate). With no effect at "
+          f"all, about {0.1 * len(headline):.1f} would exclude zero by chance alone, so no interval is read on its own.")
+    print(f"Headline intervals that exclude zero: {int(headline['significant_tbill'].astype(bool).sum())}")
+    tested = summary["sharpe_diff_tbill"].notna()
+    print(f"Intervals added by the portfolios: {int(tested.sum())} with the Treasury bill rate and {int(tested.sum())} "
+          f"with the flat 2% (comparison only).")
+
+
 # ---------------------------------------------------------------------------
 # Run
 # ---------------------------------------------------------------------------
@@ -233,8 +374,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--dry-run", action="store_true", help="run every check and print everything, write nothing")
     if not parser.parse_args().dry_run:
-        raise SystemExit("Only --dry-run is available. The portfolio and survivorship parts are not built yet, and "
-                         "all eight files are written in one run. Nothing written.")
+        raise SystemExit("Only --dry-run is available. The survivorship part is not built yet, and all eight files "
+                         "are written in one run. Nothing written.")
 
     outputs = skip_month_outputs()
     stop_if_outputs_exist(outputs.values())
@@ -250,14 +391,24 @@ def main():
     periods = study_periods()
     registered, saved_robust = run_reproduction_checks(path, returns, periods)
 
+    rf = load_rf(evaluation_dates())
+    print(f"\nTreasury bill rate: {len(rf)} months, every month has a rate.")
+    registered_portfolios, registered_benchmarks, saved_summary = run_portfolio_reproduction(path, returns, rf, periods)
+
     print(f"\nBootstrap: {N_SIMS} resamples, seed {SEED}, 90% intervals.")
-    frames, series = build_skip_month(prices, usability, path, returns, periods)
+    frames, series, signals = build_skip_month(prices, usability, path, returns, periods)
+    portfolio_frames, portfolios, benchmarks = build_skip_month_portfolios(signals, returns, rf, registered_benchmarks,
+                                                                           periods)
+    frames.update(portfolio_frames)
+
     print_report(frames, series, registered, saved_robust, periods)
+    print_portfolio_report(frames, portfolios, benchmarks, registered_portfolios, registered_benchmarks, saved_summary,
+                           rf, periods)
 
     print("\nDry run: nothing written. These files would be written, with mode x:")
-    for part in STEP_2_PARTS:
+    for part in BUILT_PARTS:
         print(f"  {outputs[part]} ({len(frames[part])} rows)")
-    print("Not built yet: " + ", ".join(str(outputs[p]) for p in outputs if p not in STEP_2_PARTS))
+    print("Not built yet: " + ", ".join(str(outputs[p]) for p in outputs if p not in BUILT_PARTS))
 
 
 if __name__ == "__main__":

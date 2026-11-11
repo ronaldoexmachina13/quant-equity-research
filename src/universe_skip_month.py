@@ -26,6 +26,10 @@ from src.signal_eval import (
     MIN_NAMES_PER_MONTH, rank_ic, quintile_spread, monthly_statistic, monthly_counts, fama_macbeth_slopes,
     summarize_signal,
 )
+from src.universe_portfolio import (
+    top_group_weights, portfolio_series, strategy_summary, reference_summary, SIZES, GROSS, NET_DRIFT,
+    MOMENTUM_BENCHMARK, VALUE_BENCHMARK,
+)
 from src.universe_study import NEW_TEST, RE_TEST, FULL_PERIOD, monthly_frame, series_frame
 from src.universe_value import combined_signal, slope_summary, SUMMARY_COLUMNS
 
@@ -42,6 +46,16 @@ RESULTS_DIR = Path("results")
 SKIP_MONTH_PARTS = ["monthly_counts", "ic_monthly", "spread_monthly", "signal_summary", "inference_robustness",
                     "portfolio_returns", "portfolio_summary"]
 SURVIVORSHIP_BY_YEAR = "survivorship_by_year"
+
+# Portfolios (Amendment 15, decision 3). Each strategy is tested against the registered benchmark series
+SKIP_MONTH_BENCHMARK = {MOMENTUM_12_1: MOMENTUM_BENCHMARK, COMBINED_12_1: VALUE_BENCHMARK}
+REGISTERED_BENCHMARK = {"Momentum": MOMENTUM_BENCHMARK, "Combined": VALUE_BENCHMARK}
+REGISTERED_STRATEGY = {MOMENTUM_12_1: "Momentum", COMBINED_12_1: "Combined"}
+RETURN_COLUMNS = ["names_held", "names_without_return", GROSS, "turnover_existing", "turnover_drift",
+                  "net_existing", NET_DRIFT, "rf_monthly"]
+PORTFOLIO_TEST_COLUMNS = ["months", "sharpe_tbill", "benchmark_sharpe_tbill", "sharpe_diff_tbill", "ci_90_lower_tbill",
+                          "ci_90_upper_tbill", "sharpe_diff_flat_2pct", "ci_90_lower_flat_2pct", "ci_90_upper_flat_2pct"]
+PORTFOLIO_KEYS = ["period", "strategy", "size", "basis"]
 
 
 # ---------------------------------------------------------------------------
@@ -255,6 +269,119 @@ def reading_rule_flags(new: pd.DataFrame, registered: pd.DataFrame) -> pd.DataFr
     any_new = merged["iid_excludes_zero"] | merged["nw_excludes_zero"] | merged["block_excludes_zero"]
     flagged = merged[any_new & ~merged["iid_excludes_zero_registered"].astype(bool)]
     return flagged[["test", "signal", "period", "iid_excludes_zero", "nw_excludes_zero", "block_excludes_zero"]].reset_index(drop=True)
+
+
+# ---------------------------------------------------------------------------
+# Portfolios (Amendment 15, decision 3)
+# ---------------------------------------------------------------------------
+
+def portfolio_dates(periods: dict) -> pd.DatetimeIndex:
+    """Every month of the given periods, in order. With the trimmed periods, 2012-02 to 2026-08."""
+    return pd.DatetimeIndex(sorted(set().union(*[set(dates) for dates in periods.values()])))
+
+
+def decile_minimum_failures(signals: dict, dates: pd.DatetimeIndex, minimum: int) -> list[str]:
+    """Months in which the 12-1 or Combined set has fewer names than the decile minimum of Phase 4."""
+    failures = []
+    for name in (MOMENTUM_12_1, COMBINED_12_1):
+        counts = signals[name].loc[dates].notna().sum(axis=1)
+        failures += [f"{d:%Y-%m}: {name} has {n} names, below the decile minimum of {minimum}"
+                     for d, n in counts[counts < minimum].items()]
+    return failures
+
+
+def skip_month_portfolios(signals: dict, returns: pd.DataFrame, dates: pd.DatetimeIndex) -> dict:
+    """
+    {(strategy, size): monthly series} for the 12-1 and Combined top groups.
+    The weights start at dates[0], so that month is the purchase from cash:
+    the turnover functions treat only the first row of the frame that way.
+    """
+    return {(name, size): portfolio_series(top_group_weights(signals[name].loc[dates], q), returns)
+            for name in (MOMENTUM_12_1, COMBINED_12_1) for size, q in SIZES.items()}
+
+
+def benchmarks_from(benchmarks: dict, dates: pd.DatetimeIndex) -> dict:
+    """The registered benchmark series on these dates, rows unchanged: the turnover is not restarted from cash."""
+    return {name: series.loc[dates] for name, series in benchmarks.items()}
+
+
+def portfolio_summary_frame(portfolios: dict, benchmarks: dict, benchmark_of: dict, rf_monthly: pd.Series,
+                            periods: dict, n_sims: int = 5000, seed: int = 42,
+                            include_benchmarks: bool = True) -> pd.DataFrame:
+    """strategy_summary() for each portfolio against its own benchmark, then the benchmark level rows."""
+    parts = [strategy_summary(strategy, size, series, benchmarks[benchmark_of[strategy]], benchmark_of[strategy],
+                              rf_monthly, periods, n_sims, seed)
+             for (strategy, size), series in portfolios.items()]
+    if include_benchmarks:
+        parts += [reference_summary(name, series, [GROSS, NET_DRIFT], rf_monthly, periods)
+                  for name, series in benchmarks.items()]
+    return pd.concat(parts, ignore_index=True)
+
+
+def portfolio_months_failures(summary: pd.DataFrame, expected: dict = EXPECTED_MONTHS) -> list[str]:
+    wrong = summary[summary["months"] != summary["period"].map(expected)]
+    return [f"{r.strategy} {r.size} {r.basis} {r.period}: {r.months} months, expected {expected[r.period]}"
+            for r in wrong.itertuples()]
+
+
+def _keyed(frame: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
+    out = frame.copy()
+    if "size" in out:
+        out["size"] = out["size"].fillna("")
+    if "date" in out:
+        out["date"] = pd.to_datetime(out["date"])
+    return out.set_index(keys)
+
+
+def _value_failures(found: pd.DataFrame, saved: pd.DataFrame, keys: list[str], columns: list[str],
+                    tolerance: float) -> list[str]:
+    """Every found row must be in saved, and each column must match within tolerance. NaN matches NaN."""
+    found, saved = _keyed(found, keys), _keyed(saved, keys)
+    missing = found.index.difference(saved.index)
+    failures = [f"{key}: not in the saved file" for key in missing]
+    common = found.index.intersection(saved.index)
+    for column in columns:
+        a = found.loc[common, column].astype(float)
+        b = saved.loc[common, column].astype(float)
+        bad = ~(a.isna() & b.isna()) & ~((a - b).abs() <= tolerance)
+        failures += [f"{key}: {column} {a[key]!r}, saved {b[key]!r}" for key in a.index[bad]]
+    return failures
+
+
+def portfolio_returns_failures(found: pd.DataFrame, saved: pd.DataFrame, tolerance: float = 1e-9) -> list[str]:
+    """Recomputed long-format portfolio returns against the saved file, by strategy, size and date."""
+    return _value_failures(found, saved, ["strategy", "size", "date"], RETURN_COLUMNS, tolerance)
+
+
+def portfolio_summary_failures(found: pd.DataFrame, saved: pd.DataFrame, tolerance: float = 1e-9) -> list[str]:
+    """Recomputed summary rows against the saved summary, by period, strategy, size and basis."""
+    return _value_failures(found, saved, PORTFOLIO_KEYS, PORTFOLIO_TEST_COLUMNS, tolerance)
+
+
+def _excludes_zero(frame: pd.DataFrame) -> pd.Series:
+    return ~((frame["ci_90_lower_tbill"] <= 0) & (0 <= frame["ci_90_upper_tbill"]))
+
+
+def portfolio_flags(new: pd.DataFrame, registered: pd.DataFrame) -> pd.DataFrame:
+    """
+    Decision 6 for portfolios, as answered: gross basis, Treasury bill
+    interval only. A 12-1 row is flagged if its interval excludes zero while
+    the registered row of the same strategy, size and period does not. A row
+    with no registered match is an error, not a silent pass.
+    """
+    rows = new[new["strategy"].isin(list(REGISTERED_STRATEGY)) & (new["basis"] == GROSS)]
+    rows = rows.assign(registered_strategy=rows["strategy"].map(REGISTERED_STRATEGY))
+    reg = registered[registered["basis"] == GROSS].assign(registered_excludes=_excludes_zero)
+    merged = rows.merge(reg[["period", "strategy", "size", "registered_excludes"]],
+                        left_on=["period", "registered_strategy", "size"], right_on=["period", "strategy", "size"],
+                        how="left", suffixes=("", "_registered"))
+    unmatched = merged["registered_excludes"].isna()
+    if unmatched.any():
+        raise ValueError(f"No registered row for: {merged.loc[unmatched, ['strategy', 'size', 'period']].values.tolist()}")
+    merged["excludes_zero_tbill"] = _excludes_zero(merged)
+    flagged = merged[merged["excludes_zero_tbill"] & ~merged["registered_excludes"].astype(bool)]
+    return flagged[["period", "strategy", "size", "basis", "sharpe_diff_tbill", "ci_90_lower_tbill",
+                    "ci_90_upper_tbill"]].reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------

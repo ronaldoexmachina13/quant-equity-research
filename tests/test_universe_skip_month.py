@@ -19,7 +19,13 @@ from src.universe_skip_month import (
     skip_month_signal_set, skip_month_set_failures, months_failures, series_failures, summary_failures,
     skip_month_series, skip_month_summary, monthly_series_frame, skip_month_counts_frame, without_first_month,
     ic_correlation, reading_rule_flags, skip_month_outputs,
+    portfolio_dates, decile_minimum_failures, skip_month_portfolios, benchmarks_from, portfolio_summary_frame,
+    portfolio_months_failures, portfolio_returns_failures, portfolio_summary_failures, portfolio_flags,
+    SKIP_MONTH_BENCHMARK, REGISTERED_BENCHMARK,
     MOMENTUM_12_1, COMBINED_12_1, LAST_MONTH, VALUE_JOINT_12_1, VALUE, EXPECTED_MONTHS,
+)
+from src.universe_portfolio import (
+    portfolio_series, top_group_weights, universe_weights, returns_frame, MOMENTUM_BENCHMARK, VALUE_BENCHMARK,
 )
 from src.universe_study import NEW_TEST, RE_TEST, FULL_PERIOD
 from src.universe_value import SUMMARY_COLUMNS, combined_signal
@@ -391,3 +397,174 @@ def test_skip_month_outputs_are_the_eight_registered_names():
         "universe_study_portfolio_summary_momentum_skip_month.csv",
         "universe_study_survivorship_by_year.csv",
     ])
+
+
+# ---------------------------------------------------------------------------
+# Portfolios (step 3)
+# ---------------------------------------------------------------------------
+
+TEN = list("ABCDEFGHIJ")
+
+
+def ten_name_set(n_months: int = 15):
+    """
+    Ten names over n_months. The first month is empty for 12-1, as 2012-01 is.
+    Momentum ranks A lowest to J highest every month. Value scores are
+    irregular, so Combined has no ties and is defined on all ten names.
+    """
+    dates = DATES[:n_months]
+    momentum = pd.DataFrame([[0.1 * (j + 1) for j in range(10)]] * n_months, index=dates, columns=TEN)
+    momentum.iloc[0] = np.nan
+    pb = [1.3, 2.9, 4.1, 0.7, 5.6, 3.3, 8.2, 6.4, 9.5, 7.8]
+    value = pd.DataFrame([[-x for x in pb]] * n_months, index=dates, columns=TEN)
+    returns = pd.DataFrame([[0.01 * (((i * 3 + j * 7) % 11) - 5) for j in range(10)] for i in range(n_months)],
+                           index=dates, columns=TEN)
+    return skip_month_signal_set(momentum, value), returns
+
+
+def two_benchmarks(signals, returns):
+    return {MOMENTUM_BENCHMARK: portfolio_series(universe_weights(signals[MOMENTUM_12_1].notna()), returns),
+            VALUE_BENCHMARK: portfolio_series(universe_weights(signals[VALUE].notna()), returns)}
+
+
+def test_portfolio_dates_is_the_union_of_the_periods_in_order():
+    periods = {NEW_TEST: DATES[1:3], RE_TEST: DATES[3:5], FULL_PERIOD: DATES[1:5]}
+    assert list(portfolio_dates(periods)) == list(DATES[1:5])
+
+
+def test_decile_minimum_failures_flags_a_thin_month():
+    signals, _ = ten_name_set(3)
+    assert decile_minimum_failures(signals, DATES[1:3], minimum=10) == []
+    signals[MOMENTUM_12_1].loc[DATES[2], "A"] = np.nan
+    assert decile_minimum_failures(signals, DATES[1:3], minimum=10) == [
+        "2020-03: Momentum 12-1 has 9 names, below the decile minimum of 10"]
+
+
+def test_skip_month_portfolios_buy_from_cash_in_the_first_used_month():
+    """Starting the weights at the second month makes it the purchase from cash on both bases."""
+    signals, returns = ten_name_set(3)
+    portfolios = skip_month_portfolios(signals, returns, DATES[1:3])
+    for series in portfolios.values():
+        assert series.index[0] == DATES[1]
+        assert series.loc[DATES[1], "turnover_existing"] == pytest.approx(1.0)
+        assert series.loc[DATES[1], "turnover_drift"] == pytest.approx(1.0)
+
+
+def test_an_empty_first_row_would_undercharge_the_purchase():
+    """Why the weights are sliced: with the empty month kept, the first purchase is charged as half."""
+    signals, returns = ten_name_set(3)
+    kept = portfolio_series(top_group_weights(signals[MOMENTUM_12_1].loc[DATES[:3]], 10), returns)
+    assert kept.loc[DATES[1], "turnover_existing"] == pytest.approx(0.5)
+
+
+def test_skip_month_portfolios_hold_the_top_group_by_hand():
+    """Top decile of ten names is J alone; top quintile is I and J."""
+    signals, returns = ten_name_set(3)
+    portfolios = skip_month_portfolios(signals, returns, DATES[1:3])
+    assert set(portfolios) == {(MOMENTUM_12_1, "top_decile"), (MOMENTUM_12_1, "top_quintile"),
+                               (COMBINED_12_1, "top_decile"), (COMBINED_12_1, "top_quintile")}
+    decile, quintile = portfolios[(MOMENTUM_12_1, "top_decile")], portfolios[(MOMENTUM_12_1, "top_quintile")]
+    assert decile.loc[DATES[1], "names_held"] == 1 and quintile.loc[DATES[1], "names_held"] == 2
+    assert decile.loc[DATES[1], "gross"] == pytest.approx(returns.loc[DATES[1], "J"])
+    assert quintile.loc[DATES[1], "gross"] == pytest.approx(returns.loc[DATES[1], ["I", "J"]].mean())
+
+
+def test_benchmarks_from_keeps_the_registered_rows():
+    """The benchmark is sliced, not restarted: its second-month turnover stays a rebalance, here zero."""
+    signals, returns = ten_name_set(3)
+    full = portfolio_series(universe_weights(signals[VALUE].notna()), returns)
+    sliced = benchmarks_from({VALUE_BENCHMARK: full}, DATES[1:3])[VALUE_BENCHMARK]
+    pd.testing.assert_frame_equal(sliced, full.loc[DATES[1:3]])
+    assert sliced.loc[DATES[1], "turnover_existing"] == pytest.approx(0.0)
+
+
+def test_benchmark_mappings():
+    assert SKIP_MONTH_BENCHMARK == {MOMENTUM_12_1: MOMENTUM_BENCHMARK, COMBINED_12_1: VALUE_BENCHMARK}
+    assert REGISTERED_BENCHMARK == {"Momentum": MOMENTUM_BENCHMARK, "Combined": VALUE_BENCHMARK}
+
+
+def test_portfolio_summary_frame_tests_each_strategy_against_its_own_benchmark():
+    signals, returns = ten_name_set(15)
+    dates = DATES[1:15]
+    portfolios = skip_month_portfolios(signals, returns, dates)
+    benchmarks = benchmarks_from(two_benchmarks(signals, returns), dates)
+    summary = portfolio_summary_frame(portfolios, benchmarks, SKIP_MONTH_BENCHMARK, pd.Series(0.001, index=DATES),
+                                      {FULL_PERIOD: dates}, n_sims=50, seed=42)
+    strategies = summary[summary["strategy"].isin([MOMENTUM_12_1, COMBINED_12_1])]
+    assert len(strategies) == 12 and len(summary) == 16
+    assert set(strategies.loc[strategies["strategy"] == MOMENTUM_12_1, "benchmark"]) == {MOMENTUM_BENCHMARK}
+    assert set(strategies.loc[strategies["strategy"] == COMBINED_12_1, "benchmark"]) == {VALUE_BENCHMARK}
+    assert (strategies["headline_test"] == (strategies["basis"] == "gross")).all()
+    assert (summary["months"] == 14).all()
+
+
+def test_portfolio_summary_frame_can_leave_out_the_benchmark_rows():
+    signals, returns = ten_name_set(15)
+    dates = DATES[1:15]
+    portfolios = skip_month_portfolios(signals, returns, dates)
+    benchmarks = benchmarks_from(two_benchmarks(signals, returns), dates)
+    summary = portfolio_summary_frame(portfolios, benchmarks, SKIP_MONTH_BENCHMARK, pd.Series(0.001, index=DATES),
+                                      {FULL_PERIOD: dates}, n_sims=20, seed=42, include_benchmarks=False)
+    assert len(summary) == 12
+
+
+def test_portfolio_months_failures_flags_a_wrong_count():
+    summary = pd.DataFrame({"strategy": [MOMENTUM_12_1], "size": ["top_decile"], "basis": ["gross"],
+                            "period": [FULL_PERIOD], "months": [176]})
+    assert portfolio_months_failures(summary) == [
+        f"{MOMENTUM_12_1} top_decile gross {FULL_PERIOD}: 176 months, expected 175"]
+
+
+def long_returns():
+    """A strategy and a benchmark, two months, in the layout of the saved returns file."""
+    series = pd.DataFrame({"names_held": [2, 2], "names_without_return": [0, 0], "gross": [0.01, np.nan],
+                           "turnover_existing": [1.0, 0.1], "turnover_drift": [1.0, 0.12],
+                           "net_existing": [0.009, np.nan], "net_drift": [0.009, np.nan]}, index=DATES[:2])
+    rf = pd.Series([0.001, 0.002], index=DATES[:2])
+    return pd.concat([returns_frame("Momentum", "top_decile", series, rf),
+                      returns_frame(MOMENTUM_BENCHMARK, None, series, rf)], ignore_index=True)
+
+
+def test_portfolio_returns_failures_passes_on_the_same_rows_with_nan_and_empty_size():
+    found = long_returns()
+    saved = found.copy()
+    saved["date"] = pd.to_datetime(saved["date"]).dt.strftime("%Y-%m-%d")
+    saved["size"] = saved["size"].where(saved["size"].notna(), np.nan)
+    assert portfolio_returns_failures(found, saved) == []
+
+
+def test_portfolio_returns_failures_flags_a_changed_value_and_a_missing_row():
+    found, saved = long_returns(), long_returns()
+    saved.loc[0, "net_drift"] = 0.0091
+    failures = portfolio_returns_failures(found, saved.iloc[:3])
+    assert any("net_drift" in f for f in failures)
+    assert any("not in the saved file" in f for f in failures)
+
+
+def summary_rows(lower=0.01, upper=0.2, strategy="Momentum", basis="gross"):
+    shared = {c: 0.1 for c in ["months", "sharpe_tbill", "benchmark_sharpe_tbill", "sharpe_diff_tbill",
+                               "sharpe_diff_flat_2pct", "ci_90_lower_flat_2pct", "ci_90_upper_flat_2pct"]}
+    return pd.DataFrame([{"period": FULL_PERIOD, "strategy": strategy, "size": "top_decile", "basis": basis, **shared,
+                          "ci_90_lower_tbill": lower, "ci_90_upper_tbill": upper}])
+
+
+def test_portfolio_summary_failures_passes_on_identical_rows_and_flags_a_changed_interval():
+    assert portfolio_summary_failures(summary_rows(), summary_rows()) == []
+    failures = portfolio_summary_failures(summary_rows(lower=0.02), summary_rows())
+    assert len(failures) == 1 and "ci_90_lower_tbill" in failures[0]
+
+
+def test_portfolio_flags_gross_treasury_bill_only():
+    """Momentum gross is flagged. Combined is not, since the registered interval also excludes zero. Net rows never flag."""
+    new = pd.concat([summary_rows(0.01, 0.2, MOMENTUM_12_1), summary_rows(0.01, 0.2, COMBINED_12_1),
+                     summary_rows(0.01, 0.2, MOMENTUM_12_1, basis="net_drift")], ignore_index=True)
+    registered = pd.concat([summary_rows(-0.1, 0.2, "Momentum"), summary_rows(0.01, 0.2, "Combined"),
+                            summary_rows(-0.1, 0.2, "Momentum", basis="net_drift")], ignore_index=True)
+    flags = portfolio_flags(new, registered)
+    assert flags[["strategy", "size", "period", "basis"]].values.tolist() == [
+        [MOMENTUM_12_1, "top_decile", FULL_PERIOD, "gross"]]
+
+
+def test_portfolio_flags_stops_on_a_row_with_no_registered_match():
+    with pytest.raises(ValueError):
+        portfolio_flags(summary_rows(0.01, 0.2, MOMENTUM_12_1), summary_rows(0.01, 0.2, "Combined"))
