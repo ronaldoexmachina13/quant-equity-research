@@ -40,7 +40,7 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
-from config import UNIVERSE, IN_SAMPLE_END, OUT_OF_SAMPLE_START
+from config import UNIVERSE, IN_SAMPLE_END
 from src.backtest import calculate_monthly_returns, calculate_benchmark_returns
 from src.database import get_connection, load_book_value
 from src.factors import load_prices

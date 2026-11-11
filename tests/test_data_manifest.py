@@ -4,7 +4,6 @@ Small files in a temporary folder; no real data.
 """
 import re
 
-import pandas as pd
 
 from src.data_manifest import file_manifest, verify_manifest, MANIFEST_COLUMNS
 

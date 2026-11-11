@@ -12,7 +12,6 @@ silently replaced. To regenerate one, move the old file first.
 """
 import json
 import math
-import sys
 from pathlib import Path
 
 import pandas as pd

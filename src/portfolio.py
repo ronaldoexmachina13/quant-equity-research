@@ -1,5 +1,4 @@
 import pandas as pd
-from src.database import get_connection
 from src.factors import load_prices, calculate_momentum
 
 

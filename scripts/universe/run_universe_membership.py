@@ -19,7 +19,7 @@ import requests
 from config import UNIVERSE
 from src.fundamentals import HEADERS
 from src.universe import (
-    FEASIBILITY_DB_PATH, WIKIPEDIA_URL, WIKIPEDIA_CHANGES_URL, FIRST_PRICE_MONTH, EVALUATION_START, EVALUATION_END,
+    FEASIBILITY_DB_PATH, WIKIPEDIA_URL, WIKIPEDIA_CHANGES_URL, FIRST_PRICE_MONTH, EVALUATION_END,
     GATE1_START, MEMBERS_MIN, MEMBERS_MAX,
     cache_dir, month_range, evaluation_months_frame, parse_constituents, parse_changes,
     rebuild_membership, tickers_in_window, format_intervals, gate1_failures,

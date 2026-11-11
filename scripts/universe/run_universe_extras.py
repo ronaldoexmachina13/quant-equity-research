@@ -19,11 +19,10 @@ Run from the repository root:  python -m scripts.universe.run_universe_extras
 """
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from scripts.universe.run_universe_gates import (
-    COVERAGE_PATH, run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures,
+    run_gate2, run_gate1a_momentum, run_count_check, run_value_path, stop_on_failures,
 )
 from scripts.universe.run_universe_signals import load_inputs, stop_if_outputs_exist, N_SIMS, SEED
 from src.backtest import calculate_monthly_returns
