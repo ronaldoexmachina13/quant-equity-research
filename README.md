@@ -209,3 +209,5 @@ A delisting-aware data source, a delisting-return sensitivity, a Fama-French fac
 ## Licence
 
 MIT. See [`LICENSE`](LICENSE). This is research code, not investment advice.
+
+**Data sources.** The index membership in `results/universe_membership.csv` is derived from the tables on the Wikipedia pages [List of S&P 500 companies](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies) and [Historical components of the S&P 500](https://en.wikipedia.org/wiki/Historical_components_of_the_S%26P_500), whose text is available under the [Creative Commons Attribution-ShareAlike 4.0 licence](https://creativecommons.org/licenses/by-sa/4.0/). The code rebuilt those tables into monthly membership intervals, so the file is a modified version, and it is shared under the same CC BY-SA 4.0 terms. Prices come from Yahoo Finance and book values from SEC EDGAR filings. The raw downloads are not redistributed in this repository.
