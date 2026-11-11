@@ -13,8 +13,8 @@
 | Question | Answer |
 |---|---|
 | **Do the rankings predict returns?** | Not detectably. In the six main tests (rank IC for each of three signals over two test periods) every interval includes zero. Another 27 tests ask the same question in other ways, so they are not independent evidence, and none of them excludes zero either. |
-| **Do the top-ranked portfolios beat the benchmark?** | Not reliably. 2 of 18 Sharpe comparisons exclude zero. Both are Value in 2012 to 2020 (the top decile and the top quintile, so the holdings overlap), and in both Value did worse than the benchmark on a risk-adjusted basis. Chance alone gives about 1.8. |
-| **Could the test have found an effect?** | Only a fairly large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
+| **Do the top-ranked portfolios beat the benchmark?** | No. Only 2 of 18 Sharpe comparisons exclude zero, about what chance gives (1.8). Both are Value in 2012 to 2020 (the top decile and the top quintile, so the holdings overlap), and in both Value did worse than the benchmark on a risk-adjusted basis. |
+| **Could the test have found an effect?** | Only a large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
 | **Is the data good enough?** | For return levels, no. The data are free and survivor-biased: names later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. Differences between a portfolio and its benchmark are affected too, because the missing names are missing from both, in a direction that depends on the signal. |
 
 ### Reading guide
@@ -45,7 +45,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - **Pre-specified.** The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. They are dated Git commits made by the author, not entries in an independent registry. Post-hoc additions are labelled as such.
 - **No look-ahead.** A signal dated t uses only information available at the end of month t-1 and is held through month t. Book values enter on the date the filing became public.
 - **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
-- **Honest intervals.** 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of false positives expected by chance is stated beside the result.
+- **Interval choice.** 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of false positives expected by chance is stated beside the result.
 - **It found and fixed its own errors.** These were corrected and are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
 - **Tested and reproducible.** More than 400 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
