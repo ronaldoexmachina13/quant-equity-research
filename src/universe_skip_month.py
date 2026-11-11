@@ -30,7 +30,9 @@ from src.universe_portfolio import (
     top_group_weights, portfolio_series, strategy_summary, reference_summary, SIZES, GROSS, NET_DRIFT,
     MOMENTUM_BENCHMARK, VALUE_BENCHMARK,
 )
-from src.universe_study import NEW_TEST, RE_TEST, FULL_PERIOD, monthly_frame, series_frame
+from src.data_manifest import sha256_of
+from src.survivorship_by_year import BY_YEAR_NOTE
+from src.universe_study import NEW_TEST, RE_TEST, FULL_PERIOD, UNIVERSE_NOTE, monthly_frame, series_frame
 from src.universe_value import combined_signal, slope_summary, SUMMARY_COLUMNS
 
 SENSITIVITY = "momentum_skip_month"
@@ -393,3 +395,119 @@ def skip_month_outputs(folder: Path = RESULTS_DIR) -> dict:
     paths = {part: folder / f"universe_study_{part}_{SENSITIVITY}.csv" for part in SKIP_MONTH_PARTS}
     paths[SURVIVORSHIP_BY_YEAR] = folder / f"universe_study_{SURVIVORSHIP_BY_YEAR}.csv"
     return paths
+
+
+# ---------------------------------------------------------------------------
+# Writing (Amendment 15, decision 9): all eight files or none
+# ---------------------------------------------------------------------------
+
+EXPECTED_ROWS = {
+    "monthly_counts": 176,          # evaluation months, 2012-01 to 2026-08
+    "ic_monthly": 528,              # 3 signals x 176 months
+    "spread_monthly": 528,
+    "signal_summary": 30,           # 10 series x 3 periods
+    "inference_robustness": 24,     # 8 series x 3 periods
+    "portfolio_returns": 1050,      # 6 series x 175 months
+    "portfolio_summary": 48,        # 36 strategy rows and 12 benchmark rows
+    SURVIVORSHIP_BY_YEAR: 45,       # 15 years x 3 signals
+}
+
+
+def prepare_outputs(frames: dict, universe_note: str = UNIVERSE_NOTE) -> dict:
+    """
+    The seven 12-1 frames get the universe note as their last column, as in the
+    registered scripts. The survivorship table keeps its own note and has no
+    sensitivity column, since it describes the registered signals.
+    """
+    prepared = {}
+    for part, frame in frames.items():
+        if part == SURVIVORSHIP_BY_YEAR:
+            prepared[part] = frame[[c for c in frame.columns if c != "universe_note"] + ["universe_note"]]
+        else:
+            prepared[part] = frame.drop(columns=["universe_note"], errors="ignore").assign(universe_note=universe_note)
+    return prepared
+
+
+def output_failures(frames: dict, expected: dict = EXPECTED_ROWS) -> list[str]:
+    """Exactly the expected parts, the expected row counts, and the note rule, checked on prepared frames."""
+    failures = [f"{part}: expected but not built" for part in expected if part not in frames]
+    failures += [f"{part}: built but not expected" for part in frames if part not in expected]
+    for part, frame in frames.items():
+        if part not in expected:
+            continue
+        if len(frame) != expected[part]:
+            failures.append(f"{part}: {len(frame)} rows, expected {expected[part]}")
+        if list(frame.columns)[-1:] != ["universe_note"]:
+            failures.append(f"{part}: universe_note is not the last column")
+        if part == SURVIVORSHIP_BY_YEAR:
+            if "sensitivity" in frame:
+                failures.append(f"{part}: has a sensitivity column, but it describes the registered signals")
+            if "universe_note" in frame and not (frame["universe_note"] == BY_YEAR_NOTE).all():
+                failures.append(f"{part}: universe_note is not its own descriptive note")
+        else:
+            if "sensitivity" not in frame or not (frame["sensitivity"] == SENSITIVITY).all():
+                failures.append(f"{part}: sensitivity is not {SENSITIVITY} in every row")
+            if "universe_note" in frame and not (frame["universe_note"] == UNIVERSE_NOTE).all():
+                failures.append(f"{part}: universe_note is not UNIVERSE_NOTE in every row")
+    return failures
+
+
+def write_all_or_nothing(frames: dict, paths: dict) -> pd.DataFrame:
+    """
+    Writes every frame with mode "x", in the order of paths, then reads each
+    file back and checks its rows and columns. Returns the manifest: file,
+    rows, bytes and SHA-256.
+
+    If anything fails, the files created by this call are deleted and the
+    error is raised again, so no partial set remains. This does not conflict
+    with the rule that results are never overwritten or regenerated: mode "x"
+    refuses any file that already exists, so every file in `created` was made
+    by this call seconds earlier, and no file that existed before the run can
+    be in it. A file that mode "x" refused is never touched.
+    """
+    created = []
+    try:
+        for part, path in paths.items():
+            path = Path(path)
+            try:
+                frames[part].to_csv(path, index=False, mode="x")
+            except FileExistsError:
+                raise                       # not ours: mode "x" refused it before writing anything
+            except BaseException:
+                if path.exists():           # mode "x" created it, so a partial file is ours
+                    created.append(path)
+                raise
+            created.append(path)
+
+        rows = []
+        for part, path in paths.items():
+            path = Path(path)
+            back = pd.read_csv(path)
+            if len(back) != len(frames[part]) or list(back.columns) != list(frames[part].columns):
+                raise ValueError(f"{path}: read back {len(back)} rows and {list(back.columns)}, "
+                                 f"wrote {len(frames[part])} rows and {list(frames[part].columns)}")
+            rows.append({"file": path.as_posix(), "rows": len(back), "bytes": path.stat().st_size,
+                         "sha256": sha256_of(path)})
+        return pd.DataFrame(rows)
+    except BaseException:
+        for path in created:
+            path.unlink(missing_ok=True)
+            print(f"Removed {path}, created by this run before the failure")
+        raise
+
+
+def write_stage(frames: dict, paths: dict, expected: dict = EXPECTED_ROWS) -> pd.DataFrame:
+    """
+    The last stage of the write run: prepare the notes, check every frame, refuse
+    if any target exists, then write all or nothing. A failed check writes nothing.
+    """
+    prepared = prepare_outputs(frames)
+    failures = output_failures(prepared, expected)
+    if set(prepared) != set(paths):
+        failures.append(f"frames {sorted(prepared)} do not match the output paths {sorted(paths)}")
+    if failures:
+        raise SystemExit("Output checks failed, nothing written:\n  " + "\n  ".join(failures))
+    existing = [str(p) for p in paths.values() if Path(p).exists()]
+    if existing:
+        raise SystemExit(f"Output files already exist and are never overwritten: {existing}. Nothing written.")
+    return write_all_or_nothing(prepared, paths)

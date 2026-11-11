@@ -23,7 +23,10 @@ from src.universe_skip_month import (
     portfolio_months_failures, portfolio_returns_failures, portfolio_summary_failures, portfolio_flags,
     SKIP_MONTH_BENCHMARK, REGISTERED_BENCHMARK,
     MOMENTUM_12_1, COMBINED_12_1, LAST_MONTH, VALUE_JOINT_12_1, VALUE, EXPECTED_MONTHS,
+    EXPECTED_ROWS, SENSITIVITY, SURVIVORSHIP_BY_YEAR, prepare_outputs, output_failures, write_all_or_nothing, write_stage,
 )
+from src.survivorship_by_year import BY_YEAR_NOTE
+from src.universe_study import UNIVERSE_NOTE
 from src.universe_portfolio import (
     portfolio_series, top_group_weights, universe_weights, returns_frame, MOMENTUM_BENCHMARK, VALUE_BENCHMARK,
 )
@@ -568,3 +571,157 @@ def test_portfolio_flags_gross_treasury_bill_only():
 def test_portfolio_flags_stops_on_a_row_with_no_registered_match():
     with pytest.raises(ValueError):
         portfolio_flags(summary_rows(0.01, 0.2, MOMENTUM_12_1), summary_rows(0.01, 0.2, "Combined"))
+
+
+# ---------------------------------------------------------------------------
+# Writing (step 5): all eight files or none
+# ---------------------------------------------------------------------------
+
+SMALL_ROWS = {part: 2 for part in EXPECTED_ROWS}
+
+
+def built_frames() -> dict:
+    """Eight two-row frames as the run builds them: the seven 12-1 frames with a sensitivity column."""
+    frames = {part: pd.DataFrame({"value": [1.0, 2.0], "sensitivity": SENSITIVITY})
+              for part in EXPECTED_ROWS if part != SURVIVORSHIP_BY_YEAR}
+    frames[SURVIVORSHIP_BY_YEAR] = pd.DataFrame({"year": [2020, 2021], "universe_note": BY_YEAR_NOTE})
+    return frames
+
+
+def test_expected_rows_cover_the_eight_files():
+    assert list(EXPECTED_ROWS) == list(skip_month_outputs())
+    assert list(EXPECTED_ROWS.values()) == [176, 528, 528, 30, 24, 1050, 48, 45]
+
+
+def test_prepare_outputs_applies_the_note_rule():
+    prepared = prepare_outputs(built_frames())
+    for part, frame in prepared.items():
+        assert list(frame.columns)[-1] == "universe_note"
+        if part == SURVIVORSHIP_BY_YEAR:
+            assert (frame["universe_note"] == BY_YEAR_NOTE).all()
+            assert "sensitivity" not in frame
+        else:
+            assert (frame["universe_note"] == UNIVERSE_NOTE).all()
+            assert (frame["sensitivity"] == SENSITIVITY).all()
+
+
+def test_output_failures_passes_on_a_correct_set():
+    assert output_failures(prepare_outputs(built_frames()), SMALL_ROWS) == []
+
+
+def test_output_failures_flags_rows_missing_parts_and_the_note_rule():
+    frames = built_frames()
+    frames["signal_summary"] = frames["signal_summary"].iloc[:1]
+    del frames["ic_monthly"]
+    frames[SURVIVORSHIP_BY_YEAR] = frames[SURVIVORSHIP_BY_YEAR].assign(sensitivity=SENSITIVITY)
+    frames["portfolio_summary"] = frames["portfolio_summary"].drop(columns=["sensitivity"])
+    failures = output_failures(prepare_outputs(frames), SMALL_ROWS)
+    assert "ic_monthly: expected but not built" in failures
+    assert "signal_summary: 1 rows, expected 2" in failures
+    assert any(f.startswith(f"{SURVIVORSHIP_BY_YEAR}: has a sensitivity column") for f in failures)
+    assert f"portfolio_summary: sensitivity is not {SENSITIVITY} in every row" in failures
+
+
+def test_write_all_or_nothing_writes_reads_back_and_hashes(tmp_path):
+    import hashlib
+    paths = skip_month_outputs(tmp_path)
+    prepared = prepare_outputs(built_frames())
+    manifest = write_all_or_nothing(prepared, paths)
+    assert len(manifest) == 8
+    for row, path in zip(manifest.itertuples(), paths.values()):
+        assert row.rows == 2
+        assert row.sha256 == hashlib.sha256(path.read_bytes()).hexdigest()
+        assert row.bytes == path.stat().st_size
+    assert pd.read_csv(paths[SURVIVORSHIP_BY_YEAR])["universe_note"].eq(BY_YEAR_NOTE).all()
+
+
+def test_mode_x_refuses_an_existing_file_and_leaves_no_partial_set(tmp_path):
+    """The fourth target already exists: it is left as it was, and the three files written before it are removed."""
+    paths = skip_month_outputs(tmp_path)
+    existing = list(paths.values())[3]
+    existing.write_bytes(b"registered result, must not change")
+    with pytest.raises(FileExistsError):
+        write_all_or_nothing(prepare_outputs(built_frames()), paths)
+    assert existing.read_bytes() == b"registered result, must not change"
+    assert [p for p in paths.values() if p.exists()] == [existing]
+
+
+def test_write_stage_refuses_an_existing_file_before_writing(tmp_path):
+    paths = skip_month_outputs(tmp_path)
+    existing = list(paths.values())[-1]
+    existing.write_bytes(b"keep")
+    with pytest.raises(SystemExit):
+        write_stage(built_frames(), paths, SMALL_ROWS)
+    assert sorted(tmp_path.iterdir()) == [existing]
+
+
+def test_a_failed_check_writes_nothing(tmp_path):
+    frames = built_frames()
+    frames["portfolio_returns"] = frames["portfolio_returns"].iloc[:1]
+    with pytest.raises(SystemExit):
+        write_stage(frames, skip_month_outputs(tmp_path), SMALL_ROWS)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_a_failure_mid_write_removes_only_the_files_of_this_run(tmp_path):
+    """The fourth write leaves a partial file and fails: all files of this run go, an unrelated file stays."""
+    unrelated = tmp_path / "other.csv"
+    unrelated.write_bytes(b"not ours")
+    paths = skip_month_outputs(tmp_path)
+    prepared = prepare_outputs(built_frames())
+    fourth = list(paths)[3]
+
+    def broken_to_csv(path, **kwargs):
+        with open(path, "x") as handle:
+            handle.write("partial")
+        raise OSError("disk full")
+
+    object.__setattr__(prepared[fourth], "to_csv", broken_to_csv)
+    with pytest.raises(OSError):
+        write_all_or_nothing(prepared, paths)
+    assert not any(p.exists() for p in paths.values())
+    assert unrelated.read_bytes() == b"not ours"
+
+
+@pytest.mark.parametrize("leaves_partial", [True, False])
+def test_a_keyboard_interrupt_mid_write_removes_the_files_of_this_run_and_propagates(tmp_path, leaves_partial):
+    """
+    Ctrl+C during the fourth write, with or without a partial fourth file on
+    disk: the three files written before it and any partial fourth file are
+    removed, an unrelated file stays, and the KeyboardInterrupt is not swallowed.
+    """
+    unrelated = tmp_path / "other.csv"
+    unrelated.write_bytes(b"not ours")
+    paths = skip_month_outputs(tmp_path)
+    prepared = prepare_outputs(built_frames())
+    fourth = list(paths)[3]
+
+    def interrupted_to_csv(path, **kwargs):
+        if leaves_partial:
+            with open(path, "x") as handle:
+                handle.write("partial")
+        raise KeyboardInterrupt
+
+    object.__setattr__(prepared[fourth], "to_csv", interrupted_to_csv)
+    with pytest.raises(KeyboardInterrupt):
+        write_all_or_nothing(prepared, paths)
+    assert not any(p.exists() for p in paths.values())
+    assert sorted(tmp_path.iterdir()) == [unrelated]
+    assert unrelated.read_bytes() == b"not ours"
+
+
+def test_cli_exits_before_any_input_without_a_mode_and_rejects_bad_combinations(monkeypatch):
+    import scripts.universe.run_universe_skip_month as script
+
+    def reached(*args, **kwargs):
+        raise AssertionError("the run started")
+
+    monkeypatch.setattr(script, "load_inputs", reached)
+    monkeypatch.setattr(script, "stop_if_outputs_exist", reached)
+    with pytest.raises(SystemExit) as no_flag:
+        script.main([])
+    assert str(no_flag.value) == script.NO_FLAG_MESSAGE
+    for argv in (["--write", "--dry-run"], ["--write", "--survivorship-only"], ["--survivorship-only"]):
+        with pytest.raises(SystemExit) as rejected:
+            script.main(argv)
+        assert rejected.value.code == 2

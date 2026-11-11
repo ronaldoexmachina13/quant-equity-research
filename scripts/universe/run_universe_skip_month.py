@@ -41,13 +41,18 @@ reproduced from the saved files. Any difference above 1e-9 stops the run.
 Run from the repository root:
   python -m scripts.universe.run_universe_skip_month --dry-run
   python -m scripts.universe.run_universe_skip_month --dry-run --survivorship-only
-The dry run runs every check, builds every frame in memory, prints everything
-and writes nothing. With --survivorship-only it builds and prints only the
-survivorship table and its checks. Writing is not available: all eight files of
-Amendment 15, decision 9 are written in one run, with mode "x", in a later step
-with its own plan.
+  python -m scripts.universe.run_universe_skip_month --write
+With no flag the script exits at once. The dry run runs every check, builds
+every frame in memory, prints everything and writes nothing. With
+--survivorship-only it builds and prints only the survivorship table and its
+checks. --write is the single run of Amendment 15, decision 9: it refuses to
+start if any of the eight files exists, builds and checks everything in memory,
+then writes all eight files with mode "x", reads each back and prints its row
+count and SHA-256. If any write fails, the files this run created are removed,
+so either all eight files exist or none.
 """
 import argparse
+from datetime import datetime
 
 import pandas as pd
 
@@ -73,7 +78,7 @@ from src.universe_skip_month import (
     skip_month_usable_mask, skip_month_signal, last_month_return_signal, missing_signal_failures,
     skip_month_signal_set, skip_month_set_failures, months_failures, series_failures, summary_failures,
     skip_month_series, skip_month_summary, monthly_series_frame, skip_month_counts_frame, without_first_month,
-    ic_correlation, reading_rule_flags, skip_month_outputs,
+    ic_correlation, reading_rule_flags, skip_month_outputs, prepare_outputs, output_failures, write_stage,
     portfolio_dates, decile_minimum_failures, skip_month_portfolios, benchmarks_from, portfolio_summary_frame,
     portfolio_months_failures, portfolio_returns_failures, portfolio_summary_failures, portfolio_flags,
     SENSITIVITY, MOMENTUM_12_1, COMBINED_12_1, LAST_MONTH, VALUE_JOINT_12_1, REGISTERED_NAME,
@@ -459,18 +464,37 @@ def print_survivorship_report(table: pd.DataFrame, saved_diagnostic: pd.DataFram
 # Run
 # ---------------------------------------------------------------------------
 
-def main():
+NO_FLAG_MESSAGE = ("Choose --dry-run, or --write for the single run that writes all eight files. Nothing written.")
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--dry-run", action="store_true", help="run every check and print everything, write nothing")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true", help="run every check and print everything, write nothing")
+    mode.add_argument("--write", action="store_true",
+                      help="the single run: every check, then write all eight files with mode x, or none")
     parser.add_argument("--survivorship-only", action="store_true",
                         help="with --dry-run: build and print only the survivorship-by-year table and its checks")
-    args = parser.parse_args()
-    if not args.dry_run:
-        raise SystemExit("Only --dry-run is available. All eight files are written in one run, which is a later step "
-                         "with its own plan. Nothing written.")
+    args = parser.parse_args(argv)
+    if args.survivorship_only and not args.dry_run:
+        parser.error("--survivorship-only works only with --dry-run; the eight files are written together")
+    return args
 
+
+def print_manifest(manifest: pd.DataFrame):
+    print("\nFiles written (mode x, read back, SHA-256 of the bytes on disk):")
+    for row in manifest.itertuples():
+        print(f"  {row.file}  rows {row.rows}  bytes {row.bytes}  sha256 {row.sha256}")
+    print("To check the hashes yourself in PowerShell:")
+    print(r"  Get-FileHash -Algorithm SHA256 results\universe_study_*_momentum_skip_month.csv")
+    print(r"  Get-FileHash -Algorithm SHA256 results\universe_study_survivorship_by_year.csv")
+    print(f"{len(manifest)} of {len(BUILT_PARTS)} files written with mode x and read back. The hashes are of the "
+          f"working copy as written; Git line-ending conversion can change them in a later checkout.")
+
+
+def run(args: argparse.Namespace):
     outputs = skip_month_outputs()
-    stop_if_outputs_exist(outputs.values())
+    stop_if_outputs_exist(outputs.values())     # before any computation
     calendar, usability = load_inputs()
     run_gate2(calendar)
     prices = read_month_end_prices(calendar)
@@ -506,12 +530,32 @@ def main():
                            rf, periods)
     print_survivorship_report(frames[SURVIVORSHIP_BY_YEAR], saved_diagnostic)
 
-    print("\nDry run: nothing written. These files would be written, with mode x, in the later writing step:")
-    for part in BUILT_PARTS:
-        print(f"  {outputs[part]} ({len(frames[part])} rows)")
-    missing = [str(outputs[p]) for p in outputs if p not in BUILT_PARTS]
-    if missing:
-        print("Not built: " + ", ".join(missing))
+    stop_on_failures("Output checks", output_failures(prepare_outputs(frames)))
+    print(f"\nOutput checks: {len(frames)} frames, row counts {dict((p, len(f)) for p, f in frames.items())}, "
+          f"notes and sensitivity columns as registered.")
+
+    if not args.write:
+        print("\nDry run: nothing written. With --write these files would be written, with mode x:")
+        for part in BUILT_PARTS:
+            print(f"  {outputs[part]} ({len(frames[part])} rows)")
+        return
+
+    stop_if_outputs_exist(outputs.values())     # again, in case a file appeared during the run
+    print_manifest(write_stage(frames, outputs))
+
+
+def main(argv: list[str] | None = None):
+    args = parse_args(argv)
+    if not (args.dry_run or args.write):
+        raise SystemExit(NO_FLAG_MESSAGE)
+    started = datetime.now()
+    mode = "write" if args.write else ("dry run, survivorship only" if args.survivorship_only else "dry run")
+    print(f"Run started {started:%Y-%m-%d %H:%M:%S} ({mode})")
+    try:
+        run(args)
+    finally:
+        ended = datetime.now()
+        print(f"\nRun ended {ended:%Y-%m-%d %H:%M:%S}, duration {str(ended - started).split('.')[0]}")
 
 
 if __name__ == "__main__":
