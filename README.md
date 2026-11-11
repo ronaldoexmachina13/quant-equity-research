@@ -2,9 +2,9 @@
 
 [![tests](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml/badge.svg)](https://github.com/ronaldoexmachina13/quant-equity-research/actions/workflows/tests.yml)
 
-**Short answer: not detectably.** This is a pre-registered test of two of the best-known stock factors, momentum (the return over the 11 months to the end of the previous month) and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The sections below show how the test was built to avoid look-ahead and tuning, and where it still falls short.
+**Short answer: not detectably.** This is a pre-specified test of two of the best-known stock factors, momentum (the return over the 11 months to the end of the previous month) and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The sections below show how the test was built to avoid look-ahead and tuning, and where it still falls short.
 
-[**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-registration](docs/LIMITATIONS_PLAN.md)
+[**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-specification](docs/LIMITATIONS_PLAN.md)
 
 ![Exhibit 1: rank IC by signal](results/exhibit_1_rank_ic.png)
 
@@ -42,7 +42,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 
 ## How the study avoids fooling itself
 
-- **Pre-registered.** The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. Post-hoc additions are labelled as such.
+- **Pre-specified.** The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. They are dated Git commits made by the author, not entries in an independent registry. Post-hoc additions are labelled as such.
 - **No look-ahead.** A signal dated t uses data up to the end of month t-1 and is paired with the return in month t. Book values enter on the date the filing became public.
 - **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
 - **Honest intervals.** 90% bootstrap intervals, re-checked with Newey-West errors and a block bootstrap. Every test is counted, and the expected number of false alarms is stated.
@@ -77,7 +77,7 @@ Momentum is the return from the close 12 months before the trade date to the clo
 3. **Secondary evidence.** Top-decile and top-quintile portfolios, with a paired bootstrap interval for each Sharpe difference. A difference counts only if the 90% interval excludes zero, and portfolio results are read alongside the signal tests.
 4. **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied.
 
-**Pre-registration.** The design, the reading rules and every later change are recorded as dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. The earlier study's out-of-sample test follows [`docs/OUT_OF_SAMPLE_PLAN.md`](docs/OUT_OF_SAMPLE_PLAN.md).
+**Pre-specification.** The design, the reading rules and every later change are recorded as dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. The earlier study's out-of-sample test follows [`docs/OUT_OF_SAMPLE_PLAN.md`](docs/OUT_OF_SAMPLE_PLAN.md).
 
 **Power.** The monthly rank IC has a standard deviation of up to about 0.23. With 108 months the minimum detectable mean IC is about 0.055, above the 0.02 to 0.03 often cited for large-cap momentum. The test could not have found a small real effect, so an interval that includes zero does not show the effect is zero.
 
@@ -188,7 +188,7 @@ scripts/first_study/          the 17-stock study and its sensitivities
 tests/                        unit tests checked against hand-worked cases, run on every push
 sql/                          schema and analytical queries (see sql/README.md)
 results/                      every generated CSV, JSON and chart (universe_* is the 500-stock study)
-docs/                         pre-registration, out-of-sample plan, and the 17-stock write-up
+docs/                         the dated plan and its amendments, the out-of-sample plan, and the 17-stock write-up
 database/                     SQLite files, generated and not committed
 CLAUDE.md                     standing rules for the AI coding assistant used on this project
 ```
@@ -198,7 +198,7 @@ CLAUDE.md                     standing rules for the AI coding assistant used on
 <details>
 <summary><b>Earlier study: 17 stocks</b></summary>
 
-A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-registered months it had not seen (January 2025 to August 2026). The benchmark had the highest out-of-sample Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum) and no strategy could be statistically distinguished from it. Value's in-sample edge does not survive the split correction. The write-up is in [`docs/STUDY_17_STOCKS.md`](docs/STUDY_17_STOCKS.md).
+A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-specified months it had not seen (January 2025 to August 2026). The benchmark had the highest out-of-sample Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum) and no strategy could be statistically distinguished from it. Value's in-sample edge does not survive the split correction. The write-up is in [`docs/STUDY_17_STOCKS.md`](docs/STUDY_17_STOCKS.md).
 
 </details>
 
