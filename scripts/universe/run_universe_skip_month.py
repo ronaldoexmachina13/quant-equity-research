@@ -1,7 +1,6 @@
 """
 Amendment 15 (LIMITATIONS_PLAN.md): the true 12-1 Momentum sensitivity, the
-reversal diagnostic and the 12-1 portfolios. The survivorship-by-year table is
-added in a later step.
+reversal diagnostic, the 12-1 portfolios and the survivorship-by-year table.
 
 The registered Momentum signal ends at the close of t-1 and skips no month.
 The 12-1 signal runs from the close of t-13 to the close of t-2. It is tested
@@ -21,20 +20,32 @@ cash, gross and net on both turnover bases, with the paired Sharpe difference
 on the Treasury bill rate (headline basis: gross) and the flat 2% (comparison
 only). A month with fewer than 200 names in either set stops the run.
 
+Survivorship by year (decision 7): a descriptive table for the registered
+Momentum, Value and Combined signals, not the 12-1 sensitivity, built from the
+saved result files. Per year: the share of the index usable (all, removed,
+stayed, and the tested set), the mean rank IC, and the gross top-decile and
+benchmark levels with their Sharpe difference and a paired 90% interval (Treasury
+bill rate only). Survivorship affects both the levels and the differences, so
+neither is presented as unbiased. The table adds no test.
+
 Nothing here replaces a registered result. The re-test months are already
 known from the published study, so they are not out-of-sample evidence.
 
 Before anything new is built, the gates rerun and the registered Momentum and
 Combined counts, monthly series, signal summaries, portfolio returns and the 12
 gross headline portfolio rows are recomputed and compared with the saved files.
-Any difference above 1e-9 stops the run.
+Before the survivorship table is built, the coverage shares, period mean IC,
+period top-decile Sharpe figures and the registered survivorship diagnostic are
+reproduced from the saved files. Any difference above 1e-9 stops the run.
 
 Run from the repository root:
   python -m scripts.universe.run_universe_skip_month --dry-run
+  python -m scripts.universe.run_universe_skip_month --dry-run --survivorship-only
 The dry run runs every check, builds every frame in memory, prints everything
-and writes nothing. Writing is not available yet: all eight files of
-Amendment 15, decision 9 are written in one run, with mode "x", once the
-survivorship part exists and steps 2 to 4 are approved.
+and writes nothing. With --survivorship-only it builds and prints only the
+survivorship table and its checks. Writing is not available: all eight files of
+Amendment 15, decision 9 are written in one run, with mode "x", in a later step
+with its own plan.
 """
 import argparse
 
@@ -45,12 +56,18 @@ from scripts.universe.run_universe_gates import (
     COVERAGE_PATH, TOP_DECILE_MINIMUM, run_gate2, run_gate1a_momentum, run_count_check, run_value_path,
     stop_on_failures,
 )
-from scripts.universe.run_universe_portfolios import load_rf, build_set, returns_long, held_without_return_failures
+from scripts.universe.run_universe_portfolios import (
+    BY_YEAR_PATH, MOMENTUM_SET, VALUE_SET, load_rf, load_groups, build_set, returns_long, held_without_return_failures,
+)
 from scripts.universe.run_universe_signals import load_inputs, stop_if_outputs_exist, N_SIMS, SEED
 from src.backtest import calculate_monthly_returns
 from src.signal_eval import rank_ic, quintile_spread, monthly_statistic, fama_macbeth_slopes, summarize_signal
-from src.universe_portfolio import stage3_count_failures, HEADLINE_BASIS
-from src.universe_study import read_month_end_prices, evaluation_dates, usable_mask, study_periods
+from src.survivorship_by_year import (
+    yearly_shares, share_tested_by_year, share_failures, period_ic_failures, period_sharpe_failures,
+    diagnostic_failures, survivorship_by_year_table, yearly_total_failures, SIGNALS, SHARE_COLUMN, COUNT_COLUMN,
+)
+from src.universe_portfolio import stage3_count_failures, survivorship_monthly, survivorship_summary, HEADLINE_BASIS
+from src.universe_study import read_month_end_prices, evaluation_dates, usable_mask, study_periods, FULL_PERIOD
 from src.universe_value import registered_list_failures, combined_signal, slope_summary, SUMMARY_COLUMNS
 from src.universe_skip_month import (
     skip_month_usable_mask, skip_month_signal, last_month_return_signal, missing_signal_failures,
@@ -60,7 +77,7 @@ from src.universe_skip_month import (
     portfolio_dates, decile_minimum_failures, skip_month_portfolios, benchmarks_from, portfolio_summary_frame,
     portfolio_months_failures, portfolio_returns_failures, portfolio_summary_failures, portfolio_flags,
     SENSITIVITY, MOMENTUM_12_1, COMBINED_12_1, LAST_MONTH, VALUE_JOINT_12_1, REGISTERED_NAME,
-    SKIP_MONTH_BENCHMARK, REGISTERED_BENCHMARK, REGISTERED_STRATEGY, PORTFOLIO_KEYS,
+    SKIP_MONTH_BENCHMARK, REGISTERED_BENCHMARK, REGISTERED_STRATEGY, PORTFOLIO_KEYS, SURVIVORSHIP_BY_YEAR,
 )
 
 MOMENTUM_COUNTS_PATH = "results/universe_study_monthly_counts_momentum.csv"
@@ -76,9 +93,12 @@ SAVED_SUMMARIES = ["results/universe_study_signal_summary_momentum.csv",
 SAVED_ROBUSTNESS = "results/universe_study_inference_robustness.csv"
 SAVED_PORTFOLIO_RETURNS = "results/universe_study_portfolio_returns.csv"
 SAVED_PORTFOLIO_SUMMARY = "results/universe_study_portfolio_summary.csv"
+SAVED_SURVIVORSHIP = "results/universe_study_survivorship.csv"
+IC_PATHS = {"Momentum": SAVED_MONTHLY[("Momentum", "rank_ic")], "Value": SAVED_MONTHLY[("Combined", "rank_ic")],
+            "Combined": SAVED_MONTHLY[("Combined", "rank_ic")]}
 REGISTERED_HEADLINE_ROWS = 12   # Momentum and Combined, two sizes, three periods, gross
 BUILT_PARTS = ["monthly_counts", "ic_monthly", "spread_monthly", "signal_summary", "inference_robustness",
-               "portfolio_returns", "portfolio_summary"]
+               "portfolio_returns", "portfolio_summary", SURVIVORSHIP_BY_YEAR]
 
 
 # ---------------------------------------------------------------------------
@@ -367,15 +387,87 @@ def print_portfolio_report(frames: dict, portfolios: dict, benchmarks: dict, reg
 
 
 # ---------------------------------------------------------------------------
+# Survivorship by year (decision 7)
+# ---------------------------------------------------------------------------
+
+def build_survivorship_by_year(path: dict, prices: pd.DataFrame, returns: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """The reproduction checks, then the 45-row table. Returns the table and the saved registered diagnostic."""
+    periods = study_periods()
+    by_year = pd.read_csv(BY_YEAR_PATH)
+    counts = {"Momentum": pd.read_csv(MOMENTUM_COUNTS_PATH)}
+    counts["Value"] = counts["Combined"] = pd.read_csv(VALUE_COUNTS_PATH)
+    tested = {signal: share_tested_by_year(counts[signal], COUNT_COLUMN[signal]) for signal in SIGNALS}
+    ic = {signal: pd.read_csv(IC_PATHS[signal]) for signal in SIGNALS}
+    returns_saved = pd.read_csv(SAVED_PORTFOLIO_RETURNS)
+    signal_summary = pd.concat([pd.read_csv(p) for p in SAVED_SUMMARIES], ignore_index=True)
+    portfolio_summary = pd.read_csv(SAVED_PORTFOLIO_SUMMARY)
+    saved_diagnostic = pd.read_csv(SAVED_SURVIVORSHIP)
+
+    failures = share_failures(pd.read_csv(COVERAGE_PATH), by_year)
+    coverage_momentum = yearly_shares(by_year, SHARE_COLUMN["Momentum"])["share_usable_all"]
+    failures += [f"{year}: Momentum tested share {share!r}, coverage share {coverage_momentum[year]!r}"
+                 for year, share in tested["Momentum"].items() if not abs(share - coverage_momentum[year]) <= 1e-9]
+    for signal in SIGNALS:
+        failures += period_ic_failures(ic[signal], signal_summary, signal, periods)
+        failures += period_sharpe_failures(returns_saved, portfolio_summary, signal, periods)
+
+    groups = load_groups(list(prices.columns))
+    diagnostic = pd.concat([survivorship_summary(survivorship_monthly(path[key].notna(), returns, groups), periods, label)
+                            for key, label in (("momentum", MOMENTUM_SET), ("value", VALUE_SET))], ignore_index=True)
+    failures += diagnostic_failures(diagnostic, saved_diagnostic)
+    stop_on_failures("Survivorship-by-year reproduction", failures)
+    print("\nReproduction: coverage shares by year, the Momentum tested share, period mean IC and period gross "
+          "top-decile Sharpe figures for Momentum, Value and Combined, and the registered survivorship diagnostic "
+          "match the saved files within 1e-9.")
+
+    print(f"  Survivorship by year: one {N_SIMS}-resample bootstrap per year and signal (Treasury bill rate only)")
+    table = survivorship_by_year_table(by_year, tested, ic, returns_saved, n_sims=N_SIMS, seed=SEED)
+    stop_on_failures("Yearly totals", yearly_total_failures(table, signal_summary, portfolio_summary, FULL_PERIOD))
+    return table, saved_diagnostic
+
+
+SURVIVORSHIP_SHOWN = ["year", "months", "share_usable_all", "share_usable_removed", "share_usable_stayed",
+                      "share_usable_tested", "ic_months", "mean_rank_ic", "top_decile_annualized_return",
+                      "benchmark_annualized_return", "top_decile_sharpe_tbill", "benchmark_sharpe_tbill",
+                      "sharpe_diff_tbill", "ci_90_lower_tbill", "ci_90_upper_tbill", "interval_excludes_zero"]
+
+
+def print_survivorship_report(table: pd.DataFrame, saved_diagnostic: pd.DataFrame):
+    with pd.option_context("display.width", 300, "display.max_columns", 40, "display.max_rows", 200):
+        print("\nRegistered survivorship diagnostic by period (Amendment 13, decision 8), descriptive, context only:")
+        print(saved_diagnostic.drop(columns=["universe_note"], errors="ignore").round(5).to_string(index=False))
+
+        print("\nSurvivorship by year (Amendment 15, decision 7). Registered signals and portfolios, not the 12-1 "
+              "sensitivity. Gross basis, Treasury bill rate.")
+        print("  share_usable_all, _removed, _stayed: share of index member-months usable for the signal, from the "
+              "Phase 3 coverage file (for Value and Combined, before the validity rule of Amendment 11).")
+        print("  share_usable_tested: share of index member-months in the set actually tested (Stage 3 counts), "
+              "all names only.")
+        for signal in SIGNALS:
+            rows = table[table["signal"] == signal]
+            print(f"\n{signal} (benchmark: {rows['benchmark'].iloc[0]}):")
+            print(rows[SURVIVORSHIP_SHOWN].round(4).to_string(index=False))
+
+    partial = sorted(table.loc[table["partial_year"], "year"].unique())
+    print(f"\nDescriptive only, no test. The missing names are mostly acquired or bankrupt companies and are absent from "
+          f"both the strategy and its benchmark, so survivorship affects the levels and the differences alike; neither "
+          f"is an unbiased estimate. The {len(table)} yearly intervals, on 8 to 12 months, are wide and are not part of "
+          f"any test family. Partial years: {partial}.")
+
+
+# ---------------------------------------------------------------------------
 # Run
 # ---------------------------------------------------------------------------
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--dry-run", action="store_true", help="run every check and print everything, write nothing")
-    if not parser.parse_args().dry_run:
-        raise SystemExit("Only --dry-run is available. The survivorship part is not built yet, and all eight files "
-                         "are written in one run. Nothing written.")
+    parser.add_argument("--survivorship-only", action="store_true",
+                        help="with --dry-run: build and print only the survivorship-by-year table and its checks")
+    args = parser.parse_args()
+    if not args.dry_run:
+        raise SystemExit("Only --dry-run is available. All eight files are written in one run, which is a later step "
+                         "with its own plan. Nothing written.")
 
     outputs = skip_month_outputs()
     stop_if_outputs_exist(outputs.values())
@@ -388,6 +480,13 @@ def main():
     stop_on_failures("Registered 24-name list", registered_list_failures(path["jumps"]))
 
     returns = calculate_monthly_returns(prices)
+    if args.survivorship_only:
+        table, saved_diagnostic = build_survivorship_by_year(path, prices, returns)
+        print_survivorship_report(table, saved_diagnostic)
+        print(f"\nDry run, survivorship only: nothing written. The full dry run builds all eight files together.\n"
+              f"  {outputs[SURVIVORSHIP_BY_YEAR]} would have {len(table)} rows.")
+        return
+
     periods = study_periods()
     registered, saved_robust = run_reproduction_checks(path, returns, periods)
 
@@ -400,15 +499,19 @@ def main():
     portfolio_frames, portfolios, benchmarks = build_skip_month_portfolios(signals, returns, rf, registered_benchmarks,
                                                                            periods)
     frames.update(portfolio_frames)
+    frames[SURVIVORSHIP_BY_YEAR], saved_diagnostic = build_survivorship_by_year(path, prices, returns)
 
     print_report(frames, series, registered, saved_robust, periods)
     print_portfolio_report(frames, portfolios, benchmarks, registered_portfolios, registered_benchmarks, saved_summary,
                            rf, periods)
+    print_survivorship_report(frames[SURVIVORSHIP_BY_YEAR], saved_diagnostic)
 
-    print("\nDry run: nothing written. These files would be written, with mode x:")
+    print("\nDry run: nothing written. These files would be written, with mode x, in the later writing step:")
     for part in BUILT_PARTS:
         print(f"  {outputs[part]} ({len(frames[part])} rows)")
-    print("Not built yet: " + ", ".join(str(outputs[p]) for p in outputs if p not in BUILT_PARTS))
+    missing = [str(outputs[p]) for p in outputs if p not in BUILT_PARTS]
+    if missing:
+        print("Not built: " + ", ".join(missing))
 
 
 if __name__ == "__main__":
