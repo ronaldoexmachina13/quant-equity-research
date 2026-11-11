@@ -16,12 +16,12 @@
 
     <div class="hero-finding" style="margin-top:1.25rem;">
       <b class="box-label">Short answer</b>
-      Not detectably. None of the three signals can be shown to rank next-month returns better than chance, and the portfolios built on them do not reliably beat an equal-weight benchmark. The test was built so that this is a credible answer: its design was pre-specified and committed in advance, it counts every test it ran, and it states how small an effect it could have found.
+      Not detectably. None of the three signals can be shown to rank next-month returns better than chance, and the portfolios built on them do not reliably beat an equal-weight benchmark. The design was pre-specified and committed in advance, every test is counted, and the study states how small an effect it could have found.
     </div>
 
     <div class="mini-stats">
       <div class="mini-stat"><div class="ms-value" id="kTests">0 of 6</div><div class="ms-label" id="kTestsLabel">main tests find a real relationship (rank IC, three signals, two test periods). The 27 other tests ask the same question in other ways and agree</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio comparisons stood out: one Value bet, counted twice, that did worse than the benchmark</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio comparisons stood out: one Value portfolio in 2012 to 2020, counted twice (top decile and top quintile), that did worse than the benchmark</div></div>
       <div class="mini-stat"><div class="ms-value" id="kPower">0.055</div><div class="ms-label">smallest average rank IC the test could reliably detect. Smaller effects would be missed</div></div>
     </div>
   </section>
@@ -54,7 +54,7 @@
 
   <div class="section-label">Exhibit 3 <span>portfolios: do the top-ranked stocks beat the benchmark?</span></div>
   <div class="panel">
-    <h2>Only one bet stands out, and it lagged the benchmark</h2>
+    <h2>Only one portfolio stands out, and it lagged the benchmark</h2>
     <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe ratio difference intervals"></svg>
     <p class="caption">Top-decile portfolios against the equal-weight benchmark of the same stocks: difference in Sharpe ratio before costs, with a 90% paired bootstrap interval. Red marks an interval that excludes zero. Across 18 comparisons (three signals, two portfolio sizes, three periods) about two would do so by chance alone. The Portfolios page has the top-quintile versions.</p>
   </div>
@@ -64,7 +64,7 @@
     <div class="trust"><b>Pre-specified</b><p>The design and every later change are dated, append-only amendments, committed before the code that depends on them.</p></div>
     <div class="trust"><b>No look-ahead, no tuning</b><p>Signals use data to the end of the previous month, book values enter on the filing date, and nothing was varied to improve a result.</p></div>
     <div class="trust"><b>Power is stated</b><p>With 108 months the test finds only a fairly large effect. A null here means "no evidence of an effect", not "proof of none".</p></div>
-    <div class="trust"><b>It found its own errors</b><p>A split bug that flattered Value and unit errors in SEC share counts were caught, fixed and logged on the Data page.</p></div>
+    <div class="trust"><b>It found its own errors</b><p>A one-month look-ahead, a split bug that flattered Value, unit errors in SEC share counts and a mislabelled Momentum signal were all caught, fixed and logged on the Data page.</p></div>
   </div>
 
   <div class="section-label">Every test <span>the full scorecard, for readers who want the numbers</span></div>
