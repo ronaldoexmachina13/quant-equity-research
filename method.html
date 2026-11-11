@@ -19,8 +19,8 @@
   <div class="panel">
     <ol class="step-list">
       <li><div><b>Question.</b> Do simple momentum and value signals rank large US stocks by next-month return, and do portfolios built from them beat an equal-weight benchmark?</div></li>
-      <li><div><b>Signals.</b> Momentum is the return from 12 months before the trade date to the end of the previous month, with no month skipped. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied.</div></li>
-      <li><div><b>Timing.</b> A signal dated t uses data up to the end of month t-1 and is paired with the return in month t. Book value is aligned to the date each filing became public.</div></li>
+      <li><div><b>Signals.</b> Momentum is the return from 12 months before the trade date to the end of the previous month, with no month skipped. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied to improve a result. A true 12-1 version was run afterwards as a labelled sensitivity (Amendment 15) and changes no reading.</div></li>
+      <li><div><b>Timing.</b> A signal dated t uses only information available at the end of month t-1 and is held through month t. Book value is aligned to the date each filing became public.</div></li>
       <li><div><b>Primary evidence.</b> Rank IC, quintile spread and Fama-MacBeth slopes, each with a 90% bootstrap interval (5,000 resamples, seed 42). Two test periods are reported separately, 2012 to 2020 and 2021 to 2026, plus the full sample.</div></li>
       <li><div><b>Secondary evidence.</b> Top-decile and top-quintile portfolios at equal weight, rebalanced monthly, with 10 bps one-way costs charged on drift-inclusive turnover. The Sharpe difference against the benchmark is tested with a paired bootstrap using the Treasury bill rate.</div></li>
       <li><div><b>Reading rule.</b> A difference counts only if its 90% interval excludes zero, and portfolio results are read only next to the signal tests. The headline holds 18 intervals, so about two would exclude zero by chance.</div></li>
@@ -35,7 +35,7 @@
         <tbody id="regBody"></tbody>
       </table>
     </div>
-    <p class="caption">Entries are appended and never edited. There is no Amendment 4: the Phase 2 design took that slot, and the label Amendment 5 was kept as written. The full text is in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/LIMITATIONS_PLAN.md" target="_blank">LIMITATIONS_PLAN.md</a> and <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/OUT_OF_SAMPLE_PLAN.md" target="_blank">OUT_OF_SAMPLE_PLAN.md</a>. Amendments 8 to 11 came from findings during the work, not from results on the signals.</p>
+    <p class="caption">Entries are appended and never edited. There is no Amendment 4: the Phase 2 design took that slot, and the label Amendment 5 was kept as written. The full text is in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/LIMITATIONS_PLAN.md" target="_blank">LIMITATIONS_PLAN.md</a> and <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/OUT_OF_SAMPLE_PLAN.md" target="_blank">OUT_OF_SAMPLE_PLAN.md</a>. Amendments 8 to 11 came from findings during the work, not from results on the signals. Amendment 15 came from a pre-publication audit of the code and wording.</p>
   </div>
 
   <div class="section-label">3 &middot; Power <span>what the sample could have detected</span></div>
@@ -49,12 +49,13 @@
   <div class="section-label">4 &middot; Limitations</div>
   <div class="panel">
     <ol class="step-list">
-      <li><div><b>Survivorship.</b> Acquired and bankrupt companies mostly have no free price history. A delisting-aware source such as CRSP is the real fix.</div></li>
+      <li><div><b>Survivorship.</b> Acquired and bankrupt companies mostly have no free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them.</div></li>
       <li><div><b>Free data.</b> Wikipedia membership is approximate early on. Some book values rest on share counts that may carry unit errors the validity rule cannot detect. Ticker reuse is not fully detectable. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.</div></li>
       <li><div><b>Universe.</b> Large, liquid S&amp;P 500 names are the hardest place to find a factor premium.</div></li>
       <li><div><b>Signals.</b> Price-to-book is not sector-adjusted, Momentum is not volatility-scaled, and there is no quality factor.</div></li>
       <li><div><b>Costs.</b> A flat 10 bps one way, with no market impact or capacity analysis.</div></li>
       <li><div><b>Multiplicity.</b> 18 headline portfolio intervals at the 90% level, so about two would exclude zero by chance.</div></li>
+      <li><div><b>Sharpe convention.</b> The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. This was checked after the results and is not one of the registered tests.</div></li>
       <li><div><b>Inference.</b> No Fama-French controls. Newey-West and block-bootstrap intervals were added after the results (Amendment 14) and agree with the registered ones: none of the 33 signal tests excludes zero under any method.</div></li>
     </ol>
   </div>
@@ -88,7 +89,8 @@ const REG = [
   ["2026-10-31", "Amendment 11", "any Value or Combined signal test (share-count validity rule; corrections are appended to the entry)"],
   ["2026-11-01", "Amendment 12", "any Value or Combined signal test or return was computed (labelled sensitivity)"],
   ["2026-11-07", "Amendment 13", "any Stage 4 code was written or run and before any portfolio result existed"],
-  ["2026-11-07", "Amendment 14", "any code for the additions was written; exploratory and after every registered result existed (group returns, interval robustness, book value check, data manifest)"]
+  ["2026-11-07", "Amendment 14", "any code for the additions was written; exploratory and after every registered result existed (group returns, interval robustness, book value check, data manifest)"],
+  ["2026-11-11", "Amendment 15", "any code for the additions was written; exploratory and after every registered result existed (true 12-1 sensitivity, survivorship by year)"]
 ];
 document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="month-cell">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
 
