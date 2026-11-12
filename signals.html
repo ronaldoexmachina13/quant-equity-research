@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=6">
+<link rel="stylesheet" href="assets/styles.css?v=9">
 </head>
 <body>
 <div id="chrome"></div>
@@ -15,89 +15,87 @@
     <p class="lede">Do the rankings predict next-month returns? This is the primary evidence. Each signal is tested on rank IC, quintile spread and Fama-MacBeth slopes, with 90% bootstrap intervals, before any portfolio is built.</p>
   </section>
 
-  <div class="section-label">1 &middot; Signal tests <span>all signals, two test periods and the full sample</span></div>
-  <div class="panel">
-    <div class="ctrl-row"><div class="ctrl-group" id="testTabs"></div></div>
-    <svg class="forest" id="signalForest" role="img" aria-label="Signal test confidence intervals"></svg>
-    <p class="caption" id="signalCaption"></p>
-  </div>
+  <details class="panel fold" id="defs">
+    <summary>Signal definitions: construction, hypothesis and failure modes</summary>
+    <div class="def-grid" id="defGrid"></div>
+  </details>
 
-  <div class="section-label">2 &middot; Stability of the rank IC <span>is the relationship persistent or episodic?</span></div>
-  <div class="panel">
-    <h2>Cumulative rank IC <span>running sum of the monthly rank correlation</span></h2>
-    <div class="legend-row">
-      <span><i style="background:var(--momentum)"></i>Momentum</span>
-      <span><i style="background:var(--value)"></i>Value</span>
-      <span><i style="background:var(--combined)"></i>Combined</span>
+  <div class="tabbar" id="pageTabs" role="tablist"></div>
+
+  <!-- Tab 1 -->
+  <div class="tabpane" id="pane-predictive">
+    <div class="panel">
+      <h2 id="forestTitle">Predictive power</h2>
+      <div class="ctrl-row"><div class="ctrl-group" id="testTabs"></div></div>
+      <svg class="forest" id="signalForest" role="img" aria-label="Signal test confidence intervals"></svg>
+      <p class="caption" id="signalCaption"></p>
     </div>
-    <div style="position:relative; height:260px;"><canvas id="icChart"></canvas></div>
-    <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
-  </div>
 
-  <div class="panel">
-    <h2>Rolling 36-month mean rank IC</h2>
-    <div class="legend-row">
-      <span><i style="background:var(--momentum)"></i>Momentum</span>
-      <span><i style="background:var(--value)"></i>Value</span>
-      <span><i style="background:var(--combined)"></i>Combined</span>
+    <div class="panel">
+      <h2>Return by group <span>does return rise step by step with the signal? annualised, equal-weighted</span></h2>
+      <div class="legend-row"><span><i class="ghost-solid"></i>2012 to 2020, new test</span><span><i class="ghost-light"></i>2021 to 2026, re-test</span></div>
+      <div class="grp-grid">
+        <div><div class="grp-title"><b style="color:var(--momentum)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum"></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--value)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue"></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--combined)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined"></canvas></div></div>
+      </div>
+      <p class="caption">Mean return of each fifth of stocks, ranked on the signal at the start of the month. Group 5 minus group 1 is the quintile spread, shown above each chart with its 90% interval for the 2012 to 2020 test. A working signal rises from left to right. Five bars are descriptive only; the spread and its interval are the test.</p>
     </div>
-    <div style="position:relative; height:240px;"><canvas id="icRollChart"></canvas></div>
-    <p class="caption" id="icRollCaption"></p>
   </div>
 
-  <div class="panel">
-    <h2>Rank IC statistics <span>monthly, by period</span></h2>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table perf-table">
-        <thead><tr><th>Period</th><th class="num">Months</th><th class="num">Mean IC</th><th class="num">SD</th><th class="num">Mean / SD</th><th class="num">Hit rate</th></tr></thead>
-        <tbody id="icStatBody"></tbody>
-      </table>
+  <!-- Tab 2 -->
+  <div class="tabpane" id="pane-stability" hidden>
+    <div class="panel">
+      <h2>Cumulative rank IC <span>running sum of the monthly rank correlation</span></h2>
+      <div class="legend-row">
+        <span><i style="background:var(--momentum)"></i>Momentum</span>
+        <span><i style="background:var(--value)"></i>Value</span>
+        <span><i style="background:var(--combined)"></i>Combined</span>
+      </div>
+      <div style="position:relative; height:260px;"><canvas id="icChart"></canvas></div>
+      <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
     </div>
-    <p class="caption">Mean / SD is the monthly information ratio of the signal. Hit rate is the share of months with a positive IC. A mean IC of 0.03 with an SD of 0.23 has a ratio of about 0.13 and would not be separable from zero in 108 months.</p>
-  </div>
 
-  <div class="section-label">3 &middot; Signal profile <span>construction, full test table and sensitivity, one signal at a time</span></div>
-  <div id="profileCtx"></div>
-
-  <div class="panel">
-    <h2 id="defTitle">Construction</h2>
-    <div class="definition-body" id="defBody"></div>
-  </div>
-
-  <div class="panel">
-    <h2 id="testsTitle">Signal tests</h2>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table perf-table">
-        <thead><tr><th>Test</th><th>Period</th><th class="num">Mean</th><th class="num">90% interval</th><th class="num">Excludes zero</th></tr></thead>
-        <tbody id="testBody"></tbody>
-      </table>
+    <div class="panel">
+      <h2>Rolling 36-month mean rank IC</h2>
+      <div class="legend-row">
+        <span><i style="background:var(--momentum)"></i>Momentum</span>
+        <span><i style="background:var(--value)"></i>Value</span>
+        <span><i style="background:var(--combined)"></i>Combined</span>
+      </div>
+      <div style="position:relative; height:240px;"><canvas id="icRollChart"></canvas></div>
+      <p class="caption" id="icRollCaption"></p>
     </div>
-    <p class="caption">Rank IC is the monthly Spearman correlation between the signal and the next month's return. The quintile spread is the top fifth minus the bottom fifth. Fama-MacBeth is the average slope of monthly cross-sectional regressions (joint: Momentum and Value together). A ringed marker and an asterisk mark an interval that excludes zero.</p>
-  </div>
 
-  <div class="panel">
-    <h2 id="quintTitle">Return by group <span>does the return rise step by step with the signal?</span></h2>
-    <div class="legend-row" id="quintLegend"></div>
-    <div style="position:relative; height:240px;"><canvas id="quintChart"></canvas></div>
-    <p class="caption" id="quintCaption"></p>
-  </div>
-
-  <div class="panel">
-    <h2 id="robustTitle">Interval robustness <span>do the conclusions survive months that are not independent?</span></h2>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table perf-table">
-        <thead><tr><th>Test</th><th>Period</th><th class="num">Mean</th><th class="num">Registered 90%</th><th class="num">Newey-West 90%</th><th class="num">Block bootstrap 90%</th><th class="num">Lag-1 autocorr.</th></tr></thead>
-        <tbody id="robustBody"></tbody>
-      </table>
+    <div class="panel">
+      <h2>Rank IC statistics <span>monthly, by period</span></h2>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table perf-table">
+          <thead><tr><th>Period</th><th class="num">Months</th><th class="num">Mean IC</th><th class="num">SD</th><th class="num">Mean / SD</th><th class="num">Hit rate</th></tr></thead>
+          <tbody id="icStatBody"></tbody>
+        </table>
+      </div>
+      <p class="caption">Mean / SD is the monthly information ratio of the signal. Hit rate is the share of months with a positive IC. A mean IC of 0.03 with an SD of 0.23 has a ratio of about 0.13 and would not be separable from zero in 108 months.</p>
     </div>
-    <p class="caption" id="robustCaption"></p>
   </div>
 
-  <div class="panel">
-    <h2 id="sensTitle">Sensitivity <span>same tests, different treatments of the book-value data</span></h2>
-    <div class="ctrl-row"><div class="ctrl-group" id="sensTabs"></div></div>
-    <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
-    <p class="caption" id="sensCaption"></p>
+  <!-- Tab 3 -->
+  <div class="tabpane" id="pane-robustness" hidden>
+    <div id="profileCtx"></div>
+
+    <div class="panel">
+      <h2 id="robustTitle">Interval method</h2>
+      <div class="ctrl-row"><div class="ctrl-group" id="robTabs"></div></div>
+      <svg class="forest" id="robustForest" role="img" aria-label="Intervals under three methods"></svg>
+      <p class="caption" id="robustCaption"></p>
+    </div>
+
+    <div class="panel">
+      <h2 id="sensTitle">Book-value treatment</h2>
+      <div class="ctrl-row"><div class="ctrl-group" id="sensTabs"></div></div>
+      <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
+      <p class="caption" id="sensCaption"></p>
+    </div>
   </div>
 
   <div id="foot"></div>
@@ -113,9 +111,29 @@
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;
 const X = UNIVERSE_EXTRAS;
-let quintChart = null;
+const mde = minDetectableIC();
 
-/* 1. signal tests */
+/* definitions, all three signals side by side */
+document.getElementById("defGrid").innerHTML = SIGNALS.map(s =>
+  `<div><h3 style="color:${COLORS[s]}">${s}</h3><div class="definition-body">${DEFINITIONS[s].body}</div></div>`).join("");
+
+/* tabs, with the active tab kept in the URL hash so a view can be linked */
+const PAGE_TABS = [
+  { key: "predictive", label: "Predictive power" },
+  { key: "stability", label: "Stability" },
+  { key: "robustness", label: "Robustness" }
+];
+function showTab(key, fromClick) {
+  if (!PAGE_TABS.some(t => t.key === key)) key = PAGE_TABS[0].key;
+  PAGE_TABS.forEach(t => { document.getElementById("pane-" + t.key).hidden = t.key !== key; });
+  document.getElementById("pageTabs").innerHTML = PAGE_TABS.map(t =>
+    `<button role="tab" class="tab${t.key === key ? " active" : ""}" data-k="${t.key}" aria-selected="${t.key === key}">${t.label}</button>`).join("");
+  document.querySelectorAll("#pageTabs .tab").forEach(b => b.onclick = () => showTab(b.dataset.k, true));
+  if (fromClick) { try { history.replaceState(null, "", "#" + key); } catch (e) { /* ignore */ } }
+  Object.values(Chart.instances).forEach(c => c.resize());
+}
+
+/* 1a. signal tests */
 let testKey = "rank_ic";
 function drawSignalForest() {
   const t = TESTS.find(x => x.key === testKey);
@@ -124,13 +142,37 @@ function drawSignalForest() {
     const r = U.signalTests.find(x => x.test === testKey && x.signal === sig && x.period === p.key);
     if (r) rows.push({ label: sig + " · " + p.label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, color: sig, group: sig, excl: r.excludes_zero });
   }));
-  forest("signalForest", rows, t.fmt);
-  document.getElementById("signalCaption").textContent = t.text;
+  const n = rows.filter(r => r.excl).length;
+  document.getElementById("forestTitle").textContent = t.label + ": " + (n === 0 ? "no interval excludes zero" : n + " of " + rows.length + " intervals exclude zero");
+  const band = testKey === "rank_ic" ? { half: mde, label: "EFFECTS INSIDE THE BAND WOULD LIKELY BE MISSED (±" + mde.toFixed(3) + ", 2012–2020 TEST)", short: "LIKELY MISSED: ±" + mde.toFixed(3) } : null;
+  forest("signalForest", rows, t.fmt, null, band);
+  document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".");
 }
 buttons("testTabs", TESTS, testKey, k => { testKey = k; drawSignalForest(); });
 drawSignalForest();
 
-/* 2. IC stability */
+/* 1b. return by group, three small multiples */
+(function groups() {
+  SIGNALS.forEach(sig => {
+    const sets = PERIODS.slice(0, 2).map((p, i) => ({
+      label: p.label, backgroundColor: COLORS[sig] + (i === 0 ? "FF" : "66"), maxBarThickness: 26,
+      data: [1, 2, 3, 4, 5].map(q => { const r = X.quintiles.find(x => x.signal === sig && x.period === p.key && x.quintile === q); return r ? r.mean_annualised : null; })
+    }));
+    const sp = U.signalTests.find(t => t.test === "quintile_spread" && t.signal === sig && t.period === PERIODS[0].key);
+    document.getElementById("qs" + sig).textContent = "group 5 minus 1: " + spct(sp.mean, 2) + " a month [" + spct(sp.ci_90_lower, 2) + ", " + spct(sp.ci_90_upper, 2) + "]" + (sp.excludes_zero ? " *" : "");
+    new Chart(document.getElementById("q" + sig), {
+      type: "bar",
+      data: { labels: ["1 low", "2", "3", "4", "5 high"], datasets: sets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + spct(i.parsed.y, 1) + " a year" } } },
+        scales: { y: { ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 6 } }, x: { grid: { display: false } } }
+      }
+    });
+  });
+})();
+
+/* 2. stability */
 (function cumulativeIc() {
   const sets = SIGNALS.map(sig => {
     let c = 0;
@@ -148,7 +190,30 @@ drawSignalForest();
 })();
 icStatisticsTable("icStatBody");
 
-/* 3. signal profile */
+/* 3a. interval method */
+let robKey = "rank_ic";
+function drawRobust() {
+  const t = TESTS.find(x => x.key === robKey);
+  document.getElementById("robustTitle").innerHTML = "Interval method <span>" + SEL.sig + ": does the reading change if months are not independent?</span>";
+  const rows = [];
+  PERIODS.forEach(p => {
+    const r = X.robustness.find(x => x.test === robKey && x.signal === SEL.sig && x.period === p.key);
+    if (!r) return;
+    [["Registered", r.iid_ci_90_lower, r.iid_ci_90_upper, r.iid_excludes_zero], ["Newey-West", r.nw_ci_90_lower, r.nw_ci_90_upper, r.nw_excludes_zero], ["Block bootstrap", r.block_ci_90_lower, r.block_ci_90_upper, r.block_excludes_zero]]
+      .forEach(m => rows.push({ label: p.label + " · " + m[0], mean: r.mean, lo: m[1], hi: m[2], color: SEL.sig, group: p.key, excl: m[3] }));
+  });
+  forest("robustForest", rows, t.fmt);
+  const all = X.robustness, total = all.length;
+  const excl = all.filter(r => r.iid_excludes_zero).length;
+  const robust = all.filter(r => r.iid_excludes_zero && r.nw_excludes_zero && r.block_excludes_zero).length;
+  document.getElementById("robustCaption").textContent =
+    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. The point estimate is the same in each row. A ringed marker and an asterisk mark an interval that excludes zero. " +
+    (excl === 0 ? "Across all " + total + " signal tests, no interval excludes zero under any of the three methods." :
+      "Across all " + total + " signal tests, the registered interval excludes zero in " + excl + " and all three intervals do in " + robust + ".");
+}
+buttons("robTabs", TESTS.filter(t => X.robustness.some(r => r.test === t.key)), robKey, k => { robKey = k; drawRobust(); });
+
+/* 3b. book-value treatment */
 let sensKey = "rank_ic";
 const SENS_VARIANTS = {
   Headline: { label: "Headline", tests: () => U.signalTests, sum: () => U.summary },
@@ -163,75 +228,8 @@ const SENS_METRICS = [
   { key: "top_decile", label: "Sharpe diff, top decile", kind: "sum", fmt: { axis: v => v.toFixed(1), val: v => sgn(v, 2) } },
   { key: "top_quintile", label: "Sharpe diff, top quintile", kind: "sum", fmt: { axis: v => v.toFixed(1), val: v => sgn(v, 2) } }
 ];
-function drawDefinition() {
-  document.getElementById("defTitle").innerHTML = SEL.sig + " <span>construction, hypothesis and failure modes</span>";
-  document.getElementById("defBody").innerHTML = DEFINITIONS[SEL.sig].body;
-}
-function drawTests() {
-  document.getElementById("testsTitle").innerHTML = "Signal tests <span>" + SEL.sig + "</span>";
-  const body = document.getElementById("testBody");
-  body.innerHTML = "";
-  TESTS.forEach(t => PERIODS.forEach(p => {
-    const r = U.signalTests.find(x => x.test === t.key && x.signal === SEL.sig && x.period === p.key);
-    if (!r) return;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${t.label}</td><td>${p.label}</td><td class="num">${t.fmt.val(r.mean)}</td><td class="num">${flagText(`[${t.fmt.val(r.ci_90_lower)}, ${t.fmt.val(r.ci_90_upper)}]`, r.excludes_zero)}</td><td class="num">${r.excludes_zero ? '<span class="neg">yes</span>' : "no"}</td>`;
-    body.appendChild(tr);
-  }));
-}
-function drawRobust() {
-  document.getElementById("robustTitle").innerHTML = "Interval robustness <span>" + SEL.sig + ": do the conclusions survive months that are not independent?</span>";
-  const body = document.getElementById("robustBody");
-  body.innerHTML = "";
-  let rows = 0, autoSum = 0, flipped = 0;
-  TESTS.forEach(t => PERIODS.forEach(p => {
-    const r = X.robustness.find(x => x.test === t.key && x.signal === SEL.sig && x.period === p.key);
-    if (!r) return;
-    rows++; autoSum += r.autocorrelation_lag1;
-    if (r.iid_excludes_zero && !(r.nw_excludes_zero && r.block_excludes_zero)) flipped++;
-    const iv = (lo, hi, ex) => flagText(`[${t.fmt.val(lo)}, ${t.fmt.val(hi)}]`, ex);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${t.label}</td><td>${p.label}</td><td class="num">${t.fmt.val(r.mean)}</td>` +
-      `<td class="num">${iv(r.iid_ci_90_lower, r.iid_ci_90_upper, r.iid_excludes_zero)}</td>` +
-      `<td class="num">${iv(r.nw_ci_90_lower, r.nw_ci_90_upper, r.nw_excludes_zero)}</td>` +
-      `<td class="num">${iv(r.block_ci_90_lower, r.block_ci_90_upper, r.block_excludes_zero)}</td>` +
-      `<td class="num">${sgn(r.autocorrelation_lag1, 2)}</td>`;
-    body.appendChild(tr);
-  }));
-  const all = X.robustness, total = all.length;
-  const excl = all.filter(r => r.iid_excludes_zero).length;
-  const robust = all.filter(r => r.iid_excludes_zero && r.nw_excludes_zero && r.block_excludes_zero).length;
-  document.getElementById("robustCaption").textContent =
-    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. A ringed marker and an asterisk mark an interval that excludes zero. " +
-    (excl === 0 ? "Across all " + total + " signal tests, no interval excludes zero under any of the three methods. " :
-      "Across all " + total + " signal tests, the registered interval excludes zero in " + excl + " and all three intervals do in " + robust + ". ") +
-    (rows ? "For " + SEL.sig + ", " + (flipped ? flipped + " of the registered exclusions do not hold under both new intervals." : "the new intervals change no reading.") : "");
-}
-function drawQuintiles() {
-  document.getElementById("quintTitle").innerHTML = "Return by group <span>" + SEL.sig + ": does the return rise step by step with the signal?</span>";
-  const shades = ["55", "AA", "FF"];
-  const sets = PERIODS.map((p, i) => ({
-    label: p.label,
-    data: [1, 2, 3, 4, 5].map(q => { const r = X.quintiles.find(x => x.signal === SEL.sig && x.period === p.key && x.quintile === q); return r ? r.mean_annualised : null; }),
-    backgroundColor: COLORS[SEL.sig] + shades[i], borderColor: COLORS[SEL.sig], borderWidth: 1
-  }));
-  if (quintChart) quintChart.destroy();
-  quintChart = new Chart(document.getElementById("quintChart"), {
-    type: "bar",
-    data: { labels: ["1 (lowest)", "2", "3", "4", "5 (highest)"], datasets: sets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + spct(i.parsed.y, 1) } } },
-      scales: { y: { ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 7 } }, x: { grid: { display: false } } }
-    }
-  });
-  document.getElementById("quintLegend").innerHTML = PERIODS.map((p, i) => `<span><i style="background:${COLORS[SEL.sig]}${shades[i]}"></i>${p.label}</span>`).join("");
-  const mono = PERIODS.map(p => { const r = X.quintiles.find(x => x.signal === SEL.sig && x.period === p.key && x.quintile === 1); return p.label + ": " + (r ? r.monotonicity.toFixed(2) : "n/a"); }).join(", ");
-  document.getElementById("quintCaption").textContent =
-    "Annualised mean return (monthly mean times 12) of each fifth of stocks, ranked on the signal at the start of the month, equal-weighted. Group 5 minus group 1 is the quintile spread. Monotonicity is the rank correlation between group number and return, from -1 to 1 (" + mono + "). It rests on five points, so it is descriptive only and has no significance of its own. A working signal rises from left to right; a single large bar at one end is not the same as a trend.";
-}
 function drawSens() {
-  document.getElementById("sensTitle").innerHTML = "Sensitivity <span>" + SEL.sig + ": same tests, different treatments of the book-value data</span>";
+  document.getElementById("sensTitle").innerHTML = "Book-value treatment <span>" + SEL.sig + ": same tests, different handling of the book-value data</span>";
   const m = SENS_METRICS.find(x => x.key === sensKey);
   const variants = SEL.sig === "Momentum" ? ["Headline"] : ["Headline", "Winsorised", "Excl24", "Excl37"];
   const rows = [];
@@ -257,8 +255,10 @@ function drawSens() {
   document.getElementById("sensCaption").textContent = notes.join(" ");
 }
 buttons("sensTabs", SENS_METRICS.map(m => ({ key: m.key, label: m.label })), sensKey, k => { sensKey = k; drawSens(); });
-contextStrip("profileCtx", ["sig"], () => { drawDefinition(); drawTests(); drawRobust(); drawQuintiles(); drawSens(); }, false);
-drawDefinition(); drawTests(); drawRobust(); drawQuintiles(); drawSens();
+contextStrip("profileCtx", ["sig"], () => { drawRobust(); drawSens(); }, false);
+drawRobust(); drawSens();
+
+showTab((location.hash || "").slice(1), false);
 </script>
 </body>
 </html>
