@@ -24,6 +24,7 @@ STOCKS_OUT = Path("assets/universe_stocks_data.js")
 HOLDINGS_OUT = Path("assets/universe_holdings_data.js")
 EXTRAS_OUT = Path("assets/universe_extras_data.js")
 CONTROLS_OUT = Path("assets/universe_controls_data.js")
+FACTOR4_OUT = Path("assets/universe_factor4_data.js")
 
 
 def clean(value):
@@ -280,6 +281,20 @@ def write_controls():
     write_js(CONTROLS_OUT, "UNIVERSE_CONTROLS", data, "the alpha, French and sector-neutral files in results/")
 
 
+def write_factor4():
+    source = RESULTS / "universe_study_alpha_factor4.csv"
+    if FACTOR4_OUT.exists():
+        print(f"{FACTOR4_OUT} already exists, left unchanged.")
+        return
+    if not source.exists():
+        print(f"{source} is missing; run run_universe_alpha_factor4.py first. Skipping {FACTOR4_OUT}.")
+        return
+    keys = ["variant", "period", "strategy", "size", "basis", "months", "lags", "alpha_annual", "alpha_annual_ci_90_lower",
+            "alpha_annual_ci_90_upper", "alpha_t", "r_squared", "alpha_excludes_zero", "beta_Mkt-RF", "beta_Mkt-RF_se",
+            "beta_SMB", "beta_SMB_se", "beta_HML", "beta_HML_se", "beta_Mom", "beta_Mom_se"]
+    write_js(FACTOR4_OUT, "UNIVERSE_FACTOR4", sens_rows(source, keys), "results/universe_study_alpha_factor4.csv")
+
+
 def main():
     write_main()
     write_sens()
@@ -287,6 +302,7 @@ def main():
     write_holdings()
     write_extras()
     write_controls()
+    write_factor4()
 
 
 if __name__ == "__main__":

@@ -61,6 +61,44 @@ def regress_on_benchmark(excess: pd.Series, benchmark_excess: pd.Series, lags: i
             "beta": float(coef[1]), "beta_se": float(se[1]), "r_squared": float(r_squared)}
 
 
+def regress_on_factors(excess: pd.Series, factors: pd.DataFrame, lags: int | None = None, ci: float = 0.90) -> dict:
+    """
+    OLS of a monthly excess return on several factor columns (Amendment 18):
+    excess_t = alpha + sum_k beta_k * factor_k,t + error_t. The standard errors are Newey-West exactly as in
+    regress_on_benchmark (Bartlett kernel, no small-sample correction, lags from newey_west_lags(n) unless given).
+    Only months present in the return and in every factor are used. The result holds alpha with its
+    interval and, for each factor, its loading and standard error.
+    """
+    both = pd.concat([excess.rename("__y__"), factors], axis=1).dropna()
+    n = len(both)
+    k = factors.shape[1]
+    if n < 10 + k:
+        raise ValueError(f"only {n} common months; at least {10 + k} are needed")
+    y = both["__y__"].to_numpy(dtype=float)
+    X = np.column_stack([np.ones(n), both[list(factors.columns)].to_numpy(dtype=float)])
+    lags = newey_west_lags(n) if lags is None else lags
+    xtx_inv = np.linalg.inv(X.T @ X)
+    coef = xtx_inv @ X.T @ y
+    residual = y - X @ coef
+    scores = X * residual[:, None]
+    S = scores.T @ scores
+    for j in range(1, min(lags, n - 1) + 1):
+        weight = 1 - j / (lags + 1)
+        gamma = scores[j:].T @ scores[:-j]
+        S += weight * (gamma + gamma.T)
+    se = np.sqrt(np.diag(xtx_inv @ S @ xtx_inv))
+    z = float(norm.ppf((1 + ci) / 2))
+    total = ((y - y.mean()) ** 2).sum()
+    out = {"months": n, "lags": lags, "alpha": float(coef[0]), "alpha_se": float(se[0]),
+           "alpha_t": float(coef[0] / se[0]) if se[0] > 0 else float("nan"),
+           "alpha_lower": float(coef[0] - z * se[0]), "alpha_upper": float(coef[0] + z * se[0]),
+           "r_squared": float(1 - (residual ** 2).sum() / total) if total > 0 else float("nan")}
+    for i, name in enumerate(factors.columns, start=1):
+        out[f"beta_{name}"] = float(coef[i])
+        out[f"beta_{name}_se"] = float(se[i])
+    return out
+
+
 def annualise_alpha(alpha_monthly: float) -> float:
     """Monthly alpha times 12. A simple scaling, not compounding, as the regression is in monthly arithmetic returns."""
     return alpha_monthly * MONTHS_PER_YEAR

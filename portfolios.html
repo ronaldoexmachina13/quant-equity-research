@@ -125,6 +125,14 @@
     <p class="caption" id="alphaCaption"></p>
   </div>
 
+  <div class="panel" data-stamp="exploratory">
+    <h2>Alpha after four published factors <span>Amendment 18: market, size, value and momentum</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="f4Variant"></div></div>
+    <svg class="forest" id="f4Forest" role="img" aria-label="Four-factor alpha intervals"></svg>
+    <div class="timeline-table-wrap" style="max-height:none;"><table class="timeline-table perf-table" id="f4Table"></table></div>
+    <p class="caption" id="f4Caption"></p>
+  </div>
+
   <div class="panel" data-stamp="descriptive">
     <h2>Who is left out of the sector-neutral version</h2>
     <p class="caption" id="universeCaption"></p>
@@ -137,6 +145,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_controls_data.js"></script>
+<script src="assets/universe_factor4_data.js"></script>
 <script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
@@ -320,9 +329,38 @@ function drawUniverse() {
     (excl === 0 ? "None of the " + total + " new signal tests excludes zero." : excl + " of the " + total + " new signal tests exclude zero under the registered interval.");
 }
 buttons("ctlSig", ["Value", "Combined"].map(k => ({ key: k, label: k })), ctlSig, k => { ctlSig = k; drawSector(); });
-buttons("ctlSize", Object.keys(SIZE_LABEL).map(k => ({ key: k, label: SIZE_LABEL[k] })), ctlSize, k => { ctlSize = k; drawSector(); drawAlpha(); });
+buttons("ctlSize", Object.keys(SIZE_LABEL).map(k => ({ key: k, label: SIZE_LABEL[k] })), ctlSize, k => { ctlSize = k; drawSector(); drawAlpha(); drawFactor4(); });
 buttons("ctlBench", [{ key: "matched", label: "Matched benchmark" }, { key: "spy", label: "SPY" }], alphaBench, k => { alphaBench = k; drawAlpha(); });
-drawSector(); drawAlpha(); drawUniverse();
+let f4Variant = "published";
+const F4_LABEL = { published: "Published", control_same_names: "Same names", sector_neutral: "Sector-neutral" };
+function drawFactor4() {
+  const F = UNIVERSE_FACTOR4;
+  const sigs = f4Variant === "published" ? SIGNALS : ["Value", "Combined"];
+  const pick = (s, p) => F.find(x => x.variant === f4Variant && x.strategy === s && x.size === ctlSize && x.basis === "gross" && x.period === p);
+  const rows = [];
+  sigs.forEach(s => PERIODS.forEach(p => {
+    const r = pick(s, p.key);
+    if (r) rows.push({ label: s + " \u00b7 " + p.label, mean: r.alpha_annual, lo: r.alpha_annual_ci_90_lower, hi: r.alpha_annual_ci_90_upper, color: s, group: s, excl: r.alpha_excludes_zero });
+  }));
+  forest("f4Forest", rows, { axis: v => (v * 100).toFixed(0) + "%", val: v => spct(v, 1) }, [Math.min(0, ...rows.map(r => r.lo)), Math.max(0, ...rows.map(r => r.hi))]);
+  const full = PERIODS[2].key;
+  let t = "<thead><tr><th>Full period</th><th class=num>Alpha</th><th class=num>Market</th><th class=num>Size</th><th class=num>Value</th><th class=num>Momentum</th><th class=num>R\u00b2</th></tr></thead><tbody>";
+  sigs.forEach(s => {
+    const r = pick(s, full);
+    if (r) t += `<tr><td style="color:${COLORS[s]}">${s}</td><td class="num">${spct(r.alpha_annual, 1)}</td><td class="num">${r["beta_Mkt-RF"].toFixed(2)}</td><td class="num">${sgn(r.beta_SMB, 2)}</td><td class="num">${sgn(r.beta_HML, 2)}</td><td class="num">${sgn(r.beta_Mom, 2)}</td><td class="num">${r.r_squared.toFixed(2)}</td></tr>`;
+  });
+  document.getElementById("f4Table").innerHTML = t + "</tbody>";
+  const mine = F.filter(x => x.variant === f4Variant && x.size === ctlSize && x.basis === "gross");
+  const nEx = mine.filter(x => x.alpha_excludes_zero).length;
+  const all = F.length, allEx = F.filter(x => x.alpha_excludes_zero).length;
+  document.getElementById("f4Caption").innerHTML =
+    "<b>" + F4_LABEL[f4Variant] + ", " + SIZE_LABEL[ctlSize].toLowerCase() + ":</b> " + nEx + " of " + mine.length + " alpha intervals here exclude zero. Alpha is the intercept of the portfolio's excess return over Treasury bills on Kenneth French's market, size (SMB), value (HML) and momentum (Mom) factors, times 12, with Newey-West 90% intervals, before costs. " +
+    "The columns are the loadings: how much of each factor the portfolio carried. Loadings are descriptive. French's factors use all US stocks, this study about 500 index members, so they show similarity, not an exact decomposition. " +
+    "Across all " + all + " four-factor regressions (every variant, size, basis and period, which overlap heavily), " + allEx + " intervals exclude zero, against about " + (all * 0.1).toFixed(0) + " expected by chance at the 90% level if they were independent. " +
+    "They join the family of tests, as exploratory, and a single interval that excludes zero is not read on its own. Added after the results (Amendment 18).";
+}
+buttons("f4Variant", Object.keys(F4_LABEL).map(k => ({ key: k, label: F4_LABEL[k] })), f4Variant, k => { f4Variant = k; drawFactor4(); });
+drawSector(); drawAlpha(); drawFactor4(); drawUniverse();
 const PAGE_TABS = [
   { key: "perf", label: "Performance" },
   { key: "risk", label: "Drawdown and rolling excess" },

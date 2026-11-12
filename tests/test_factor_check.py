@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.factor_check import annualise_alpha, correlation_with_reference, read_french, regress_on_benchmark
+from src.factor_check import (annualise_alpha, correlation_with_reference, read_french, regress_on_benchmark,
+                              regress_on_factors)
 
 
 def _months(n):
@@ -70,3 +71,42 @@ def test_read_french_converts_percent_and_month_end(tmp_path):
     assert list(frame.index) == [pd.Timestamp("2012-01-31"), pd.Timestamp("2012-02-29")]
     assert frame.loc["2012-01-31", "a"] == pytest.approx(0.015)
     assert frame.loc["2012-02-29", "b"] == pytest.approx(0.0025)
+
+
+def _factors(n, seed=3):
+    rng = np.random.default_rng(seed)
+    return pd.DataFrame(rng.normal(0.005, 0.04, (n, 4)), index=_months(n), columns=["Mkt-RF", "SMB", "HML", "Mom"])
+
+
+def test_factor_regression_recovers_exact_coefficients():
+    f = _factors(60)
+    y = 0.003 + 1.1 * f["Mkt-RF"] - 0.4 * f["SMB"] + 0.7 * f["HML"] + 0.2 * f["Mom"]
+    out = regress_on_factors(y, f)
+    assert out["alpha"] == pytest.approx(0.003, abs=1e-12)
+    assert out["beta_Mkt-RF"] == pytest.approx(1.1, abs=1e-10)
+    assert out["beta_SMB"] == pytest.approx(-0.4, abs=1e-10)
+    assert out["beta_HML"] == pytest.approx(0.7, abs=1e-10)
+    assert out["beta_Mom"] == pytest.approx(0.2, abs=1e-10)
+    assert out["r_squared"] == pytest.approx(1.0)
+
+
+def test_factor_regression_matches_statsmodels_hac():
+    sm = pytest.importorskip("statsmodels.api")
+    f = _factors(90, seed=5)
+    rng = np.random.default_rng(6)
+    y = 0.001 + 0.9 * f["Mkt-RF"] + 0.3 * f["HML"] + pd.Series(rng.normal(0, 0.02, 90), index=f.index)
+    ours = regress_on_factors(y, f, lags=4)
+    fit = sm.OLS(y.values, sm.add_constant(f.values)).fit(cov_type="HAC", cov_kwds={"maxlags": 4, "use_correction": False})
+    assert ours["alpha"] == pytest.approx(fit.params[0], abs=1e-12)
+    assert ours["alpha_se"] == pytest.approx(fit.bse[0], rel=1e-9)
+    for i, name in enumerate(f.columns, start=1):
+        assert ours[f"beta_{name}"] == pytest.approx(fit.params[i], abs=1e-12)
+        assert ours[f"beta_{name}_se"] == pytest.approx(fit.bse[i], rel=1e-9)
+
+
+def test_factor_regression_uses_only_common_months_and_needs_enough():
+    f = _factors(40)
+    y = (0.001 + f["Mkt-RF"]).iloc[5:]
+    assert regress_on_factors(y, f)["months"] == 35
+    with pytest.raises(ValueError):
+        regress_on_factors(y.iloc[:12], f)

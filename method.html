@@ -112,7 +112,7 @@ const CONCERNS = {
   A8: "Split-consistent book value", A9: "Restated Value result", A10: "Book value, share count and split code", A11: "Share-count validity rule",
   A12: "Labelled Value sensitivity", A13: "Stage 4 portfolio tests",
   A14: "Group returns, interval robustness, book value check, data manifest", A15: "True 12-1 sensitivity, survivorship by year",
-  A16: "Benchmark regression, French factor check", A17: "Sector-neutral Value, same-names control"
+  A16: "Benchmark regression, French factor check", A17: "Sector-neutral Value, same-names control", A18: "Four-factor alpha regression"
 };
 const LOG = OS_ENTRIES.concat(META.entries.map(e => {
   if (!(e.id in CONCERNS)) console.warn("No CONCERNS text for " + e.id);
