@@ -396,3 +396,47 @@ details.fold > summary::-webkit-details-marker { display: none; }
   .tape-row .t-x { grid-column: 1 / -1; }
   footer .facts { flex-direction: column; }
 }
+
+/* evidence matrix, relative chart, spec and limits blocks (Findings page) */
+.matrix-wrap { overflow-x: auto; margin: 0 -0.25rem; }
+.matrix { width: 100%; border-collapse: collapse; min-width: 860px; font-size: 0.82rem; }
+.matrix th { text-align: left; font-family: var(--mono); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--line-strong); }
+.matrix th small { display: block; color: var(--dim); letter-spacing: 0.06em; }
+.matrix td { padding: 0.45rem 0.7rem; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.matrix tr.first td { border-top: 1px solid var(--line); }
+.matrix .sig-name { white-space: nowrap; width: 7rem; }
+.matrix tr:not(.first) .sig-name > * { visibility: hidden; }
+.matrix .per { font-family: var(--mono); color: var(--muted); white-space: nowrap; }
+.matrix .per small { color: var(--dim); }
+.matrix .sec { background: rgba(255,255,255,0.015); }
+.matrix .glyph { display: block; margin-bottom: 0.15rem; }
+.matrix .cv { font-family: var(--mono); font-size: 0.78rem; color: var(--text-strong); font-variant-numeric: tabular-nums; }
+.matrix .cv small { color: var(--muted); margin-left: 0.5rem; font-size: 0.68rem; }
+.matrix td.flagged .cv { font-weight: 600; }
+.rel-canvas { position: relative; height: 320px; }
+.spec dl { display: grid; grid-template-columns: 9rem 1fr; gap: 0.55rem 1.25rem; margin: 0; font-size: 0.85rem; }
+.spec dt { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-top: 0.15rem; }
+.spec dd { margin: 0; color: var(--text); line-height: 1.55; }
+.notshow ul { margin: 0; padding-left: 1.1rem; font-size: 0.88rem; line-height: 1.6; }
+.notshow li { margin: 0.35rem 0; }
+@media (max-width: 600px) {
+  .spec dl { grid-template-columns: 1fr; gap: 0.1rem; }
+  .spec dd { margin-bottom: 0.5rem; }
+  .rel-canvas { height: 260px; }
+}
+
+@media (max-width: 600px) {
+  .matrix-wrap { overflow: visible; margin: 0; }
+  .matrix { min-width: 0; display: block; }
+  .matrix thead { display: none; }
+  .matrix tbody, .matrix tr { display: block; }
+  .matrix tr { border-top: 1px solid var(--line); padding: 0.6rem 0 0.4rem; }
+  .matrix tr.first td { border-top: none; }
+  .matrix td { display: block; border: none; padding: 0.15rem 0; }
+  .matrix tr:not(.first) .sig-name > * { visibility: visible; }
+  .matrix .sig-name { display: inline-block; width: auto; margin-right: 0.8rem; }
+  .matrix .per { display: inline-block; }
+  .matrix td.cell { display: grid; grid-template-columns: 7.2rem 1fr; align-items: center; column-gap: 0.6rem; background: none; padding: 0.35rem 0; }
+  .matrix td.cell::before { content: attr(data-label); grid-row: span 2; font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .matrix td.cell .glyph { grid-column: 2; width: 100%; }
+}

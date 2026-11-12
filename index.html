@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Summary | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=6">
+<link rel="stylesheet" href="assets/styles.css?v=8">
 </head>
 <body>
 <div id="chrome"></div>
@@ -15,69 +15,55 @@
     <p class="lede">A pre-specified test of 11-month momentum, price-to-book value and their average on about 500 large US stocks, January 2012 to August 2026.</p>
 
     <div class="hero-finding" style="margin-top:1.25rem;">
-      <b class="box-label">Short answer</b>
-      Not detectably. None of the three signals can be shown to rank next-month returns better than chance, and the portfolios built on them do not reliably beat an equal-weight benchmark. The design was pre-specified and committed in advance, every test is counted, and the study states how small an effect it could have found.
+      <b class="box-label">Finding</b>
+      The data do not show that any of the three signals ranks next-month returns better than chance. The one result that stood out was a portfolio that did worse than its benchmark. The design was committed before the results existed and every test is counted. The test could only have detected a large effect, so this is an absence of evidence and not a proof of no effect.
     </div>
 
     <div class="mini-stats">
-      <div class="mini-stat"><div class="ms-value" id="kTests">0 of 6</div><div class="ms-label" id="kTestsLabel">main tests find a real relationship (rank IC, three signals, two test periods). The 27 other tests ask the same question in other ways and agree</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">portfolio comparisons stood out: one Value portfolio in 2012 to 2020, counted twice (top decile and top quintile), that did worse than the benchmark</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kPower">0.055</div><div class="ms-label">smallest average rank IC the test could reliably detect. Smaller effects would be missed</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kTests">0 of 6</div><div class="ms-label" id="kTestsLabel"></div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPort">2 of 18</div><div class="ms-label">headline portfolio comparisons excluded zero. They are one Value portfolio in 2012 to 2020, counted at two portfolio sizes, and it did worse than the benchmark</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPower">0.055</div><div class="ms-label">smallest average rank IC the 2012 to 2020 test could reliably detect. Smaller effects would be missed</div></div>
     </div>
   </section>
 
-  <div class="section-label">Reading guide <span>four terms used below</span></div>
-  <div class="trust-grid">
-    <div class="trust"><b>Rank IC</b><p>Each month, rank stocks by the signal and by their next-month return, then correlate the two rankings. +1 is perfect, 0 is no information, -1 is backwards. Useful signals usually score only a few hundredths.</p></div>
-    <div class="trust"><b>90% interval</b><p>The range of values the data are consistent with. If it contains zero, the result cannot be told apart from no effect.</p></div>
-    <div class="trust"><b>Sharpe ratio</b><p>Return above the risk-free rate per unit of volatility. A Sharpe difference compares a portfolio with its benchmark; negative means it did worse.</p></div>
-    <div class="trust"><b>Group</b><p>One fifth of the stocks, ranked on the signal. Group 5 has the highest signal.</p></div>
-  </div>
-
-  <div class="section-label">Exhibit 1 <span>rank IC: do the rankings predict next-month returns?</span></div>
+  <div class="section-label">Evidence <span>every headline result in one table: estimate, 90% interval, and where the interval sits relative to zero</span></div>
   <div class="panel">
-    <h2>No signal's rank IC is distinguishable from zero</h2>
-    <svg class="forest" id="icForest" role="img" aria-label="Rank IC intervals"></svg>
-    <p class="caption">Mean monthly rank correlation between the signal and next month's return, with a 90% bootstrap interval. Zero means no ranking power, and an interval that crosses zero cannot be told apart from it. The 2021 to 2026 months were known from an earlier study, so they are a re-test, not out-of-sample evidence.</p>
+    <h2 id="matrixTitle">Evidence</h2>
+    <div class="matrix-wrap"><table class="matrix" id="matrix"></table></div>
+    <p class="caption" id="matrixCaption"></p>
   </div>
 
-  <div class="section-label">Exhibit 2 <span>return by group: does return rise as the signal improves?</span></div>
+  <div class="section-label">Relative performance <span>top-decile portfolio against the equal-weight benchmark of the same stocks</span></div>
   <div class="panel">
-    <h2>Returns do not climb in steps as the signal improves</h2>
-    <div class="grp-grid">
-      <div><div class="grp-title"><b style="color:var(--momentum)">Momentum</b><span id="monoMomentum"></span></div><div class="grp-canvas"><canvas id="grpMomentum"></canvas></div></div>
-      <div><div class="grp-title"><b style="color:var(--value)">Value</b><span id="monoValue"></span></div><div class="grp-canvas"><canvas id="grpValue"></canvas></div></div>
-      <div><div class="grp-title"><b style="color:var(--combined)">Combined</b><span id="monoCombined"></span></div><div class="grp-canvas"><canvas id="grpCombined"></canvas></div></div>
-    </div>
-    <p class="caption">Annualised return of each fifth of stocks, ranked on the signal at the start of the month, 2012 to 2026. A working signal would rise from group 1 (lowest) to group 5 (highest). Momentum's top group is best, but the others are not ordered. Value is not monotonic.</p>
+    <h2 id="relTitle"></h2>
+    <div class="rel-canvas"><canvas id="relChart"></canvas></div>
+    <p class="caption">Cumulative return of each top-decile portfolio divided by that of its own equal-weight benchmark, before costs, on a log scale. A line above 1.0 means the portfolio is ahead. Momentum needs 11 months of history, so it has its own benchmark; Value and Combined share one. Prices come from stocks that were in the index at some point and are still tradable today, which flatters every line; the Data page measures how much. The Portfolios page has growth, drawdowns and costs.</p>
   </div>
 
-  <div class="section-label">Exhibit 3 <span>portfolios: do the top-ranked stocks beat the benchmark?</span></div>
-  <div class="panel">
-    <h2>Only one portfolio stands out, and it lagged the benchmark</h2>
-    <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe ratio difference intervals"></svg>
-    <p class="caption">Top-decile portfolios against the equal-weight benchmark of the same stocks: difference in Sharpe ratio before costs, with a 90% paired bootstrap interval. A ringed marker and an asterisk mark an interval that excludes zero. Across 18 comparisons (three signals, two portfolio sizes, three periods) about two would do so by chance alone. The Portfolios page has the top-quintile versions.</p>
+  <div class="section-label">Specification <span>what was tested</span></div>
+  <div class="panel spec">
+    <dl>
+      <dt>Universe</dt><dd>S&amp;P 500 members, about 500 stocks, 176 months from January 2012 to August 2026</dd>
+      <dt>Signals</dt><dd>Momentum: 11-month return, no skipped month. Value: negative price-to-book. Combined: average of the two z-scores</dd>
+      <dt>Primary tests</dt><dd>Mean monthly rank IC, quintile spread, Fama-MacBeth slope, each with a 90% bootstrap interval</dd>
+      <dt>Portfolios</dt><dd>Top decile and top quintile, equal weight, monthly rebalance, against an equal-weight benchmark. Costs of 10 bps one way are shown separately</dd>
+      <dt>Periods</dt><dd>2012 to 2020 (108 months) is the new test. 2021 to 2026 (68 months) is a re-test, because those months were seen in an earlier 17-stock study</dd>
+      <dt>Timing</dt><dd>Signals use data to the end of the previous month. Book values enter on the filing date</dd>
+    </dl>
   </div>
 
-  <div class="section-label">Why believe it <span>how the study avoids fooling itself</span></div>
-  <div class="trust-grid">
-    <div class="trust"><b>Pre-specified</b><p>The design and every later change are dated, append-only amendments, committed before the code that depends on them.</p></div>
-    <div class="trust"><b>No look-ahead, no tuning</b><p>Signals use data to the end of the previous month, book values enter on the filing date, and nothing was varied to improve a result.</p></div>
-    <div class="trust"><b>Power is stated</b><p>With 108 months the test finds only a large effect. A null here means "no evidence of an effect", not "proof of none".</p></div>
-    <div class="trust"><b>It found its own errors</b><p>A one-month look-ahead, a split bug that flattered Value, unit errors in SEC share counts and a mislabelled Momentum signal were all caught, fixed and logged on the Data page.</p></div>
+  <div class="section-label">Limits <span>what this page does not show</span></div>
+  <div class="panel notshow">
+    <ul>
+      <li>It does not show that the signals are worthless. The test has power only for a rank IC above about <span id="nsPower">0.055</span>.</li>
+      <li>It does not show out-of-sample performance. No period was held back, and the 2021 to 2026 months were already known.</li>
+      <li>It does not remove survivorship bias. Removed index members are under-represented in the price data. See the Data page.</li>
+      <li>It does not test other signals or horizons. Thirty-three tests are reported, counting every variant that was run.</li>
+    </ul>
   </div>
 
   <div class="section-label">Amendment log <span>the newest dated entries of the pre-specification, each written before the work it concerns</span></div>
   <div id="tape"></div>
-
-  <div class="section-label">Every test <span>the full scorecard, for readers who want the numbers</span></div>
-  <details class="panel fold">
-    <summary>Show the scorecard: three signals, four measures, the two test periods (the full sample is on the Signals page)</summary>
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table scorecard" id="scorecard"></table>
-    </div>
-    <p class="caption">Estimate and 90% bootstrap interval, before costs. Rank IC, quintile spread and Fama-MacBeth slope are the primary tests. The Sharpe difference is the top-decile portfolio against its benchmark and is secondary evidence. A ringed marker and an asterisk mark an interval that excludes zero. Quintile spread is the return of the top fifth of stocks minus the bottom fifth. A Fama-MacBeth slope is the average monthly effect of the signal on next-month returns.</p>
-  </details>
 
   <div class="section-label">Where to look <span>one question per page</span></div>
   <div class="nav-cards">
@@ -101,6 +87,7 @@
 renderTape("tape", 6);
 renderChrome("index.html", "S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (11-month) &middot; Value (P/B) &middot; Combined");
 const X = UNIVERSE_EXTRAS;
+const mde = minDetectableIC();
 
 /* header figures, all computed from the data */
 (function headerFigures() {
@@ -110,74 +97,78 @@ const X = UNIVERSE_EXTRAS;
   const mainFail = main.filter(r => r.excludes_zero).length;
   document.getElementById("kTests").textContent = mainFail + " of " + main.length;
   document.getElementById("kTestsLabel").textContent = "main tests find a real relationship (rank IC, three signals, two test periods). " +
-    (failing === 0 ? "The " + (tests.length - main.length) + " other tests ask the same question in other ways and agree" : "See the scorecard below for the other " + (tests.length - main.length) + " tests");
+    (failing === 0 ? "The " + (tests.length - main.length) + " other tests ask the same question in other ways and agree" : "See the table below for the other " + (tests.length - main.length) + " tests");
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null);
   document.getElementById("kPort").textContent = head.filter(r => r.sig).length + " of " + head.length;
-  const Z = 1.645 + 0.842, sd = Math.max(...SIGNALS.map(s => icStatistics(s, 0, U.split).sd));
-  document.getElementById("kPower").textContent = (Z * sd / Math.sqrt(U.split)).toFixed(3);
+  document.getElementById("kPower").textContent = mde.toFixed(3);
+  document.getElementById("nsPower").textContent = mde.toFixed(3);
 })();
 
-/* exhibit 1: rank IC */
-(function exhibit1() {
-  const rows = [];
-  SIGNALS.forEach(sig => PERIODS.slice(0, 2).forEach(p => {
-    const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === sig && x.period === p.key);
-    rows.push({ label: sig + " · " + p.label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, color: sig, group: sig, excl: r.excludes_zero });
-  }));
-  const mde = minDetectableIC();
-  forest("icForest", rows, TESTS[0].fmt, null, { half: mde, label: "EFFECTS INSIDE THE BAND WOULD LIKELY BE MISSED (±" + mde.toFixed(3) + ", 2012–2020 TEST)", short: "LIKELY MISSED: ±" + mde.toFixed(3) });
-})();
-
-/* exhibit 2: return by group, full period */
-(function exhibit2() {
-  SIGNALS.forEach(sig => {
-    const rows = [1, 2, 3, 4, 5].map(q => X.quintiles.find(r => r.signal === sig && r.period === PERIODS[2].key && r.quintile === q));
-    const avg = rows.reduce((a, r) => a + r.mean_annualised, 0) / rows.length;
-    const sp = U.signalTests.find(t => t.test === "quintile_spread" && t.signal === sig && t.period === PERIODS[2].key);
-    document.getElementById("mono" + sig).textContent = "group 5 minus 1: " + spct(sp.mean, 2) + " a month [" + spct(sp.ci_90_lower, 2) + ", " + spct(sp.ci_90_upper, 2) + "]" + (sp.excludes_zero ? " *" : "");
-    new Chart(document.getElementById("grp" + sig), {
-      type: "bar",
-      data: { labels: ["1 low", "2", "3", "4", "5 high"], datasets: [{ data: rows.map(r => r.mean_annualised), backgroundColor: COLORS[sig], maxBarThickness: 38 }] },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => (i.parsed.y * 100).toFixed(1) + "% a year" } } },
-        scales: { y: { min: 0, suggestedMax: 0.2, ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 5 } }, x: { grid: { display: false } } }
-      },
-      plugins: [makeRefLine(avg, "")]
-    });
-  });
-})();
-
-/* exhibit 3: Sharpe differences, top decile, gross */
-(function exhibit3() {
-  const rows = [];
-  SIGNALS.forEach(sig => PERIODS.forEach(p => {
-    const r = U.summary.find(x => x.period === p.key && x.strategy === sig && x.size === "top_decile" && x.basis === "gross" && x.diff !== null);
-    if (r) rows.push({ label: sig + " · " + p.label, mean: r.diff, lo: r.lo, hi: r.hi, color: sig, group: sig, excl: r.sig });
-  }));
-  forest("sharpeForest", rows, { axis: v => v.toFixed(1), val: v => sgn(v, 2) });
-})();
-
-/* scorecard: three signals by four measures by two test periods */
-(function scorecard() {
+/* evidence matrix: three signals by two periods, four measures, with an interval glyph per cell on a shared column scale */
+(function evidenceMatrix() {
   const periods = [PERIODS[0], PERIODS[1]];
   const columns = [
-    { label: "Rank IC", get: (s, p) => { const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero, f: v => sgn(v, 3) }; } },
-    { label: "Quintile spread, %", get: (s, p) => { const r = U.signalTests.find(x => x.test === "quintile_spread" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero, f: v => (v < 0 ? MINUS : "+") + Math.abs(v * 100).toFixed(2) }; } },
-    { label: "Fama-MacBeth slope", get: (s, p) => { const r = U.signalTests.find(x => x.test === "fama_macbeth_single" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero, f: v => sgn(v, 4) }; } },
-    { label: "Sharpe diff, top decile", get: (s, p) => { const r = U.summary.find(x => x.period === p.key && x.strategy === s && x.size === "top_decile" && x.basis === "gross" && x.diff !== null); return r && { m: r.diff, lo: r.lo, hi: r.hi, x: r.sig, f: v => sgn(v, 2) }; } }
+    { label: "Rank IC", band: mde, get: (s, p) => { const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero }; }, f: v => sgn(v, 3) },
+    { label: "Quintile spread, % a month", get: (s, p) => { const r = U.signalTests.find(x => x.test === "quintile_spread" && x.signal === s && x.period === p.key); return r && { m: r.mean * 100, lo: r.ci_90_lower * 100, hi: r.ci_90_upper * 100, x: r.excludes_zero }; }, f: v => sgn(v, 2) },
+    { label: "Fama-MacBeth slope", get: (s, p) => { const r = U.signalTests.find(x => x.test === "fama_macbeth_single" && x.signal === s && x.period === p.key); return r && { m: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, x: r.excludes_zero }; }, f: v => sgn(v, 4) },
+    { label: "Sharpe difference, top decile", secondary: true, get: (s, p) => { const r = U.summary.find(x => x.period === p.key && x.strategy === s && x.size === "top_decile" && x.basis === "gross" && x.diff !== null); return r && { m: r.diff, lo: r.lo, hi: r.hi, x: r.sig }; }, f: v => sgn(v, 2) }
   ];
-  let html = `<thead><tr><th class="sig-name" rowspan="2">Signal</th>` + columns.map(c => `<th class="grp" colspan="2">${c.label}</th>`).join("") + `</tr><tr>` +
-    columns.map(() => periods.map((p, k) => `<th class="${k === 0 ? "grp" : ""}">${p.label}</th>`).join("")).join("") + `</tr></thead><tbody>`;
-  SIGNALS.forEach(s => {
-    html += `<tr><td class="sig-name"><span class="swatch" style="background:${COLORS[s]};margin-right:0.5rem"></span><b>${s}</b></td>`;
-    columns.forEach(c => periods.forEach((p, k) => {
-      const r = c.get(s, p);
-      html += r ? `<td class="${k === 0 ? "grp" : ""}${r.x ? " neg" : ""}">${r.f(r.m)}<small>[${r.f(r.lo)}, ${r.f(r.hi)}]</small></td>` : `<td class="${k === 0 ? "grp" : ""}">&ndash;</td>`;
-    }));
-    html += `</tr>`;
+  const GW = 120, GH = 18;
+  columns.forEach(c => {
+    const cells = []; SIGNALS.forEach(s => periods.forEach(p => { const r = c.get(s, p); if (r) cells.push(r); }));
+    let lo = Math.min(0, ...cells.map(r => r.lo), c.band ? -c.band : 0), hi = Math.max(0, ...cells.map(r => r.hi), c.band ? c.band : 0);
+    const pad = (hi - lo) * 0.05; c.lo = lo - pad; c.hi = hi + pad;
   });
-  document.getElementById("scorecard").innerHTML = html + "</tbody>";
+  const glyph = (c, r, color) => {
+    const x = v => 2 + (v - c.lo) / (c.hi - c.lo) * (GW - 4), y = GH / 2;
+    const band = c.band ? `<rect x="${x(-c.band)}" y="1" width="${x(c.band) - x(-c.band)}" height="${GH - 2}" fill="#858C97" fill-opacity="0.16"/>` : "";
+    return `<svg class="glyph" viewBox="0 0 ${GW} ${GH}" width="${GW}" height="${GH}" aria-hidden="true">${band}` +
+      `<line x1="${x(0)}" x2="${x(0)}" y1="0" y2="${GH}" stroke="#D9DCE1" stroke-width="1"/>` +
+      `<line x1="${x(r.lo)}" x2="${x(r.hi)}" y1="${y}" y2="${y}" stroke="${color}" stroke-width="2"/>` +
+      `<line x1="${x(r.lo)}" x2="${x(r.lo)}" y1="${y - 3.5}" y2="${y + 3.5}" stroke="${color}"/><line x1="${x(r.hi)}" x2="${x(r.hi)}" y1="${y - 3.5}" y2="${y + 3.5}" stroke="${color}"/>` +
+      `<polygon points="${x(r.m)},${y - 4.5} ${x(r.m) + 4.5},${y} ${x(r.m)},${y + 4.5} ${x(r.m) - 4.5},${y}" fill="${color}" ${r.x ? 'stroke="#F2F3F5" stroke-width="1.6"' : 'stroke="#12151A" stroke-width="1"'}/></svg>`;
+  };
+  let html = `<thead><tr><th>Signal</th><th>Period</th>` + columns.map(c => `<th class="${c.secondary ? "sec" : ""}">${c.label}${c.secondary ? " <small>secondary</small>" : ""}</th>`).join("") + `</tr></thead><tbody>`;
+  SIGNALS.forEach((s, si) => periods.forEach((p, pi) => {
+    html += `<tr class="${pi === 0 ? "first" : ""}"><td class="sig-name"><span class="swatch" style="background:${COLORS[s]}"></span><b>${s}</b></td><td class="per">${p.label}${pi === 1 ? " <small>re-test</small>" : ""}</td>`;
+    columns.forEach(c => {
+      const r = c.get(s, p);
+      html += r ? `<td data-label="${c.label}" class="cell${r.x ? " flagged" : ""}${c.secondary ? " sec" : ""}">${glyph(c, r, COLORS[s])}<div class="cv">${c.f(r.m)}${r.x ? "*" : ""}<small>[${c.f(r.lo)}, ${c.f(r.hi)}]</small></div></td>` : `<td class="cell">&ndash;</td>`;
+    });
+    html += `</tr>`;
+  }));
+  document.getElementById("matrix").innerHTML = html + "</tbody>";
+  const flagged = [];
+  SIGNALS.forEach(s => periods.forEach(p => columns.forEach(c => { const r = c.get(s, p); if (r && r.x) flagged.push(s + " " + p.label + ", " + c.label.toLowerCase()); })));
+  const primaryFlag = SIGNALS.some(s => periods.some(p => columns.slice(0, 3).some(c => { const r = c.get(s, p); return r && r.x; })));
+  document.getElementById("matrixTitle").textContent = primaryFlag ? "At least one primary test excludes zero; see the flagged cells" : "No interval on a primary test excludes zero";
+  document.getElementById("matrixCaption").innerHTML = "Each cell shows the estimate, its 90% bootstrap interval and a plot of that interval on a scale shared by the column. The vertical line is zero. In the Rank IC column the grey band is the smallest effect the 2012 to 2020 test could reliably detect (&plusmn;" + mde.toFixed(3) + "). A ringed marker and an asterisk mark an interval that excludes zero" +
+    (flagged.length ? ": " + flagged.join("; ") + ". Across 18 headline comparisons about two would do so by chance alone" : ", and none do") +
+    ". Rank IC, quintile spread and Fama-MacBeth slope are the primary tests; the Sharpe difference is the top-decile portfolio against its benchmark, before costs. Quintile spread is the top fifth of stocks minus the bottom fifth. The Signals page has the full-period results and the other robustness checks.";
+})();
+
+/* relative performance: top decile over its own benchmark, log scale */
+(function relativePerformance() {
+  const labels = U.dates;
+  const rel = SIGNALS.map(sig => {
+    const r = U.series[sig].top_decile.gross, b = U.benchmarks[benchmarkKey(sig)].gross;
+    let v = 1; return { sig, data: r.map((x, i) => (v *= (1 + x) / (1 + b[i]))) };
+  });
+  const end = rel.map(o => o.data[o.data.length - 1]);
+  const full = SIGNALS.map(sig => U.summary.find(x => x.period === PERIODS[2].key && x.strategy === sig && x.size === "top_decile" && x.basis === "gross"));
+  const ahead = end.filter(v => v > 1).length, sigCount = full.filter(r => r.sig).length;
+  document.getElementById("relTitle").textContent = ahead + " of 3 ended ahead on cumulative return (" + SIGNALS.map((s, i) => s + " " + end[i].toFixed(2)).join(", ") + "), but " +
+    (sigCount === 0 ? "no full-period Sharpe difference excludes zero" : sigCount + " full-period Sharpe differences exclude zero");
+  new Chart(document.getElementById("relChart"), {
+    type: "line",
+    data: { labels, datasets: rel.map(o => ({ label: o.sig, data: o.data, borderColor: COLORS[o.sig], backgroundColor: COLORS[o.sig], pointRadius: 0, tension: 0 })) },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { position: "top", align: "start", labels: { boxWidth: 10, boxHeight: 2, usePointStyle: false } }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + i.parsed.y.toFixed(3) } } },
+      scales: { y: { type: "logarithmic", ticks: { callback: v => v.toFixed(1), maxTicksLimit: 6 } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 8, callback: function (v) { return this.getLabelForValue(v).slice(0, 4); } } } }
+    },
+    plugins: [makeSplitLine(false), makeRefLine(1, "")]
+  });
 })();
 </script>
 </body>
