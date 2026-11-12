@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Method | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=6">
+<link rel="stylesheet" href="assets/styles.css?v=11">
 </head>
 <body>
 <div id="chrome"></div>
@@ -15,8 +15,11 @@
     <p class="lede">What was done, in what order, and what the design could and could not detect. The design and every later change were recorded before the code that depends on them.</p>
   </section>
 
-  <div class="section-label">1 &middot; Design <span>in the order it was applied</span></div>
+  <div class="tabbar" id="pageTabs" role="tablist"></div>
+
+  <div class="tabpane" id="pane-design">
   <div class="panel">
+    <h2>Design <span>in the order it was applied</span></h2>
     <ol class="step-list">
       <li><div><b>Question.</b> Do simple momentum and value signals rank large US stocks by next-month return, and do portfolios built from them beat an equal-weight benchmark?</div></li>
       <li><div><b>Signals.</b> Momentum is the return from 12 months before the trade date to the end of the previous month, with no month skipped. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied to improve a result. A true 12-1 version was run afterwards as a labelled sensitivity (Amendment 15) and changes no reading.</div></li>
@@ -27,27 +30,9 @@
     </ol>
   </div>
 
-  <div class="section-label">2 &middot; Pre-specification <span>dated entries, each written before the code or result it concerns</span></div>
-  <div class="panel">
-    <div class="timeline-table-wrap" style="max-height:none;">
-      <table class="timeline-table">
-        <thead><tr><th>Date</th><th>Entry</th><th>Written before</th></tr></thead>
-        <tbody id="regBody"></tbody>
-      </table>
-    </div>
-    <p class="caption">Entries are appended and never edited. There is no Amendment 4: the Phase 2 design took that slot, and the label Amendment 5 was kept as written. The full text is in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/LIMITATIONS_PLAN.md" target="_blank">LIMITATIONS_PLAN.md</a> and <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/OUT_OF_SAMPLE_PLAN.md" target="_blank">OUT_OF_SAMPLE_PLAN.md</a>. Amendments 8 to 11 came from findings during the work, not from results on the signals. Amendment 15 came from a pre-publication audit of the code and wording.</p>
-  </div>
 
-  <div class="section-label">3 &middot; Power <span>what the sample could have detected</span></div>
   <div class="panel">
-    <h2>Minimum detectable mean rank IC <span>90% two-sided interval, 80% power</span></h2>
-    <div class="legend-row" id="powerLegend"></div>
-    <div style="position:relative; height:280px;"><canvas id="powerChart"></canvas></div>
-    <p class="caption" id="powerCaption"></p>
-  </div>
-
-  <div class="section-label">4 &middot; Limitations</div>
-  <div class="panel">
+    <h2>Limitations</h2>
     <ol class="step-list">
       <li><div><b>Survivorship.</b> Acquired and bankrupt companies mostly have no free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them.</div></li>
       <li><div><b>Free data.</b> Wikipedia membership is approximate early on. Some book values rest on share counts that may carry unit errors the validity rule cannot detect. Ticker reuse is not fully detectable. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.</div></li>
@@ -58,6 +43,35 @@
       <li><div><b>Sharpe convention.</b> The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. This was checked after the results and is not one of the registered tests.</div></li>
       <li><div><b>Inference.</b> No Fama-French controls. Newey-West and block-bootstrap intervals were added after the results (Amendment 14) and agree with the registered ones: none of the 33 signal tests excludes zero under any method.</div></li>
     </ol>
+  </div>
+  </div>
+
+  <div class="tabpane" id="pane-log" hidden>
+    <div class="panel">
+      <h2 id="tlTitle">Registration log</h2>
+      <div class="legend-row"><span><i class="sq-pre"></i>Written before any result it concerns</span><span><i class="sq-post"></i>Written after every registered result existed (exploratory)</span><span><i class="sq-os"></i>17-stock study plan</span></div>
+      <svg class="timeline" id="timeline" role="img" aria-label="Dated entries of the pre-specification"></svg>
+    </div>
+    <div class="panel">
+      <h2>Entries <span>newest last, append-only</span></h2>
+      <div class="timeline-table-wrap" style="max-height:none;">
+        <table class="timeline-table">
+          <thead><tr><th>ID</th><th>Date</th><th>Concerns</th><th>Written before</th></tr></thead>
+          <tbody id="regBody"></tbody>
+        </table>
+      </div>
+          <p class="caption">Entries are appended and never edited. There is no Amendment 4: the Phase 2 design took that slot, and the label Amendment 5 was kept as written. The full text is in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/LIMITATIONS_PLAN.md" target="_blank">LIMITATIONS_PLAN.md</a> and <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/OUT_OF_SAMPLE_PLAN.md" target="_blank">OUT_OF_SAMPLE_PLAN.md</a>. Amendments 8 to 11 came from findings during the work, not from results on the signals. Amendment 15 came from a pre-publication audit of the code and wording.</p>
+    </div>
+  </div>
+
+  <div class="tabpane" id="pane-power" hidden>
+  <div class="panel">
+    <h2>Minimum detectable mean rank IC <span>90% two-sided interval, 80% power</span></h2>
+    <div class="legend-row" id="powerLegend"></div>
+    <div style="position:relative; height:280px;"><canvas id="powerChart"></canvas></div>
+    <p class="caption" id="powerCaption"></p>
+  </div>
+
   </div>
 
   <div id="foot"></div>
@@ -70,30 +84,65 @@
 <script>
 renderChrome("method.html", "Pre-specified design &middot; frozen signals &middot; no tuning &middot; every variant reported");
 
-/* pre-specification log: dates and headings as written in the plan files */
-const REG = [
-  ["2026-09-24", "Out-of-sample plan, Amendment 1", "any data after 31 December 2024 was downloaded (Value look-ahead fix)"],
-  ["2026-09-24", "Out-of-sample plan, Amendment 2", "any out-of-sample result was computed (missing final trading day)"],
-  ["2026-10-23", "Amendment 1", "any Phase 1 code was written or run"],
-  ["2026-10-23", "Amendment 2", "any Phase 1B code was written or run"],
-  ["2026-10-23", "Amendment 3", "any Phase 1C code was written or run"],
-  ["2026-10-23", "Phase 2 detailed design: robustness grid", "any Phase 2 code was written or run"],
-  ["2026-10-23", "Amendment 5", "any Phase 2 code was written or run"],
-  ["2026-10-23", "Phase 3 detailed design: data feasibility, larger universe", "any Phase 3 code was written or run"],
-  ["2026-10-23", "Phase 2B detailed design: risk diagnostics", "any Phase 2B code was written or run"],
-  ["2026-10-28", "Amendment 6", "any Phase 3 code was written or run"],
-  ["2026-10-28", "Amendment 7", "any Phase 3 result existed"],
-  ["2026-10-31", "Phase 4 detailed design: signal and portfolio tests on the rebuilt universe", "any Phase 4 code was written or run"],
-  ["2026-10-31", "Amendment 8", "any Phase 4 result existed (split-consistent book value)"],
-  ["2026-10-31", "Amendment 9", "any restated Value result had been seen"],
-  ["2026-10-31", "Amendment 10", "the book value, share count or split code was built"],
-  ["2026-10-31", "Amendment 11", "any Value or Combined signal test (share-count validity rule; corrections are appended to the entry)"],
-  ["2026-11-01", "Amendment 12", "any Value or Combined signal test or return was computed (labelled sensitivity)"],
-  ["2026-11-07", "Amendment 13", "any Stage 4 code was written or run and before any portfolio result existed"],
-  ["2026-11-07", "Amendment 14", "any code for the additions was written; exploratory and after every registered result existed (group returns, interval robustness, book value check, data manifest)"],
-  ["2026-11-11", "Amendment 15", "any code for the additions was written; exploratory and after every registered result existed (true 12-1 sensitivity, survivorship by year)"]
+const PAGE_TABS = [
+  { key: "design", label: "Design and limits" },
+  { key: "log", label: "Registration log" },
+  { key: "power", label: "Power" }
 ];
-document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="month-cell">${r[0]}</td><td>${r[1].startsWith("Out-of-sample") ? r[1] : "Limitations plan, " + r[1]}</td><td>${r[2]}</td></tr>`).join("");
+function showTab(key, fromClick) {
+  if (!PAGE_TABS.some(t => t.key === key)) key = PAGE_TABS[0].key;
+  PAGE_TABS.forEach(t => { document.getElementById("pane-" + t.key).hidden = t.key !== key; });
+  document.getElementById("pageTabs").innerHTML = PAGE_TABS.map(t =>
+    `<button role="tab" class="tab${t.key === key ? " active" : ""}" data-k="${t.key}" aria-selected="${t.key === key}">${t.label}</button>`).join("");
+  document.querySelectorAll("#pageTabs .tab").forEach(b => b.onclick = () => showTab(b.dataset.k, true));
+  if (fromClick) { try { history.replaceState(null, "", "#" + key); } catch (e) { /* ignore */ } }
+  Object.values(Chart.instances).forEach(c => c.resize());
+}
+
+/* Registration log. Dates, headings and "written before" wording come from the plan file through meta_data.js.
+   CONCERNS is the only hand-typed part: one short topic per entry. An entry missing from it shows a dash and warns in the console. */
+const OS_ENTRIES = [
+  { id: "OS-A1", date: "2026-09-24", concerns: "Value look-ahead fix", note: "Before any data after 31 December 2024 was downloaded", kind: "os" },
+  { id: "OS-A2", date: "2026-09-24", concerns: "Missing final trading day", note: "Before any out-of-sample result was computed", kind: "os" }
+];
+const CONCERNS = {
+  A1: "Phase 1", A2: "Phase 1B", A3: "Phase 1C", PH2: "Robustness grid", A5: "Phase 2", PH3: "Data feasibility, larger universe",
+  PH2B: "Risk diagnostics", A6: "Phase 3", A7: "Phase 3 results", PH4: "Signal and portfolio tests, rebuilt universe",
+  A8: "Split-consistent book value", A9: "Restated Value result", A10: "Book value, share count and split code", A11: "Share-count validity rule",
+  A12: "Labelled Value sensitivity", A13: "Stage 4 portfolio tests",
+  A14: "Group returns, interval robustness, book value check, data manifest", A15: "True 12-1 sensitivity, survivorship by year"
+};
+const LOG = OS_ENTRIES.concat(META.entries.map(e => {
+  if (!(e.id in CONCERNS)) console.warn("No CONCERNS text for " + e.id);
+  return { id: "LP-" + e.id, date: e.date, concerns: CONCERNS[e.id] || "–", note: e.note, kind: /^After every registered result/.test(e.note) ? "post" : "pre" };
+}));
+document.getElementById("regBody").innerHTML = LOG.map(e =>
+  `<tr><td class="month-cell"><span class="sq-${e.kind} sq"></span> ${e.id}</td><td style="white-space:nowrap">${e.date}</td><td>${e.concerns}</td><td>${e.note}</td></tr>`).join("");
+(function timeline() {
+  const days = d => Date.parse(d + "T00:00:00Z") / 86400000;
+  const t0 = days(LOG[0].date), t1 = days(LOG[LOG.length - 1].date);
+  const W = 860, left = 24, right = 24, step = 15, maxStack = Math.max(...Object.values(LOG.reduce((a, e) => (a[e.date] = (a[e.date] || 0) + 1, a), {})));
+  const H = 28 + maxStack * step + 50;
+  const x = d => left + (days(d) - t0) / (t1 - t0) * (W - left - right);
+  const seen = {};
+  let s = `<line x1="${left - 8}" x2="${W - right + 8}" y1="${H - 30}" y2="${H - 30}" stroke="#353C47"/>`;
+  LOG.forEach(e => {
+    const k = seen[e.date] = (seen[e.date] || 0) + 1, cx = x(e.date), cy = H - 30 - 4 - k * step + 6;
+    const fill = e.kind === "pre" ? "#F0A83A" : e.kind === "post" ? "none" : "#7B828E";
+    const stroke = e.kind === "post" ? "#F2F3F5" : "none";
+    s += `<rect x="${cx - 5}" y="${cy - 5}" width="10" height="10" fill="${fill}" stroke="${stroke}" stroke-width="1.6"><title>${e.id}, ${e.date}: ${e.concerns}</title></rect>`;
+  });
+  let lastX = -99, lane = 0;
+  Object.keys(seen).forEach(dt => {
+    lane = x(dt) - lastX < 44 ? 1 - lane : 0; lastX = x(dt);
+    s += `<line x1="${x(dt)}" x2="${x(dt)}" y1="${H - 30}" y2="${H - 25}" stroke="#5A616D"/><text x="${x(dt)}" y="${H - 13 + (lane ? 12 : 0)}" text-anchor="middle" class="dim">${ymLabel(dt.slice(0, 7)).slice(0, 3)} ${+dt.slice(8, 10)}</text>`;
+  });
+  const svg = document.getElementById("timeline");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = s;
+  const post = LOG.filter(e => e.kind === "post").length;
+  document.getElementById("tlTitle").textContent = META.entries.length + " plan entries: " + (META.entries.length - post) + " written before the results they concern, " + post + " after every registered result existed";
+})();
 
 /* power: (z_alpha + z_power) * sd / sqrt(n), with z_alpha = 1.645 (90% two-sided) and z_power = 0.842 (80%) */
 (function power() {
@@ -130,6 +179,8 @@ document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="mont
   document.getElementById("powerCaption").textContent =
     `With 108 months the minimum detectable mean IC is ${mde(lo.sd, 108)} to ${mde(hi.sd, 108)}, and with the full 176 months ${mde(lo.sd, 176)} to ${mde(hi.sd, 176)}. A true mean IC of 0.03 would need roughly ${need(0.03, lo.sd)} to ${need(0.03, hi.sd)} months, about ${Math.round(need(0.03, lo.sd) / 12)} to ${Math.round(need(0.03, hi.sd) / 12)} years of data. The study therefore could not have found a small real effect, and an interval that includes zero does not show that the effect is zero.`;
 })();
+
+showTab((location.hash || "").slice(1), false);
 </script>
 </body>
 </html>

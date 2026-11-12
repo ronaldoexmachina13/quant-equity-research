@@ -453,3 +453,12 @@ details.fold > summary::-webkit-details-marker { display: none; }
 .ghost-solid { background: var(--text); } .ghost-light { background: var(--muted); opacity: 0.5; }
 details.fold:not([open]) > summary { margin-bottom: -1rem; border-bottom: none; }
 @media (max-width: 600px) { .tabbar .tab { padding: 0.6rem 0.75rem; font-size: 0.66rem; letter-spacing: 0.06em; } }
+
+/* registration timeline (Method) */
+.timeline { display: block; width: 100%; height: auto; font-family: var(--mono); font-size: 10px; }
+.timeline .dim { fill: var(--muted); }
+.sq { display: inline-block; width: 8px; height: 8px; vertical-align: baseline; }
+.sq-pre { background: var(--amber); }
+.sq-post { background: transparent; border: 1.5px solid var(--text-strong); box-sizing: border-box; }
+.sq-os { background: #7B828E; }
+.legend-row i.sq-post { border: 1.5px solid var(--text-strong); background: transparent; box-sizing: border-box; }
