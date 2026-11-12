@@ -518,3 +518,26 @@ Before this amendment was written, a read-only audit check (not saved, not commi
 ### What this does not do
 
 It does not change the pre-registered design, does not tune a lookback, and does not decide which Momentum definition is better. A delisting-return scenario, a block bootstrap for the portfolio Sharpe differences, an arithmetic Sharpe column and a factor-model alpha are separate additions, to be registered in their own amendment.
+
+## Amendment 16 (2026-11-12, after every registered result existed, before any code for these additions was written or run)
+
+A review of the finished study raised concentration, benchmark-risk and validation questions. Everything added here is exploratory and post hoc. No registered rule, headline or published figure changes.
+
+### Disclosure of a prior look
+
+Before this amendment was written, a read-only check of the saved holdings file (not committed) showed that the top Value decile held about 53% Financials against about 12% of the universe, and that top-decile Value volatility was about 25% against about 15% for the benchmark. These observations motivate items 1 and 2.
+
+### Decisions
+
+1. **Sector-neutral Value and Combined.** Each month the Value z-score is computed within sector, then Combined is rebuilt from the registered Momentum leg and the sector-neutral Value leg. Same periods, same tests, same 5,000 resamples, seed 42, 90% intervals, Newey-West and block intervals as Amendments 14 and 15.
+2. **Benchmark regression.** For each headline portfolio, monthly excess return is regressed on the benchmark's excess return. Alpha and beta are reported with Newey-West 90% intervals (lags by the rule in Amendment 14). The same is run for the sector-neutral portfolios.
+3. **Earnings yield.** Used only if net income or EPS with a disclosure date is already in the stored fundamentals. If not, this is reported as not feasible and no data is added.
+4. **Reference factor check.** The Kenneth French monthly Mom (UMD) and HML factors are used, taken from the data library (CRSP database of 202609) and stored unchanged for 2011-01 to 2026-09 in data/external/french/ (ff3_monthly_201101_202609.csv: Mkt-RF, SMB, HML, RF; mom_monthly_201101_202609.csv: Mom; percent, months before 2011 not stored). The correlation of each with the long-short spread of Momentum and Value over the overlapping study months (2012-01 to 2026-08) is reported, descriptive only. French's factors use all US stocks and value-weighting, so a high correlation is not expected, and the sign and rough size are the check.
+5. **Book value timing.** A descriptive count of how many stored book values were first disclosed after the date they are used, expected to be zero under the existing rule.
+6. **Reading rule.** Results join the existing family of tests and are counted in the ledger. A single interval that excludes zero is not read on its own. No variant is dropped.
+7. **Wording.** "Pre-registered" is replaced by "pre-specified and version-controlled" in README, dashboard and LinkedIn draft. The rule is unchanged, only the description.
+8. **Outputs.** New files only, mode x, named results/universe_study_*_sector_neutral.csv and results/universe_study_alpha_regression.csv. Scripts stop if any exists.
+
+### What this does not do
+
+It does not tune a parameter, choose a better Value definition, or add power to the registered sample.
