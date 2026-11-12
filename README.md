@@ -64,8 +64,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 | Summary | What is the answer, and why believe it? |
 | Signals | Do the rankings predict next-month returns? |
 | Portfolios | Do top-ranked stocks beat the benchmark? |
-| Holdings | Which names drove the results? |
-| Data | Can the data be trusted? |
+| Universe | Can the data be trusted, and which names drove the results? |
 | Method | What was done, in what order? |
 
 <details>
@@ -188,7 +187,7 @@ Rerunning a result-writing script in a fresh clone stops at the first existing f
 <summary><b>Repository layout</b></summary>
 
 ```
-index.html, signals.html, portfolios.html, holdings.html, data.html, method.html
+index.html, signals.html, portfolios.html, universe.html, method.html
                               dashboard pages (GitHub Pages serves the repository root)
 assets/                       dashboard.js, styles.css and the generated universe_*_data.js files
 config.py                     17-stock universe and evaluation windows (earlier study)

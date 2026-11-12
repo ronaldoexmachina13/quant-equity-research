@@ -259,8 +259,7 @@ const PAGES = [
   { href: "index.html", label: "Summary" },
   { href: "signals.html", label: "Signals" },
   { href: "portfolios.html", label: "Portfolios" },
-  { href: "holdings.html", label: "Holdings" },
-  { href: "data.html", label: "Data" },
+  { href: "universe.html", label: "Universe" },
   { href: "method.html", label: "Method" }
 ];
 const REPO_URL = "https://github.com/ronaldoexmachina13/quant-equity-research";

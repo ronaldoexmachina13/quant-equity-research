@@ -37,7 +37,7 @@
   <div class="panel">
     <h2 id="relTitle"></h2>
     <div class="rel-canvas"><canvas id="relChart"></canvas></div>
-    <p class="caption">Cumulative return of each top-decile portfolio divided by that of its own equal-weight benchmark, before costs, on a log scale. A line above 1.0 means the portfolio is ahead. Momentum needs 11 months of history, so it has its own benchmark; Value and Combined share one. Prices come from stocks that were in the index at some point and are still tradable today, which flatters every line; the Data page measures how much. The Portfolios page has growth, drawdowns and costs.</p>
+    <p class="caption">Cumulative return of each top-decile portfolio divided by that of its own equal-weight benchmark, before costs, on a log scale. A line above 1.0 means the portfolio is ahead. Momentum needs 11 months of history, so it has its own benchmark; Value and Combined share one. Prices come from stocks that were in the index at some point and are still tradable today, which flatters every line; the Universe page measures how much. The Portfolios page has growth, drawdowns and costs.</p>
   </div>
 
   <div class="section-label">Specification <span>what was tested</span></div>
@@ -57,7 +57,7 @@
     <ul>
       <li>It does not show that the signals are worthless. The test has power only for a rank IC above about <span id="nsPower">0.055</span>.</li>
       <li>It does not show out-of-sample performance. No period was held back, and the 2021 to 2026 months were already known.</li>
-      <li>It does not remove survivorship bias. Removed index members are under-represented in the price data. See the Data page.</li>
+      <li>It does not remove survivorship bias. Removed index members are under-represented in the price data. See the Universe page.</li>
       <li>It does not test other signals or horizons. Thirty-three tests are reported, counting every variant that was run.</li>
     </ul>
   </div>
@@ -69,8 +69,7 @@
   <div class="nav-cards">
     <a class="nav-card" href="signals.html"><div class="nc-eyebrow">Primary evidence</div><h3>Signals</h3><p>Do the rankings predict next-month returns? Interval plots, rank IC stability, sensitivity to the book-value treatment.</p><div class="nc-arrow">Open &rarr;</div></a>
     <a class="nav-card" href="portfolios.html"><div class="nc-eyebrow">Secondary evidence</div><h3>Portfolios</h3><p>Do top-ranked stocks beat the benchmark? Growth, drawdowns, monthly active returns, costs and Sharpe differences.</p><div class="nc-arrow">Open &rarr;</div></a>
-    <a class="nav-card" href="holdings.html"><div class="nc-eyebrow">Attribution</div><h3>Holdings</h3><p>Which names drove the results? Contributors, month-by-month holdings and trades, and the 861-ticker table.</p><div class="nc-arrow">Open &rarr;</div></a>
-    <a class="nav-card" href="data.html"><div class="nc-eyebrow">Provenance</div><h3>Data and integrity</h3><p>Can the data be trusted? Coverage, survivorship and the errors the project found in its own work.</p><div class="nc-arrow">Open &rarr;</div></a>
+    <a class="nav-card" href="universe.html"><div class="nc-eyebrow">Provenance and attribution</div><h3>Universe</h3><p>Can the data be trusted, and which names drove the results? Coverage, survivorship, errata, contributors, extreme moves and every ticker.</p><div class="nc-arrow">Open &rarr;</div></a>
     <a class="nav-card" href="method.html"><div class="nc-eyebrow">Design</div><h3>Method</h3><p>What was done and in what order: the pre-specification, the power calculation and the limitations.</p><div class="nc-arrow">Open &rarr;</div></a>
     <a class="nav-card" href="https://github.com/ronaldoexmachina13/quant-equity-research" target="_blank"><div class="nc-eyebrow">Repository</div><h3>Code and results</h3><p>Every number on these pages is reproducible from the files in the repository.</p><div class="nc-arrow">Open on GitHub &rarr;</div></a>
   </div>

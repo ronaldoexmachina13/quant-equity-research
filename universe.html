@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Universe | Equity Factor Research</title>
+<link rel="stylesheet" href="assets/styles.css?v=10">
+</head>
+<body>
+<div id="chrome"></div>
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Universe</h1>
+    <p class="lede">What was tested, and can it be trusted? What the free sources provide, how survivorship bias shows up, the errors found along the way, and which stocks drove each portfolio.</p>
+  </section>
+
+  <div class="tabbar" id="pageTabs" role="tablist"></div>
+
+  <div class="tabpane" id="pane-data">
+  <section class="hero" style="padding-top:0">
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="ms-value" id="kAll">&ndash;</div><div class="ms-label">tickers ever in the index</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kPrice">&ndash;</div><div class="ms-label">with price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kNone">&ndash;</div><div class="ms-label">with no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kRemShare">&ndash;</div><div class="ms-label">of removed names have no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kStayShare">&ndash;</div><div class="ms-label">of names that stayed have none</div></div>
+    </div>
+  </section>
+
+  <div class="panel">
+    <h2>Sources <span>all free</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table">
+        <thead><tr><th>Item</th><th>Source and treatment</th></tr></thead>
+        <tbody>
+          <tr><td class="month-cell">Universe</td><td>S&amp;P 500 membership rebuilt month by month from Wikipedia.</td></tr>
+          <tr><td class="month-cell">Prices</td><td>Yahoo Finance via <code>yfinance</code>, adjusted close.</td></tr>
+          <tr><td class="month-cell">Book value</td><td>SEC EDGAR filings, aligned to the date each filing became public. Book value per share is restated for later splits.</td></tr>
+          <tr><td class="month-cell">Risk-free rate</td><td>Three-month Treasury bill, FRED.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Usable names per month</h2>
+    <div class="legend-row">
+      <span><i style="background:#F2F3F5"></i>Index members</span>
+      <span><i style="background:var(--momentum)"></i>Usable for Momentum</span>
+      <span><i style="background:var(--value)"></i>Usable for Value and Combined</span>
+    </div>
+    <div style="position:relative; height:260px;"><canvas id="covChart"></canvas></div>
+    <p class="caption">A name is usable when it has the price history (and, for Value, the book value) the signal needs. Companies that were acquired or went bankrupt mostly have no free price history, so the gap is largest in the early years. Membership is approximate early on: up to about 12 names may be overstated in 2012.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Coverage by status <span>why survivorship matters</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Status</th><th class="num">Tickers</th><th class="num">With price history</th><th class="num">Without</th><th class="num">Share without</th></tr></thead>
+        <tbody id="covBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">&ldquo;Removed&rdquo; means the company left the index at some point in the sample (acquired, merged, bankrupt or dropped for size). Free providers mostly keep no price history for names that no longer trade, so removed companies are far more likely to be missing. The study can use only names that have data, which is why levels are inflated and differences are also biased, in a direction that depends on the signal.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Survivorship <span>names later removed from the index against names that stayed</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table surv-table">
+        <thead><tr><th>Period</th><th class="num">Removed names</th><th class="num">Stayed names</th><th class="num">Removed return</th><th class="num">Stayed return</th></tr></thead>
+        <tbody id="survBody"></tbody>
+      </table>
+    </div>
+    <p class="caption">Names per month and annualised mean return. Descriptive only, not a correction. Names later removed that still had a price history earned a lower average return than names that stayed, Neither the direction nor the size of the effect of the missing names can be measured without delisting data, since acquired companies often earned a premium and bankrupt ones lost most of their value.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Errata <span>errors the project found in its own work</span></h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table">
+        <thead><tr><th>When</th><th>Defect</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td class="month-cell">Sep 2026</td><td>Value used the month-end price instead of the previous month-end, a one-month look-ahead.</td><td>17-stock study: Value Sharpe moved from 0.75 to 0.85, before the split fix below. The bug had penalised Value.</td></tr>
+          <tr><td class="month-cell">Sep 2026</td><td>The first download missed 31 December 2024 because the Yahoo Finance end date is exclusive.</td><td>About 0.01 of Sharpe.</td></tr>
+          <tr><td class="month-cell">Oct 2026</td><td>Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split while SEC book value per share does not change.</td><td>17-stock study: in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. See the <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/STUDY_17_STOCKS.md" target="_blank">write-up</a>.</td></tr>
+          <tr><td class="month-cell">Oct 2026</td><td>Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios.</td><td>Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded.</td></tr>
+          <tr><td class="month-cell">Nov 2026</td><td>Momentum was described as 12-1, skipping the most recent month. The code uses the return from 12 months before the trade date to the end of the previous month, with no month skipped.</td><td>No reading changes. A true 12-1 version gives a similar rank IC (mean +0.005 against +0.008, monthly series correlation 0.97, no interval excluding zero). The description was corrected; see Amendment 15 and the <code>_momentum_skip_month</code> files.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">The design, the reading rules and every later change were written into the repository as dated, append-only amendments before the code that depends on them.</p>
+  </div>
+  </div>
+
+  <div class="tabpane" id="pane-attribution" hidden>
+  <div id="ctx"></div>
+  <div class="panel">
+    <h2 id="contribTitle">Largest contributors and detractors</h2>
+    <div class="two-col">
+      <div><div class="section-label" style="margin-top:0">Largest contributors</div><div id="topList"></div></div>
+      <div><div class="section-label" style="margin-top:0">Largest detractors</div><div id="botList"></div></div>
+    </div>
+    <p class="caption" id="contribCaption"></p>
+  </div>
+
+
+  <div class="panel">
+    <h2 id="outTitle">Extreme single-month returns</h2>
+    <div class="timeline-table-wrap" style="max-height:none;">
+      <table class="timeline-table perf-table">
+        <thead><tr><th>Month</th><th>Portfolio</th><th>Stock</th><th class="num">Stock return</th><th class="num">Adds to portfolio</th><th class="num">Portfolio return</th></tr></thead>
+        <tbody id="outBody"></tbody>
+      </table>
+    </div>
+    <p class="caption" id="outCaption"></p>
+  </div>
+  </div>
+
+  <div class="tabpane" id="pane-months" hidden>
+  <div class="panel">
+    <div class="month-ctrl">
+      <span class="month-label" id="monthLabel"></span>
+    </div>
+    <div class="ctrl-row"><span class="pick-label">Year</span><div class="ctrl-group" id="yearRow"></div></div>
+    <div class="ctrl-row"><span class="pick-label">Month</span><div class="ctrl-group" id="monthRow"></div></div>
+    <h2>Growth of $1 <span>top decile, before costs, with the selected month marked</span></h2>
+    <div class="legend-row">
+      <span><i style="background:var(--momentum)"></i>Momentum</span>
+      <span><i style="background:var(--value)"></i>Value</span>
+      <span><i style="background:var(--combined)"></i>Combined</span>
+      <span><i style="background:#F2F3F5"></i>Equal-weight benchmark (Value and Combined usable)</span>
+    </div>
+    <div style="position:relative; height:260px;"><canvas id="growthChart"></canvas></div>
+    <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased. Pick a year and month above, click the chart, or use the left and right arrow keys.</p>
+  </div>
+  <div class="grid3" id="cols"></div>
+
+  </div>
+
+  <div class="tabpane" id="pane-stocks" hidden>
+  <div class="panel">
+    <h2>All stocks</h2>
+    <div class="filter-row">
+      <input id="fSearch" type="search" placeholder="Search stocks">
+      <select id="fSector"></select>
+      <select id="fStatus"><option value="">All statuses</option><option value="stayed">Stayed in the index</option><option value="removed">Removed from the index</option></select>
+      <select id="fData"><option value="">All data</option><option value="yes">Has price history</option><option value="no">No price history</option></select>
+      <select id="fStrategy"><option>Momentum</option><option>Value</option><option>Combined</option></select>
+      <label style="font-size:0.74rem; color:var(--muted);"><input type="checkbox" id="fHeld"> held at least once</label>
+    </div>
+    <div class="timeline-table-wrap" style="max-height:620px;">
+      <table class="timeline-table stocks-table">
+        <thead><tr id="stocksHead"></tr></thead>
+        <tbody id="stocksBody"></tbody>
+      </table>
+    </div>
+    <p class="caption" id="stocksCaption"></p>
+  </div>
+
+  </div>
+
+  <div id="foot"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="assets/universe_data.js"></script>
+<script src="assets/universe_stocks_data.js"></script>
+<script src="assets/universe_holdings_data.js"></script>
+<script src="assets/meta_data.js"></script>
+<script src="assets/dashboard.js"></script>
+<script>
+renderChrome("universe.html", "Free data &middot; survivor-biased &middot; top-decile portfolios, equal weight, rebalanced monthly &middot; every ticker that was in the index");
+const H = UNIVERSE_HOLDINGS;
+const stockCols = UNIVERSE_STOCKS.columns;
+const STOCKS = UNIVERSE_STOCKS.rows.map(r => Object.fromEntries(stockCols.map((c, k) => [c, r[k]])));
+const COMPANY = Object.fromEntries(STOCKS.map(s => [s.ticker, s.company]));
+
+/* a single-month move this large is either a real event or a data error; it is flagged, not removed */
+const OUT_UP = 1.0, OUT_DOWN = -0.5;
+function isOutlier(r) { return r >= OUT_UP || r <= OUT_DOWN; }
+
+/* tabs, kept in the URL hash */
+const PAGE_TABS = [
+  { key: "data", label: "Data and integrity" },
+  { key: "attribution", label: "Attribution" },
+  { key: "months", label: "Month by month" },
+  { key: "stocks", label: "All stocks" }
+];
+function showTab(key, fromClick) {
+  if (!PAGE_TABS.some(t => t.key === key)) key = PAGE_TABS[0].key;
+  PAGE_TABS.forEach(t => { document.getElementById("pane-" + t.key).hidden = t.key !== key; });
+  document.getElementById("pageTabs").innerHTML = PAGE_TABS.map(t =>
+    `<button role="tab" class="tab${t.key === key ? " active" : ""}" data-k="${t.key}" aria-selected="${t.key === key}">${t.label}</button>`).join("");
+  document.querySelectorAll("#pageTabs .tab").forEach(b => b.onclick = () => showTab(b.dataset.k, true));
+  if (fromClick) { try { history.replaceState(null, "", "#" + key); } catch (e) { /* ignore */ } }
+  Object.values(Chart.instances).forEach(c => c.resize());
+}
+
+(function summary() {
+  const has = STOCKS.filter(s => s.has_price_history).length;
+  const grp = g => STOCKS.filter(s => s.group === g);
+  const share = g => grp(g).filter(s => !s.has_price_history).length / grp(g).length;
+  document.getElementById("kAll").textContent = STOCKS.length;
+  document.getElementById("kPrice").textContent = has;
+  document.getElementById("kNone").textContent = STOCKS.length - has;
+  document.getElementById("kRemShare").textContent = pct(share("removed"), 0);
+  document.getElementById("kStayShare").textContent = pct(share("stayed"), 0);
+  const body = document.getElementById("covBody");
+  [["stayed", "Stayed in the index"], ["removed", "Removed from the index"]].forEach(([g, label]) => {
+    const n = grp(g).length, w = grp(g).filter(s => s.has_price_history).length;
+    body.insertAdjacentHTML("beforeend", `<tr><td>${label}</td><td class="num">${n}</td><td class="num">${w}</td><td class="num">${n - w}</td><td class="num">${pct((n - w) / n, 0)}</td></tr>`);
+  });
+})();
+
+lineChart("covChart", [
+  { label: "Index members", data: U.coverage.members, borderColor: "#F2F3F5", backgroundColor: "#F2F3F5", borderDash: [3, 3], borderWidth: 1.5 },
+  { label: "Usable for Momentum", data: U.coverage.momentum, borderColor: COLORS.Momentum, backgroundColor: COLORS.Momentum },
+  { label: "Usable for Value and Combined", data: U.coverage.value_combined, borderColor: COLORS.Value, backgroundColor: COLORS.Value }
+], v => v, v => v, false);
+
+(function survivorship() {
+  const body = document.getElementById("survBody");
+  ["Momentum usable", "Value and Combined usable"].forEach(setName => {
+    const head = document.createElement("tr");
+    head.className = "tbl-group";
+    head.innerHTML = `<td colspan="5">${setName.replace(" usable", "")}</td>`;
+    body.appendChild(head);
+    PERIODS.forEach(p => {
+      const get = g => U.survivorship.find(r => r.universe_set === setName && r.period === p.key && r.group === g);
+      const rem = get("removed"), stay = get("stayed");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${p.label}</td><td class="num">${rem.names_per_month_avg.toFixed(0)}</td><td class="num">${stay.names_per_month_avg.toFixed(0)}</td><td class="num">${pct(rem.annualised_mean, 1)}</td><td class="num">${pct(stay.annualised_mean, 1)}</td>`;
+      body.appendChild(tr);
+    });
+  });
+})();
+
+
+/* extreme single-month returns among held names */
+(function outliers() {
+  const rows = [];
+  SIGNALS.forEach(sig => H.holdings[sig].forEach((m, k) => {
+    const n = m.length;
+    m.forEach(([t, r]) => { if (isOutlier(r)) rows.push({ k, sig, t, r, add: r / n, port: U.series[sig].top_decile.gross[k] }); });
+  }));
+  rows.sort((a, b) => Math.abs(b.add) - Math.abs(a.add));
+  const up = rows.filter(r => r.r > 0).length;
+  document.getElementById("outTitle").innerHTML = rows.length + " holding-months moved by +100% or more, or -50% or less <span>top-decile portfolios, all three signals</span>";
+  document.getElementById("outBody").innerHTML = rows.map(r =>
+    `<tr><td>${ymLabel(U.dates[r.k])}</td><td><span class="swatch" style="background:${COLORS[r.sig]};margin-right:0.4rem"></span>${r.sig}</td><td title="${esc(COMPANY[r.t] || r.t)}"><b>${esc(r.t)}</b></td>` +
+    `<td class="num ${r.r < 0 ? "neg" : ""}">${spct(r.r, 0)}</td><td class="num">${spct(r.add, 1)}</td><td class="num">${spct(r.port, 1)}</td></tr>`).join("");
+  document.getElementById("outCaption").textContent =
+    "A held name with a single-month return of +100% or more, or -50% or less, listed by how many percentage points it added to its portfolio that month (" + up + " gains and " + (rows.length - up) + " losses). None has been checked against a second price source, and none was removed or altered. A move this size is either a real event or a data error, so a reader should confirm the largest ones before relying on the months they sit in. The March 2020 rows are the market crash in oil, travel and retail names.";
+})();
+
+/* 1. contributors */
+function drawContrib() {
+  const strat = SEL.sig;
+  document.getElementById("contribTitle").innerHTML = "Largest contributors and detractors <span>" + strat + ", top decile, 2012 to 2026</span>";
+  const key = "contribution_" + strat.toLowerCase();
+  const pool = STOCKS.filter(s => s[key] !== null).sort((a, b) => b[key] - a[key]);
+  const top = pool.slice(0, 10), bot = pool.slice(-10).reverse();
+  const max = Math.max(...top.map(s => Math.abs(s[key])), ...bot.map(s => Math.abs(s[key])));
+  const row = s => `<div class="bar-row" title="${esc(s.company || s.ticker)}"><span><b>${esc(s.ticker)}</b></span><span class="bar-track"><span class="bar-fill" style="background:${s[key] >= 0 ? COLORS[strat] : "#E5636B"}; left:0; width:${Math.abs(s[key]) / max * 100}%"></span></span><span style="text-align:right">${spct(s[key], 1)}</span></div>`;
+  document.getElementById("topList").innerHTML = top.map(row).join("");
+  document.getElementById("botList").innerHTML = bot.map(row).join("");
+  const total = pool.reduce((a, s) => a + s[key], 0), topShare = top.reduce((a, s) => a + s[key], 0) / total;
+  document.getElementById("contribCaption").textContent =
+    `Contribution is the sum over months of weight times monthly return while a stock was held (a simple attribution, not compounded). ${pool.length} names were held at least once. The ten largest contributors account for ${pct(topShare, 0)} of the summed contribution, so ${topShare > 0.4 ? "the result leans on a small number of names" : "the result is spread across many names"}. Hover a ticker for the company name.`;
+}
+
+/* 2. month by month */
+let i = U.dates.length - 1;
+Chart.register({
+  id: "marker",
+  afterDraw(chart) {
+    if (chart.canvas.id !== "growthChart") return;
+    const x = chart.scales.x.getPixelForValue(i);
+    const { ctx, chartArea } = chart;
+    ctx.save(); ctx.strokeStyle = "#F0A83A"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke(); ctx.restore();
+  }
+});
+const sets = SIGNALS.map(s => ({ label: s, data: growth(U.series[s].top_decile.gross), borderColor: COLORS[s], backgroundColor: COLORS[s] }));
+sets.push({ label: "Benchmark", data: growth(U.benchmarks["Value and Combined"].gross), borderColor: "#F2F3F5", backgroundColor: "#F2F3F5", borderWidth: 1.5 });
+const chart = lineChart("growthChart", sets, v => "$" + v, v => "$" + v.toFixed(2), false);
+Object.assign(chart.options.scales.y, { type: "logarithmic", afterBuildTicks: ax => { ax.ticks = [1, 2, 3, 5, 10, 20, 30, 50].filter(v => v >= ax.min && v <= ax.max).map(value => ({ value })); } });
+chart.options.animation = false;
+chart.update();
+function heldNames(sig, k) { return new Set((H.holdings[sig][k] || []).map(h => h[0])); }
+function drawMonth() {
+  document.getElementById("monthLabel").textContent = ymLabel(U.dates[i]);
+  drawPickers();
+  chart.draw();
+  const box = document.getElementById("cols");
+  box.innerHTML = "";
+  SIGNALS.forEach(sig => {
+    const list = H.holdings[sig][i].map(([t, r, sc]) => ({ t, r, sc }));
+    const n = list.length;
+    list.forEach(h => { h.c = h.r / n; });
+    list.sort((a, b) => b.c - a.c);
+    const ret = U.series[sig].top_decile.gross[i];
+    const bench = U.benchmarks[benchmarkKey(sig)].gross[i];
+    const cur = heldNames(sig, i), prev = i > 0 ? heldNames(sig, i - 1) : new Set();
+    const bought = [...cur].filter(x => !prev.has(x)).sort(), sold = [...prev].filter(x => !cur.has(x)).sort();
+    const first = i === 0;
+    const div = document.createElement("div");
+    div.className = "panel"; div.style.marginBottom = "0";
+    div.innerHTML =
+      `<h2><span style="display:inline-block;width:9px;height:9px;background:${COLORS[sig]};margin-right:0.5rem"></span>${sig}</h2>` +
+      `<div class="mini-line"><span>Portfolio return</span><b class="${ret < 0 ? "neg" : ""}">${spct(ret, 2)}</b></div>` +
+      `<div class="mini-line"><span>Benchmark return</span><b>${spct(bench, 2)}</b></div>` +
+      `<div class="mini-line"><span>Names held</span><b>${n}</b></div>` +
+      `<div class="mini-line"><span>Bought / sold</span><b>${first ? n + " / 0" : bought.length + " / " + sold.length}</b></div>` +
+      `<p class="caption" style="margin:0.5rem 0 0.75rem;"><b style="color:var(--text)">Bought:</b> ${first ? "all names (initial purchase)" : (bought.join(", ") || "none")}<br><b style="color:var(--text)">Sold:</b> ${first ? "none" : (sold.join(", ") || "none")}</p>` +
+      `<div class="timeline-table-wrap" style="max-height:340px;"><table class="timeline-table perf-table"><thead><tr><th>Stock</th><th class="num">Return</th><th class="num">Adds</th></tr></thead><tbody>` +
+      list.map(h => `<tr><td title="${esc(COMPANY[h.t] || h.t)}"><b>${esc(h.t)}</b>${isOutlier(h.r) ? ' <span class="tag warn" title="Single-month move beyond +100% or -50%; see the Attribution tab">check</span>' : ""}</td><td class="num ${h.r < 0 ? "neg" : ""}" style="font-weight:400">${spct(h.r, 1)}</td><td class="num">${spct(h.c, 2)}</td></tr>`).join("") +
+      `</tbody></table></div>`;
+    box.appendChild(div);
+  });
+}
+/* year and month pickers: two clicks reach any month */
+const YEARS = [...new Set(U.dates.map(d => d.slice(0, 4)))];
+function jumpTo(year, month) {
+  const target = year + "-" + String(month).padStart(2, "0");
+  let k = U.dates.indexOf(target);
+  if (k < 0) k = year === YEARS[0] ? 0 : U.dates.length - 1;
+  i = k; drawMonth();
+}
+function drawPickers() {
+  const cur = U.dates[i], cy = cur.slice(0, 4), cm = +cur.slice(5, 7);
+  const yr = document.getElementById("yearRow"), mr = document.getElementById("monthRow");
+  yr.innerHTML = ""; mr.innerHTML = "";
+  YEARS.forEach(y => {
+    const b = document.createElement("button");
+    b.className = "metric-btn" + (y === cy ? " active" : "");
+    b.textContent = y;
+    b.onclick = () => { const first = U.dates.find(d => d.startsWith(y)); jumpTo(y, Math.min(Math.max(cm, +first.slice(5, 7)), 12)); };
+    yr.appendChild(b);
+  });
+  MONTH_NAMES.forEach((m, k) => {
+    const b = document.createElement("button");
+    const exists = U.dates.includes(cy + "-" + String(k + 1).padStart(2, "0"));
+    b.className = "metric-btn" + (k + 1 === cm ? " active" : "");
+    b.textContent = m; b.disabled = !exists;
+    b.onclick = () => jumpTo(cy, k + 1);
+    mr.appendChild(b);
+  });
+}
+document.getElementById("growthChart").addEventListener("click", ev => {
+  const x = ev.offsetX, area = chart.chartArea;
+  if (x < area.left || x > area.right) return;
+  i = Math.min(Math.max(Math.round(chart.scales.x.getValueForPixel(x)), 0), U.dates.length - 1);
+  drawMonth();
+});
+document.getElementById("growthChart").style.cursor = "pointer";
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (document.getElementById("pane-months").hidden) return;
+  if (e.key === "ArrowLeft" && i > 0) { i--; drawMonth(); } else if (e.key === "ArrowRight" && i < U.dates.length - 1) { i++; drawMonth(); }
+});
+
+/* 3. stock table */
+const COLS = [
+  { k: "ticker", label: "Ticker" }, { k: "company", label: "Company" }, { k: "gics_sector", label: "Sector" },
+  { k: "group", label: "Status" }, { k: "start_date", label: "In index" }, { k: "has_price_history", label: "Price data" },
+  { k: "months_usable_momentum", label: "Mom. data", num: true }, { k: "months_usable_value", label: "Value data", num: true },
+  { k: "_held", label: "Held", num: true }, { k: "_contrib", label: "Contrib.", num: true }
+];
+let sortKey = "ticker", sortDir = 1;
+const sectors = [...new Set(STOCKS.map(s => s.gics_sector).filter(Boolean))].sort();
+document.getElementById("fSector").innerHTML = '<option value="">All sectors</option>' + sectors.map(s => `<option>${esc(s)}</option>`).join("") + '<option value="__none">Sector not recorded</option>';
+document.getElementById("stocksHead").innerHTML = COLS.map(c => `<th class="sortable${c.num ? " num" : ""}" data-k="${c.k}">${c.label}</th>`).join("");
+document.querySelectorAll("#stocksHead th").forEach(th => th.onclick = () => {
+  const k = th.dataset.k; if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = (k === "ticker" || k === "company") ? 1 : -1; } drawTable();
+});
+["fSearch", "fSector", "fStatus", "fData", "fStrategy", "fHeld"].forEach(id => document.getElementById(id).addEventListener("input", drawTable));
+function drawTable() {
+  const strat = document.getElementById("fStrategy").value.toLowerCase();
+  const q = document.getElementById("fSearch").value.trim().toLowerCase();
+  const sec = document.getElementById("fSector").value, st = document.getElementById("fStatus").value, dt = document.getElementById("fData").value;
+  const heldOnly = document.getElementById("fHeld").checked;
+  let rows = STOCKS.map(s => Object.assign({}, s, { _held: s["months_held_" + strat], _contrib: s["contribution_" + strat] }));
+  rows = rows.filter(s =>
+    (!q || s.ticker.toLowerCase().includes(q) || (s.company || "").toLowerCase().includes(q)) &&
+    (!sec || (sec === "__none" ? !s.gics_sector : s.gics_sector === sec)) &&
+    (!st || s.group === st) &&
+    (!dt || (dt === "yes") === s.has_price_history) &&
+    (!heldOnly || s._held > 0));
+  rows.sort((a, b) => {
+    let x = a[sortKey], y = b[sortKey];
+    if (x === null || x === undefined) return 1; if (y === null || y === undefined) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir;
+  });
+  document.getElementById("stocksBody").innerHTML = rows.map(s => {
+    const start = s.start_date ? s.start_date.slice(0, 7) : "pre-2012", end = s.end_date ? s.end_date.slice(0, 7) : "now";
+    return `<tr><td class="month-cell">${esc(s.ticker)}</td><td class="name" title="${esc(s.company || "")}">${esc(s.company || "")}</td>` +
+      `<td class="name" style="max-width:120px" title="${esc(s.gics_sector || "")}">${s.gics_sector ? esc(s.gics_sector) : '<span style="color:var(--muted)">not recorded</span>'}</td>` +
+      `<td>${s.group === "removed" ? '<span class="tag warn">removed</span>' : '<span class="tag">stayed</span>'}</td>` +
+      `<td>${start} – ${end}</td>` +
+      `<td>${s.has_price_history ? "yes" : '<span class="neg">none</span>'}</td>` +
+      `<td class="num">${s.months_usable_momentum}</td><td class="num">${s.months_usable_value}</td>` +
+      `<td class="num">${s._held}</td><td class="num">${s._contrib === null ? "–" : spct(s._contrib, 1)}</td></tr>`;
+  }).join("");
+  document.getElementById("stocksCaption").textContent =
+    `Showing ${rows.length} of ${STOCKS.length}. Mom. data and Value data count the months (out of ${U.dates.length}) in which the stock had the data that signal needs. Held is the number of months in the top-decile ${document.getElementById("fStrategy").value} portfolio and Contrib. is its summed contribution while held. Sector is recorded only for current members. Click a column heading to sort.`;
+}
+
+
+document.getElementById("fStrategy").value = SEL.sig;
+contextStrip("ctx", ["sig"], () => { drawContrib(); document.getElementById("fStrategy").value = SEL.sig; drawTable(); }, false);
+drawContrib();
+drawMonth();
+drawTable();
+showTab((location.hash || "").slice(1), false);
+</script>
+</body>
+</html>
