@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portfolios | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=6">
+<link rel="stylesheet" href="assets/styles.css?v=9">
 </head>
 <body>
 <div id="chrome"></div>
@@ -17,7 +17,9 @@
 
   <div id="ctx"></div>
 
-  <div class="section-label">Selected portfolio <span>every panel below follows the bar above, except where stated</span></div>
+  <div class="tabbar" id="pageTabs" role="tablist"></div>
+
+  <div class="tabpane" id="pane-perf">
 
   <div class="hero-finding" style="max-width:none;">
     <b class="box-label" id="readingTitle">Headline reading</b>
@@ -28,11 +30,8 @@
     <h2 id="growthTitle">Growth of $1</h2>
     <div class="legend-row" id="portLegend"></div>
     <div style="position:relative; height:340px;"><canvas id="growthChart"></canvas></div>
-    <p class="caption">The benchmark is the equal-weight average of every name with usable data for that signal, which isolates the signal from the universe. The two test periods are chained for display and reported separately in the table. Levels are inflated by survivorship, and differences are also affected, so read both with the coverage on the Data page.</p>
+    <p class="caption">Log scale, so equal slopes are equal percentage growth. The benchmark is the equal-weight average of every name with usable data for that signal, which isolates the signal from the universe. The two test periods are chained for display and reported separately in the table. Levels are inflated by survivorship, and differences are also affected, so read both with the coverage on the Data page.</p>
 
-    <h2 id="ddTitle" style="margin-top:1.5rem;">Drawdown</h2>
-    <div style="position:relative; height:220px;"><canvas id="ddChart"></canvas></div>
-    <p class="caption">Percentage below each series' previous high, from monthly data, which understates intramonth drawdowns.</p>
   </div>
 
   <div class="panel">
@@ -44,6 +43,15 @@
       </table>
     </div>
     <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is flagged (bold, with an asterisk) only when its 90% paired bootstrap interval excludes zero.</p>
+  </div>
+
+  </div>
+
+  <div class="tabpane" id="pane-risk" hidden>
+  <div class="panel">
+    <h2 id="ddTitle">Drawdown</h2>
+    <div style="position:relative; height:220px;"><canvas id="ddChart"></canvas></div>
+    <p class="caption">Percentage below each series' previous high, from monthly data, which understates intramonth drawdowns.</p>
   </div>
 
   <div class="panel">
@@ -63,6 +71,9 @@
     <p class="caption">The five largest peak-to-trough episodes of the monthly series. A trailing plus sign marks an episode still open at the end of the sample.</p>
   </div>
 
+  </div>
+
+  <div class="tabpane" id="pane-returns" hidden>
   <div class="panel">
     <h2 id="hmTitle">Monthly returns</h2>
     <div class="ctrl-row"><div class="ctrl-group" id="hmTabs"></div></div>
@@ -82,12 +93,15 @@
     <p class="caption" id="costCaption"></p>
   </div>
 
-  <div class="section-label">All portfolios <span>independent of the bar above</span></div>
+  </div>
+
+  <div class="tabpane" id="pane-all" hidden>
   <div class="panel">
-    <h2>Sharpe difference against the benchmark <span>all 18 headline comparisons, before costs</span></h2>
+    <h2>Sharpe difference against the benchmark <span>all 18 headline comparisons, before costs; independent of the selection bar</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="periodTabs"></div></div>
     <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe difference confidence intervals"></svg>
     <p class="caption">Each bar is the paired bootstrap interval for the difference in Sharpe ratio between a portfolio and its benchmark (5,000 resamples). At the 90% level, about 1.8 of 18 intervals would exclude zero under the null. Two do: Value in 2012 to 2020, where the portfolio Sharpe ratio is below the benchmark. They are one finding, since the decile and quintile portfolios overlap, and it is absent from the re-test and the full period. Some secondary signal tests lean the same way, but they share the same months and stocks and are not independent evidence.</p>
+  </div>
   </div>
 
   <div id="foot"></div>
@@ -119,10 +133,10 @@ function drawPortfolios() {
   const b = SEL.basis, sb = SUMMARY_BASIS();
   const strat = U.series[SEL.sig][SEL.size][b], bench = U.benchmarks[benchmarkKey(SEL.sig)][b], spy = U.spy;
   const g = [growth(strat), growth(bench), growth(spy)];
-  const names = [SEL.sig + ", " + SIZE_LABEL[SEL.size].toLowerCase(), "Equal-weight benchmark", "S&P 500 (SPY), reference"];
+  const names = [SEL.sig + ", " + SIZE_LABEL[SEL.size].toLowerCase(), benchmarkName(SEL.sig), "S&P 500 (SPY), reference"];
   const cols = [COLORS[SEL.sig], COLORS.Benchmark, COLORS.SPY];
   const fields = ["sig", "size", "basis"];
-  title("growthTitle", "Growth of $1", fields);
+  title("growthTitle", "Growth of $1, log scale", fields);
   title("ddTitle", "Drawdown", fields);
   title("perfTitle", "Performance by period", fields);
   title("rollTitle", "Rolling 36-month excess return", fields);
@@ -132,8 +146,11 @@ function drawPortfolios() {
   const sets = arr => arr.map((d, i) => ({ label: names[i], data: d, borderColor: cols[i], backgroundColor: cols[i], borderWidth: i === 0 ? 2.5 : (i === 1 ? 2 : 1.5), borderDash: i === 2 ? [2, 3] : [] }));
   if (growthChart) growthChart.destroy();
   if (ddChart) ddChart.destroy();
-  growthChart = lineChart("growthChart", sets(g), v => "$" + v.toFixed(0), v => "$" + v.toFixed(2), true);
-  ddChart = lineChart("ddChart", sets(g.map(drawdown)), v => (v * 100).toFixed(0) + "%", v => pct(v, 1), true, true);
+  growthChart = lineChart("growthChart", sets(g), v => "$" + v, v => "$" + v.toFixed(2), true);
+  /* log axis with round-number ticks only */
+  Object.assign(growthChart.options.scales.y, { type: "logarithmic", afterBuildTicks: ax => { ax.ticks = [1, 2, 3, 5, 10, 20, 30, 50].filter(v => v >= ax.min && v <= ax.max).map(value => ({ value })); } });
+  growthChart.update();
+  ddChart = lineChart("ddChart", sets(g.map(drawdown)), v => (v * 100).toFixed(0) + "%", v => pct(v, 1), true, false);
 
   const body = document.getElementById("perfBody");
   body.innerHTML = "";
@@ -215,10 +232,27 @@ function drawSharpeForest() {
 }
 buttons("periodTabs", PERIODS.map(p => ({ key: p.key, label: p.label })), periodKey, k => { periodKey = k; drawSharpeForest(); });
 buttons("hmTabs", [{ key: "active", label: "Active vs benchmark" }, { key: "absolute", label: "Absolute" }], hmMode, k => { hmMode = k; drawHeatmap(); });
+const PAGE_TABS = [
+  { key: "perf", label: "Performance" },
+  { key: "risk", label: "Drawdown and rolling excess" },
+  { key: "returns", label: "Monthly returns and costs" },
+  { key: "all", label: "All 18 comparisons" }
+];
+function showTab(key, fromClick) {
+  if (!PAGE_TABS.some(t => t.key === key)) key = PAGE_TABS[0].key;
+  PAGE_TABS.forEach(t => { document.getElementById("pane-" + t.key).hidden = t.key !== key; });
+  document.getElementById("ctx").style.display = key === "all" ? "none" : "";
+  document.getElementById("pageTabs").innerHTML = PAGE_TABS.map(t =>
+    `<button role="tab" class="tab${t.key === key ? " active" : ""}" data-k="${t.key}" aria-selected="${t.key === key}">${t.label}</button>`).join("");
+  document.querySelectorAll("#pageTabs .tab").forEach(b => b.onclick = () => showTab(b.dataset.k, true));
+  if (fromClick) { try { history.replaceState(null, "", "#" + key); } catch (e) { /* ignore */ } }
+  Object.values(Chart.instances).forEach(c => c.resize());
+}
 contextStrip("ctx", ["sig", "size", "basis"], () => { drawReading(); drawPortfolios(); }, true);
 drawReading();
 drawPortfolios();
 drawSharpeForest();
+showTab((location.hash || "").slice(1), false);
 </script>
 </body>
 </html>
