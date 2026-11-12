@@ -565,3 +565,26 @@ Before this entry was written, a read-only check of the saved membership file an
 ### What this does not do
 
 It does not tune the minimum sector size, choose a better sector definition, or make the universe free of survivorship.
+
+## Amendment 18 (2026-11-12, after every registered result existed, after Amendments 16 and 17 and their results, before any code for this entry was written or run)
+
+Amendment 16 regressed each portfolio on the benchmark. This entry adds a regression on four published factors, to see how much of any benchmark alpha is exposure to the market, size, value and momentum factors. Everything is exploratory and post hoc. It changes no registered rule, headline or published figure.
+
+### Disclosure of a prior look
+
+Before this entry was written, the benchmark-regression results (Amendment 16, decision 2) and the French correlations had been read. The Momentum and Combined benchmark alphas, about +4.7% a year over the full period, have intervals that exclude zero. These readings motivate the entry. The four-factor results have not been seen.
+
+### Decisions
+
+1. **Regression.** For each portfolio, the monthly return minus the saved monthly Treasury bill rate (rf_monthly in the saved portfolio files) is regressed on the Kenneth French monthly Mkt-RF, SMB, HML and Mom, converted from percent to decimal, as stored unchanged in data/external/french/. The French RF column is not used, so the excess return is the same one used in Amendment 16.
+2. **Portfolios.** The registered Momentum, Value and Combined portfolios (top decile and top quintile) from results/universe_study_portfolio_returns.csv, and the Value and Combined portfolios of the sector-neutral and same-names variants from results/universe_study_sector_neutral_portfolio_returns.csv. Both bases used in Amendment 16 (gross and net_drift). Three periods as before: 2012-2020, 2021-2026, 2012-2026.
+3. **Inference.** Newey-West standard errors with the lag rule of Amendment 14, no small-sample correction, 90% intervals, the same function as Amendment 16 extended to several regressors. Alpha is annualised by 12. Loadings and R-squared are reported with it.
+4. **Months.** The months are those the portfolio files hold. Months absent from the French files stop the run.
+5. **Checks before anything is reported.** The regression function is tested on hand-made data with known coefficients. The reported alpha, loadings and standard errors are compared with an independent statsmodels fit, and a difference above 1e-8 stops the run.
+6. **Outputs.** One new file, results/universe_study_alpha_factor4.csv, mode x. The script stops if it exists.
+7. **Reading rule.** The 4-factor alphas join the family of tests and are counted in the ledger, as exploratory. A single interval that excludes zero is not read on its own. The loadings are descriptive. No variant is dropped.
+8. **Dashboard.** The results are shown on the Controls tab next to the benchmark regression, with every sentence computed from the file.
+
+### What this does not do
+
+It does not add the French factors to the portfolios as a hedge, choose a better factor model, correct for the lack of point-in-time sector or survivorship, or add power to the registered sample. The French factors are built from a broader CRSP universe than this study's 500 names, so loadings show similarity to those factors, not an exact decomposition.
