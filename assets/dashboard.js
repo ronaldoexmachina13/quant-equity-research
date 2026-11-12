@@ -1,12 +1,20 @@
 /* Shared helpers for the large-universe dashboard pages. Needs Chart.js and universe_data.js loaded first. */
-Chart.defaults.font.family = '"DejaVu Sans Mono", "JetBrains Mono", Menlo, Consolas, ui-monospace, monospace';
-Chart.defaults.font.size = 11;
-Chart.defaults.color = "#8A8A8A";
-Chart.defaults.borderColor = "#2A2A2A";
-Chart.defaults.scale.grid.color = "#2A2A2A";
-Object.assign(Chart.defaults.plugins.tooltip, { titleColor: "#FFB000", bodyColor: "#E8E8E8", titleFont: { weight: "700" } });
+Chart.defaults.font.family = '"IBM Plex Mono", "DejaVu Sans Mono", Menlo, Consolas, ui-monospace, monospace';
+Chart.defaults.font.size = 10;
+Chart.defaults.color = "#858C97";
+Chart.defaults.borderColor = "#1B2027";
+Chart.defaults.scale.grid.color = "#1B2027";
+Chart.defaults.scale.grid.drawTicks = false;
+Chart.defaults.scale.ticks.padding = 6;
+Chart.defaults.scale.border.display = false;
+Chart.defaults.elements.line.borderWidth = 1.6;
+Chart.defaults.elements.bar.borderRadius = 0;
+Object.assign(Chart.defaults.plugins.tooltip, {
+  backgroundColor: "#0B0D10", borderColor: "#353C47", borderWidth: 1, cornerRadius: 0, padding: 8,
+  titleColor: "#F2F3F5", bodyColor: "#D9DCE1", titleFont: { weight: "500", size: 10 }, bodyFont: { size: 10 }, boxPadding: 3
+});
 
-const COLORS = { Momentum: "#3ED88A", Value: "#29B6F6", Combined: "#FFB000", Benchmark: "#FFFFFF", SPY: "#8A8A8A" };
+const COLORS = { Momentum: "#45B8A6", Value: "#6F9FE6", Combined: "#E3AB42", Benchmark: "#F2F3F5", SPY: "#7B828E" };
 const PERIODS = [
   { key: "New test (2012-2020)", label: "2012–2020" },
   { key: "Re-test (2021-2026)", label: "2021–2026" },
@@ -37,31 +45,46 @@ function niceStep(range) {
   const raw = range / 5, mag = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / mag;
   return (n < 1.5 ? 1 : n < 3.5 ? 2 : n < 7.5 ? 5 : 10) * mag;
 }
-function forest(svgId, rows, fmt, domain) {
-  const W = 860, right = 190, left = Math.max(175, Math.max(...rows.map(r => r.label.length)) * 7.4 + 12), rowH = 30, top = 14, bottom = 36;
+function forest(svgId, rows, fmt, domain, band) {
+  /* On a phone the plot is redrawn narrow, with the label and value above each interval, so the text stays readable */
+  const compact = window.innerWidth < 640;
+  const W = compact ? 400 : 860, right = compact ? 10 : 190, left = compact ? 10 : Math.max(175, Math.max(...rows.map(r => r.label.length)) * 7.4 + 12);
+  const rowH = compact ? 50 : 30, top = 26, bottom = 34;
   const H = top + rows.length * rowH + bottom;
-  let lo = domain ? domain[0] : Math.min(0, ...rows.map(r => r.lo));
-  let hi = domain ? domain[1] : Math.max(0, ...rows.map(r => r.hi));
+  let lo = domain ? domain[0] : Math.min(0, ...rows.map(r => r.lo), band ? -band.half : 0);
+  let hi = domain ? domain[1] : Math.max(0, ...rows.map(r => r.hi), band ? band.half : 0);
   const pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
   const x = v => left + (v - lo) / (hi - lo) * (W - left - right);
   const step = niceStep(hi - lo);
   let s = "";
+  if (band) {
+    s += `<rect x="${x(-band.half)}" y="${top}" width="${x(band.half) - x(-band.half)}" height="${H - bottom - top}" fill="#858C97" fill-opacity="0.10"/>` +
+         `<line x1="${x(-band.half)}" x2="${x(-band.half)}" y1="${top}" y2="${H - bottom}" stroke="#858C97" stroke-opacity="0.5" stroke-dasharray="3 3"/>` +
+         `<line x1="${x(band.half)}" x2="${x(band.half)}" y1="${top}" y2="${H - bottom}" stroke="#858C97" stroke-opacity="0.5" stroke-dasharray="3 3"/>` +
+         `<text class="dim" x="${x(-band.half)}" y="${top - 9}">${compact && band.short ? band.short : band.label}</text>`;
+  }
   for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) {
     const tv = Math.abs(t) < step / 1000 ? 0 : t;
-    s += `<line x1="${x(tv)}" x2="${x(tv)}" y1="${top}" y2="${H - bottom}" stroke="#2A2A2A"/>` +
-         `<text class="muted" x="${x(tv)}" y="${H - bottom + 16}" text-anchor="middle">${fmt.axis(tv)}</text>`;
+    s += `<line x1="${x(tv)}" x2="${x(tv)}" y1="${top}" y2="${H - bottom}" stroke="#1B2027"/>` +
+         `<text class="muted" x="${x(tv)}" y="${H - bottom + 17}" text-anchor="middle">${fmt.axis(tv)}</text>`;
   }
-  s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${H - bottom}" stroke="#E8E8E8" stroke-width="1.2"/>`;
+  s += `<line x1="${left}" x2="${W - right}" y1="${H - bottom}" y2="${H - bottom}" stroke="#353C47"/>`;
+  s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${H - bottom}" stroke="#D9DCE1" stroke-width="1"/>`;
   rows.forEach((r, i) => {
-    const y = top + i * rowH + rowH / 2;
-    if (i > 0 && rows[i - 1].group !== r.group) s += `<line x1="0" x2="${W}" y1="${top + i * rowH}" y2="${top + i * rowH}" stroke="#2A2A2A" stroke-dasharray="2 3"/>`;
-    const c = COLORS[r.color] || "#E8E8E8";
-    s += `<text x="0" y="${y + 4}">${r.label}</text>`;
-    s += `<line x1="${x(r.lo)}" x2="${x(r.hi)}" y1="${y}" y2="${y}" stroke="${c}" stroke-width="2.5"/>`;
-    s += `<line x1="${x(r.lo)}" x2="${x(r.lo)}" y1="${y - 5}" y2="${y + 5}" stroke="${c}" stroke-width="2"/>`;
-    s += `<line x1="${x(r.hi)}" x2="${x(r.hi)}" y1="${y - 5}" y2="${y + 5}" stroke="${c}" stroke-width="2"/>`;
-    s += `<circle cx="${x(r.mean)}" cy="${y}" r="4.5" fill="${c}" ${r.excl ? 'stroke="#FF5A5A" stroke-width="2.5"' : 'stroke="#000" stroke-width="1.5"'}/>`;
-    s += `<text class="${r.excl ? "flag" : "muted"}" x="${W - right + 14}" y="${y + 4}">${fmt.val(r.mean)} [${fmt.val(r.lo)}, ${fmt.val(r.hi)}]</text>`;
+    const y0 = top + i * rowH, y = compact ? y0 + 34 : y0 + rowH / 2;
+    if (i > 0 && rows[i - 1].group !== r.group) s += `<line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="#232830" stroke-dasharray="2 3"/>`;
+    const c = COLORS[r.color] || "#D9DCE1";
+    const textY = compact ? y0 + 16 : y + 4;
+    s += `<text x="${compact ? left : 0}" y="${textY}">${r.label}${r.excl ? " *" : ""}</text>`;
+    s += `<line x1="${x(r.lo)}" x2="${x(r.hi)}" y1="${y}" y2="${y}" stroke="${c}" stroke-width="2"/>`;
+    s += `<line x1="${x(r.lo)}" x2="${x(r.lo)}" y1="${y - 4}" y2="${y + 4}" stroke="${c}" stroke-width="1.5"/>`;
+    s += `<line x1="${x(r.hi)}" x2="${x(r.hi)}" y1="${y - 4}" y2="${y + 4}" stroke="${c}" stroke-width="1.5"/>`;
+    const m = x(r.mean), d = 5.5;
+    /* A white ring marks an interval that excludes zero. Colour is kept for the sign of the value. */
+    s += `<polygon points="${m},${y - d} ${m + d},${y} ${m},${y + d} ${m - d},${y}" fill="${c}" ${r.excl ? 'stroke="#F2F3F5" stroke-width="2"' : 'stroke="#0B0D10" stroke-width="1.5"'}/>`;
+    const cls = r.excl ? "flag " + (r.mean < 0 ? "neg" : "pos") : "muted";
+    const vx = compact ? W - right : W - right + 14;
+    s += `<text class="${cls}" x="${vx}" y="${textY}"${compact ? ' text-anchor="end"' : ""}>${fmt.val(r.mean)} [${fmt.val(r.lo)}, ${fmt.val(r.hi)}]</text>`;
   });
   const svg = document.getElementById(svgId);
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -71,7 +94,7 @@ function forest(svgId, rows, fmt, domain) {
 /* ---------- 1. signal tests ---------- */
 const TESTS = [
   { key: "rank_ic", label: "Rank IC", fmt: { axis: v => v.toFixed(2), val: v => sgn(v, 3) },
-    text: "Rank IC is the monthly Spearman correlation between a signal and the next month's return. Zero means no ranking power; a positive mean means higher-ranked stocks tended to earn more. Bars are 90% bootstrap intervals (5,000 resamples). Red marks an interval that excludes zero; none do." },
+    text: "Rank IC is the monthly Spearman correlation between a signal and the next month's return. Zero means no ranking power; a positive mean means higher-ranked stocks tended to earn more. Bars are 90% bootstrap intervals (5,000 resamples). A ringed marker and an asterisk mark an interval that excludes zero; none do." },
   { key: "quintile_spread", label: "Quintile spread", fmt: { axis: v => (v * 100).toFixed(1) + "%", val: v => spct(v, 2) },
     text: "Average next-month return of the top-ranked fifth of stocks minus the bottom-ranked fifth. A positive spread means the signal sorted winners from losers in the expected direction." },
   { key: "fama_macbeth_single", label: "Fama-MacBeth", fmt: { axis: v => v.toFixed(3), val: v => sgn(v, 4) },
@@ -82,19 +105,47 @@ const TESTS = [
 /* ---------- shared chart helpers ---------- */
 function makeSplitLine(atBottom) { return {
   id: "splitLine",
+  beforeDatasetsDraw(chart) {
+    const x = chart.scales.x.getPixelForValue(U.split);
+    const { ctx, chartArea } = chart;
+    ctx.save();
+    ctx.fillStyle = "rgba(217,220,225,0.035)";
+    ctx.fillRect(x, chartArea.top, chartArea.right - x, chartArea.bottom - chartArea.top);
+    ctx.restore();
+  },
   afterDraw(chart) {
     const x = chart.scales.x.getPixelForValue(U.split);
     const { ctx, chartArea } = chart;
     ctx.save();
-    ctx.strokeStyle = "#8A8A8A"; ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = "#5A616D"; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle = "#8A8A8A"; ctx.font = "700 10px " + Chart.defaults.font.family;
+    ctx.setLineDash([]); ctx.fillStyle = "#858C97"; ctx.font = "500 9px " + Chart.defaults.font.family;
     const y = atBottom ? chartArea.bottom - 6 : chartArea.top + 12;
-    ctx.textAlign = "right"; ctx.fillText("2012–2020", x - 6, y);
-    ctx.textAlign = "left"; ctx.fillText("2021–2026 (RE-TEST)", x + 6, y);
+    const narrow = chartArea.right - chartArea.left < 420;
+    ctx.textAlign = "right"; ctx.fillText(narrow ? "NEW TEST" : "2012–2020 · NEW TEST", x - 6, y);
+    ctx.textAlign = "left"; ctx.fillText(narrow ? "SEEN BEFORE" : "2021–2026 · SEEN IN 17-STOCK STUDY", x + 6, y);
     ctx.restore();
   }
 }; }
+/* Dashed horizontal reference line with a label at the right edge (used for averages and zero lines) */
+function makeRefLine(value, label) { return {
+  id: "refLine",
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    const y = scales.y.getPixelForValue(value);
+    ctx.save();
+    ctx.strokeStyle = "#858C97"; ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(chartArea.left, y); ctx.lineTo(chartArea.right, y); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle = "#858C97"; ctx.font = "500 9px " + Chart.defaults.font.family;
+    ctx.textAlign = "right"; ctx.fillText(label, chartArea.right - 2, y - 4);
+    ctx.restore();
+  }
+}; }
+/* Smallest mean rank IC the 2012-2020 test could reliably detect (90% two-sided interval, 80% power) */
+function minDetectableIC() {
+  const Z = 1.645 + 0.842, sd = Math.max(...SIGNALS.map(s => icStatistics(s, 0, U.split).sd));
+  return Z * sd / Math.sqrt(U.split);
+}
 function lineChart(canvasId, datasets, yTick, tipFmt, withSplit, splitAtBottom) {
   return new Chart(document.getElementById(canvasId), {
     type: "line",
@@ -154,8 +205,8 @@ function monthlyHeatmap(containerId, returns, bench, scale) {
   const years = [...new Set(U.dates.map(d => d.slice(0, 4)))];
   const cell = v => {
     if (v === null) return `<td class="hm-empty"></td>`;
-    const a = 0.08 + 0.62 * Math.min(Math.abs(v) / scale, 1);
-    const bg = v < 0 ? `rgba(255,90,90,${a.toFixed(2)})` : `rgba(62,216,138,${a.toFixed(2)})`;
+    const a = 0.07 + 0.5 * Math.min(Math.abs(v) / scale, 1);
+    const bg = v < 0 ? `rgba(229,99,107,${a.toFixed(2)})` : `rgba(79,191,139,${a.toFixed(2)})`;
     const txt = (v * 100).toFixed(1).replace(/^-0\.0$/, "0.0");
     return `<td class="hm-cell" style="background:${bg}">${txt}</td>`;
   };
@@ -214,13 +265,35 @@ const PAGES = [
 ];
 const REPO_URL = "https://github.com/ronaldoexmachina13/quant-equity-research";
 function renderChrome(active, subtitle) {
+  const meta = typeof META !== "undefined" ? META : null;
+  const cov = U.coverage;
+  const members = cov && cov.members ? cov.members[cov.members.length - 1] : null;
+  const facts = [
+    ["Data through", ymLabel(U.dates[U.dates.length - 1]), true],
+    ["Months", U.dates.length],
+    ["Universe", members ? members + " S&amp;P 500 members" : "S&amp;P 500 members"],
+    ["Limitations plan", meta ? meta.entries.filter(e => e.id[0] === "A").length + " amendments, " + meta.entries.filter(e => e.id.startsWith("PH")).length + " designs" : null],
+    ["Status", "Pre-specified, free data"]
+  ].filter(f => f[1] !== null);
   document.getElementById("chrome").innerHTML =
     `<nav class="topnav"><div class="topnav-inner"><a class="brand" href="index.html">Quant Equity Research</a><div class="links">` +
     PAGES.map(p => `<a href="${p.href}"${p.href === active ? ' class="active"' : ""}>${p.label}</a>`).join("") +
-    `</div></div></nav><div class="subtitle-bar">${subtitle}</div>`;
+    `</div></div></nav>` +
+    `<div class="statusbar"><div class="statusbar-inner">` + facts.map(f => `<span class="st${f[2] ? " live" : ""}"><i>${f[0]}</i><b>${f[1]}</b></span>`).join("") + `</div></div>` +
+    `<div class="subtitle-bar">${subtitle}</div>`;
   document.getElementById("foot").innerHTML =
     `<footer><div class="facts"><span>About 500 S&amp;P 500 members</span><span>Jan 2012 &ndash; Aug 2026</span><span>Free data, survivor-biased</span></div>` +
+    `<div class="lineage">Lineage: results/*.csv &rarr; scripts/universe/generate_universe_dashboard_data.py &rarr; assets/universe_*.js &rarr; this page</div>` +
     `<div class="repo">Quant Equity Research &middot; <a href="${REPO_URL}" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div></footer>`;
+}
+/* Amendment log: the newest dated entries of the pre-specification, read from assets/meta_data.js */
+function renderTape(containerId, count) {
+  const box = document.getElementById(containerId);
+  if (!box || typeof META === "undefined") return;
+  const rows = META.entries.slice().reverse().slice(0, count);
+  box.className = "tape";
+  box.innerHTML = rows.map(e => `<div class="tape-row"><span class="t-n">${e.id}</span><span class="t-d">${e.date}</span><span class="t-x">${e.note}</span></div>`).join("") +
+    `<div class="tape-foot">Newest ${rows.length} of ${META.entries.length} dated entries &middot; append-only &middot; <a href="${REPO_URL}/blob/main/${META.planFile}" target="_blank">${META.planFile}</a></div>`;
 }
 
 const SIZE_LABEL = { top_decile: "Top decile", top_quintile: "Top quintile" };
@@ -267,7 +340,8 @@ function selectionText(fields) {
 
 function benchmarkKey(sig) { return sig === "Momentum" ? "Momentum" : "Value and Combined"; }
 function benchmarkName(sig) { return sig === "Momentum" ? "Benchmark (Momentum usable)" : "Benchmark (Value and Combined usable)"; }
-function flagText(t, excludes) { return excludes ? `<span class="neg">${t}</span>` : t; }
+/* Marks an interval that excludes zero with bold type and an asterisk; colour follows the sign of the value */
+function flagText(t, excludes) { return excludes ? `<span class="flagval ${/^\[?\u2212/.test(t) ? "neg" : "pos"}">${t}*</span>` : t; }
 function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
 
 const DEFINITIONS = {

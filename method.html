@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Method | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=5">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div id="chrome"></div>
@@ -65,6 +65,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
+<script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("method.html", "Pre-specified design &middot; frozen signals &middot; no tuning &middot; every variant reported");
@@ -92,7 +93,7 @@ const REG = [
   ["2026-11-07", "Amendment 14", "any code for the additions was written; exploratory and after every registered result existed (group returns, interval robustness, book value check, data manifest)"],
   ["2026-11-11", "Amendment 15", "any code for the additions was written; exploratory and after every registered result existed (true 12-1 sensitivity, survivorship by year)"]
 ];
-document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="month-cell">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="month-cell">${r[0]}</td><td>${r[1].startsWith("Out-of-sample") ? r[1] : "Limitations plan, " + r[1]}</td><td>${r[2]}</td></tr>`).join("");
 
 /* power: (z_alpha + z_power) * sd / sqrt(n), with z_alpha = 1.645 (90% two-sided) and z_power = 0.842 (80%) */
 (function power() {
@@ -102,17 +103,17 @@ document.getElementById("regBody").innerHTML = REG.map(r => `<tr><td class="mont
   const months = []; for (let n = 24; n <= 240; n += 4) months.push(n);
   const curve = sd => months.map(n => Z * sd / Math.sqrt(n));
   const sets = [
-    { label: `SD ${hi.sd.toFixed(2)} (${hi.s}, 2012 to 2020)`, data: curve(hi.sd), borderColor: "#FFB000", backgroundColor: "#FFB000" },
-    { label: `SD ${lo.sd.toFixed(2)} (${lo.s}, 2012 to 2020)`, data: curve(lo.sd), borderColor: "#29B6F6", backgroundColor: "#29B6F6" }
+    { label: `SD ${hi.sd.toFixed(2)} (${hi.s}, 2012 to 2020)`, data: curve(hi.sd), borderColor: "#E3AB42", backgroundColor: "#E3AB42" },
+    { label: `SD ${lo.sd.toFixed(2)} (${lo.s}, 2012 to 2020)`, data: curve(lo.sd), borderColor: "#6F9FE6", backgroundColor: "#6F9FE6" }
   ];
   document.getElementById("powerLegend").innerHTML = sets.map(s => `<span><i style="background:${s.borderColor}"></i>${s.label}</span>`).join("");
   const marks = { id: "marks", afterDraw(chart) {
     const { ctx, chartArea, scales } = chart;
     [[108, "108 months: first test period"], [176, "176 months: full sample"]].forEach(([n, label]) => {
       const x = scales.x.getPixelForValue(months.indexOf(n));
-      ctx.save(); ctx.strokeStyle = "#8A8A8A"; ctx.setLineDash([4, 4]);
+      ctx.save(); ctx.strokeStyle = "#5A616D"; ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
-      ctx.setLineDash([]); ctx.fillStyle = "#8A8A8A"; ctx.font = "700 10px " + Chart.defaults.font.family; ctx.textAlign = "left";
+      ctx.setLineDash([]); ctx.fillStyle = "#5A616D"; ctx.font = "700 10px " + Chart.defaults.font.family; ctx.textAlign = "left";
       ctx.fillText(label, x + 6, chartArea.top + 12); ctx.restore();
     });
   } };

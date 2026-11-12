@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Data | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=5">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div id="chrome"></div>
@@ -41,7 +41,7 @@
   <div class="panel">
     <h2>Usable names per month</h2>
     <div class="legend-row">
-      <span><i style="background:#FFFFFF"></i>Index members</span>
+      <span><i style="background:#F2F3F5"></i>Index members</span>
       <span><i style="background:var(--momentum)"></i>Usable for Momentum</span>
       <span><i style="background:var(--value)"></i>Usable for Value and Combined</span>
     </div>
@@ -94,6 +94,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_stocks_data.js"></script>
+<script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("data.html", "Free data &middot; survivor-biased &middot; membership, prices, book value and risk-free rate");
@@ -117,7 +118,7 @@ const STOCKS = UNIVERSE_STOCKS.rows.map(r => Object.fromEntries(stockCols.map((c
 })();
 
 lineChart("covChart", [
-  { label: "Index members", data: U.coverage.members, borderColor: "#FFFFFF", backgroundColor: "#FFFFFF", borderDash: [3, 3], borderWidth: 1.5 },
+  { label: "Index members", data: U.coverage.members, borderColor: "#F2F3F5", backgroundColor: "#F2F3F5", borderDash: [3, 3], borderWidth: 1.5 },
   { label: "Usable for Momentum", data: U.coverage.momentum, borderColor: COLORS.Momentum, backgroundColor: COLORS.Momentum },
   { label: "Usable for Value and Combined", data: U.coverage.value_combined, borderColor: COLORS.Value, backgroundColor: COLORS.Value }
 ], v => v, v => v, false);

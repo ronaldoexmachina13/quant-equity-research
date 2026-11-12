@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portfolios | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=5">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div id="chrome"></div>
@@ -43,7 +43,7 @@
         <tbody id="perfBody"></tbody>
       </table>
     </div>
-    <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is flagged (red) only when its 90% paired bootstrap interval excludes zero.</p>
+    <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is flagged (bold, with an asterisk) only when its 90% paired bootstrap interval excludes zero.</p>
   </div>
 
   <div class="panel">
@@ -95,6 +95,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
+<script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("portfolios.html", "Equal weight &middot; rebalanced monthly &middot; 10 bps one-way costs &middot; benchmark: equal-weight average of usable names");
@@ -163,7 +164,7 @@ function drawPortfolios() {
   if (rollChart) rollChart.destroy();
   rollChart = lineChart("rollChart", [
     { label: "Portfolio minus benchmark", data: roll, borderColor: COLORS[SEL.sig], backgroundColor: COLORS[SEL.sig], borderWidth: 2.5 },
-    { label: "Zero", data: strat.map(() => 0), borderColor: "#8A8A8A", backgroundColor: "#8A8A8A", borderWidth: 1, borderDash: [4, 4] }
+    { label: "Zero", data: strat.map(() => 0), borderColor: "#7B828E", backgroundColor: "#7B828E", borderWidth: 1, borderDash: [4, 4] }
   ], v => (v * 100).toFixed(0) + "%", v => v === null ? "" : spct(v, 1), true);
 
   drawdownTable("ddBody", strat, 5);

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=5">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div id="chrome"></div>
@@ -72,7 +72,7 @@
         <tbody id="testBody"></tbody>
       </table>
     </div>
-    <p class="caption">Rank IC is the monthly Spearman correlation between the signal and the next month's return. The quintile spread is the top fifth minus the bottom fifth. Fama-MacBeth is the average slope of monthly cross-sectional regressions (joint: Momentum and Value together). Red marks an interval that excludes zero.</p>
+    <p class="caption">Rank IC is the monthly Spearman correlation between the signal and the next month's return. The quintile spread is the top fifth minus the bottom fifth. Fama-MacBeth is the average slope of monthly cross-sectional regressions (joint: Momentum and Value together). A ringed marker and an asterisk mark an interval that excludes zero.</p>
   </div>
 
   <div class="panel">
@@ -107,6 +107,7 @@
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_sens_data.js"></script>
 <script src="assets/universe_extras_data.js"></script>
+<script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
@@ -201,7 +202,7 @@ function drawRobust() {
   const excl = all.filter(r => r.iid_excludes_zero).length;
   const robust = all.filter(r => r.iid_excludes_zero && r.nw_excludes_zero && r.block_excludes_zero).length;
   document.getElementById("robustCaption").textContent =
-    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. Red marks an interval that excludes zero. " +
+    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. A ringed marker and an asterisk mark an interval that excludes zero. " +
     (excl === 0 ? "Across all " + total + " signal tests, no interval excludes zero under any of the three methods. " :
       "Across all " + total + " signal tests, the registered interval excludes zero in " + excl + " and all three intervals do in " + robust + ". ") +
     (rows ? "For " + SEL.sig + ", " + (flipped ? flipped + " of the registered exclusions do not hold under both new intervals." : "the new intervals change no reading.") : "");
@@ -227,7 +228,7 @@ function drawQuintiles() {
   document.getElementById("quintLegend").innerHTML = PERIODS.map((p, i) => `<span><i style="background:${COLORS[SEL.sig]}${shades[i]}"></i>${p.label}</span>`).join("");
   const mono = PERIODS.map(p => { const r = X.quintiles.find(x => x.signal === SEL.sig && x.period === p.key && x.quintile === 1); return p.label + ": " + (r ? r.monotonicity.toFixed(2) : "n/a"); }).join(", ");
   document.getElementById("quintCaption").textContent =
-    "Annualised mean return (monthly mean times 12) of each fifth of stocks, ranked on the signal at the start of the month, equal-weighted. Group 5 minus group 1 is the quintile spread. Monotonicity is the rank correlation between group number and return, from -1 to 1 (" + mono + "). A working signal rises from left to right; a single large bar at one end is not the same as a trend.";
+    "Annualised mean return (monthly mean times 12) of each fifth of stocks, ranked on the signal at the start of the month, equal-weighted. Group 5 minus group 1 is the quintile spread. Monotonicity is the rank correlation between group number and return, from -1 to 1 (" + mono + "). It rests on five points, so it is descriptive only and has no significance of its own. A working signal rises from left to right; a single large bar at one end is not the same as a trend.";
 }
 function drawSens() {
   document.getElementById("sensTitle").innerHTML = "Sensitivity <span>" + SEL.sig + ": same tests, different treatments of the book-value data</span>";
@@ -252,7 +253,7 @@ function drawSens() {
   const notes = [];
   if (SEL.sig === "Momentum") notes.push(DEFINITIONS.Momentum.note);
   else notes.push("Winsorised P/B caps extreme price-to-book values and was run for the signal tests only, so it has no portfolio rows. Excluding 24 or 37 names removes stocks whose book values looked unreliable (split or share-count problems); each portfolio is then compared with the equal-weight portfolio of the names that remain.");
-  notes.push("Red marks an interval that excludes zero. Variants share the same months and stocks, so they are not independent confirmations.");
+  notes.push("A ringed marker and an asterisk mark an interval that excludes zero. Variants share the same months and stocks, so they are not independent confirmations.");
   document.getElementById("sensCaption").textContent = notes.join(" ");
 }
 buttons("sensTabs", SENS_METRICS.map(m => ({ key: m.key, label: m.label })), sensKey, k => { sensKey = k; drawSens(); });

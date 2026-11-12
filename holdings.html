@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Holdings | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=5">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div id="chrome"></div>
@@ -38,7 +38,7 @@
       <span><i style="background:var(--momentum)"></i>Momentum</span>
       <span><i style="background:var(--value)"></i>Value</span>
       <span><i style="background:var(--combined)"></i>Combined</span>
-      <span><i style="background:#FFFFFF"></i>Equal-weight benchmark (Value and Combined usable)</span>
+      <span><i style="background:#F2F3F5"></i>Equal-weight benchmark (Value and Combined usable)</span>
     </div>
     <div style="position:relative; height:260px;"><canvas id="growthChart"></canvas></div>
     <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased. Pick a year and month above, click the chart, or use the left and right arrow keys.</p>
@@ -72,6 +72,7 @@
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_stocks_data.js"></script>
 <script src="assets/universe_holdings_data.js"></script>
+<script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
 renderChrome("holdings.html", "Top-decile portfolios &middot; equal weight &middot; rebalanced monthly &middot; every ticker that was in the index");
@@ -88,7 +89,7 @@ function drawContrib() {
   const pool = STOCKS.filter(s => s[key] !== null).sort((a, b) => b[key] - a[key]);
   const top = pool.slice(0, 10), bot = pool.slice(-10).reverse();
   const max = Math.max(...top.map(s => Math.abs(s[key])), ...bot.map(s => Math.abs(s[key])));
-  const row = s => `<div class="bar-row" title="${esc(s.company || s.ticker)}"><span><b>${esc(s.ticker)}</b></span><span class="bar-track"><span class="bar-fill" style="background:${s[key] >= 0 ? COLORS[strat] : "#FF5A5A"}; left:0; width:${Math.abs(s[key]) / max * 100}%"></span></span><span style="text-align:right">${spct(s[key], 1)}</span></div>`;
+  const row = s => `<div class="bar-row" title="${esc(s.company || s.ticker)}"><span><b>${esc(s.ticker)}</b></span><span class="bar-track"><span class="bar-fill" style="background:${s[key] >= 0 ? COLORS[strat] : "#E5636B"}; left:0; width:${Math.abs(s[key]) / max * 100}%"></span></span><span style="text-align:right">${spct(s[key], 1)}</span></div>`;
   document.getElementById("topList").innerHTML = top.map(row).join("");
   document.getElementById("botList").innerHTML = bot.map(row).join("");
   const total = pool.reduce((a, s) => a + s[key], 0), topShare = top.reduce((a, s) => a + s[key], 0) / total;
@@ -104,12 +105,12 @@ Chart.register({
     if (chart.canvas.id !== "growthChart") return;
     const x = chart.scales.x.getPixelForValue(i);
     const { ctx, chartArea } = chart;
-    ctx.save(); ctx.strokeStyle = "#FFB000"; ctx.lineWidth = 1.5;
+    ctx.save(); ctx.strokeStyle = "#F0A83A"; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke(); ctx.restore();
   }
 });
 const sets = SIGNALS.map(s => ({ label: s, data: growth(U.series[s].top_decile.gross), borderColor: COLORS[s], backgroundColor: COLORS[s] }));
-sets.push({ label: "Benchmark", data: growth(U.benchmarks["Value and Combined"].gross), borderColor: "#FFFFFF", backgroundColor: "#FFFFFF", borderWidth: 1.5 });
+sets.push({ label: "Benchmark", data: growth(U.benchmarks["Value and Combined"].gross), borderColor: "#F2F3F5", backgroundColor: "#F2F3F5", borderWidth: 1.5 });
 const chart = lineChart("growthChart", sets, v => "$" + v.toFixed(0), v => "$" + v.toFixed(2), false);
 chart.options.animation = false;
 chart.update();

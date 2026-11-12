@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Summary | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=5">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div id="chrome"></div>
@@ -56,7 +56,7 @@
   <div class="panel">
     <h2>Only one portfolio stands out, and it lagged the benchmark</h2>
     <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe ratio difference intervals"></svg>
-    <p class="caption">Top-decile portfolios against the equal-weight benchmark of the same stocks: difference in Sharpe ratio before costs, with a 90% paired bootstrap interval. Red marks an interval that excludes zero. Across 18 comparisons (three signals, two portfolio sizes, three periods) about two would do so by chance alone. The Portfolios page has the top-quintile versions.</p>
+    <p class="caption">Top-decile portfolios against the equal-weight benchmark of the same stocks: difference in Sharpe ratio before costs, with a 90% paired bootstrap interval. A ringed marker and an asterisk mark an interval that excludes zero. Across 18 comparisons (three signals, two portfolio sizes, three periods) about two would do so by chance alone. The Portfolios page has the top-quintile versions.</p>
   </div>
 
   <div class="section-label">Why believe it <span>how the study avoids fooling itself</span></div>
@@ -67,13 +67,16 @@
     <div class="trust"><b>It found its own errors</b><p>A one-month look-ahead, a split bug that flattered Value, unit errors in SEC share counts and a mislabelled Momentum signal were all caught, fixed and logged on the Data page.</p></div>
   </div>
 
+  <div class="section-label">Amendment log <span>the newest dated entries of the pre-specification, each written before the work it concerns</span></div>
+  <div id="tape"></div>
+
   <div class="section-label">Every test <span>the full scorecard, for readers who want the numbers</span></div>
   <details class="panel fold">
     <summary>Show the scorecard: three signals, four measures, the two test periods (the full sample is on the Signals page)</summary>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table scorecard" id="scorecard"></table>
     </div>
-    <p class="caption">Estimate and 90% bootstrap interval, before costs. Rank IC, quintile spread and Fama-MacBeth slope are the primary tests. The Sharpe difference is the top-decile portfolio against its benchmark and is secondary evidence. Red marks an interval that excludes zero. Quintile spread is the return of the top fifth of stocks minus the bottom fifth. A Fama-MacBeth slope is the average monthly effect of the signal on next-month returns.</p>
+    <p class="caption">Estimate and 90% bootstrap interval, before costs. Rank IC, quintile spread and Fama-MacBeth slope are the primary tests. The Sharpe difference is the top-decile portfolio against its benchmark and is secondary evidence. A ringed marker and an asterisk mark an interval that excludes zero. Quintile spread is the return of the top fifth of stocks minus the bottom fifth. A Fama-MacBeth slope is the average monthly effect of the signal on next-month returns.</p>
   </details>
 
   <div class="section-label">Where to look <span>one question per page</span></div>
@@ -92,8 +95,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_extras_data.js"></script>
+<script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
+renderTape("tape", 6);
 renderChrome("index.html", "S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (11-month) &middot; Value (P/B) &middot; Combined");
 const X = UNIVERSE_EXTRAS;
 
@@ -119,22 +124,26 @@ const X = UNIVERSE_EXTRAS;
     const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === sig && x.period === p.key);
     rows.push({ label: sig + " · " + p.label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, color: sig, group: sig, excl: r.excludes_zero });
   }));
-  forest("icForest", rows, TESTS[0].fmt);
+  const mde = minDetectableIC();
+  forest("icForest", rows, TESTS[0].fmt, null, { half: mde, label: "EFFECTS INSIDE THE BAND WOULD LIKELY BE MISSED (±" + mde.toFixed(3) + ", 2012–2020 TEST)", short: "LIKELY MISSED: ±" + mde.toFixed(3) });
 })();
 
 /* exhibit 2: return by group, full period */
 (function exhibit2() {
   SIGNALS.forEach(sig => {
     const rows = [1, 2, 3, 4, 5].map(q => X.quintiles.find(r => r.signal === sig && r.period === PERIODS[2].key && r.quintile === q));
-    document.getElementById("mono" + sig).textContent = "rank corr. " + sgn(rows[0].monotonicity, 1);
+    const avg = rows.reduce((a, r) => a + r.mean_annualised, 0) / rows.length;
+    const sp = U.signalTests.find(t => t.test === "quintile_spread" && t.signal === sig && t.period === PERIODS[2].key);
+    document.getElementById("mono" + sig).textContent = "group 5 minus 1: " + spct(sp.mean, 2) + " a month [" + spct(sp.ci_90_lower, 2) + ", " + spct(sp.ci_90_upper, 2) + "]" + (sp.excludes_zero ? " *" : "");
     new Chart(document.getElementById("grp" + sig), {
       type: "bar",
-      data: { labels: ["1 low", "2", "3", "4", "5 high"], datasets: [{ data: rows.map(r => r.mean_annualised), backgroundColor: COLORS[sig] }] },
+      data: { labels: ["1 low", "2", "3", "4", "5 high"], datasets: [{ data: rows.map(r => r.mean_annualised), backgroundColor: COLORS[sig], maxBarThickness: 38 }] },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => (i.parsed.y * 100).toFixed(1) + "% a year" } } },
         scales: { y: { min: 0, suggestedMax: 0.2, ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 5 } }, x: { grid: { display: false } } }
-      }
+      },
+      plugins: [makeRefLine(avg, "")]
     });
   });
 })();
