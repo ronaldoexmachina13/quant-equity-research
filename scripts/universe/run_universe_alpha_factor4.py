@@ -21,11 +21,9 @@ import hashlib
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from src.factor_check import annualise_alpha, read_french, regress_on_factors
-from src.signal_extras import newey_west_lags
 from src.universe_study import FULL_PERIOD, NEW_TEST, RE_TEST
 
 RETURNS_PATH = "results/universe_study_portfolio_returns.csv"
