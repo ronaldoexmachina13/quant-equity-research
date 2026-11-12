@@ -541,3 +541,27 @@ Before this amendment was written, a read-only check of the saved holdings file 
 ### What this does not do
 
 It does not tune a parameter, choose a better Value definition, or add power to the registered sample.
+
+## Amendment 17 (2026-11-12, after every registered result existed, after Amendment 16 and before any code for decision 1 of Amendment 16 was written or run)
+
+This entry fixes details that Amendment 16, decision 1 left open. Everything is exploratory and post hoc. It changes no registered rule, headline or published figure.
+
+### Disclosure of a prior look
+
+Before this entry was written, a read-only check of the saved membership file and the saved month flags (not committed) showed that the sector field is a single current sector per ticker, that 353 of the 358 removed names have no sector, and that the names without a sector are about 10.5% of the name-months that have signal inputs (about 16% in 2012, falling to about 2% in 2026). This shapes decisions 1 and 2.
+
+### Decisions
+
+1. **Sector source.** The gics_sector column of results/universe_membership.csv, one sector per ticker, taken from the current index table. It is not a point-in-time classification, so a company that changed sector is classified by its latest one.
+2. **Names without a sector.** They are left out of the sector-neutral signals in every month and counted per month. Because they are mostly removed names, the sector-neutral universe is more weighted to names that stayed in the index than the registered one. This is disclosed with the results.
+3. **Minimum sector size.** In a given month a sector needs at least 10 names with a Value score to be ranked. Names in smaller sectors are left out of the sector-neutral signals for that month and counted.
+4. **Sector-neutral Value.** Each month, the registered Value score (negative price to book) is standardised within each sector, subtracting the sector mean and dividing by the sector standard deviation, the same standardisation as in calculate_combined_score(). Sector-neutral Combined is calculate_combined_score() of the registered Momentum signal and the sector-neutral Value score, both restricted to the names that remain.
+5. **Control on the same names.** The registered Value and Combined signals are also recomputed on exactly the names that remain after decisions 2 and 3, with no sector adjustment, and tested the same way. The comparison of the control with the sector-neutral result shows what sector neutrality changes. The comparison of the control with the published registered result shows what the change of universe changes. Both are reported.
+6. **Tests.** The tests of Amendment 14 and 15 apply to Value and Combined, sector-neutral and control: rank IC, quintile spread, single Fama-MacBeth, the three periods, 5,000 resamples, seed 42, 90% intervals, with the Newey-West and block-bootstrap intervals. Portfolios are the top decile and top quintile, equal weight, held one month, gross and net on both turnover bases, against the equal-weight benchmark of the remaining names, with the paired Sharpe difference on the Treasury bill rate (headline basis gross). A month with fewer than 100 names stops the run.
+7. **Checks before anything new is built.** The gates and the registered Value and Combined counts and series are recomputed and compared with the saved files. A difference above 1e-9 stops the run.
+8. **Outputs.** New files only, mode x, named results/universe_study_*_sector_neutral*.csv. The script stops if any exists.
+9. **Reading rule.** The results join the family of tests and are counted in the ledger. A single interval that excludes zero is not read on its own. No variant is dropped.
+
+### What this does not do
+
+It does not tune the minimum sector size, choose a better sector definition, or make the universe free of survivorship.
