@@ -5,6 +5,7 @@
   universe_stocks_data.js  one row per ticker ever in the index (holdings.html, data.html)
   universe_holdings_data.js  top-decile holdings by month (holdings.html)
   universe_extras_data.js  quintile returns and interval robustness (signals.html, Amendment 14)
+  universe_controls_data.js  alpha regression, French factor check and sector-neutral Value (Amendments 16 and 17)
 
 Reads only the committed result files in results/. An output that already exists
 is left alone and reported, in line with the project's rule that files are never
@@ -22,6 +23,7 @@ SENS_OUT = Path("assets/universe_sens_data.js")
 STOCKS_OUT = Path("assets/universe_stocks_data.js")
 HOLDINGS_OUT = Path("assets/universe_holdings_data.js")
 EXTRAS_OUT = Path("assets/universe_extras_data.js")
+CONTROLS_OUT = Path("assets/universe_controls_data.js")
 
 
 def clean(value):
@@ -238,12 +240,53 @@ def write_extras():
     write_js(EXTRAS_OUT, "UNIVERSE_EXTRAS", data, "the quintile and robustness files in results/")
 
 
+def write_controls():
+    alpha = RESULTS / "universe_study_alpha_regression.csv"
+    french = RESULTS / "universe_study_french_correlation.csv"
+    summary = RESULTS / "universe_study_sector_neutral_portfolio_summary.csv"
+    counts = RESULTS / "universe_study_sector_neutral_counts.csv"
+    signals = RESULTS / "universe_study_sector_neutral_signal_summary.csv"
+    registered = RESULTS / "universe_study_portfolio_summary.csv"
+    if CONTROLS_OUT.exists():
+        print(f"{CONTROLS_OUT} already exists, left unchanged.")
+        return
+    missing = [p for p in (alpha, french, summary, counts, signals, registered) if not p.exists()]
+    if missing:
+        print(f"{missing[0]} is missing; run its script first. Skipping {CONTROLS_OUT}.")
+        return
+    a_keys = ["period", "strategy", "size", "basis", "benchmark", "months", "lags", "alpha_annual", "alpha_annual_ci_90_lower",
+              "alpha_annual_ci_90_upper", "alpha_t", "beta", "beta_se", "r_squared", "alpha_excludes_zero", "headline_test"]
+    f_keys = ["period", "signal", "reference", "months", "pearson", "pearson_lower", "pearson_upper", "spearman"]
+    s_keys = ["period", "strategy", "size", "basis", "months", "sharpe_tbill", "benchmark_sharpe_tbill", "sharpe_diff_tbill",
+              "ci_90_lower_tbill", "ci_90_upper_tbill", "significant_tbill"]
+    neutral = pd.read_csv(summary)
+    neutral = neutral[neutral["sharpe_diff_tbill"].notna() & (neutral["basis"] == "gross")]
+    saved = pd.read_csv(registered)
+    saved = saved[saved["strategy"].isin(["Value", "Combined"]) & (saved["basis"] == "gross") & saved["sharpe_diff_tbill"].notna()]
+    rows = [{**{k: clean(r[k]) for k in s_keys}, "variant": "published"} for _, r in saved.iterrows()]
+    rows += [{**{k: clean(r[k]) for k in s_keys}, "variant": r["variant"]} for _, r in neutral.iterrows()]
+    c = pd.read_csv(counts)
+    s = pd.read_csv(signals)
+    data = {
+        "alpha": sens_rows(alpha, a_keys), "french": sens_rows(french, f_keys), "sector": rows,
+        "counts": {"months": int(len(c)), "scored_mean": clean(float(c["names_scored"].mean())),
+                   "no_sector_mean": clean(float(c["no_sector"].mean())), "small_sector_mean": clean(float(c["small_sector"].mean())),
+                   "kept_mean": clean(float(c["kept"].mean())), "kept_min": int(c["kept"].min()),
+                   "no_sector_first_year": clean(float(c[c["date"].str[:4] == "2012"]["no_sector"].sum() / c[c["date"].str[:4] == "2012"]["names_scored"].sum())),
+                   "no_sector_last_year": clean(float(c[c["date"].str[:4] == "2026"]["no_sector"].sum() / c[c["date"].str[:4] == "2026"]["names_scored"].sum()))},
+        "signal_tests": {v: {"tests": int((s["variant"] == v).sum()), "exclude_zero": int(s[s["variant"] == v]["excludes_zero"].sum())}
+                         for v in sorted(s["variant"].unique())},
+    }
+    write_js(CONTROLS_OUT, "UNIVERSE_CONTROLS", data, "the alpha, French and sector-neutral files in results/")
+
+
 def main():
     write_main()
     write_sens()
     write_stocks()
     write_holdings()
     write_extras()
+    write_controls()
 
 
 if __name__ == "__main__":

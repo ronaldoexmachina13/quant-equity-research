@@ -109,6 +109,18 @@ const META = {
    "date": "2026-11-11",
    "title": "Amendment 15",
    "note": "After every registered result existed, before any code for these additions was written or run"
+  },
+  {
+   "id": "A16",
+   "date": "2026-11-12",
+   "title": "Amendment 16",
+   "note": "After every registered result existed, before any code for these additions was written or run"
+  },
+  {
+   "id": "A17",
+   "date": "2026-11-12",
+   "title": "Amendment 17",
+   "note": "After every registered result existed, after Amendment 16 and before any code for decision 1 of Amendment 16 was written or run"
   }
  ]
 };

@@ -97,6 +97,12 @@
       <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
       <p class="caption" id="sensCaption"></p>
     </div>
+
+    <div class="panel" data-stamp="descriptive">
+      <h2>Check against published factors <span>correlation of each monthly quintile spread with Kenneth French's UMD and HML</span></h2>
+      <div class="timeline-table-wrap" style="max-height:none;"><table class="timeline-table perf-table" id="frenchTable"></table></div>
+      <p class="caption" id="frenchCaption"></p>
+    </div>
   </div>
 
   <div id="foot"></div>
@@ -106,6 +112,7 @@
 <script src="assets/universe_data.js"></script>
 <script src="assets/universe_sens_data.js"></script>
 <script src="assets/universe_extras_data.js"></script>
+<script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
@@ -259,6 +266,27 @@ buttons("sensTabs", SENS_METRICS.map(m => ({ key: m.key, label: m.label })), sen
 contextStrip("profileCtx", ["sig"], () => { drawRobust(); drawSens(); }, false);
 drawRobust(); drawSens();
 
+/* ---------- check against French factors (Amendment 16) ---------- */
+(function drawFrench() {
+  const F = UNIVERSE_CONTROLS.french;
+  const cell = (s, ref, p) => {
+    const r = F.find(x => x.signal === s && x.reference === ref && x.period === p.key);
+    return r ? `${sgn(r.pearson, 2)} <small>[${sgn(r.pearson_lower, 2)}, ${sgn(r.pearson_upper, 2)}]</small>` : "–";
+  };
+  const refs = [...new Set(F.map(r => r.reference))];
+  let h = `<thead><tr><th>Spread</th><th>Factor</th>${PERIODS.map(p => `<th class="num">${p.label}</th>`).join("")}</tr></thead><tbody>`;
+  SIGNALS.forEach(s => refs.forEach(ref => {
+    h += `<tr><td style="color:${COLORS[s]}">${s}</td><td>${ref.split(" ")[0]}</td>` + PERIODS.map(p => `<td class="num">${cell(s, ref, p)}</td>`).join("") + "</tr>";
+  }));
+  document.getElementById("frenchTable").innerHTML = h + "</tbody>";
+  const full = PERIODS[2].key;
+  const get = (s, ref) => F.find(x => x.signal === s && x.reference === ref && x.period === full);
+  const umd = refs.find(r => r.startsWith("UMD")), hml = refs.find(r => r.startsWith("HML"));
+  document.getElementById("frenchCaption").innerHTML =
+    "Pearson correlation over the months in each period, with a Fisher 90% interval that treats months as independent and is only indicative. Over the full period the Momentum spread has a correlation of " + sgn(get("Momentum", umd).pearson, 2) +
+    " with UMD, and the Value spread " + sgn(get("Value", hml).pearson, 2) + " with HML. The study uses about 500 current and former index members with equal weights, while French's factors use all US stocks with value weights, so a high correlation is not expected, and the sign and rough size are the check. " +
+    "It is a test of the pipeline, not of the strategy. Factor data: Kenneth French's data library, CRSP database of 202609, stored unchanged for 2011 onward in data/external/french/. Added after the results (Amendment 16).";
+})();
 showTab((location.hash || "").slice(1), false);
 </script>
 </body>

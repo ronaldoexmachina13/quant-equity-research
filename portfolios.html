@@ -105,11 +105,38 @@
   </div>
   </div>
 
+  <div class="tabpane" id="pane-controls" hidden>
+  <div class="hero-finding" style="max-width:none;">
+    <b class="box-label">Added after the results</b>
+    <div id="ctlReading"></div>
+  </div>
+
+  <div class="panel" data-stamp="exploratory">
+    <h2>Sharpe difference with and without sector neutrality <span>Amendments 16 and 17, added after every registered result existed</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="ctlSig"></div><div class="ctrl-group" id="ctlSize"></div></div>
+    <svg class="forest" id="sectorForest" role="img" aria-label="Sharpe difference intervals, published, control and sector-neutral"></svg>
+    <p class="caption" id="sectorCaption"></p>
+  </div>
+
+  <div class="panel" data-stamp="exploratory">
+    <h2>Alpha against the benchmark <span>annualised intercept of the portfolio's excess return on the benchmark's</span></h2>
+    <div class="ctrl-row"><div class="ctrl-group" id="ctlBench"></div></div>
+    <svg class="forest" id="alphaForest" role="img" aria-label="Annualised alpha intervals"></svg>
+    <p class="caption" id="alphaCaption"></p>
+  </div>
+
+  <div class="panel" data-stamp="descriptive">
+    <h2>Who is left out of the sector-neutral version</h2>
+    <p class="caption" id="universeCaption"></p>
+  </div>
+  </div>
+
   <div id="foot"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="assets/universe_data.js"></script>
+<script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
 <script src="assets/dashboard.js"></script>
 <script>
@@ -233,16 +260,80 @@ function drawSharpeForest() {
 }
 buttons("periodTabs", PERIODS.map(p => ({ key: p.key, label: p.label })), periodKey, k => { periodKey = k; drawSharpeForest(); });
 buttons("hmTabs", [{ key: "active", label: "Active vs benchmark" }, { key: "absolute", label: "Absolute" }], hmMode, k => { hmMode = k; drawHeatmap(); });
+/* ---------- controls: sector neutrality and alpha (Amendments 16 and 17) ---------- */
+const CTL = UNIVERSE_CONTROLS;
+const VARIANTS = [
+  { key: "published", label: "Published", color: null },
+  { key: "control_same_names", label: "Same names", color: "SPY" },
+  { key: "sector_neutral", label: "Sector-neutral", color: "Benchmark" }
+];
+let ctlSig = "Value", ctlSize = "top_decile", alphaBench = "matched";
+const SHARPE_FMT = { axis: v => v.toFixed(1), val: v => sgn(v, 2) };
+function ctlRow(sig, size, period, variant) {
+  return CTL.sector.find(r => r.strategy === sig && r.size === size && r.period === period && r.variant === variant);
+}
+function drawSector() {
+  const rows = [];
+  PERIODS.forEach(p => VARIANTS.forEach(v => {
+    const r = ctlRow(ctlSig, ctlSize, p.key, v.key);
+    if (r) rows.push({ label: p.label + " · " + v.label, mean: r.sharpe_diff_tbill, lo: r.ci_90_lower_tbill, hi: r.ci_90_upper_tbill,
+      color: v.color || ctlSig, group: p.key, excl: r.ci_90_lower_tbill > 0 || r.ci_90_upper_tbill < 0 });
+  }));
+  forest("sectorForest", rows, SHARPE_FMT, [Math.min(0, ...rows.map(r => r.lo)), Math.max(0, ...rows.map(r => r.hi))]);
+  const first = PERIODS[0];
+  const pub = ctlRow(ctlSig, ctlSize, first.key, "published"), ctl = ctlRow(ctlSig, ctlSize, first.key, "control_same_names"), neu = ctlRow(ctlSig, ctlSize, first.key, "sector_neutral");
+  const sentence = r => sgn(r.sharpe_diff_tbill, 2) + " [" + sgn(r.ci_90_lower_tbill, 2) + ", " + sgn(r.ci_90_upper_tbill, 2) + "]";
+  document.getElementById("sectorCaption").innerHTML =
+    "<b>" + ctlSig + ", " + SIZE_LABEL[ctlSize].toLowerCase() + ", " + first.label + ":</b> published " + sentence(pub) + ", same names " + sentence(ctl) + ", sector-neutral " + sentence(neu) + ". " +
+    "Each bar is the paired bootstrap 90% interval (5,000 resamples, seed 42) for the Sharpe difference against the equal-weight benchmark of the same universe, before costs. " +
+    "<i>Published</i> is the registered result. <i>Same names</i> is the registered signal on exactly the names that remain once names with no sector, and sectors with fewer than 10 scored names in the month, are dropped, so comparing it with the published result shows what the change of universe does. " +
+    "<i>Sector-neutral</i> scores each name against its sector peers, so comparing it with the same-names row shows what sector neutrality does. A ringed marker means the interval excludes zero.";
+  const sigPick = ctlRow(ctlSig, ctlSize, first.key, "sector_neutral");
+  document.getElementById("ctlReading").innerHTML = "A top decile can hold a large share of a few sectors, so its Sharpe difference can mix the signal with a sector tilt. These checks ask whether a result survives sector neutrality and a regression on the benchmark. " +
+    "They were run after every registered result existed and add tests to the family, so a single interval that excludes zero is not read on its own. " +
+    "Selected: " + ctlSig + ", " + SIZE_LABEL[ctlSize].toLowerCase() + ", " + first.label + ". The interval " + (pub.ci_90_lower_tbill > 0 || pub.ci_90_upper_tbill < 0 ? "excludes" : "includes") + " zero as published, " +
+    (ctl.ci_90_lower_tbill > 0 || ctl.ci_90_upper_tbill < 0 ? "excludes" : "includes") + " zero on the same names, and " + (sigPick.ci_90_lower_tbill > 0 || sigPick.ci_90_upper_tbill < 0 ? "excludes" : "includes") + " zero when sector-neutral.";
+}
+function drawAlpha() {
+  const rows = [];
+  SIGNALS.forEach(s => PERIODS.forEach(p => {
+    const bench = alphaBench === "spy" ? "SPY (reference)" : null;
+    const r = CTL.alpha.find(x => x.strategy === s && x.size === ctlSize && x.basis === "gross" && x.period === p.key &&
+      (bench ? x.benchmark === bench : x.benchmark !== "SPY (reference)"));
+    if (r) rows.push({ label: s + " · " + p.label + " · beta " + r.beta.toFixed(2), mean: r.alpha_annual, lo: r.alpha_annual_ci_90_lower, hi: r.alpha_annual_ci_90_upper,
+      color: s, group: s, excl: r.alpha_excludes_zero });
+  }));
+  forest("alphaForest", rows, { axis: v => (v * 100).toFixed(0) + "%", val: v => spct(v, 1) }, [Math.min(0, ...rows.map(r => r.lo)), Math.max(0, ...rows.map(r => r.hi))]);
+  document.getElementById("alphaCaption").innerHTML =
+    "Alpha is the monthly intercept of a regression of the portfolio's excess return over Treasury bills on the benchmark's, times 12, with Newey-West 90% intervals. Beta is the slope: a value above 1 means the portfolio moved more than the benchmark. " +
+    SIZE_LABEL[ctlSize] + ". The benchmark is " + (alphaBench === "spy" ? "SPY" : "the equal-weight benchmark the registered test uses for that signal") + ". Before costs. A ringed marker means the interval excludes zero. " +
+    "This adds " + CTL.alpha.length + " regressions to the family of tests, and the registered Sharpe-difference test is unchanged.";
+}
+function drawUniverse() {
+  const c = CTL.counts, pct = v => (v * 100).toFixed(0) + "%";
+  const total = Object.values(CTL.signal_tests).reduce((a, b) => a + b.tests, 0), excl = Object.values(CTL.signal_tests).reduce((a, b) => a + b.exclude_zero, 0);
+  document.getElementById("universeCaption").textContent =
+    "Each month " + c.scored_mean.toFixed(0) + " names on average have a Value score. " + c.no_sector_mean.toFixed(0) + " have no sector and " + c.small_sector_mean.toFixed(0) +
+    " sit in a sector with fewer than 10 scored names, leaving " + c.kept_mean.toFixed(0) + " (never fewer than " + c.kept_min + "). The sector is one current label per stock, not a historical one. " +
+    "Names with no sector are mostly names that left the index: " + pct(c.no_sector_first_year) + " of scored names in 2012 and " + pct(c.no_sector_last_year) + " in 2026. " +
+    "The sector-neutral universe therefore leans toward names that stayed, and survivorship affects levels and differences alike. " +
+    (excl === 0 ? "None of the " + total + " new signal tests excludes zero." : excl + " of the " + total + " new signal tests exclude zero under the registered interval.");
+}
+buttons("ctlSig", ["Value", "Combined"].map(k => ({ key: k, label: k })), ctlSig, k => { ctlSig = k; drawSector(); });
+buttons("ctlSize", Object.keys(SIZE_LABEL).map(k => ({ key: k, label: SIZE_LABEL[k] })), ctlSize, k => { ctlSize = k; drawSector(); drawAlpha(); });
+buttons("ctlBench", [{ key: "matched", label: "Matched benchmark" }, { key: "spy", label: "SPY" }], alphaBench, k => { alphaBench = k; drawAlpha(); });
+drawSector(); drawAlpha(); drawUniverse();
 const PAGE_TABS = [
   { key: "perf", label: "Performance" },
   { key: "risk", label: "Drawdown and rolling excess" },
   { key: "returns", label: "Monthly returns and costs" },
-  { key: "all", label: "All 18 comparisons" }
+  { key: "all", label: "All 18 comparisons" },
+  { key: "controls", label: "Controls" }
 ];
 function showTab(key, fromClick) {
   if (!PAGE_TABS.some(t => t.key === key)) key = PAGE_TABS[0].key;
   PAGE_TABS.forEach(t => { document.getElementById("pane-" + t.key).hidden = t.key !== key; });
-  document.getElementById("ctx").style.display = key === "all" ? "none" : "";
+  document.getElementById("ctx").style.display = (key === "all" || key === "controls") ? "none" : "";
   document.getElementById("pageTabs").innerHTML = PAGE_TABS.map(t =>
     `<button role="tab" class="tab${t.key === key ? " active" : ""}" data-k="${t.key}" aria-selected="${t.key === key}">${t.label}</button>`).join("");
   document.querySelectorAll("#pageTabs .tab").forEach(b => b.onclick = () => showTab(b.dataset.k, true));
