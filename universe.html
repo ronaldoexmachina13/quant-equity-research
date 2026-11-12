@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Universe | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=11">
+<link rel="stylesheet" href="assets/styles.css?v=12">
 </head>
 <body>
 <div id="chrome"></div>
@@ -80,13 +81,13 @@
     <h2>Errata <span>errors the project found in its own work</span></h2>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table">
-        <thead><tr><th>When</th><th>Defect</th><th>Effect</th></tr></thead>
+        <thead><tr><th>When</th><th>Defect</th><th>Effect</th><th>Plan entry</th></tr></thead>
         <tbody>
-          <tr><td class="month-cell">Sep 2026</td><td>Value used the month-end price instead of the previous month-end, a one-month look-ahead.</td><td>17-stock study: Value Sharpe moved from 0.75 to 0.85, before the split fix below. The bug had penalised Value.</td></tr>
-          <tr><td class="month-cell">Sep 2026</td><td>The first download missed 31 December 2024 because the Yahoo Finance end date is exclusive.</td><td>About 0.01 of Sharpe.</td></tr>
-          <tr><td class="month-cell">Oct 2026</td><td>Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split while SEC book value per share does not change.</td><td>17-stock study: in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. See the <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/STUDY_17_STOCKS.md" target="_blank">write-up</a>.</td></tr>
-          <tr><td class="month-cell">Oct 2026</td><td>Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios.</td><td>Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded.</td></tr>
-          <tr><td class="month-cell">Nov 2026</td><td>Momentum was described as 12-1, skipping the most recent month. The code uses the return from 12 months before the trade date to the end of the previous month, with no month skipped.</td><td>No reading changes. A true 12-1 version gives a similar rank IC (mean +0.005 against +0.008, monthly series correlation 0.97, no interval excluding zero). The description was corrected; see Amendment 15 and the <code>_momentum_skip_month</code> files.</td></tr>
+          <tr><td class="month-cell">Sep 2026</td><td>Value used the month-end price instead of the previous month-end, a one-month look-ahead.</td><td>17-stock study: Value Sharpe moved from 0.75 to 0.85, before the split fix below. The bug had penalised Value.</td><td class="month-cell" style="white-space:nowrap">OS-A1</td></tr>
+          <tr><td class="month-cell">Sep 2026</td><td>The first download missed 31 December 2024 because the Yahoo Finance end date is exclusive.</td><td>About 0.01 of Sharpe.</td><td class="month-cell" style="white-space:nowrap">OS-A2</td></tr>
+          <tr><td class="month-cell">Oct 2026</td><td>Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split while SEC book value per share does not change.</td><td>17-stock study: in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. See the <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/docs/STUDY_17_STOCKS.md" target="_blank">write-up</a>.</td><td class="month-cell" style="white-space:nowrap">LP-A8 to A10</td></tr>
+          <tr><td class="month-cell">Oct 2026</td><td>Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings), giving absurd price-to-book ratios.</td><td>Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded.</td><td class="month-cell" style="white-space:nowrap">LP-A11</td></tr>
+          <tr><td class="month-cell">Nov 2026</td><td>Momentum was described as 12-1, skipping the most recent month. The code uses the return from 12 months before the trade date to the end of the previous month, with no month skipped.</td><td>No reading changes. A true 12-1 version gives a similar rank IC (mean +0.005 against +0.008, monthly series correlation 0.97, no interval excluding zero). The description was corrected; see Amendment 15 and the <code>_momentum_skip_month</code> files.</td><td class="month-cell" style="white-space:nowrap">LP-A15</td></tr>
         </tbody>
       </table>
     </div>

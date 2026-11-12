@@ -275,7 +275,7 @@ function renderChrome(active, subtitle) {
     ["Status", "Pre-specified, free data"]
   ].filter(f => f[1] !== null);
   document.getElementById("chrome").innerHTML =
-    `<nav class="topnav"><div class="topnav-inner"><a class="brand" href="index.html">Quant Equity Research</a><div class="links">` +
+    `<nav class="topnav"><div class="topnav-inner"><a class="brand" href="index.html"><svg class="logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22" stroke="#D9DCE1" stroke-width="1.5"/><g stroke="#F0A83A" stroke-width="2"><line x1="5" y1="6" x2="17" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></g><g fill="#F0A83A"><polygon points="11,3.2 13.8,6 11,8.8 8.2,6"/><polygon points="14.5,9.2 17.3,12 14.5,14.8 11.7,12"/><polygon points="8.5,15.2 11.3,18 8.5,20.8 5.7,18"/></g></svg>Quant Equity Research</a><div class="links">` +
     PAGES.map(p => `<a href="${p.href}"${p.href === active ? ' class="active"' : ""}>${p.label}</a>`).join("") +
     `</div></div></nav>` +
     `<div class="statusbar"><div class="statusbar-inner">` + facts.map(f => `<span class="st${f[2] ? " live" : ""}"><i>${f[0]}</i><b>${f[1]}</b></span>`).join("") + `</div></div>` +

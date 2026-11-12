@@ -462,3 +462,24 @@ details.fold:not([open]) > summary { margin-bottom: -1rem; border-bottom: none; 
 .sq-post { background: transparent; border: 1.5px solid var(--text-strong); box-sizing: border-box; }
 .sq-os { background: #7B828E; }
 .legend-row i.sq-post { border: 1.5px solid var(--text-strong); background: transparent; box-sizing: border-box; }
+
+/* trademark layer: logo, evidence stamps, test ledger */
+.topnav .brand::before { display: none; }
+.topnav .brand .logo { flex-shrink: 0; }
+.panel[data-stamp] { position: relative; }
+.panel[data-stamp] > h2:first-child { padding-right: 8.5rem; }
+.panel[data-stamp]::after {
+  position: absolute; top: 0.55rem; right: 1rem; padding: 0.12rem 0.45rem; border: 1px solid var(--line-strong);
+  font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: var(--bg);
+}
+.panel[data-stamp="registered"]::after { content: "Registered"; color: var(--amber); border-color: var(--amber); }
+.panel[data-stamp="exploratory"]::after { content: "Exploratory"; color: var(--text-strong); border-style: dashed; }
+.panel[data-stamp="sensitivity"]::after { content: "Sensitivity"; border-style: dashed; }
+.panel[data-stamp="descriptive"]::after { content: "Descriptive"; }
+.ledger { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.ledger th { text-align: right; font-family: var(--mono); font-size: 0.64rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--line-strong); }
+.ledger th:first-child, .ledger td:first-child { text-align: left; }
+.ledger td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-strong); }
+.ledger td:first-child { font-family: var(--sans); color: var(--text); }
+.ledger td small { color: var(--dim); font-family: var(--mono); font-size: 0.66rem; margin-left: 0.4rem; }
+@media (max-width: 600px) { .panel[data-stamp] > h2:first-child { padding-right: 6.5rem; } .ledger th, .ledger td { padding: 0.4rem 0.4rem; font-size: 0.72rem; } }

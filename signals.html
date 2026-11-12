@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=11">
+<link rel="stylesheet" href="assets/styles.css?v=12">
 </head>
 <body>
 <div id="chrome"></div>
@@ -24,14 +25,14 @@
 
   <!-- Tab 1 -->
   <div class="tabpane" id="pane-predictive">
-    <div class="panel">
+    <div class="panel" data-stamp="registered">
       <h2 id="forestTitle">Predictive power</h2>
       <div class="ctrl-row"><div class="ctrl-group" id="testTabs"></div></div>
       <svg class="forest" id="signalForest" role="img" aria-label="Signal test confidence intervals"></svg>
       <p class="caption" id="signalCaption"></p>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-stamp="exploratory">
       <h2>Return by group <span>does return rise step by step with the signal? annualised, equal-weighted</span></h2>
       <div class="legend-row"><span><i class="ghost-solid"></i>2012 to 2020, new test</span><span><i class="ghost-light"></i>2021 to 2026, re-test</span></div>
       <div class="grp-grid">
@@ -45,7 +46,7 @@
 
   <!-- Tab 2 -->
   <div class="tabpane" id="pane-stability" hidden>
-    <div class="panel">
+    <div class="panel" data-stamp="descriptive">
       <h2>Cumulative rank IC <span>running sum of the monthly rank correlation</span></h2>
       <div class="legend-row">
         <span><i style="background:var(--momentum)"></i>Momentum</span>
@@ -56,7 +57,7 @@
       <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-stamp="descriptive">
       <h2>Rolling 36-month mean rank IC</h2>
       <div class="legend-row">
         <span><i style="background:var(--momentum)"></i>Momentum</span>
@@ -67,7 +68,7 @@
       <p class="caption" id="icRollCaption"></p>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-stamp="descriptive">
       <h2>Rank IC statistics <span>monthly, by period</span></h2>
       <div class="timeline-table-wrap" style="max-height:none;">
         <table class="timeline-table perf-table">
@@ -83,14 +84,14 @@
   <div class="tabpane" id="pane-robustness" hidden>
     <div id="profileCtx"></div>
 
-    <div class="panel">
+    <div class="panel" data-stamp="exploratory">
       <h2 id="robustTitle">Interval method</h2>
       <div class="ctrl-row"><div class="ctrl-group" id="robTabs"></div></div>
       <svg class="forest" id="robustForest" role="img" aria-label="Intervals under three methods"></svg>
       <p class="caption" id="robustCaption"></p>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-stamp="sensitivity">
       <h2 id="sensTitle">Book-value treatment</h2>
       <div class="ctrl-row"><div class="ctrl-group" id="sensTabs"></div></div>
       <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
