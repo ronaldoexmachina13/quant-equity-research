@@ -7,6 +7,7 @@ CLAUDE.md rule 1: never overwrite or regenerate an existing result file. The
 published file. These two functions give them the same behaviour: stop before
 any work is done, and say what was in the way.
 """
+import os
 import sqlite3
 from pathlib import Path
 
@@ -17,7 +18,10 @@ GUARDED_TABLES = ("prices", "book_value")
 
 def refuse_to_overwrite(paths) -> None:
     """Exit with a message, writing nothing, if any of the output files already exists."""
-    existing = [str(p) for p in paths if Path(p).exists()]
+    if isinstance(paths, (str, os.PathLike)):
+        paths = [paths]  # a single path passed on its own would otherwise be read letter by letter
+    # lexists, not exists: a broken symlink "does not exist" but writing to it would still create its target.
+    existing = [str(p) for p in paths if os.path.lexists(p)]
     if existing:
         raise SystemExit(
             "Refusing to overwrite existing result files (CLAUDE.md rule 1). Nothing was written.\n  "
