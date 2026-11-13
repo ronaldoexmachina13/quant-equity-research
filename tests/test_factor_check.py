@@ -110,3 +110,30 @@ def test_factor_regression_uses_only_common_months_and_needs_enough():
     assert regress_on_factors(y, f)["months"] == 35
     with pytest.raises(ValueError):
         regress_on_factors(y.iloc[:12], f)
+
+
+def test_regressions_do_not_depend_on_the_order_the_months_are_passed_in():
+    """
+    Newey-West standard errors use the covariance between a month and the
+    months just before it, so they are only right if the rows are in date
+    order. The same 24 months passed in a scrambled order (even-numbered
+    months first, then odd) must give the same alpha and the same standard
+    error as the dated order, for the benchmark regression and the factor
+    regression.
+    """
+    dates = pd.date_range("2015-01-31", periods=24, freq="ME")
+    wave = pd.Series([0.01, -0.02, 0.015, 0.0, -0.01, 0.02] * 4, index=dates)
+    bench = pd.Series([0.02, -0.01, 0.0, 0.03, -0.02, 0.01] * 4, index=dates)
+    y = 0.5 * bench + wave
+    factors = pd.DataFrame({"f1": bench, "f2": wave.shift(1).fillna(0.0)})
+    scrambled = list(range(0, 24, 2)) + list(range(1, 24, 2))
+
+    forward = regress_on_benchmark(y, bench)
+    shuffled = regress_on_benchmark(y.iloc[scrambled], bench.iloc[scrambled])
+    assert shuffled["alpha"] == pytest.approx(forward["alpha"], abs=1e-12)
+    assert shuffled["alpha_se"] == pytest.approx(forward["alpha_se"], abs=1e-12)
+
+    forward = regress_on_factors(y, factors)
+    shuffled = regress_on_factors(y.iloc[scrambled], factors.iloc[scrambled])
+    assert shuffled["alpha"] == pytest.approx(forward["alpha"], abs=1e-12)
+    assert shuffled["alpha_se"] == pytest.approx(forward["alpha_se"], abs=1e-12)

@@ -34,7 +34,10 @@ def regress_on_benchmark(excess: pd.Series, benchmark_excess: pd.Series, lags: i
     Newey-West (Bartlett kernel, no small-sample correction), with lags from
     newey_west_lags(n) unless given. Only months present in both series are used.
     """
-    both = pd.concat([excess, benchmark_excess], axis=1, keys=["y", "x"]).dropna()
+    # sort_index(): the Newey-West lags pair each month with the months just before it, so the rows
+    # must be in date order. concat does not reorder inputs that already share an index, and pandas 4
+    # will not sort a union of dates either, so the order is set here. sort=True keeps today's behaviour.
+    both = pd.concat([excess, benchmark_excess], axis=1, keys=["y", "x"], sort=True).dropna().sort_index()
     n = len(both)
     if n < 10:
         raise ValueError(f"only {n} common months; at least 10 are needed")
@@ -69,7 +72,7 @@ def regress_on_factors(excess: pd.Series, factors: pd.DataFrame, lags: int | Non
     Only months present in the return and in every factor are used. The result holds alpha with its
     interval and, for each factor, its loading and standard error.
     """
-    both = pd.concat([excess.rename("__y__"), factors], axis=1).dropna()
+    both = pd.concat([excess.rename("__y__"), factors], axis=1, sort=True).dropna().sort_index()  # date order, as above
     n = len(both)
     k = factors.shape[1]
     if n < 10 + k:
