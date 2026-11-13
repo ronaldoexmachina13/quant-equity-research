@@ -208,7 +208,7 @@ const mde = minDetectableIC();
   document.getElementById("f1Caption").innerHTML = "Each row is one test: the estimate (marker) and its 90% bootstrap interval (line) against zero (vertical line). The tests are in different units, so each block has its own scale with zero in the same place. " +
     "A filled marker means the interval excludes zero; a hollow marker that it includes zero. The grey band behind each signal's rows is the smallest true average effect that signal's 2012 to 2020 test (108 months) could reliably detect, at 80% power and a 10% two-sided level, so a true effect inside the band would usually be missed. " +
     "The bands are descriptive: they were computed after the registered results, from the saved monthly series, and are approximate for the Fama-MacBeth slopes, where the monthly slopes are not saved and the figure is recovered from the saved 90% interval. " +
-    "They are drawn behind all of a signal's rows but describe the 2012 to 2020 test. The results are consistent with no effect and with a small one. The expected count assumes independent tests; the tests overlap, so it is a rough guide.";
+    "They are drawn behind all of a signal's rows but describe the 2012 to 2020 test: the 2021 to 2026 test has fewer months (68), so its own band would be wider, and the full-period test has more (176), so its own band would be narrower. The results are consistent with no effect and with a small one; they are not evidence of no effect. The expected count assumes independent tests; the tests overlap, so it is a rough guide.";
 
   /* family 2: registered Sharpe comparisons */
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null), hit = head.filter(r => r.sig);

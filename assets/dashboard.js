@@ -59,13 +59,20 @@ function forest(svgId, rows, fmt, domain, band) {
   const W = compact ? 400 : 860, right = compact ? 10 : 190, left = compact ? 10 : Math.max(175, Math.max(...rows.map(r => r.label.length)) * 7.4 + 12);
   const rowH = compact ? 50 : 30, top = 26, bottom = 34;
   const H = top + rows.length * rowH + bottom;
-  let lo = domain ? domain[0] : Math.min(0, ...rows.map(r => r.lo), band ? -band.half : 0);
-  let hi = domain ? domain[1] : Math.max(0, ...rows.map(r => r.hi), band ? band.half : 0);
+  /* A band is either one half-width for the whole plot, or { bySignal: { signal: half-width } } shading only that signal's rows */
+  const bandMax = band ? (band.bySignal ? Math.max(...Object.values(band.bySignal)) : band.half) : 0;
+  let lo = domain ? domain[0] : Math.min(0, ...rows.map(r => r.lo), -bandMax);
+  let hi = domain ? domain[1] : Math.max(0, ...rows.map(r => r.hi), bandMax);
   const pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
   const x = v => left + (v - lo) / (hi - lo) * (W - left - right);
   const step = niceStep(hi - lo);
   let s = "";
-  if (band) {
+  if (band && band.bySignal) {
+    const runs = {};
+    rows.forEach((r, i) => { if (band.bySignal[r.group]) { const run = runs[r.group] || (runs[r.group] = [i, i]); run[1] = i; } });
+    Object.entries(runs).forEach(([g, [a, b]]) => { const w = band.bySignal[g]; s += `<rect x="${x(-w)}" y="${top + a * rowH}" width="${x(w) - x(-w)}" height="${(b - a + 1) * rowH}" fill="${cssVar("--band")}" fill-opacity="0.16"/>`; });
+    s += `<text class="dim" x="${x(-bandMax)}" y="${top - 9}">${compact && band.short ? band.short : band.label}</text>`;
+  } else if (band) {
     s += `<rect x="${x(-band.half)}" y="${top}" width="${x(band.half) - x(-band.half)}" height="${H - bottom - top}" fill="${cssVar("--zero")}" fill-opacity="0.10"/>` +
          `<line x1="${x(-band.half)}" x2="${x(-band.half)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--zero")}" stroke-opacity="0.5" stroke-dasharray="3 3"/>` +
          `<line x1="${x(band.half)}" x2="${x(band.half)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--zero")}" stroke-opacity="0.5" stroke-dasharray="3 3"/>` +

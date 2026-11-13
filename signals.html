@@ -138,7 +138,7 @@ const mde = minDetectableIC();
     return `<div class="mini-stat"><div class="ms-head"><span class="swatch" style="background:${COLORS[sig]}"></span>${sig}</div><div class="ms-value">${sgn(r.mean, 3)}</div>` +
       `<div class="ms-label">mean rank IC, ${per.label}. 90% interval ${sgn(r.ci_90_lower, 3)} to ${sgn(r.ci_90_upper, 3)}, which ${r.excludes_zero ? "excludes" : "includes"} zero</div></div>`;
   });
-  tiles.push(`<div class="mini-stat"><div class="ms-head">Detectable effect</div><div class="ms-value">${mde.toFixed(3)}</div><div class="ms-label">smallest mean rank IC the ${per.label} test could reliably detect. Smaller effects would be missed</div></div>`);
+  tiles.push(`<div class="mini-stat"><div class="ms-head">Detectable effect</div><div class="ms-value">${mde.toFixed(3)}</div><div class="ms-label">smallest mean rank IC the ${per.label} test could detect for Momentum, the largest of the three (Value ${U.detectable.rank_ic.Value.toFixed(3)}, Combined ${U.detectable.rank_ic.Combined.toFixed(3)}). Smaller effects would be missed</div></div>`);
   document.getElementById("sKeys").innerHTML = tiles.join("");
 })();
 
@@ -173,9 +173,12 @@ function drawSignalForest() {
   }));
   const n = rows.filter(r => r.excl).length;
   document.getElementById("forestTitle").textContent = t.label + ": " + (n === 0 ? "no interval excludes zero" : n + " of " + rows.length + " intervals exclude zero");
-  const band = testKey === "rank_ic" ? { half: mde, label: "Effects inside the band would likely be missed (±" + mde.toFixed(3) + ", 2012 to 2020 test)", short: "Likely missed: ±" + mde.toFixed(3) } : null;
+  const det = U.detectable[testKey];
+  const band = det ? { bySignal: det, label: "Shaded: smallest effect each signal's 2012 to 2020 test could detect", short: "Shaded: smallest detectable effect" } : null;
   forest("signalForest", rows, t.fmt, null, band);
-  document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".");
+  const slopes = testKey.startsWith("fama_macbeth");
+  document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".") +
+    " The shaded band behind each signal's rows is the smallest effect that signal's 2012 to 2020 test could detect at 80% power; a true effect inside it would usually be missed. It is descriptive, computed after the registered results" + (slopes ? " and approximate for the slopes" : "") + ", and it describes the 2012 to 2020 test even where it is drawn behind the other periods.";
 }
 buttons("testTabs", TESTS, testKey, k => { testKey = k; drawSignalForest(); });
 drawSignalForest();
