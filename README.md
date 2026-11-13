@@ -12,7 +12,9 @@ The work uses Python (pandas, NumPy, SciPy, statsmodels, matplotlib), SQLite and
 
 As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 19.
 
-![Exhibit 1: the 33 registered signal tests. Each row is one test with its 90% interval against zero; no interval excludes zero.](docs/img/01-registered-tests.png)
+![Exhibit 1: the 33 registered signal tests, one row each, in four blocks. Each row shows the estimate and its 90% bootstrap interval against zero.](docs/img/01-registered-tests.png)
+
+Exhibit 1 shows each registered signal test (rank IC, quintile spread and two Fama-MacBeth slopes, for Momentum, Value and Combined, over 2012 to 2020, 2021 to 2026 and the full period) as an estimate with its 90% bootstrap interval against zero. An interval that spans zero is read as no detectable effect. All 33 span zero, and so do the Newey-West and block-bootstrap versions of the same tests. The shaded band in the first block is the smallest mean rank IC the 2012 to 2020 test could reliably detect (about 0.055, at 80% power), so an effect inside the band would usually be missed. If the tests were independent, about 3 would be expected to exclude zero by chance; they are not independent, because the periods overlap and the signals share stocks, so that count is a rough guide. Source: `results/universe_study_signal_summary_momentum.csv`, `results/universe_study_signal_summary_value_combined.csv` and `results/universe_study_inference_robustness.csv`.
 
 ## Findings
 
