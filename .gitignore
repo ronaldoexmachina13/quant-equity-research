@@ -225,3 +225,6 @@ data_cache/
 # Local working files, not part of the published project
 claude/
 results/linkedin/
+
+# Local LinkedIn image drafts (not part of the repository)
+linkedin_images/
