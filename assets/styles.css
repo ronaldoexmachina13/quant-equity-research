@@ -41,7 +41,6 @@
 
   --grid: #1F1F1C;
   --zero: #A19D91;
-  --band: #8B98AD;   /* cool slate, so a detectable-effect band is not read as the gold Combined colour */
   --ref: #5F5D55;
   --label: #C9C5B9;
   --shade: rgba(232, 228, 218, 0.035);
@@ -66,7 +65,7 @@
     --amber: #7A5C14; --pos: #4F6B3A; --neg: #8E3F2B;
     --benchmark: #4A463C; --combined: #8A6A1F; --value: #8A8678; --momentum: #23211C; --p1: #8A8678; --p2: #23211C; --oos: #7A5C14;
     --momentum-text: #23211C; --value-text: #5F5B50; --combined-text: #7A5C14;
-    --grid: #E3DFD2; --zero: #5F5B50; --band: #5E6E86; --ref: #8F8B7E; --label: #3B382F; --shade: rgba(35, 33, 28, 0.045); --tip-bg: #F6F3EA; --tip-border: #A8A294;
+    --grid: #E3DFD2; --zero: #5F5B50; --ref: #8F8B7E; --label: #3B382F; --shade: rgba(35, 33, 28, 0.045); --tip-bg: #F6F3EA; --tip-border: #A8A294;
     color-scheme: light;
 }
 * { box-sizing: border-box; border-radius: 0; }
@@ -524,7 +523,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
     --amber: #7A5C14; --pos: #4F6B3A; --neg: #8E3F2B;
     --benchmark: #4A463C; --combined: #8A6A1F; --value: #8A8678; --momentum: #23211C; --p1: #8A8678; --p2: #23211C; --oos: #7A5C14;
     --momentum-text: #23211C; --value-text: #5F5B50; --combined-text: #7A5C14;
-    --grid: #E3DFD2; --zero: #5F5B50; --band: #5E6E86; --ref: #8F8B7E; --label: #3B382F; --shade: rgba(35, 33, 28, 0.045); --tip-bg: #F6F3EA; --tip-border: #A8A294;
+    --grid: #E3DFD2; --zero: #5F5B50; --ref: #8F8B7E; --label: #3B382F; --shade: rgba(35, 33, 28, 0.045); --tip-bg: #F6F3EA; --tip-border: #A8A294;
     color-scheme: light;
   }
   body { background: #fff; color: #111; }

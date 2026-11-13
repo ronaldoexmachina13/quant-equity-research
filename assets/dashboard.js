@@ -53,31 +53,18 @@ function niceStep(range) {
   const raw = range / 5, mag = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / mag;
   return (n < 1.5 ? 1 : n < 3.5 ? 2 : n < 7.5 ? 5 : 10) * mag;
 }
-function forest(svgId, rows, fmt, domain, band) {
+function forest(svgId, rows, fmt, domain) {
   /* On a phone the plot is redrawn narrow, with the label and value above each interval, so the text stays readable */
   const compact = window.innerWidth < 640;
   const W = compact ? 400 : 860, right = compact ? 10 : 190, left = compact ? 10 : Math.max(175, Math.max(...rows.map(r => r.label.length)) * 7.4 + 12);
   const rowH = compact ? 50 : 30, top = 26, bottom = 34;
   const H = top + rows.length * rowH + bottom;
-  /* A band is either one half-width for the whole plot, or { bySignal: { signal: half-width } } shading only that signal's rows */
-  const bandMax = band ? (band.bySignal ? Math.max(...Object.values(band.bySignal)) : band.half) : 0;
-  let lo = domain ? domain[0] : Math.min(0, ...rows.map(r => r.lo), -bandMax);
-  let hi = domain ? domain[1] : Math.max(0, ...rows.map(r => r.hi), bandMax);
+  let lo = domain ? domain[0] : Math.min(0, ...rows.map(r => r.lo));
+  let hi = domain ? domain[1] : Math.max(0, ...rows.map(r => r.hi));
   const pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
   const x = v => left + (v - lo) / (hi - lo) * (W - left - right);
   const step = niceStep(hi - lo);
   let s = "";
-  if (band && band.bySignal) {
-    const runs = {};
-    rows.forEach((r, i) => { if (band.bySignal[r.group]) { const run = runs[r.group] || (runs[r.group] = [i, i]); run[1] = i; } });
-    Object.entries(runs).forEach(([g, [a, b]]) => { const w = band.bySignal[g]; s += `<rect x="${x(-w)}" y="${top + a * rowH}" width="${x(w) - x(-w)}" height="${(b - a + 1) * rowH}" fill="${cssVar("--band")}" fill-opacity="0.16"/>`; });
-    s += `<text class="dim" x="${x(-bandMax)}" y="${top - 9}">${compact && band.short ? band.short : band.label}</text>`;
-  } else if (band) {
-    s += `<rect x="${x(-band.half)}" y="${top}" width="${x(band.half) - x(-band.half)}" height="${H - bottom - top}" fill="${cssVar("--zero")}" fill-opacity="0.10"/>` +
-         `<line x1="${x(-band.half)}" x2="${x(-band.half)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--zero")}" stroke-opacity="0.5" stroke-dasharray="3 3"/>` +
-         `<line x1="${x(band.half)}" x2="${x(band.half)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--zero")}" stroke-opacity="0.5" stroke-dasharray="3 3"/>` +
-         `<text class="dim" x="${x(-band.half)}" y="${top - 9}">${compact && band.short ? band.short : band.label}</text>`;
-  }
   for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) {
     const tv = Math.abs(t) < step / 1000 ? 0 : t;
     s += `<line x1="${x(tv)}" x2="${x(tv)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--grid")}"/>` +
@@ -109,7 +96,7 @@ function forest(svgId, rows, fmt, domain, band) {
 /* ---------- family forest: many tests in one SVG ----------
    One block per unit (rank IC, quintile spread, Sharpe difference and so on). Each block has a symmetric scale of its own, so zero
    sits at the same horizontal position in every block and in every family; a filled marker means the 90% interval excludes zero.
-   Rows: { label, sig, rest, mean, lo, hi, excl } or { header } for a sub-heading. Block: { title, fmt, rows, bands }, where bands is { signal: half-width } and shades only that signal's rows. */
+   Rows: { label, sig, rest, mean, lo, hi, excl } or { header } for a sub-heading. Block: { title, fmt, rows }. */
 function familyForest(svgId, blocks, opt) {
   opt = opt || {};
   const small = !!opt.small, compact = small || window.innerWidth < 640;
@@ -119,15 +106,13 @@ function familyForest(svgId, blocks, opt) {
   let y = 2, s = "";
   blocks.forEach(b => {
     const data = b.rows.filter(r => !r.header);
-    const h = b.h ? niceHalf(b.h) : niceHalf(Math.max(...data.map(r => Math.max(Math.abs(r.lo), Math.abs(r.hi))), ...Object.values(b.bands || {})));
+    const h = b.h ? niceHalf(b.h) : niceHalf(Math.max(...data.map(r => Math.max(Math.abs(r.lo), Math.abs(r.hi)))));
     const x = v => mid + v / h * half;
     if (b.title) { s += `<text class="blk" x="0" y="${y + 12}">${b.title}</text>`; y += 22; }
     const top = y;
     let body = "";
-    const bandRuns = {};   /* signal -> [first y, last y] of its rows, so each band sits behind its own signal only */
     b.rows.forEach(r => {
       if (r.header) { body += `<text class="sub" x="0" y="${y + rowH - 4}">${r.header}</text>`; y += rowH; return; }
-      if (b.bands && b.bands[r.sig]) { const run = bandRuns[r.sig] || (bandRuns[r.sig] = [y, y]); run[1] = y + rowH; }
       const yc = y + rowH / 2, c = COLORS[r.sig] || cssVar("--text"), label = r.sig && !r.plain ? `<tspan fill="${TEXTC[r.sig]}">${r.sig}</tspan>${esc(r.rest)}` : esc(r.label);
       const txt = `${b.fmt.val(r.mean)} [${b.fmt.val(r.lo)}, ${b.fmt.val(r.hi)}]${r.excl ? " *" : ""}`;
       body += `<g><title>${esc((r.sig || "") + (r.rest || r.label || ""))}: ${txt}</title><rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>` +
@@ -139,7 +124,6 @@ function familyForest(svgId, blocks, opt) {
       y += rowH;
     });
     const bottom = y;
-    Object.entries(bandRuns).forEach(([sig, [from, to]]) => { const w = b.bands[sig]; s += `<rect x="${x(-w)}" y="${from}" width="${x(w) - x(-w)}" height="${to - from}" fill="${cssVar("--band")}" fill-opacity="0.16"><title>${esc(sig)}: smallest effect the 2012 to 2020 test could reliably detect, +/-${b.fmt.val(w).slice(1)}</title></rect>`; });
     [-h, -h / 2, h / 2, h].forEach(v => { s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--grid")}"/>`; });
     s += body;
     s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--text")}"/>` +

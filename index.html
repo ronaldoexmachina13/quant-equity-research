@@ -198,7 +198,7 @@ const mde = minDetectableIC();
   /* family 1: registered signal tests */
   const tests = U.signalTests, flag1 = tests.filter(r => r.excludes_zero).length;
   const blocks1 = Object.keys(TEST_TITLE).map(k => ({
-    title: TEST_TITLE[k] + ", detectable-effect bands shaded", fmt: FMT[k], bands: U.detectable[k],
+    title: TEST_TITLE[k], fmt: FMT[k],
     rows: SIGNALS.flatMap(sig => PERIODS.map(p => tests.find(r => r.test === k && r.signal === sig && r.period === p.key && p)).filter(Boolean)
       .map(r => testRow(r, PERIOD_LABEL[r.period])))
   })).filter(b => b.rows.length);
@@ -206,9 +206,8 @@ const mde = minDetectableIC();
   counted("f1Count", flag1, tests.length, ", against about " + chance(tests.length) + " expected by chance");
   familyForest("f1Forest", blocks1);
   document.getElementById("f1Caption").innerHTML = "Each row is one test: the estimate (marker) and its 90% bootstrap interval (line) against zero (vertical line). The tests are in different units, so each block has its own scale with zero in the same place. " +
-    "A filled marker means the interval excludes zero; a hollow marker that it includes zero. The grey band behind each signal's rows is the smallest true average effect that signal's 2012 to 2020 test (108 months) could reliably detect, at 80% power and a 10% two-sided level, so a true effect inside the band would usually be missed. " +
-    "The bands are descriptive: they were computed after the registered results, from the saved monthly series, and are approximate for the Fama-MacBeth slopes, where the monthly slopes are not saved and the figure is recovered from the saved 90% interval. " +
-    "They are drawn behind all of a signal's rows but describe the 2012 to 2020 test: the 2021 to 2026 test has fewer months (68), so its own band would be wider, and the full-period test has more (176), so its own band would be narrower. The results are consistent with no effect and with a small one; they are not evidence of no effect. The expected count assumes independent tests; the tests overlap, so it is a rough guide.";
+    "A filled marker means the interval excludes zero; a hollow marker that it includes zero. The smallest effect each signal's 2012 to 2020 test could detect is in the Detectable effect table below. " +
+    "The results are consistent with no effect and with a small one; they are not evidence of no effect. The expected count assumes independent tests; the tests overlap, so it is a rough guide.";
 
   /* family 2: registered Sharpe comparisons */
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null), hit = head.filter(r => r.sig);

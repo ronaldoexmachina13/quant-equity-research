@@ -1,12 +1,11 @@
 """
-The grey detectable-effect bands on the summary page (Exhibit 1). Each band is the smallest true average effect a
+The detectable-effect figures behind the summary page. Each figure is the smallest true average effect a
 signal's 2012 to 2020 test could reliably detect: (1.645 + 0.842) x standard error of the monthly mean, which is
 80% power at a 10% two-sided level. The figures are written by the dashboard data generator from saved files, so
 these tests check the arithmetic by hand and then check the committed data against an independent recomputation.
 """
 import json
 import math
-import re
 from pathlib import Path
 
 import numpy as np
@@ -90,10 +89,10 @@ def test_band_rank_ic_equals_the_figures_the_page_computes_from_the_ic_series():
         assert data["detectable"]["rank_ic"][signal] == pytest.approx(Z * first.std(ddof=1) / math.sqrt(data["split"]), abs=1e-5)
 
 
-def test_summary_page_draws_a_band_per_signal_and_the_caption_calls_them_descriptive():
+def test_summary_page_no_longer_shades_bands_and_points_to_the_detectable_effect_table():
     index = (ROOT / "index.html").read_text(encoding="utf-8")
-    assert "bands: U.detectable[k]" in index
-    assert "band: k ===" not in index                       # the old single band is gone
-    assert re.search(r"descriptive: they were computed after the registered results", index)
+    assert "bands:" not in index and "bands shaded" not in index
+    assert "Detectable effect table below" in index
+    assert "not evidence of no effect" in index
     dashboard = (ROOT / "assets" / "dashboard.js").read_text(encoding="utf-8")
-    assert "bandRuns" in dashboard
+    assert "bandRuns" not in dashboard

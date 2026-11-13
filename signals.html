@@ -173,12 +173,8 @@ function drawSignalForest() {
   }));
   const n = rows.filter(r => r.excl).length;
   document.getElementById("forestTitle").textContent = t.label + ": " + (n === 0 ? "no interval excludes zero" : n + " of " + rows.length + " intervals exclude zero");
-  const det = U.detectable[testKey];
-  const band = det ? { bySignal: det, label: "Shaded: smallest effect each signal's 2012 to 2020 test could detect", short: "Shaded: smallest detectable effect" } : null;
-  forest("signalForest", rows, t.fmt, null, band);
-  const slopes = testKey.startsWith("fama_macbeth");
-  document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".") +
-    " The shaded band behind each signal's rows is the smallest effect that signal's 2012 to 2020 test could detect at 80% power; a true effect inside it would usually be missed. It is descriptive, computed after the registered results" + (slopes ? " and approximate for the slopes" : "") + ", and it describes the 2012 to 2020 test even where it is drawn behind the other periods.";
+  forest("signalForest", rows, t.fmt, null);
+  document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".");
 }
 buttons("testTabs", TESTS, testKey, k => { testKey = k; drawSignalForest(); });
 drawSignalForest();
