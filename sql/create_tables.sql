@@ -3,11 +3,11 @@
 -- Reference schema for quant-equity-research, matching src/database.py exactly
 -- (verified against the real file, not assumed).
 --
--- Two tables. Both are raw-data caches: prices from yfinance, and forward-filled
--- book value per share from SEC EDGAR. All derived quantities (momentum score,
--- P/B, portfolio weights, backtest performance) are currently computed in
--- pandas and only ever persisted as results/*.csv, not written back to SQLite.
--- See sql/README.md for what that implies and what Tier B would change.
+-- Four tables. prices and book_value are raw-data caches: prices from yfinance,
+-- and forward-filled book value per share from SEC EDGAR. portfolio_weights and
+-- performance hold the 17-stock study's outputs. Derived quantities (momentum
+-- score, P/B) are computed in pandas and persisted only as results/*.csv. See
+-- sql/README.md.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS prices (
@@ -28,9 +28,8 @@ CREATE INDEX IF NOT EXISTS idx_prices_ticker     ON prices(ticker);
 CREATE INDEX IF NOT EXISTS idx_book_value_ticker ON book_value(ticker);
 
 -- ----------------------------------------------------------------------------
--- Tier B additions (require src/database.py to be patched; see
--- src_patch/database_py_additions.md). Not yet in the live database until
--- run_strategy_comparison.py is re-run after that patch is applied.
+-- Output tables written by src/database.py (save_portfolio_weights and
+-- save_performance), which run_strategy_comparison.py calls.
 -- ----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS portfolio_weights (

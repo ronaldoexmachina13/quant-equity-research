@@ -25,18 +25,29 @@ def load_prices() -> pd.DataFrame:
 
 def calculate_momentum(prices: pd.DataFrame, lookback_months: int = 12, skip_months: int = 1) -> pd.DataFrame:
     """
-    Calculate 12-1 style momentum scores for each ticker at each date.
+    Calculate the registered momentum score for each ticker at each month-end.
 
     momentum = price[t - skip_months] / price[t - lookback_months] - 1
+
+    With the defaults (12 and 1) this is the return from the close 12 months
+    before month-end t to the close of the previous month, t-1. That is 11
+    monthly returns and no month is skipped, so it is NOT the textbook 12-1
+    signal, which would end one month earlier (see
+    calculate_momentum_skip_month). The row dated t uses no price from t
+    itself, so it is known at the close of t-1 and is paired with the return
+    of month t.
 
     Parameters
     ----------
     prices : pd.DataFrame
         Wide-format adjusted close prices (Date index, tickers as columns).
     lookback_months : int
-        How many months back the lookback window starts (default 12).
+        How many months before t the window starts (default 12).
     skip_months : int
-        How many recent months to exclude, to avoid short-term reversal (default 1).
+        How many months before t the window ends (default 1, the previous
+        month-end). The name is historical: it sets where the window ends and
+        does not skip a month inside the window, so it does not avoid
+        short-term reversal.
 
     Returns
     -------
@@ -104,8 +115,8 @@ def calculate_value_score(prices: pd.DataFrame, book_value: pd.DataFrame) -> pd.
     return earned during month t (from the t-1 close to the t close), so
     the signal must be known at t-1. Using the month-t price here would
     select stocks with information from the end of the holding month,
-    which is look-ahead bias. Momentum already respects this through its
-    skip-month (it uses the t-1 price as its end point).
+    which is look-ahead bias. Momentum respects this in the same way: its
+    window ends at the t-1 close.
 
     Parameters
     ----------

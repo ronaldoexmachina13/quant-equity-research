@@ -11,7 +11,12 @@ Grid (every cell is run and reported, in grid order; none is chosen,
 ranked or promoted):
 - Momentum and Combined: lookback 12-1, 9-1, 6-1 x top 3, 5, 8, 10 x
   monthly, quarterly = 24 cells each. Value: top N x rebalancing = 8 cells.
-- Base case (the published headline, unchanged): top 5, monthly, 12-1.
+  The labels are kept as published. Each is the return from the close N
+  months before the trade month to the close of the previous month, so the
+  cells are 11, 8 and 5 monthly returns with no month skipped (see
+  calculate_momentum in src/factors.py).
+- Base case (the published headline, unchanged): top 5, monthly, lookback
+  labelled 12-1.
 
 Simulation:
 - Monthly cells use the existing code path: build_portfolio() for the
@@ -223,7 +228,7 @@ def reproduction_failures(grid: pd.DataFrame, gross_by_cell: dict) -> list[str]:
             check(f"{period} base {strategy} gross Sharpe", row["strategy_gross_sharpe"], table.loc[strategy, "sharpe_ratio"])
         check(f"{period} monthly benchmark gross Sharpe", row["benchmark_gross_sharpe"], table.loc["Benchmark", "sharpe_ratio"])
 
-    # Gate: monthly top 8 at 12-1 reproduces strategy_comparison_concentration.csv.
+    # Gate: monthly top 8 at the base lookback (labelled 12-1) reproduces strategy_comparison_concentration.csv.
     conc = pd.read_csv("results/strategy_comparison_concentration.csv", index_col="label")
     measures = {"annualized_return": annualized_return, "annualized_volatility": annualized_volatility,
                 "sharpe_ratio": sharpe_ratio, "sortino_ratio": sortino_ratio, "max_drawdown": max_drawdown}

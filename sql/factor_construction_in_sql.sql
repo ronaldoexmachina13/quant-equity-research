@@ -1,16 +1,14 @@
 -- ============================================================================
 -- factor_construction_in_sql.sql
--- Computes the momentum and value signals directly in SQL, against the real
--- prices/book_value schema. This is deliberately doing signal construction,
--- not just aggregation -- it's meant to demonstrate that SQL can do real
--- analytical work here, not just cache data for pandas to read back out.
+-- Computes the momentum and value signals directly in SQL against the
+-- prices/book_value schema, as an independent check on the pandas code in
+-- src/factors.py.
 --
 -- These queries operate on DAILY prices (yfinance) and derive month-end
 -- snapshots inline, since neither table stores a pre-computed "month-end"
--- flag. If book_value is only ever written at month-end already (check this
--- against how generate_dashboard_data.py / factors.py build bv_df before
--- calling save_book_value), the month-end step in query 1 is still safe to
--- run -- it's a no-op on data that's already one row per ticker per month.
+-- flag. book_value is aligned to month-end dates when it is built (see
+-- scripts/first_study/run_fundamentals_pipeline.py), so the month-end step in
+-- query 1 changes nothing there: it is already one row per ticker per month.
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
@@ -18,9 +16,8 @@
 --    previous month, computed at each month-end. No month is skipped, so this
 --    is an 11-month return and not a true 12-1 signal (see the note in
 --    docs/STUDY_17_STOCKS.md). It is the same signal src/factors.py builds
---    in pandas -- this query is meant as an independent verification of it,
---    not a replacement. If the two disagree, that's worth knowing before an
---    interview, not after.
+--    in pandas and serves as an independent check on it, not a replacement.
+--    If the two disagree, find the cause before relying on either.
 -- ----------------------------------------------------------------------------
 WITH month_end AS (
     SELECT
@@ -95,9 +92,8 @@ ORDER BY p.ticker, p.date;
 -- ----------------------------------------------------------------------------
 -- 3. Coverage diagnostic: for each ticker, how many month-end dates have a
 --    price but no matching book_value row. This is the SQL-native version of
---    the coverage table in the README (HD at 47/60, V at 0/60, etc.) -- run
---    this and compare the counts to what's currently written in the README
---    as a direct correctness check, not just a restatement of it.
+--    the coverage table in the README (HD at 47/60, V at 0/60, etc.). Compare
+--    the counts from this query with that table as a correctness check.
 -- ----------------------------------------------------------------------------
 WITH month_end_prices AS (
     SELECT DISTINCT

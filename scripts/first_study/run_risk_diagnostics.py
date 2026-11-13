@@ -4,7 +4,8 @@ detailed design: risk diagnostics").
 
 Descriptive tail-risk and consistency measures on the published monthly
 gross returns of Momentum, Value, Combined and the monthly equal-weight
-benchmark, in the base specification (top 5, monthly, 12-1). No hypothesis
+benchmark, in the base specification (top 5, monthly, lookback labelled 12-1;
+the label is historical, see run_robustness_grid.py). No hypothesis
 is tested and no strategy or published result changes.
 
 - Historical VaR and Expected Shortfall at 95% (positive losses), with 90%

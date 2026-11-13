@@ -31,10 +31,11 @@ def test_calculate_momentum_matches_formula_by_hand():
 
 def test_calculate_momentum_skips_most_recent_month():
     """
-    The whole point of the skip-month convention is that momentum should
-    NOT be affected by the single most recent month's price move --
-    changing only the final month's price should leave momentum[13]
-    unchanged, since it's built from shift(1) and shift(12), not shift(0).
+    Look-ahead guard: the score dated t must not use the price at t itself.
+    Changing only the final month's price should leave momentum[13]
+    unchanged, since it is built from shift(1) and shift(12), not shift(0).
+    This is not a reversal skip: the window ends at t-1 and no month inside
+    it is dropped.
     """
     dates = pd.date_range("2020-01-31", periods=14, freq="ME")
     prices_a = pd.DataFrame({"A": [100 + 2 * i for i in range(14)]}, index=dates)

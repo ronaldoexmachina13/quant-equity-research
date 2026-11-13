@@ -17,7 +17,9 @@ def calculate_monthly_returns(prices: pd.DataFrame) -> pd.DataFrame:
 def run_backtest(weights: pd.DataFrame, returns: pd.DataFrame) -> pd.Series:
     """
     Simulate strategy returns: weight[t] applied to return[t] (same index),
-    valid because momentum's skip-month already lags the signal appropriately.
+    valid because every signal dated t is built from data up to the close of
+    t-1 only (the momentum window ends at t-1; Value uses the t-1 price), so
+    the weights are known before month t starts.
     """
     common_dates = weights.index.intersection(returns.index)
     w = weights.loc[common_dates]

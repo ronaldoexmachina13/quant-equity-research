@@ -1,12 +1,9 @@
 -- ============================================================================
 -- portfolio_and_regime_queries.sql
 --
--- REQUIRES TIER B. These queries reference portfolio_weights and performance,
--- which do not exist until src/database.py is patched per
--- src_patch/database_py_additions.md AND run_strategy_comparison.py has been
--- re-run at least once afterward. Running this file against the database
--- before that will fail with "no such table" -- that failure is correct
--- behavior, not a bug in this file.
+-- These queries reference portfolio_weights and performance, which are
+-- written by run_strategy_comparison.py. Running this file against a database
+-- that script has not populated fails with "no such table".
 --
 -- No sector/company table exists in this schema, so a sector-concentration
 -- query isn't included here -- that would need a new companies(ticker,
@@ -53,9 +50,9 @@ ORDER BY strategy, date;
 -- ----------------------------------------------------------------------------
 -- 2. Annualized Sharpe ratio by strategy and regime (2021-2022 vs 2023-2024),
 -- computed in SQL from daily_return. Flat 2% annual risk-free rate, matching
--- the rest of the project. Compare this output directly against the numbers
--- already in strategies.html's Robustness tab -- they should match closely;
--- if they don't, find out why before anyone else does.
+-- the rest of the project. Compare the output with the Sharpe ratios in
+-- results/strategy_comparison_2021_2022.csv and strategy_comparison_2023_2024.csv;
+-- any difference needs explaining before relying on either.
 -- ----------------------------------------------------------------------------
 WITH regime_returns AS (
     SELECT
