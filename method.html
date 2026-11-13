@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Method | Equity Factor Research</title>
-<script src="assets/theme.js?v=20"></script>
-<link rel="stylesheet" href="assets/styles.css?v=20">
+<script src="assets/theme.js?v=22"></script>
+<link rel="stylesheet" href="assets/styles.css?v=22">
 </head>
 <body>
 <div id="chrome"></div>
@@ -113,7 +113,7 @@
 
   <div class="tabpane" id="pane-power" hidden>
   <div class="panel" data-stamp="descriptive" data-src="results/universe_study_ic_monthly_momentum.csv; results/universe_study_ic_monthly_value_combined.csv">
-    <h2>Minimum detectable mean rank IC <span>90% two-sided interval, 80% power</span></h2>
+    <h2>Minimum detectable mean rank IC <span>10% two-sided level, 80% power</span></h2>
     <div class="legend-row" id="powerLegend"></div>
     <div style="position:relative; height:280px;"><canvas id="powerChart" role="img" aria-label="Line chart. Minimum detectable mean rank IC against months of data, for the highest and lowest standard deviation of monthly rank IC."></canvas></div>
     <p class="caption" id="powerCaption"></p>
@@ -136,7 +136,7 @@
 <script src="assets/universe_data.js"></script>
 <script src="assets/meta_data.js"></script>
 <script src="assets/universe_ledger_data.js"></script>
-<script src="assets/dashboard.js?v=20"></script>
+<script src="assets/dashboard.js?v=22"></script>
 <script>
 renderChrome("method.html", "Pre-specified design &middot; frozen signals &middot; no tuning &middot; every variant reported");
 document.getElementById("planLogLine").textContent = planLogSentence();

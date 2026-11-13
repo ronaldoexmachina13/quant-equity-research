@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<script src="assets/theme.js?v=20"></script>
-<link rel="stylesheet" href="assets/styles.css?v=20">
+<script src="assets/theme.js?v=22"></script>
+<link rel="stylesheet" href="assets/styles.css?v=22">
 </head>
 <body>
 <div id="chrome"></div>
@@ -123,7 +123,7 @@
 <script src="assets/universe_extras_data.js"></script>
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=20"></script>
+<script src="assets/dashboard.js?v=22"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;
@@ -172,7 +172,7 @@ function drawSignalForest() {
     if (r) rows.push({ label: sig + " · " + p.label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, color: sig, group: sig, excl: r.excludes_zero });
   }));
   const n = rows.filter(r => r.excl).length;
-  document.getElementById("forestTitle").textContent = t.label + ": " + (n === 0 ? "no interval excludes zero" : n + " of " + rows.length + " intervals exclude zero");
+  document.getElementById("forestTitle").textContent = t.label + ": " + (n === 0 ? "all " + rows.length + " intervals include zero" : n + " of " + rows.length + " intervals exclude zero");
   forest("signalForest", rows, t.fmt, null);
   document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".");
 }

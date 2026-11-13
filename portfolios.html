@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Portfolios | Equity Factor Research</title>
-<script src="assets/theme.js?v=20"></script>
-<link rel="stylesheet" href="assets/styles.css?v=20">
+<script src="assets/theme.js?v=22"></script>
+<link rel="stylesheet" href="assets/styles.css?v=22">
 </head>
 <body>
 <div id="chrome"></div>
@@ -89,7 +89,7 @@
   <div class="tabpane" id="pane-returns" hidden>
   <div class="panel" data-stamp="sensitivity" data-src="results/universe_study_portfolio_summary.csv">
     <h2 id="costTitle">Trading costs</h2>
-    <p class="caption" style="margin-top:0;margin-bottom:0.75rem;">Shows all three cost treatments for the selected signal and size. It does not follow the costs button. Net returns deduct a one-way cost of 10 basis points, charged on both the selling and the buying leg of each month's turnover. Two turnover bases are shown: existing positions, and positions carried with price drift.</p>
+    <p class="caption" style="margin-top:0;margin-bottom:0.75rem;">This table shows all three cost treatments for the selected signal and size, whatever the costs button is set to. Returns after costs deduct 10 basis points on each trade, buying or selling, applied to each month's turnover. Two turnover bases are shown: existing positions, and positions carried with price drift.</p>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table perf-table">
         <thead><tr><th>Period</th><th>Costs</th><th class="num">Total return</th><th class="num">Ann. return</th><th class="num">Sharpe</th><th class="num">Turnover</th><th class="num">Sharpe diff, 90% CI</th></tr></thead>
@@ -153,7 +153,7 @@
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/universe_factor4_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=20"></script>
+<script src="assets/dashboard.js?v=22"></script>
 <script>
 renderChrome("portfolios.html", "Equal weight &middot; rebalanced monthly &middot; 10 bps one-way costs &middot; benchmark: equal-weight average of usable names");
 
@@ -181,9 +181,16 @@ function drawLead() {
   });
   document.getElementById("leadBody").innerHTML = html;
   const who = [...dup].length ? hitG[0].sig + " in " + hitG[0].p.label : "";
-  document.getElementById("leadTitle").textContent = hitG.length === 0 ? "No registered Sharpe difference has a 90% interval that excludes zero before costs"
-    : hitG.length + " of " + cells.length + " registered Sharpe differences exclude zero before costs" + (dup.size === 1 && hitG.length > 1 ? ", both " + who : "") + "; after costs, " + hitN.length + " of " + cells.length;
-  document.getElementById("leadCount").innerHTML = `<b>${hitG.length} of ${cells.length}</b> exclude zero before costs, against about ${(cells.length * 0.1).toFixed(1)} expected by chance<span> &middot; after 10 bps: ${hitN.length} of ${cells.length}</span>`;
+  const k = hitG.length, n = cells.length;
+  const sameAfter = hitN.length === k && hitG.every(c => hitN.some(m => m.sig === c.sig && m.p === c.p && m.z === c.z));
+  const dir = k && hitG.every(c => c.g.diff < 0) ? "below" : k && hitG.every(c => c.g.diff > 0) ? "above" : "";
+  document.getElementById("leadTitle").textContent =
+    k === 0 && hitN.length === 0 ? "No portfolio's Sharpe ratio differs detectably from its benchmark's, before or after 10 bps costs"
+    : k === 0 ? "No Sharpe difference is detectable before costs; " + hitN.length + " of " + n + " are after 10 bps costs"
+    : (dup.size === 1 && k > 1 && sameAfter && dir) ? "Only " + who + " has a Sharpe ratio detectably " + dir + " its benchmark's, before and after 10 bps costs"
+    : k + " of " + n + " Sharpe differences are detectable before costs and " + hitN.length + " after 10 bps costs";
+  document.getElementById("leadCount").innerHTML = `<b>${k} of ${n}</b> Sharpe differences have a 90% interval that excludes zero, against about ${(n * 0.1).toFixed(1)} expected by chance` +
+    (sameAfter ? "" : `<span> &middot; ${hitN.length} of ${n} after 10 bps costs</span>`);
   document.getElementById("leadKey").textContent = "* marks a Sharpe difference whose 90% paired bootstrap interval excludes zero." + (dup.size ? " \u2020 marks rows that are one result counted twice, because the top quintile contains the top decile." : "");
   document.getElementById("leadCaption").innerHTML = "The Sharpe difference is the portfolio's Sharpe ratio minus its own benchmark's, annualised; the interval is a paired bootstrap (5,000 resamples) at the 90% level. " +
     (hitG.length && hitG.every(c => c.g.diff < 0) ? "In each of those rows the portfolio trailed its benchmark. " : "") +

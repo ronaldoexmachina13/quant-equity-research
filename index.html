@@ -17,8 +17,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Summary | Equity Factor Research</title>
-<script src="assets/theme.js?v=20"></script>
-<link rel="stylesheet" href="assets/styles.css?v=20">
+<script src="assets/theme.js?v=22"></script>
+<link rel="stylesheet" href="assets/styles.css?v=22">
 </head>
 <body>
 <div id="chrome"></div>
@@ -85,7 +85,7 @@
     <p class="caption">Cumulative return of each top-decile portfolio divided by that of its own equal-weight benchmark, before costs, on a log scale. A line above 1.0 means the portfolio is ahead. Momentum needs 11 months of history, so it has its own benchmark; Value and Combined share one. Prices come from stocks that were in the index at some point and are still tradable today, which flatters every line; the Universe page measures how much. The Portfolios page has growth, drawdowns and costs.</p>
   </div>
 
-  <div class="section-label">Test ledger <span>how many tests were run, and how many would clear the bar by chance</span></div>
+  <div class="section-label">Test ledger <span>how many tests were run, and how many would exclude zero by chance</span></div>
   <div class="panel" data-stamp="descriptive" data-src="results/universe_study_signal_summary_*.csv; results/universe_study_portfolio_summary.csv; results/universe_study_inference_robustness.csv">
     <table class="ledger" id="ledger"></table>
     <p class="caption" id="ledgerCaption"></p>
@@ -114,7 +114,7 @@
 <script src="assets/universe_stocks_data.js"></script>
 <script src="assets/universe_sens_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=20"></script>
+<script src="assets/dashboard.js?v=22"></script>
 <script>
 renderChrome("index.html", "S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (11-month) &middot; Value (P/B) &middot; Combined");
 const X = UNIVERSE_EXTRAS;
