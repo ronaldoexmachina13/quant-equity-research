@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Data sources, survivorship, errata, attribution and every ticker in the S&P 500 equity factor study.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Universe | Equity Factor Research">
+<meta property="og:description" content="Data sources, survivorship, errata, attribution and every ticker in the S&P 500 equity factor study.">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Universe | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=14">
+<link rel="stylesheet" href="assets/styles.css?v=15">
 </head>
 <body>
 <div id="chrome"></div>
@@ -24,7 +30,7 @@
       <div class="mini-stat"><div class="ms-value" id="kAll">&ndash;</div><div class="ms-label">tickers ever in the index</div></div>
       <div class="mini-stat"><div class="ms-value" id="kPrice">&ndash;</div><div class="ms-label">with price history</div></div>
       <div class="mini-stat"><div class="ms-value" id="kNone">&ndash;</div><div class="ms-label">with no price history</div></div>
-      <div class="mini-stat"><div class="ms-value" id="kRemShare">&ndash;</div><div class="ms-label">of removed names have no price history</div></div>
+      <div class="mini-stat"><div class="ms-value" id="kRemShare">&ndash;</div><div class="ms-label" id="kRemLabel">of names removed from 2012 onward have no price history</div></div>
       <div class="mini-stat"><div class="ms-value" id="kStayShare">&ndash;</div><div class="ms-label">of names that stayed have none</div></div>
     </div>
   </section>
@@ -44,10 +50,10 @@
     </div>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_coverage_monthly.csv">
     <h2>Usable names per month</h2>
     <div class="legend-row">
-      <span><i style="background:#F2F3F5"></i>Index members</span>
+      <span><i style="background:var(--benchmark)"></i>Index members</span>
       <span><i style="background:var(--momentum)"></i>Usable for Momentum</span>
       <span><i style="background:var(--value)"></i>Usable for Value and Combined</span>
     </div>
@@ -55,7 +61,7 @@
     <p class="caption">A name is usable when it has the price history (and, for Value, the book value) the signal needs. Companies that were acquired or went bankrupt mostly have no free price history, so the gap is largest in the early years. Membership is approximate early on: up to about 12 names may be overstated in 2012.</p>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_stock_summary.csv">
     <h2>Coverage by status <span>why survivorship matters</span></h2>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table perf-table">
@@ -66,7 +72,7 @@
     <p class="caption">&ldquo;Removed&rdquo; means the company left the index at some point in the sample (acquired, merged, bankrupt or dropped for size). Free providers mostly keep no price history for names that no longer trade, so removed companies are far more likely to be missing. The study can use only names that have data, which is why levels are inflated and differences are also biased, in a direction that depends on the signal.</p>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_survivorship.csv">
     <h2>Survivorship <span>names later removed from the index against names that stayed</span></h2>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table surv-table">
@@ -97,7 +103,7 @@
 
   <div class="tabpane" id="pane-attribution" hidden>
   <div id="ctx"></div>
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_stock_summary.csv">
     <h2 id="contribTitle">Largest contributors and detractors</h2>
     <div class="two-col">
       <div><div class="section-label" style="margin-top:0">Largest contributors</div><div id="topList"></div></div>
@@ -107,7 +113,7 @@
   </div>
 
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_holdings.csv">
     <h2 id="outTitle">Extreme single-month returns</h2>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table perf-table">
@@ -120,7 +126,7 @@
   </div>
 
   <div class="tabpane" id="pane-months" hidden>
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_returns.csv; results/universe_study_holdings.csv">
     <div class="month-ctrl">
       <span class="month-label" id="monthLabel"></span>
     </div>
@@ -131,7 +137,7 @@
       <span><i style="background:var(--momentum)"></i>Momentum</span>
       <span><i style="background:var(--value)"></i>Value</span>
       <span><i style="background:var(--combined)"></i>Combined</span>
-      <span><i style="background:#F2F3F5"></i>Equal-weight benchmark (Value and Combined usable)</span>
+      <span><i style="background:var(--benchmark)"></i>Equal-weight benchmark (Value and Combined usable)</span>
     </div>
     <div style="position:relative; height:260px;"><canvas id="growthChart" role="img" aria-label="Line chart. Growth of $1 for the top-decile Momentum, Value and Combined portfolios and the equal-weight benchmark, monthly."></canvas></div>
     <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased. Pick a year and month above, click the chart, or use the left and right arrow keys.</p>
@@ -141,7 +147,7 @@
   </div>
 
   <div class="tabpane" id="pane-stocks" hidden>
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_stock_summary.csv">
     <h2>All stocks</h2>
     <div class="filter-row">
       <input id="fSearch" type="search" placeholder="Search stocks">
@@ -206,7 +212,12 @@ function showTab(key, fromClick) {
   document.getElementById("kAll").textContent = STOCKS.length;
   document.getElementById("kPrice").textContent = has;
   document.getElementById("kNone").textContent = STOCKS.length - has;
-  document.getElementById("kRemShare").textContent = pct(share("removed"), 0);
+  /* basis: names removed in or after the first sample month, the only ones that can enter a test month */
+  const removedSince = grp("removed").filter(s => s.end_date >= U.dates[0]);
+  const removedSinceNone = removedSince.filter(s => !s.has_price_history).length;
+  document.getElementById("kRemShare").textContent = pct(removedSinceNone / removedSince.length, 0);
+  document.getElementById("kRemLabel").textContent = "of names removed from 2012 onward have no price history (" + removedSinceNone + " of " + removedSince.length +
+    "). Counting all " + grp("removed").length + " removed names, including those removed before 2012 that never enter a test month, " + pct(share("removed"), 0) + " (" + grp("removed").filter(s => !s.has_price_history).length + " of " + grp("removed").length + ") have none";
   document.getElementById("kStayShare").textContent = pct(share("stayed"), 0);
   const body = document.getElementById("covBody");
   [["stayed", "Stayed in the index"], ["removed", "Removed from the index"]].forEach(([g, label]) => {
@@ -216,7 +227,7 @@ function showTab(key, fromClick) {
 })();
 
 lineChart("covChart", [
-  { label: "Index members", data: U.coverage.members, borderColor: "#F2F3F5", backgroundColor: "#F2F3F5", borderDash: [3, 3], borderWidth: 1.5 },
+  { label: "Index members", data: U.coverage.members, borderColor: cssVar("--benchmark"), backgroundColor: cssVar("--benchmark"), borderDash: [3, 3], borderWidth: 1.5 },
   { label: "Usable for Momentum", data: U.coverage.momentum, borderColor: COLORS.Momentum, backgroundColor: COLORS.Momentum },
   { label: "Usable for Value and Combined", data: U.coverage.value_combined, borderColor: COLORS.Value, backgroundColor: COLORS.Value }
 ], v => v, v => v, false);
@@ -264,7 +275,7 @@ function drawContrib() {
   const pool = STOCKS.filter(s => s[key] !== null).sort((a, b) => b[key] - a[key]);
   const top = pool.slice(0, 10), bot = pool.slice(-10).reverse();
   const max = Math.max(...top.map(s => Math.abs(s[key])), ...bot.map(s => Math.abs(s[key])));
-  const row = s => `<div class="bar-row" title="${esc(s.company || s.ticker)}"><span><b>${esc(s.ticker)}</b></span><span class="bar-track"><span class="bar-fill" style="background:${s[key] >= 0 ? COLORS[strat] : "#E5636B"}; left:0; width:${Math.abs(s[key]) / max * 100}%"></span></span><span style="text-align:right">${spct(s[key], 1)}</span></div>`;
+  const row = s => `<div class="bar-row" title="${esc(s.company || s.ticker)}"><span><b>${esc(s.ticker)}</b></span><span class="bar-track"><span class="bar-fill" style="background:${s[key] >= 0 ? COLORS[strat] : cssVar("--neg")}; left:0; width:${Math.abs(s[key]) / max * 100}%"></span></span><span style="text-align:right">${spct(s[key], 1)}</span></div>`;
   document.getElementById("topList").innerHTML = top.map(row).join("");
   document.getElementById("botList").innerHTML = bot.map(row).join("");
   const total = pool.reduce((a, s) => a + s[key], 0), topShare = top.reduce((a, s) => a + s[key], 0) / total;
@@ -280,12 +291,12 @@ Chart.register({
     if (chart.canvas.id !== "growthChart") return;
     const x = chart.scales.x.getPixelForValue(i);
     const { ctx, chartArea } = chart;
-    ctx.save(); ctx.strokeStyle = "#F0A83A"; ctx.lineWidth = 1.5;
+    ctx.save(); ctx.strokeStyle = cssVar("--amber"); ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke(); ctx.restore();
   }
 });
 const sets = SIGNALS.map(s => ({ label: s, data: growth(U.series[s].top_decile.gross), borderColor: COLORS[s], backgroundColor: COLORS[s] }));
-sets.push({ label: "Benchmark", data: growth(U.benchmarks["Value and Combined"].gross), borderColor: "#F2F3F5", backgroundColor: "#F2F3F5", borderWidth: 1.5 });
+sets.push({ label: "Benchmark", data: growth(U.benchmarks["Value and Combined"].gross), borderColor: cssVar("--benchmark"), backgroundColor: cssVar("--benchmark"), borderWidth: 1.5 });
 const chart = lineChart("growthChart", sets, v => "$" + v, v => "$" + v.toFixed(2), false);
 Object.assign(chart.options.scales.y, { type: "logarithmic", afterBuildTicks: ax => { ax.ticks = [1, 2, 3, 5, 10, 20, 30, 50].filter(v => v >= ax.min && v <= ax.max).map(value => ({ value })); } });
 chart.options.animation = false;
@@ -400,10 +411,10 @@ function drawTable() {
     return `<tr><td class="month-cell">${esc(s.ticker)}</td><td class="name" title="${esc(s.company || "")}">${esc(s.company || "")}</td>` +
       `<td class="name" style="max-width:120px" title="${esc(s.gics_sector || "")}">${s.gics_sector ? esc(s.gics_sector) : '<span style="color:var(--muted)">not recorded</span>'}</td>` +
       `<td>${s.group === "removed" ? '<span class="tag warn">removed</span>' : '<span class="tag">stayed</span>'}</td>` +
-      `<td>${start} – ${end}</td>` +
+      `<td>${start} to ${end}</td>` +
       `<td>${s.has_price_history ? "yes" : '<span class="neg">none</span>'}</td>` +
       `<td class="num">${s.months_usable_momentum}</td><td class="num">${s.months_usable_value}</td>` +
-      `<td class="num">${s._held}</td><td class="num">${s._contrib === null ? "–" : spct(s._contrib, 1)}</td></tr>`;
+      `<td class="num">${s._held}</td><td class="num">${s._contrib === null ? "n/a" : spct(s._contrib, 1)}</td></tr>`;
   }).join("");
   document.getElementById("stocksCaption").textContent =
     `Showing ${rows.length} of ${STOCKS.length}. Mom. data and Value data count the months (out of ${U.dates.length}) in which the stock had the data that signal needs. Held is the number of months in the top-decile ${document.getElementById("fStrategy").value} portfolio and Contrib. is its summed contribution while held. Sector is recorded only for current members. Click a column heading to sort.`;

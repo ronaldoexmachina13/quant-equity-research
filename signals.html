@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Rank IC, quintile spread and Fama-MacBeth tests of three equity signals, with 90% bootstrap intervals.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Signals | Equity Factor Research">
+<meta property="og:description" content="Rank IC, quintile spread and Fama-MacBeth tests of three equity signals, with 90% bootstrap intervals.">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=14">
+<link rel="stylesheet" href="assets/styles.css?v=15">
 </head>
 <body>
 <div id="chrome"></div>
@@ -14,6 +20,7 @@
   <section class="hero">
     <h1>Signals</h1>
     <p class="lede">Do the rankings predict next-month returns? This is the primary evidence. Each signal is tested on rank IC, quintile spread and Fama-MacBeth slopes, with 90% bootstrap intervals, before any portfolio is built.</p>
+    <div class="mini-stats" id="sKeys" role="group" aria-label="Mean rank IC by signal and period, with the smallest effect the test could detect"></div>
   </section>
 
   <details class="panel fold" id="defs">
@@ -25,29 +32,29 @@
 
   <!-- Tab 1 -->
   <div class="tabpane" id="pane-predictive">
-    <div class="panel" data-stamp="registered">
+    <div class="panel" data-stamp="registered" data-src="results/universe_study_signal_summary_momentum.csv; results/universe_study_signal_summary_value_combined.csv">
       <h2 id="forestTitle">Predictive power</h2>
       <div class="ctrl-row"><div class="ctrl-group" id="testTabs"></div></div>
       <svg class="forest" id="signalForest" role="img" aria-label="Signal test confidence intervals"></svg>
       <p class="caption" id="signalCaption"></p>
     </div>
 
-    <div class="panel" data-stamp="exploratory">
-      <h2>Return by group <span>does return rise step by step with the signal? annualised, equal-weighted</span></h2>
+    <div class="panel" data-stamp="exploratory" data-src="results/universe_study_quintile_returns.csv">
+      <h2>Is the relation monotonic? <span>annualised return by signal group, equal weight; 2012 to 2020 and 2021 to 2026</span></h2>
       <div class="legend-row"><span><i class="ghost-solid"></i>2012 to 2020, new test</span><span><i class="ghost-light"></i>2021 to 2026, re-test</span></div>
       <div class="grp-grid">
-        <div><div class="grp-title"><b style="color:var(--momentum)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum" role="img" aria-label="Bar chart. Annualised return of the five Momentum signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
-        <div><div class="grp-title"><b style="color:var(--value)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue" role="img" aria-label="Bar chart. Annualised return of the five Value signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
-        <div><div class="grp-title"><b style="color:var(--combined)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined" role="img" aria-label="Bar chart. Annualised return of the five Combined signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--momentum-text)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum" role="img" aria-label="Bar chart. Annualised return of the five Momentum signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--value-text)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue" role="img" aria-label="Bar chart. Annualised return of the five Value signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--combined-text)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined" role="img" aria-label="Bar chart. Annualised return of the five Combined signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
       </div>
-      <p class="caption">Mean return of each fifth of stocks, ranked on the signal at the start of the month. Group 5 minus group 1 is the quintile spread, shown above each chart with its 90% interval for the 2012 to 2020 test. A working signal rises from left to right. Five bars are descriptive only; the spread and its interval are the test.</p>
+      <p class="caption">Mean return of each fifth of stocks, ranked on the signal at the start of the month. Group 5 minus group 1 is the quintile spread, shown above each chart with its 90% interval for the 2012 to 2020 test. A working signal rises from left to right. Five bars are descriptive only; the spread and its interval are the test. Added after the results (Amendment 14).</p>
     </div>
   </div>
 
   <!-- Tab 2 -->
   <div class="tabpane" id="pane-stability" hidden>
-    <div class="panel" data-stamp="descriptive">
-      <h2>Cumulative rank IC <span>running sum of the monthly rank correlation</span></h2>
+    <div class="panel" data-stamp="descriptive" data-src="results/universe_study_ic_monthly_momentum.csv; results/universe_study_ic_monthly_value_combined.csv">
+      <h2>Steady or episodic? <span>cumulative sum of monthly rank IC</span></h2>
       <div class="legend-row">
         <span><i style="background:var(--momentum)"></i>Momentum</span>
         <span><i style="background:var(--value)"></i>Value</span>
@@ -57,8 +64,8 @@
       <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
     </div>
 
-    <div class="panel" data-stamp="descriptive">
-      <h2>Rolling 36-month mean rank IC</h2>
+    <div class="panel" data-stamp="descriptive" data-src="results/universe_study_ic_monthly_momentum.csv; results/universe_study_ic_monthly_value_combined.csv">
+      <h2>Did the relation change over time? <span>rolling 36-month mean rank IC</span></h2>
       <div class="legend-row">
         <span><i style="background:var(--momentum)"></i>Momentum</span>
         <span><i style="background:var(--value)"></i>Value</span>
@@ -68,7 +75,7 @@
       <p class="caption" id="icRollCaption"></p>
     </div>
 
-    <div class="panel" data-stamp="descriptive">
+    <div class="panel" data-stamp="descriptive" data-src="results/universe_study_ic_monthly_momentum.csv; results/universe_study_ic_monthly_value_combined.csv">
       <h2>Rank IC statistics <span>monthly, by period</span></h2>
       <div class="timeline-table-wrap" style="max-height:none;">
         <table class="timeline-table perf-table">
@@ -84,22 +91,22 @@
   <div class="tabpane" id="pane-robustness" hidden>
     <div id="profileCtx"></div>
 
-    <div class="panel" data-stamp="exploratory">
+    <div class="panel" data-stamp="exploratory" data-src="results/universe_study_inference_robustness.csv">
       <h2 id="robustTitle">Interval method</h2>
       <div class="ctrl-row"><div class="ctrl-group" id="robTabs"></div></div>
       <svg class="forest" id="robustForest" role="img" aria-label="Intervals under three methods"></svg>
       <p class="caption" id="robustCaption"></p>
     </div>
 
-    <div class="panel" data-stamp="sensitivity">
+    <div class="panel" data-stamp="sensitivity" data-src="results/universe_study_signal_summary_value_combined_winsorised_pb.csv; results/universe_study_signal_summary_value_combined_excl_24.csv; results/universe_study_signal_summary_value_combined_excl_37.csv">
       <h2 id="sensTitle">Book-value treatment</h2>
       <div class="ctrl-row"><div class="ctrl-group" id="sensTabs"></div></div>
       <svg class="forest" id="sensForest" role="img" aria-label="Sensitivity of the intervals"></svg>
       <p class="caption" id="sensCaption"></p>
     </div>
 
-    <div class="panel" data-stamp="descriptive">
-      <h2>Check against published factors <span>correlation of each monthly quintile spread with Kenneth French's UMD and HML</span></h2>
+    <div class="panel" data-stamp="descriptive" data-src="results/universe_study_french_correlation.csv">
+      <h2>Do the signals match published factors? <span>Pearson correlation of each signal's monthly long-short quintile spread with Kenneth French's UMD and HML</span></h2>
       <div class="timeline-table-wrap" style="max-height:none;"><table class="timeline-table perf-table" id="frenchTable"></table></div>
       <p class="caption" id="frenchCaption"></p>
     </div>
@@ -121,9 +128,21 @@ const S = UNIVERSE_SENS;
 const X = UNIVERSE_EXTRAS;
 const mde = minDetectableIC();
 
+/* header strip: mean rank IC for each signal in the new-test period, beside the smallest effect that test could detect */
+(function headerStrip() {
+  const per = PERIODS[0];
+  const tiles = SIGNALS.map(sig => {
+    const r = U.signalTests.find(x => x.test === "rank_ic" && x.signal === sig && x.period === per.key);
+    return `<div class="mini-stat"><div class="ms-head"><span class="swatch" style="background:${COLORS[sig]}"></span>${sig}</div><div class="ms-value">${sgn(r.mean, 3)}</div>` +
+      `<div class="ms-label">mean rank IC, ${per.label}. 90% interval ${sgn(r.ci_90_lower, 3)} to ${sgn(r.ci_90_upper, 3)}, which ${r.excludes_zero ? "excludes" : "includes"} zero</div></div>`;
+  });
+  tiles.push(`<div class="mini-stat"><div class="ms-head">Detectable effect</div><div class="ms-value">${mde.toFixed(3)}</div><div class="ms-label">smallest mean rank IC the ${per.label} test could reliably detect. Smaller effects would be missed</div></div>`);
+  document.getElementById("sKeys").innerHTML = tiles.join("");
+})();
+
 /* definitions, all three signals side by side */
 document.getElementById("defGrid").innerHTML = SIGNALS.map(s =>
-  `<div><h3 style="color:${COLORS[s]}">${s}</h3><div class="definition-body">${DEFINITIONS[s].body}</div></div>`).join("");
+  `<div><h3 style="color:${TEXTC[s]}">${s}</h3><div class="definition-body">${defList(DEFINITIONS[s].body)}</div></div>`).join("");
 
 /* tabs, with the active tab kept in the URL hash so a view can be linked */
 const PAGE_TABS = [
@@ -152,7 +171,7 @@ function drawSignalForest() {
   }));
   const n = rows.filter(r => r.excl).length;
   document.getElementById("forestTitle").textContent = t.label + ": " + (n === 0 ? "no interval excludes zero" : n + " of " + rows.length + " intervals exclude zero");
-  const band = testKey === "rank_ic" ? { half: mde, label: "EFFECTS INSIDE THE BAND WOULD LIKELY BE MISSED (±" + mde.toFixed(3) + ", 2012–2020 TEST)", short: "LIKELY MISSED: ±" + mde.toFixed(3) } : null;
+  const band = testKey === "rank_ic" ? { half: mde, label: "Effects inside the band would likely be missed (±" + mde.toFixed(3) + ", 2012 to 2020 test)", short: "Likely missed: ±" + mde.toFixed(3) } : null;
   forest("signalForest", rows, t.fmt, null, band);
   document.getElementById("signalCaption").textContent = t.text.replace("; none do.", n === 0 ? "; none do." : ".");
 }
@@ -194,7 +213,7 @@ drawSignalForest();
   const sd = SIGNALS.map(s => icStatistics(s, 0, U.dates.length).sd).reduce((a, b) => a + b, 0) / SIGNALS.length;
   document.getElementById("icRollCaption").textContent =
     "With a monthly IC standard deviation near " + sd.toFixed(2) + ", one standard error of a 36-month mean is about " + (sd / 6).toFixed(3) +
-    ". Excursions of that size are consistent with noise. The windows overlap, so adjacent points are not independent.";
+    ". Excursions of that size are consistent with noise. The windows overlap, so adjacent points are not independent. This exhibit is not specified in the plan; it was added to the dashboard after the registered results existed.";
 })();
 icStatisticsTable("icStatBody");
 
@@ -215,7 +234,7 @@ function drawRobust() {
   const excl = all.filter(r => r.iid_excludes_zero).length;
   const robust = all.filter(r => r.iid_excludes_zero && r.nw_excludes_zero && r.block_excludes_zero).length;
   document.getElementById("robustCaption").textContent =
-    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. The point estimate is the same in each row. A ringed marker and an asterisk mark an interval that excludes zero. " +
+    "The registered interval resamples single months. Newey-West allows for autocorrelation with a Bartlett kernel (3 or 4 lags, from the rule floor of 4(n/100)^(2/9)); the block bootstrap resamples runs of about n^(1/3) months. The point estimate is the same in each row. A filled marker and an asterisk mark an interval that excludes zero, and a hollow marker one that includes zero. " +
     (excl === 0 ? "Across all " + total + " signal tests, no interval excludes zero under any of the three methods." :
       "Across all " + total + " signal tests, the registered interval excludes zero in " + excl + " and all three intervals do in " + robust + ".");
 }
@@ -259,7 +278,7 @@ function drawSens() {
   const notes = [];
   if (SEL.sig === "Momentum") notes.push(DEFINITIONS.Momentum.note);
   else notes.push("Winsorised P/B caps extreme price-to-book values and was run for the signal tests only, so it has no portfolio rows. Excluding 24 or 37 names removes stocks whose book values looked unreliable (split or share-count problems); each portfolio is then compared with the equal-weight portfolio of the names that remain.");
-  notes.push("A ringed marker and an asterisk mark an interval that excludes zero. Variants share the same months and stocks, so they are not independent confirmations.");
+  notes.push("A filled marker and an asterisk mark an interval that excludes zero, and a hollow marker one that includes zero. Variants share the same months and stocks, so they are not independent confirmations.");
   document.getElementById("sensCaption").textContent = notes.join(" ");
 }
 buttons("sensTabs", SENS_METRICS.map(m => ({ key: m.key, label: m.label })), sensKey, k => { sensKey = k; drawSens(); });
@@ -271,12 +290,12 @@ drawRobust(); drawSens();
   const F = UNIVERSE_CONTROLS.french;
   const cell = (s, ref, p) => {
     const r = F.find(x => x.signal === s && x.reference === ref && x.period === p.key);
-    return r ? `${sgn(r.pearson, 2)} <small>[${sgn(r.pearson_lower, 2)}, ${sgn(r.pearson_upper, 2)}]</small>` : "–";
+    return r ? `${sgn(r.pearson, 2)} <small>[${sgn(r.pearson_lower, 2)}, ${sgn(r.pearson_upper, 2)}]</small>` : "n/a";
   };
   const refs = [...new Set(F.map(r => r.reference))];
   let h = `<thead><tr><th>Spread</th><th>Factor</th>${PERIODS.map(p => `<th class="num">${p.label}</th>`).join("")}</tr></thead><tbody>`;
   SIGNALS.forEach(s => refs.forEach(ref => {
-    h += `<tr><td style="color:${COLORS[s]}">${s}</td><td>${ref.split(" ")[0]}</td>` + PERIODS.map(p => `<td class="num">${cell(s, ref, p)}</td>`).join("") + "</tr>";
+    h += `<tr><td style="color:${TEXTC[s]}">${s}</td><td>${ref.split(" ")[0]}</td>` + PERIODS.map(p => `<td class="num">${cell(s, ref, p)}</td>`).join("") + "</tr>";
   }));
   document.getElementById("frenchTable").innerHTML = h + "</tbody>";
   const full = PERIODS[2].key;
@@ -285,7 +304,7 @@ drawRobust(); drawSens();
   document.getElementById("frenchCaption").innerHTML =
     "Pearson correlation over the months in each period, with a Fisher 90% interval that treats months as independent and is only indicative. Over the full period the Momentum spread has a correlation of " + sgn(get("Momentum", umd).pearson, 2) +
     " with UMD, and the Value spread " + sgn(get("Value", hml).pearson, 2) + " with HML. The study uses about 500 current and former index members with equal weights, while French's factors use all US stocks with value weights, so an exact match is not expected, and the sign and rough size are the check. The expectation recorded in Amendment 16 was that the correlation would not be high. The correlations above are high, so that expectation did not hold. " +
-    "It is a test of the pipeline, not of the strategy. Factor data: Kenneth French's data library, CRSP database of 202609, stored unchanged for 2011 onward in data/external/french/. Added after the results (Amendment 16).";
+    "The comparison checks the data pipeline against published factor returns. Factor data: Kenneth French's data library, CRSP database of 202609, stored unchanged for 2011 onward in data/external/french/. Added after the results (Amendment 16).";
 })();
 showTab((location.hash || "").slice(1), false);
 </script>

@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Top-decile and top-quintile equal-weight portfolios against an equal-weight benchmark: growth, drawdown, costs and Sharpe differences.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Portfolios | Equity Factor Research">
+<meta property="og:description" content="Top-decile and top-quintile equal-weight portfolios against an equal-weight benchmark: growth, drawdown, costs and Sharpe differences.">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Portfolios | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=14">
+<link rel="stylesheet" href="assets/styles.css?v=15">
 </head>
 <body>
 <div id="chrome"></div>
@@ -18,6 +24,8 @@
 
   <div id="ctx"></div>
 
+  <div class="mini-stats" id="pKeys" role="group" aria-label="Key figures for the selected portfolio, 2012 to 2026, each against its benchmark"></div>
+
   <div class="tabbar" id="pageTabs" role="tablist"></div>
 
   <div class="tabpane" id="pane-perf">
@@ -27,7 +35,7 @@
     <div id="reading"></div>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_returns.csv">
     <h2 id="growthTitle">Growth of $1</h2>
     <div class="legend-row" id="portLegend"></div>
     <div style="position:relative; height:340px;"><canvas id="growthChart" role="img" aria-label="Line chart, log scale. Growth of $1 for the selected portfolio, its equal-weight benchmark and SPY, monthly."></canvas></div>
@@ -35,7 +43,7 @@
 
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_summary.csv">
     <h2 id="perfTitle">Performance by period</h2>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table perf-table">
@@ -49,19 +57,19 @@
   </div>
 
   <div class="tabpane" id="pane-risk" hidden>
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_returns.csv">
     <h2 id="ddTitle">Drawdown</h2>
     <div style="position:relative; height:220px;"><canvas id="ddChart" role="img" aria-label="Line chart. Percentage below the previous high for the selected portfolio, its benchmark and SPY, monthly."></canvas></div>
     <p class="caption">Percentage below each series' previous high, from monthly data, which understates intramonth drawdowns.</p>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_returns.csv">
     <h2 id="rollTitle">Rolling 36-month excess return</h2>
     <div style="position:relative; height:260px;"><canvas id="rollChart" role="img" aria-label="Line chart. Rolling 36-month excess return of the selected portfolio over its benchmark."></canvas></div>
-    <p class="caption">Each point is the annualised geometric return of the portfolio minus that of its benchmark over the trailing 36 months. A persistent signal would sit mostly above zero. Sign changes across windows indicate period dependence, which is what an interval that includes zero reflects.</p>
+    <p class="caption">Each point is the annualised geometric return of the portfolio minus that of its benchmark over the trailing 36 months. A persistent signal would sit mostly above zero. Sign changes across windows indicate period dependence, which is what an interval that includes zero reflects. This exhibit is not specified in the plan; it was added to the dashboard after the registered results existed.</p>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_returns.csv">
     <h2 id="ddTableTitle">Deepest drawdowns</h2>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table perf-table">
@@ -75,16 +83,16 @@
   </div>
 
   <div class="tabpane" id="pane-returns" hidden>
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_portfolio_returns.csv">
     <h2 id="hmTitle">Monthly returns</h2>
     <div class="ctrl-row"><div class="ctrl-group" id="hmTabs"></div></div>
     <div class="heatmap-wrap" id="heatmap"></div>
     <p class="caption" id="hmCaption"></p>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-stamp="sensitivity" data-src="results/universe_study_portfolio_summary.csv">
     <h2 id="costTitle">Trading costs</h2>
-    <p class="caption" style="margin-top:0;margin-bottom:0.75rem;">Shows all three cost treatments for the selected signal and size. It does not follow the costs button.</p>
+    <p class="caption" style="margin-top:0;margin-bottom:0.75rem;">Shows all three cost treatments for the selected signal and size. It does not follow the costs button. Net returns deduct a one-way cost of 10 basis points, charged on both the selling and the buying leg of each month's turnover. Two turnover bases are shown: existing positions, and positions carried with price drift.</p>
     <div class="timeline-table-wrap" style="max-height:none;">
       <table class="timeline-table perf-table">
         <thead><tr><th>Period</th><th>Costs</th><th class="num">Total return</th><th class="num">Ann. return</th><th class="num">Sharpe</th><th class="num">Turnover</th><th class="num">Sharpe diff, 90% CI</th></tr></thead>
@@ -97,7 +105,7 @@
   </div>
 
   <div class="tabpane" id="pane-all" hidden>
-  <div class="panel" data-stamp="registered">
+  <div class="panel" data-stamp="registered" data-src="results/universe_study_portfolio_summary.csv">
     <h2>Sharpe difference against the benchmark <span>all 18 headline comparisons, before costs; independent of the selection bar</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="periodTabs"></div></div>
     <svg class="forest" id="sharpeForest" role="img" aria-label="Sharpe difference confidence intervals"></svg>
@@ -107,25 +115,24 @@
 
   <div class="tabpane" id="pane-controls" hidden>
   <div class="hero-finding" style="max-width:none;">
-    <b class="box-label">Added after the results</b>
     <div id="ctlReading"></div>
   </div>
 
-  <div class="panel" data-stamp="exploratory">
+  <div class="panel" data-stamp="exploratory" data-src="results/universe_study_sector_neutral_portfolio_summary.csv; results/universe_study_portfolio_summary.csv">
     <h2>Sharpe difference with and without sector neutrality <span>Amendments 16 and 17, added after every registered result existed</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="ctlSig"></div><div class="ctrl-group" id="ctlSize"></div></div>
     <svg class="forest" id="sectorForest" role="img" aria-label="Sharpe difference intervals, published, control and sector-neutral"></svg>
     <p class="caption" id="sectorCaption"></p>
   </div>
 
-  <div class="panel" data-stamp="exploratory">
+  <div class="panel" data-stamp="exploratory" data-src="results/universe_study_alpha_regression.csv">
     <h2>Alpha against the benchmark <span>annualised intercept of the portfolio's excess return on the benchmark's</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="ctlBench"></div></div>
     <svg class="forest" id="alphaForest" role="img" aria-label="Annualised alpha intervals"></svg>
     <p class="caption" id="alphaCaption"></p>
   </div>
 
-  <div class="panel" data-stamp="exploratory">
+  <div class="panel" data-stamp="exploratory" data-src="results/universe_study_alpha_factor4.csv">
     <h2>Alpha after four published factors <span>Amendment 18: market, size, value and momentum</span></h2>
     <div class="ctrl-row"><div class="ctrl-group" id="f4Variant"></div></div>
     <svg class="forest" id="f4Forest" role="img" aria-label="Four-factor alpha intervals"></svg>
@@ -133,7 +140,7 @@
     <p class="caption" id="f4Caption"></p>
   </div>
 
-  <div class="panel" data-stamp="descriptive">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_sector_neutral_counts.csv">
     <h2>Who is left out of the sector-neutral version</h2>
     <p class="caption" id="universeCaption"></p>
   </div>
@@ -163,7 +170,7 @@ function drawReading() {
     lines.push(`<li><b>${p.label}, ${SIZE_LABEL[z].toLowerCase()}:</b> Sharpe ratio ${r.sharpe.toFixed(2)} against the benchmark's ${b.sharpe.toFixed(2)}. The difference is ${sgn(r.diff, 2)} with a 90% interval of ${sgn(r.lo, 2)} to ${sgn(r.hi, 2)}, which ${r.sig ? "excludes" : "includes"} zero.</li>`);
   }));
   document.getElementById("reading").innerHTML = "<ul style='margin:0.25rem 0 0.5rem 1.1rem; padding:0;'>" + lines.join("") + "</ul>" +
-    "<p style='margin:0;'>The headline portfolio tests are read before costs and only next to the signal tests. With 18 headline intervals about two would exclude zero by chance. The 2021 to 2026 months were known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>";
+    "<p style='margin:0;'>The headline portfolio tests are read before costs and only next to the signal tests. The 2021 to 2026 months were known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>";
 }
 
 function drawPortfolios() {
@@ -187,7 +194,7 @@ function drawPortfolios() {
   /* log axis with round-number ticks only */
   Object.assign(growthChart.options.scales.y, { type: "logarithmic", afterBuildTicks: ax => { ax.ticks = [1, 2, 3, 5, 10, 20, 30, 50].filter(v => v >= ax.min && v <= ax.max).map(value => ({ value })); } });
   growthChart.update();
-  ddChart = lineChart("ddChart", sets(g.map(drawdown)), v => (v * 100).toFixed(0) + "%", v => pct(v, 1), true, false);
+  ddChart = lineChart("ddChart", sets(g.map(drawdown)), v => (v * 100).toFixed(0) + "%", v => pct(v, 1), true, true);
 
   const body = document.getElementById("perfBody");
   body.innerHTML = "";
@@ -203,11 +210,11 @@ function drawPortfolios() {
     ];
     items.forEach(it => {
       const r = it.row; if (!r) return;
-      let diff = "–";
+      let diff = "n/a";
       if (it.strat && r.diff !== null) diff = flagText(`${sgn(r.diff, 2)} [${sgn(r.lo, 2)}, ${sgn(r.hi, 2)}]`, r.sig);
       const tr = document.createElement("tr");
       tr.className = it.cls;
-      tr.innerHTML = `<td>${it.name}</td><td class="num">${pct(r.total, 0)}</td><td class="num">${pct(r.ann, 1)}</td><td class="num">${pct(r.vol, 1)}</td><td class="num">${r.sharpe.toFixed(2)}</td><td class="num">${pct(r.dd, 1)}</td><td class="num">${r.turnover === null || it.cls === "tbl-ref" ? "–" : pct(r.turnover, 0)}</td><td class="num">${diff}</td>`;
+      tr.innerHTML = `<td>${it.name}</td><td class="num">${pct(r.total, 0)}</td><td class="num">${pct(r.ann, 1)}</td><td class="num">${pct(r.vol, 1)}</td><td class="num">${r.sharpe.toFixed(2)}</td><td class="num">${pct(r.dd, 1)}</td><td class="num">${r.turnover === null || it.cls === "tbl-ref" ? "n/a" : pct(r.turnover, 0)}</td><td class="num">${diff}</td>`;
       body.appendChild(tr);
     });
   });
@@ -218,7 +225,7 @@ function drawPortfolios() {
   if (rollChart) rollChart.destroy();
   rollChart = lineChart("rollChart", [
     { label: "Portfolio minus benchmark", data: roll, borderColor: COLORS[SEL.sig], backgroundColor: COLORS[SEL.sig], borderWidth: 2.5 },
-    { label: "Zero", data: strat.map(() => 0), borderColor: "#7B828E", backgroundColor: "#7B828E", borderWidth: 1, borderDash: [4, 4] }
+    { label: "Zero", data: strat.map(() => 0), borderColor: cssVar("--p1"), backgroundColor: cssVar("--p1"), borderWidth: 1, borderDash: [4, 4] }
   ], v => (v * 100).toFixed(0) + "%", v => v === null ? "" : spct(v, 1), true);
 
   drawdownTable("ddBody", strat, 5);
@@ -248,7 +255,7 @@ function drawCosts() {
     if (!r) return;
     if (p.key === PERIODS[2].key) { if (b === "gross") fullGross = r; if (b === "net_drift") fullNet = r; }
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${i === 0 ? p.label : ""}</td><td>${label}</td><td class="num">${pct(r.total, 0)}</td><td class="num">${pct(r.ann, 1)}</td><td class="num">${r.sharpe.toFixed(2)}</td><td class="num">${pct(r.turnover, 0)}</td><td class="num">${r.diff === null ? "–" : flagText(`${sgn(r.diff, 2)} [${sgn(r.lo, 2)}, ${sgn(r.hi, 2)}]`, r.sig)}</td>`;
+    tr.innerHTML = `<td>${i === 0 ? p.label : ""}</td><td>${label}</td><td class="num">${pct(r.total, 0)}</td><td class="num">${pct(r.ann, 1)}</td><td class="num">${r.sharpe.toFixed(2)}</td><td class="num">${pct(r.turnover, 0)}</td><td class="num">${r.diff === null ? "n/a" : flagText(`${sgn(r.diff, 2)} [${sgn(r.lo, 2)}, ${sgn(r.hi, 2)}]`, r.sig)}</td>`;
     body.appendChild(tr);
   }));
   document.getElementById("costCaption").textContent =
@@ -296,7 +303,7 @@ function drawSector() {
     "<b>" + ctlSig + ", " + SIZE_LABEL[ctlSize].toLowerCase() + ", " + first.label + ":</b> published " + sentence(pub) + ", same names " + sentence(ctl) + ", sector-neutral " + sentence(neu) + ". " +
     "Each bar is the paired bootstrap 90% interval (5,000 resamples, seed 42) for the Sharpe difference against the equal-weight benchmark of the same universe, before costs. " +
     "<i>Published</i> is the registered result. <i>Same names</i> is the registered signal on exactly the names that remain once names with no sector, and sectors with fewer than 10 scored names in the month, are dropped, so comparing it with the published result shows what the change of universe does. " +
-    "<i>Sector-neutral</i> scores each name against its sector peers, so comparing it with the same-names row shows what sector neutrality does. A ringed marker means the interval excludes zero.";
+    "<i>Sector-neutral</i> scores each name against its sector peers, so comparing it with the same-names row shows what sector neutrality does. A filled marker means the interval excludes zero and a hollow marker that it includes zero.";
   const sigPick = ctlRow(ctlSig, ctlSize, first.key, "sector_neutral");
   document.getElementById("ctlReading").innerHTML = "A top decile can hold a large share of a few sectors, so its Sharpe difference can mix the signal with a sector tilt. These checks ask whether a result survives sector neutrality and a regression on the benchmark. " +
     "They were run after every registered result existed and add tests to the family, so a single interval that excludes zero is not read on its own. " +
@@ -314,9 +321,9 @@ function drawAlpha() {
   }));
   forest("alphaForest", rows, { axis: v => (v * 100).toFixed(0) + "%", val: v => spct(v, 1) }, [Math.min(0, ...rows.map(r => r.lo)), Math.max(0, ...rows.map(r => r.hi))]);
   document.getElementById("alphaCaption").innerHTML =
-    "Alpha is the monthly intercept of a regression of the portfolio's excess return over Treasury bills on the benchmark's, times 12, with Newey-West 90% intervals. Beta is the slope: a value above 1 means the portfolio moved more than the benchmark. " +
-    SIZE_LABEL[ctlSize] + ". The benchmark is " + (alphaBench === "spy" ? "SPY" : "the equal-weight benchmark the registered test uses for that signal") + ". Before costs. A ringed marker means the interval excludes zero. " +
-    "This adds " + CTL.alpha.length + " regressions to the family of tests, and the registered Sharpe-difference test is unchanged.";
+    "Matched-benchmark alpha is the intercept from regressing the portfolio's monthly return in excess of the Treasury bill rate on the same excess return of its equal-weight benchmark (built from the same usable names), with Newey-West 90% intervals, multiplied by 12 (Amendment 16). Beta is the slope: a value above 1 means the portfolio moved more than the benchmark. " +
+    SIZE_LABEL[ctlSize] + ". The benchmark is " + (alphaBench === "spy" ? "SPY" : "the equal-weight benchmark the registered test uses for that signal") + ". Before costs. A filled marker means the interval excludes zero and a hollow marker that it includes zero. " +
+    "Momentum and Combined hold largely the same names, so positive alphas for both are not independent confirmations. This adds " + CTL.alpha.length + " regressions to the family of tests, and the registered Sharpe-difference test is unchanged.";
 }
 function drawUniverse() {
   const c = CTL.counts, pct = v => (v * 100).toFixed(0) + "%";
@@ -347,7 +354,7 @@ function drawFactor4() {
   let t = "<thead><tr><th>Full period</th><th class=num>Alpha</th><th class=num>Market</th><th class=num>Size</th><th class=num>Value</th><th class=num>Momentum</th><th class=num>R\u00b2</th></tr></thead><tbody>";
   sigs.forEach(s => {
     const r = pick(s, full);
-    if (r) t += `<tr><td style="color:${COLORS[s]}">${s}</td><td class="num">${spct(r.alpha_annual, 1)}</td><td class="num">${r["beta_Mkt-RF"].toFixed(2)}</td><td class="num">${sgn(r.beta_SMB, 2)}</td><td class="num">${sgn(r.beta_HML, 2)}</td><td class="num">${sgn(r.beta_Mom, 2)}</td><td class="num">${r.r_squared.toFixed(2)}</td></tr>`;
+    if (r) t += `<tr><td style="color:${TEXTC[s]}">${s}</td><td class="num">${spct(r.alpha_annual, 1)}</td><td class="num">${r["beta_Mkt-RF"].toFixed(2)}</td><td class="num">${sgn(r.beta_SMB, 2)}</td><td class="num">${sgn(r.beta_HML, 2)}</td><td class="num">${sgn(r.beta_Mom, 2)}</td><td class="num">${r.r_squared.toFixed(2)}</td></tr>`;
   });
   document.getElementById("f4Table").innerHTML = t + "</tbody>";
   const mine = F.filter(x => x.variant === f4Variant && x.size === ctlSize && x.basis === "gross");
@@ -380,7 +387,19 @@ function showTab(key, fromClick) {
   if (fromClick) { try { history.replaceState(null, "", "#" + key); } catch (e) { /* ignore */ } }
   Object.values(Chart.instances).forEach(c => c.resize());
 }
-contextStrip("ctx", ["sig", "size", "basis"], () => { drawReading(); drawPortfolios(); }, true);
+/* key figures for the selection over the full period: each portfolio figure is shown beside its benchmark, never alone */
+function drawKeys() {
+  const sb = SUMMARY_BASIS(), per = PERIODS[2].key;
+  const r = summaryRow(per, SEL.sig, SEL.size, sb), bm = summaryRow(per, benchmarkName(SEL.sig), null, sb);
+  const tile = (head, val, vs, note) => `<div class="mini-stat"><div class="ms-head">${head}</div><div class="ms-value">${val}</div><div class="ms-label">${vs}${note ? " " + note : ""}</div></div>`;
+  document.getElementById("pKeys").innerHTML =
+    tile("Annualised return", pct(r.ann, 1), "against " + pct(bm.ann, 1) + " for the benchmark.", "") +
+    tile("Sharpe ratio", r.sharpe.toFixed(2), "against " + bm.sharpe.toFixed(2) + " for the benchmark.", "") +
+    tile("Maximum drawdown", pct(r.dd, 1), "against " + pct(bm.dd, 1) + " for the benchmark.", "") +
+    tile("Sharpe difference", sgn(r.diff, 2), "90% interval " + sgn(r.lo, 2) + " to " + sgn(r.hi, 2) + (r.sig ? ", which excludes zero." : ", which includes zero."), "") ;
+}
+contextStrip("ctx", ["sig", "size", "basis"], () => { drawKeys(); drawReading(); drawPortfolios(); }, true);
+drawKeys();
 drawReading();
 drawPortfolios();
 drawSharpeForest();

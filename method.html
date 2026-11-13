@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The pre-specification, amendment log and power calculation behind the S&P 500 equity factor study.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Method | Equity Factor Research">
+<meta property="og:description" content="The pre-specification, amendment log and power calculation behind the S&P 500 equity factor study.">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Method | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=14">
+<link rel="stylesheet" href="assets/styles.css?v=15">
 </head>
 <body>
 <div id="chrome"></div>
@@ -19,6 +25,18 @@
   <div class="tabbar" id="pageTabs" role="tablist"></div>
 
   <div class="tabpane" id="pane-design">
+  <div class="section-label">Specification <span>what was tested</span></div>
+  <div class="panel spec">
+    <dl>
+      <dt>Universe</dt><dd>S&amp;P 500 members, about 500 stocks, 176 months from January 2012 to August 2026</dd>
+      <dt>Signals</dt><dd>Momentum: 11-month return, no skipped month. Value: negative price-to-book. Combined: average of the two z-scores</dd>
+      <dt>Primary tests</dt><dd>Mean monthly rank IC, quintile spread, Fama-MacBeth slope, each with a 90% bootstrap interval</dd>
+      <dt>Portfolios</dt><dd>Top decile and top quintile, equal weight, monthly rebalance, against an equal-weight benchmark. Costs of 10 bps one way are shown separately</dd>
+      <dt>Periods</dt><dd>2012 to 2020 (108 months) is the new test. 2021 to 2026 (68 months) is a re-test, because those months were seen in an earlier 17-stock study</dd>
+      <dt>Timing</dt><dd>Signals use data to the end of the previous month. Book values enter on the filing date</dd>
+    </dl>
+  </div>
+
   <div class="panel">
     <h2>Design <span>in the order it was applied</span></h2>
     <ol class="step-list">
@@ -42,8 +60,30 @@
       <li><div><b>Costs.</b> A flat 10 bps one way, with no market impact or capacity analysis.</div></li>
       <li><div><b>Multiplicity.</b> 18 headline portfolio intervals at the 90% level, so about two would exclude zero by chance.</div></li>
       <li><div><b>Sharpe convention.</b> The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. It was recomputed from the saved monthly returns after the results and is not saved in a result file or part of the registered tests. Of the 18 differences, 17 are smaller (15 of them by 5% to 25%) and one is about 19% larger (Momentum top decile, 2021 to 2026).</div></li>
-      <li><div><b>Inference.</b> A four-factor Fama-French regression was added after the results (Amendment 18): none of the 18 regressions of the registered portfolios has an alpha interval that excludes zero, before costs. Newey-West and block-bootstrap intervals were added after the results (Amendment 14) and agree with the registered ones: none of the 33 signal tests excludes zero under any method.</div></li>
+      <li><div><b>Inference.</b> A four-factor Fama-French regression was added after the results (Amendment 18): none of the 18 portfolio-period regressions of the registered portfolios has an alpha interval that excludes zero, before costs. Newey-West and block-bootstrap intervals were added after the results (Amendment 14) and give the same result as the registered ones: none of the 33 signal tests excludes zero under any method.</div></li>
     </ol>
+  </div>
+
+  <div class="section-label">Glossary <span>terms used on every page</span></div>
+  <div class="panel">
+    <dl class="def" id="glossary">
+      <dt>Registered, Exploratory, Sensitivity, Descriptive</dt><dd>Registered: specified before any result and counted toward the headline. Exploratory: added after the results and never counted toward the headline. Sensitivity: a registered test under a changed assumption. Descriptive: no test.</dd>
+      <dt>Rank IC</dt><dd>Each month, the Spearman rank correlation between the signal and the next month's stock returns across stocks, averaged over months.</dd>
+      <dt>Quintile spread</dt><dd>Average return of the top fifth of stocks by signal minus that of the bottom fifth.</dd>
+      <dt>Fama-MacBeth slope</dt><dd>Each month, the slope from a cross-sectional regression of next-month returns on the signal; the average slope over months.</dd>
+      <dt>90% bootstrap interval</dt><dd>A range from resampling months with replacement 5,000 times (seed 42). If it spans zero the result is read as no detectable effect.</dd>
+      <dt>Sharpe difference</dt><dd>The portfolio Sharpe ratio minus the benchmark Sharpe ratio, annualised, using the three-month Treasury bill rate as the risk-free rate.</dd>
+      <dt>Detectable effect</dt><dd>The smallest true mean rank IC the test would find with 80% probability at a 10% two-sided level, using the sample's own standard deviation. Approximate.</dd>
+      <dt>Survivorship</dt><dd>Bias that arises when index members removed during the sample are missing from the price data.</dd>
+      <dt>Matched-benchmark alpha</dt><dd>The intercept from regressing the portfolio's monthly return in excess of the Treasury bill rate on the same excess return of its equal-weight benchmark, built from the same usable names, with Newey-West 90% intervals, multiplied by 12 (Amendment 16).</dd>
+      <dt>Four-factor alpha</dt><dd>The intercept from regressing the portfolio's monthly return in excess of the Treasury bill rate on the market, size (SMB), value (HML) and momentum (Mom) factors published by Kenneth French, with Newey-West 90% intervals, multiplied by 12 (Amendment 18).</dd>
+      <dt>Gross, net</dt><dd>Gross is before transaction costs; net is after.</dd>
+    </dl>
+  </div>
+
+  <div class="section-label">How this was built <span>tools and records</span></div>
+  <div class="panel">
+    <p>Claude Code, an AI coding assistant, helped with the code, the analysis and the drafting, under the rules in <a href="https://github.com/ronaldoexmachina13/quant-equity-research/blob/main/CLAUDE.md" target="_blank" rel="noopener">CLAUDE.md</a>. The entries in the plan files are timestamped Git commits. The author reviewed and committed every change.</p>
   </div>
   </div>
 
@@ -66,7 +106,7 @@
   </div>
 
   <div class="tabpane" id="pane-power" hidden>
-  <div class="panel">
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_ic_monthly_momentum.csv; results/universe_study_ic_monthly_value_combined.csv">
     <h2>Minimum detectable mean rank IC <span>90% two-sided interval, 80% power</span></h2>
     <div class="legend-row" id="powerLegend"></div>
     <div style="position:relative; height:280px;"><canvas id="powerChart" role="img" aria-label="Line chart. Minimum detectable mean rank IC against months of data, for the highest and lowest standard deviation of monthly rank IC."></canvas></div>
@@ -116,7 +156,7 @@ const CONCERNS = {
 };
 const LOG = OS_ENTRIES.concat(META.entries.map(e => {
   if (!(e.id in CONCERNS)) console.warn("No CONCERNS text for " + e.id);
-  return { id: "LP-" + e.id, date: e.date, concerns: CONCERNS[e.id] || "–", note: e.note, kind: /^After every registered result/.test(e.note) ? "post" : "pre" };
+  return { id: "LP-" + e.id, date: e.date, concerns: CONCERNS[e.id] || "n/a", note: e.note, kind: /^After every registered result/.test(e.note) ? "post" : "pre" };
 }));
 document.getElementById("regBody").innerHTML = LOG.map(e =>
   `<tr><td class="month-cell"><span class="sq-${e.kind} sq"></span> ${e.id}</td><td style="white-space:nowrap">${e.date}</td><td>${e.concerns}</td><td>${e.note}</td></tr>`).join("");
@@ -127,17 +167,17 @@ document.getElementById("regBody").innerHTML = LOG.map(e =>
   const H = 28 + maxStack * step + 50;
   const x = d => left + (days(d) - t0) / (t1 - t0) * (W - left - right);
   const seen = {};
-  let s = `<line x1="${left - 8}" x2="${W - right + 8}" y1="${H - 30}" y2="${H - 30}" stroke="#353C47"/>`;
+  let s = `<line x1="${left - 8}" x2="${W - right + 8}" y1="${H - 30}" y2="${H - 30}" stroke="${cssVar("--line-strong")}"/>`;
   LOG.forEach(e => {
     const k = seen[e.date] = (seen[e.date] || 0) + 1, cx = x(e.date), cy = H - 30 - 4 - k * step + 6;
-    const fill = e.kind === "pre" ? "#F0A83A" : e.kind === "post" ? "none" : "#7B828E";
-    const stroke = e.kind === "post" ? "#F2F3F5" : "none";
+    const fill = e.kind === "pre" ? cssVar("--amber") : e.kind === "post" ? "none" : cssVar("--p1");
+    const stroke = e.kind === "post" ? cssVar("--text-strong") : "none";
     s += `<rect x="${cx - 5}" y="${cy - 5}" width="10" height="10" fill="${fill}" stroke="${stroke}" stroke-width="1.6"><title>${e.id}, ${e.date}: ${e.concerns}</title></rect>`;
   });
   let lastX = -99, lane = 0;
   Object.keys(seen).forEach(dt => {
     lane = x(dt) - lastX < 44 ? 1 - lane : 0; lastX = x(dt);
-    s += `<line x1="${x(dt)}" x2="${x(dt)}" y1="${H - 30}" y2="${H - 25}" stroke="#5A616D"/><text x="${x(dt)}" y="${H - 13 + (lane ? 12 : 0)}" text-anchor="middle" class="dim">${ymLabel(dt.slice(0, 7)).slice(0, 3)} ${+dt.slice(8, 10)}</text>`;
+    s += `<line x1="${x(dt)}" x2="${x(dt)}" y1="${H - 30}" y2="${H - 25}" stroke="${cssVar("--ref")}"/><text x="${x(dt)}" y="${H - 13 + (lane ? 12 : 0)}" text-anchor="middle" class="dim">${ymLabel(dt.slice(0, 7)).slice(0, 3)} ${+dt.slice(8, 10)}</text>`;
   });
   const svg = document.getElementById("timeline");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -160,12 +200,13 @@ document.getElementById("regBody").innerHTML = LOG.map(e =>
   document.getElementById("powerLegend").innerHTML = sets.map(s => `<span><i style="background:${s.borderColor}"></i>${s.label}</span>`).join("");
   const marks = { id: "marks", afterDraw(chart) {
     const { ctx, chartArea, scales } = chart;
-    [[108, "108 months: first test period"], [176, "176 months: full sample"]].forEach(([n, label]) => {
+    const narrow = chartArea.right - chartArea.left < 420;
+    [[108, narrow ? "108 months" : "108 months: first test period", "right"], [176, narrow ? "176 months" : "176 months: full sample", "right"]].forEach(([n, label, align], i) => {
       const x = scales.x.getPixelForValue(months.indexOf(n));
-      ctx.save(); ctx.strokeStyle = "#5A616D"; ctx.setLineDash([4, 4]);
+      ctx.save(); ctx.strokeStyle = cssVar("--ref"); ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
-      ctx.setLineDash([]); ctx.fillStyle = "#5A616D"; ctx.font = "700 10px " + Chart.defaults.font.family; ctx.textAlign = "left";
-      ctx.fillText(label, x + 6, chartArea.top + 12); ctx.restore();
+      ctx.setLineDash([]); ctx.fillStyle = cssVar("--label"); ctx.font = "500 11px " + Chart.defaults.font.family; ctx.textAlign = align;
+      ctx.fillText(label, x - 6, chartArea.top + 14 + (narrow ? i * 14 : 0)); ctx.restore();
     });
   } };
   new Chart(document.getElementById("powerChart"), {
