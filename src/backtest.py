@@ -11,7 +11,9 @@ from src.risk import summarize_risk, sharpe_ratio
 def calculate_monthly_returns(prices: pd.DataFrame) -> pd.DataFrame:
     """Month-end simple returns for each ticker."""
     monthly_prices = prices.resample("ME").last()
-    return monthly_prices.pct_change()
+    # fill_method=None: a missing month-end price gives a missing return. Without it,
+    # pandas 2 would silently carry the last price forward and invent a return.
+    return monthly_prices.pct_change(fill_method=None)
 
 
 def run_backtest(weights: pd.DataFrame, returns: pd.DataFrame) -> pd.Series:

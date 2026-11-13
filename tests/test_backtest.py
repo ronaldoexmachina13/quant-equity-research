@@ -286,3 +286,20 @@ def test_hold_between_refreshes_every_month_equals_monthly_targets():
     """Refreshing in every month reduces to the monthly path: held = targets."""
     held = hold_between_refreshes(Q_TARGETS, Q_RETURNS, refresh_months=tuple(range(1, 13)))
     pd.testing.assert_frame_equal(held, Q_TARGETS.astype(float))
+
+def test_monthly_returns_leave_a_gap_empty_instead_of_carrying_the_old_price_forward():
+    """
+    A stock with no price at one month end has no return for that month, and
+    none for the next month either, because the base price is missing. The
+    return must not be computed from a stale price: that would invent a
+    return for a month in which the stock could not be traded. The result is
+    the same on every supported pandas version only if fill_method=None is
+    explicit, because pandas 2 pads by default and pandas 3 does not.
+    """
+    prices = pd.DataFrame(
+        {"A": [100.0, float("nan"), 121.0, 133.1]},
+        index=pd.to_datetime(["2021-01-31", "2021-02-28", "2021-03-31", "2021-04-30"]),
+    )
+    returns = calculate_monthly_returns(prices)["A"]
+    assert returns.iloc[:3].isna().all()          # Jan has no base, Feb has no price, Mar has no base
+    assert returns.iloc[3] == pytest.approx(0.10)  # 133.1 / 121.0 - 1
