@@ -102,7 +102,7 @@ function forest(svgId, rows, fmt, domain, band) {
 /* ---------- family forest: many tests in one SVG ----------
    One block per unit (rank IC, quintile spread, Sharpe difference and so on). Each block has a symmetric scale of its own, so zero
    sits at the same horizontal position in every block and in every family; a filled marker means the 90% interval excludes zero.
-   Rows: { label, sig, rest, mean, lo, hi, excl } or { header } for a sub-heading. Block: { title, fmt, rows, band }. */
+   Rows: { label, sig, rest, mean, lo, hi, excl } or { header } for a sub-heading. Block: { title, fmt, rows, bands }, where bands is { signal: half-width } and shades only that signal's rows. */
 function familyForest(svgId, blocks, opt) {
   opt = opt || {};
   const small = !!opt.small, compact = small || window.innerWidth < 640;
@@ -112,13 +112,15 @@ function familyForest(svgId, blocks, opt) {
   let y = 2, s = "";
   blocks.forEach(b => {
     const data = b.rows.filter(r => !r.header);
-    const h = b.h ? niceHalf(b.h) : niceHalf(Math.max(...data.map(r => Math.max(Math.abs(r.lo), Math.abs(r.hi))), b.band || 0));
+    const h = b.h ? niceHalf(b.h) : niceHalf(Math.max(...data.map(r => Math.max(Math.abs(r.lo), Math.abs(r.hi))), ...Object.values(b.bands || {})));
     const x = v => mid + v / h * half;
     if (b.title) { s += `<text class="blk" x="0" y="${y + 12}">${b.title}</text>`; y += 22; }
     const top = y;
     let body = "";
+    const bandRuns = {};   /* signal -> [first y, last y] of its rows, so each band sits behind its own signal only */
     b.rows.forEach(r => {
       if (r.header) { body += `<text class="sub" x="0" y="${y + rowH - 4}">${r.header}</text>`; y += rowH; return; }
+      if (b.bands && b.bands[r.sig]) { const run = bandRuns[r.sig] || (bandRuns[r.sig] = [y, y]); run[1] = y + rowH; }
       const yc = y + rowH / 2, c = COLORS[r.sig] || cssVar("--text"), label = r.sig && !r.plain ? `<tspan fill="${TEXTC[r.sig]}">${r.sig}</tspan>${esc(r.rest)}` : esc(r.label);
       const txt = `${b.fmt.val(r.mean)} [${b.fmt.val(r.lo)}, ${b.fmt.val(r.hi)}]${r.excl ? " *" : ""}`;
       body += `<g><title>${esc((r.sig || "") + (r.rest || r.label || ""))}: ${txt}</title><rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>` +
@@ -130,7 +132,7 @@ function familyForest(svgId, blocks, opt) {
       y += rowH;
     });
     const bottom = y;
-    if (b.band) s += `<rect x="${x(-b.band)}" y="${top}" width="${x(b.band) - x(-b.band)}" height="${bottom - top}" fill="${cssVar("--zero")}" fill-opacity="0.12"/>`;
+    Object.entries(bandRuns).forEach(([sig, [from, to]]) => { const w = b.bands[sig]; s += `<rect x="${x(-w)}" y="${from}" width="${x(w) - x(-w)}" height="${to - from}" fill="${cssVar("--band")}" fill-opacity="0.16"><title>${esc(sig)}: smallest effect the 2012 to 2020 test could reliably detect, +/-${b.fmt.val(w).slice(1)}</title></rect>`; });
     [-h, -h / 2, h / 2, h].forEach(v => { s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--grid")}"/>`; });
     s += body;
     s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--text")}"/>` +

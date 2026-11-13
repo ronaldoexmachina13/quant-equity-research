@@ -37,6 +37,50 @@ def clean(value):
     return round(value, 6) if isinstance(value, float) else value
 
 
+Z_DETECT = 1.645 + 0.842          # 10% two-sided level and 80% power, the same constants the page has always used
+Z_INTERVAL = 1.645                # half-width of a 90% interval in standard errors
+NEW_TEST = "New test (2012-2020)"
+
+
+def detectable_effects(results):
+    """
+    Smallest true mean each signal's 2012 to 2020 test could reliably detect, by test type and signal:
+    (1.645 + 0.842) x standard error of the monthly mean. Descriptive, computed after the registered results from
+    saved files, and used only to draw the grey bands on the summary page.
+
+    Rank IC and quintile spread: the standard error is the monthly standard deviation / sqrt(months), from the
+    saved monthly series. Fama-MacBeth slopes: the monthly slope series is not saved, so the standard error is
+    recovered from the saved iid 90% interval (half-width / 1.645), which is approximate. Months are 108 in
+    every case, so the three methods agree within about 2% where more than one can be computed.
+    """
+    results = Path(results)
+
+    def from_series(files, column):
+        frame = pd.concat([pd.read_csv(results / name) for name in files])
+        frame = frame[frame["period"] == NEW_TEST]
+        out = {}
+        for signal, rows in frame.groupby("signal"):
+            x = rows[column].dropna()
+            out[signal] = Z_DETECT * x.std(ddof=1) / math.sqrt(len(x))
+        return out
+
+    robustness = pd.read_csv(results / "universe_study_inference_robustness.csv")
+    robustness = robustness[robustness["period"] == NEW_TEST]
+
+    def from_interval(test):
+        rows = robustness[robustness["test"] == test]
+        half = (rows["iid_ci_90_upper"] - rows["iid_ci_90_lower"]) / 2
+        return dict(zip(rows["signal"], Z_DETECT * half / Z_INTERVAL))
+
+    found = {
+        "rank_ic": from_series(["universe_study_ic_monthly_momentum.csv", "universe_study_ic_monthly_value_combined.csv"], "rank_ic"),
+        "quintile_spread": from_series(["universe_study_spread_monthly_momentum.csv", "universe_study_spread_monthly_value_combined.csv"], "quintile_spread"),
+        "fama_macbeth_single": from_interval("fama_macbeth_single"),
+        "fama_macbeth_joint": from_interval("fama_macbeth_joint"),
+    }
+    return {test: {signal: round(float(v), 6) for signal, v in by_signal.items()} for test, by_signal in found.items()}
+
+
 def returns_series(frame, strategy, size, column):
     rows = frame[frame["strategy"] == strategy]
     if size is not None:
@@ -132,7 +176,7 @@ def write_main():
     data = {
         "dates": [d[:7] for d in dates], "split": split,
         "series": series, "benchmarks": benchmarks, "spy": spy,
-        "ic": ic, "signalTests": signal_tests, "summary": summary_rows,
+        "ic": ic, "detectable": detectable_effects(RESULTS), "signalTests": signal_tests, "summary": summary_rows,
         "coverage": coverage, "survivorship": survivorship,
     }
     text = ("/* Written by generate_universe_dashboard_data.py from results/universe_study_*.csv "

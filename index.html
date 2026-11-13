@@ -17,8 +17,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Summary | Equity Factor Research</title>
-<script src="assets/theme.js?v=16"></script>
-<link rel="stylesheet" href="assets/styles.css?v=16">
+<script src="assets/theme.js?v=17"></script>
+<link rel="stylesheet" href="assets/styles.css?v=17">
 </head>
 <body>
 <div id="chrome"></div>
@@ -114,7 +114,7 @@
 <script src="assets/universe_stocks_data.js"></script>
 <script src="assets/universe_sens_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=16"></script>
+<script src="assets/dashboard.js?v=17"></script>
 <script>
 renderChrome("index.html", "S&amp;P 500 members &middot; Jan 2012 to Aug 2026 &middot; monthly &middot; Momentum (11-month) &middot; Value (P/B) &middot; Combined");
 const X = UNIVERSE_EXTRAS;
@@ -198,7 +198,7 @@ const mde = minDetectableIC();
   /* family 1: registered signal tests */
   const tests = U.signalTests, flag1 = tests.filter(r => r.excludes_zero).length;
   const blocks1 = Object.keys(TEST_TITLE).map(k => ({
-    title: TEST_TITLE[k] + (k === "rank_ic" ? ", detectable-effect band shaded" : ""), fmt: FMT[k], band: k === "rank_ic" ? mde : 0,
+    title: TEST_TITLE[k] + ", detectable-effect bands shaded", fmt: FMT[k], bands: U.detectable[k],
     rows: SIGNALS.flatMap(sig => PERIODS.map(p => tests.find(r => r.test === k && r.signal === sig && r.period === p.key && p)).filter(Boolean)
       .map(r => testRow(r, PERIOD_LABEL[r.period])))
   })).filter(b => b.rows.length);
@@ -206,8 +206,9 @@ const mde = minDetectableIC();
   counted("f1Count", flag1, tests.length, ", against about " + chance(tests.length) + " expected by chance");
   familyForest("f1Forest", blocks1);
   document.getElementById("f1Caption").innerHTML = "Each row is one test: the estimate (marker) and its 90% bootstrap interval (line) against zero (vertical line). The tests are in different units, so each block has its own scale with zero in the same place. " +
-    "A filled marker means the interval excludes zero; a hollow marker that it includes zero. The shaded band in the first block is the smallest mean rank IC the 2012 to 2020 test could reliably detect (&plusmn;" + mde.toFixed(3) +
-    ", 80% power), so a true effect inside the band would usually be missed. The results are consistent with no effect and with a small one. The expected count assumes independent tests; the tests overlap, so it is a rough guide.";
+    "A filled marker means the interval excludes zero; a hollow marker that it includes zero. The grey band behind each signal's rows is the smallest true average effect that signal's 2012 to 2020 test (108 months) could reliably detect, at 80% power and a 10% two-sided level, so a true effect inside the band would usually be missed. " +
+    "The bands are descriptive: they were computed after the registered results, from the saved monthly series, and are approximate for the Fama-MacBeth slopes, where the monthly slopes are not saved and the figure is recovered from the saved 90% interval. " +
+    "They are drawn behind all of a signal's rows but describe the 2012 to 2020 test. The results are consistent with no effect and with a small one. The expected count assumes independent tests; the tests overlap, so it is a rough guide.";
 
   /* family 2: registered Sharpe comparisons */
   const head = U.summary.filter(r => r.headline && r.basis === "gross" && r.diff !== null), hit = head.filter(r => r.sig);
