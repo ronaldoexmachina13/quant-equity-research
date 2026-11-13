@@ -1,7 +1,6 @@
 # CLAUDE.md: standing rules for this repository
 
 Project: Quantitative Equity Strategy Research & Backtesting Framework (17-stock study and 500-stock study complete).
-Owner: Ronaldo. Strong in finance, beginner to early-intermediate in Python and SQL. Explain what you are doing and why, in financial terms, before the code.
 
 ## Environment
 - Windows, VS Code, PowerShell. The venv must be active: `.\.venv\Scripts\Activate.ps1` (prompt shows `(.venv)`). If you see "No module named pytest", the venv is not active.
@@ -16,16 +15,10 @@ Owner: Ronaldo. Strong in finance, beginner to early-intermediate in Python and 
 6. Check for look-ahead bias on every new signal: a value dated t may only use information available at the close of t-1.
 7. The CSVs are the source of truth. Never hard-code a result into HTML or README. The dashboard generator writes the data blocks.
 
-## Writing rules
-- No em dashes (the long dash) and no AI-sounding phrasing in README, HTML or comments. Use plain professional research language: "the results suggest", "the evidence is consistent with".
-- Do not edit README prose or HTML commentary. Report the numbers and I will write the text with Ronaldo.
-
-## Working style
-- Plan first. Show the plan and wait for approval before editing.
-- One logical change at a time. Keep functions small, with one responsibility and clear names.
+## Code and writing
 - Add or update unit tests for every new function in `src/`.
-- Do NOT run `git commit` or `git push`. Show `git status` and a summary of the diff. Ronaldo commits himself, with git commands on ONE line joined with `;`.
-- Known quirk: `.gitattributes` is missing, so some files show as modified because of CRLF line endings only. Do not stage files you did not change.
+- No em dashes in README, HTML or comments. Do not edit README prose or HTML commentary unless the task gives the exact text.
+- `.gitattributes` sets `* text=auto eol=lf`, so files are stored with LF. If Git shows a file as modified and `git diff --ignore-cr-at-eol` is empty, the change is line endings only. Do not stage files you did not change.
 
 ## Repo map
 - `config.py`: UNIVERSE, START_DATE, END_DATE (exclusive in yfinance), IN_SAMPLE_START/END, OUT_OF_SAMPLE_START/END.
