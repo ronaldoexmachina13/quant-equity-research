@@ -202,10 +202,13 @@ def test_sql_members_query_matches_python_rule():
     conn = sqlite3.connect(":memory:")
     create_feasibility_tables(conn)
     intervals.to_sql("index_membership", conn, if_exists="append", index=False)
-    for date in ["2013-12-31", "2016-09-29", "2016-09-30", "2020-06-14", "2020-06-15"]:
-        sql_members = {r[0] for r in conn.execute(members_query(), {"as_of_date": date})}
-        py_members = {t for t in intervals["ticker"].unique() if is_member(intervals, t, date)}
-        assert sql_members == py_members, date
+    try:
+        for date in ["2013-12-31", "2016-09-29", "2016-09-30", "2020-06-14", "2020-06-15"]:
+            sql_members = {r[0] for r in conn.execute(members_query(), {"as_of_date": date})}
+            py_members = {t for t in intervals["ticker"].unique() if is_member(intervals, t, date)}
+            assert sql_members == py_members, date
+    finally:
+        conn.close()
 
 
 # ---------------------------------------------------------------------------
@@ -363,6 +366,16 @@ def test_rate_limiter_spaces_requests():
 # Usability rules in SQL (test b)
 # ---------------------------------------------------------------------------
 
+_OPEN_CONNECTIONS = []
+
+
+@pytest.fixture(autouse=True)
+def _close_coverage_connections():
+    yield
+    while _OPEN_CONNECTIONS:
+        _OPEN_CONNECTIONS.pop().close()
+
+
 def _coverage_db():
     """
     One evaluation month, t = 2021-02 (universe date 2021-01-31, t-1 = 2021-01,
@@ -404,6 +417,7 @@ def _coverage_db():
                       ("FFF", "stayed", "Utilities"), ("GGG", "stayed", "Utilities"),
                       ("HHH", "removed", "unknown")])
     build_member_month_flags(conn)
+    _OPEN_CONNECTIONS.append(conn)
     return conn
 
 

@@ -26,6 +26,11 @@ def run_backtest(weights: pd.DataFrame, returns: pd.DataFrame) -> pd.Series:
     common_dates = weights.index.intersection(returns.index)
     w = weights.loc[common_dates]
     r = returns.loc[common_dates]
+    # A name with weight but no return would otherwise count as 0% and flatter the result silently.
+    missing = (w > 0) & r.isna()
+    if missing.any().any():
+        date, ticker = next((d, t) for d in missing.index for t in missing.columns if missing.loc[d, t])
+        raise ValueError(f"{int(missing.sum().sum())} held position(s) have no return, first {ticker} on {date.date()}")
     return (w * r).sum(axis=1)
 
 

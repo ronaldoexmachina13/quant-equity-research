@@ -16,7 +16,8 @@ def total_return(returns: pd.Series) -> float:
 
 
 def annualized_return(returns: pd.Series) -> float:
-    """Compound monthly returns into an annualized rate."""
+    """Compound monthly returns into an annualized rate. Missing months are dropped first, so the product and the month count agree."""
+    returns = returns.dropna()
     compounded = (1 + returns).prod()
     n_years = len(returns) / TRADING_PERIODS_PER_YEAR
     return compounded ** (1 / n_years) - 1
@@ -45,54 +46,6 @@ def max_drawdown(returns: pd.Series) -> float:
     running_max = cumulative.cummax()
     drawdown = (cumulative - running_max) / running_max
     return drawdown.min()
-
-
-def rolling_volatility(returns: pd.Series, window: int = 12) -> pd.Series:
-    """
-    Trailing N-month annualized volatility, recomputed at every point.
-    The first (window - 1) entries are NaN -- there isn't enough history
-    yet to compute a trailing window there.
-    """
-    return returns.rolling(window).std() * np.sqrt(TRADING_PERIODS_PER_YEAR)
-
-
-def rolling_sharpe(returns: pd.Series, window: int = 12, risk_free_rate: float = 0.02) -> pd.Series:
-    """
-    Trailing N-month Sharpe ratio, recomputed at every point. When the
-    window is exactly 12 months, the "annualized return" for that window
-    is simply the window's own compounded return (12 months = 1 year,
-    so no further annualization is needed) -- this only generalizes
-    correctly for window=12; a different window size would need a
-    different exponent.
-    """
-    rolling_compounded = returns.rolling(window).apply(lambda r: (1 + r).prod() - 1, raw=True)
-    vol = rolling_volatility(returns, window)
-    return (rolling_compounded - risk_free_rate) / vol
-
-
-def bootstrap_sharpe_ci(returns: pd.Series, risk_free_rate: float = 0.02, n_sims: int = 5000, ci: float = 0.90, seed: int | None = None) -> dict:
-    """
-    Bootstrap confidence interval around a single strategy's own Sharpe
-    ratio. Resamples the return series with replacement n_sims times and
-    recomputes Sharpe each time, giving a distribution of plausible
-    Sharpe values instead of trusting one single point estimate.
-    """
-    rng = np.random.default_rng(seed)
-    n = len(returns)
-    vals = returns.values
-    sharpes = np.empty(n_sims)
-    for i in range(n_sims):
-        idx = rng.integers(0, n, size=n)
-        sharpes[i] = sharpe_ratio(pd.Series(vals[idx]), risk_free_rate)
-    lower = float(np.percentile(sharpes, (1 - ci) / 2 * 100))
-    upper = float(np.percentile(sharpes, (1 + ci) / 2 * 100))
-    return {
-        "point": sharpe_ratio(returns, risk_free_rate),
-        "lower": lower,
-        "upper": upper,
-        "ci": ci,
-        "n_sims": n_sims,
-    }
 
 
 def bootstrap_sharpe_diff(returns_a: pd.Series, returns_b: pd.Series, risk_free_rate: float = 0.02, n_sims: int = 5000, ci: float = 0.90, seed: int | None = None) -> dict:
@@ -458,7 +411,7 @@ def expected_shortfall(returns: pd.Series, level: float = 0.95) -> float:
 def bootstrap_statistic_ci(returns: pd.Series, statistic, n_sims: int = 5000, ci: float = 0.90, seed: int | None = None) -> dict:
     """
     Bootstrap confidence interval for any statistic of one return series,
-    in the same style as bootstrap_sharpe_ci(): resample the months with
+    in the same style as bootstrap_sharpe_diff(): resample the months with
     replacement n_sims times, recompute the statistic, take percentiles.
 
     The resampled month positions depend only on the seed and the series

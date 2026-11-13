@@ -269,51 +269,6 @@ def get_book_value_for_universe(tickers: list[str]) -> dict:
     return results
 
 
-def build_pb_ratios(prices: pd.DataFrame, tickers: list[str], max_gap_months: int = 6) -> pd.DataFrame:
-    """
-    Compute historical Price-to-Book ratio for each ticker at each month-end,
-    by combining month-end adjusted close prices with forward-filled book
-    value per share from SEC filings.
-
-    Note: for the Value factor, LOW P/B is attractive (opposite direction
-    from momentum, where high score wins) -- this function returns the raw
-    ratio only; ranking direction is handled at the portfolio-construction
-    stage.
-
-    Parameters
-    ----------
-    prices : pd.DataFrame
-        Wide-format adjusted close prices (Date index, tickers as columns),
-        as returned by factors.load_prices().
-    tickers : list[str]
-        Tickers to compute P/B for.
-    max_gap_months : int
-        Passed through to forward_fill_book_value() -- max staleness allowed
-        for a book value figure before being treated as missing.
-
-    Returns
-    -------
-    pd.DataFrame
-        Wide-format P/B ratios: month-end Date index, tickers as columns.
-        NaN where price or book value is unavailable.
-    """
-    monthly_prices = prices.resample("ME").last()
-    target_dates = monthly_prices.index
-
-    pb_columns = {}
-    for ticker in tickers:
-        bv = get_book_value_per_share(ticker)
-        filled_bv = forward_fill_book_value(bv, target_dates, max_gap_months=max_gap_months)
-        filled_bv = filled_bv.set_index("date")["book_value_per_share"]
-
-        ticker_price = monthly_prices[ticker]
-        pb_columns[ticker] = ticker_price / filled_bv
-
-    pb_df = pd.DataFrame(pb_columns)
-    pb_df.index.name = "date"
-    return pb_df
-
-
 if __name__ == "__main__":
     from config import UNIVERSE
 

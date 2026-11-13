@@ -61,8 +61,10 @@ ORDER BY strategy, date;
 -- 2. Annualized Sharpe ratio by strategy and regime (2021-2022 vs 2023-2024),
 -- computed in SQL from daily_return. Flat 2% annual risk-free rate, matching
 -- the rest of the project. Compare the output with the Sharpe ratios in
--- results/strategy_comparison_2021_2022.csv and strategy_comparison_2023_2024.csv;
--- any difference needs explaining before relying on either.
+-- results/strategy_comparison_2021_2022.csv and strategy_comparison_2023_2024.csv.
+-- This query annualises with the arithmetic mean of the monthly returns times 12, while the
+-- published Sharpe ratios compound the returns (src/risk.py), so the two are expected to differ
+-- a little. It is a check on direction and rough size, not on the third decimal.
 -- ----------------------------------------------------------------------------
 WITH regime_returns AS (
     SELECT

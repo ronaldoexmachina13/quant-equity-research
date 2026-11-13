@@ -45,6 +45,9 @@ def get_price_history_multi(tickers: list[str], start_date: str, end_date: str) 
     """
     data = yf.download(tickers, start=start_date, end=end_date, auto_adjust=False)
     prices = data["Adj Close"]
+    empty = [t for t in tickers if t not in prices.columns or prices[t].isna().all()]
+    if empty:
+        raise ValueError(f"No prices returned for {empty}. Nothing should be stored from this download.")
     return prices
 
 
