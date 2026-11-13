@@ -121,21 +121,48 @@
 
   </div>
 
+  <div class="tabpane" id="pane-ledger" hidden>
+  <div class="panel" data-stamp="descriptive" data-src="results/universe_study_test_ledger.csv">
+    <h2 id="ledgerFullTitle">Test ledger</h2>
+    <div class="timeline-table-wrap" style="max-height:none;"><table class="timeline-table perf-table" id="ledgerFull"></table></div>
+    <p class="caption" id="ledgerFullCaption"></p>
+  </div>
+  </div>
+
   <div id="foot"></div>
 </div>
 
 <script src="assets/vendor/chart.umd.js?v=4.4.1"></script>
 <script src="assets/universe_data.js"></script>
 <script src="assets/meta_data.js"></script>
+<script src="assets/universe_ledger_data.js"></script>
 <script src="assets/dashboard.js?v=16"></script>
 <script>
 renderChrome("method.html", "Pre-specified design &middot; frozen signals &middot; no tuning &middot; every variant reported");
 document.getElementById("planLogLine").textContent = planLogSentence();
 
+/* test ledger: every family of intervals, straight from results/universe_study_test_ledger.csv */
+(function ledgerFull() {
+  const L = UNIVERSE_LEDGER, descriptive = r => r.tier.indexOf("Descriptive") === 0;
+  const counted = L.filter(r => !descriptive(r));
+  const run = counted.reduce((a, r) => a + r.intervals_run, 0), ex = counted.reduce((a, r) => a + r.exclude_zero, 0);
+  const esc = v => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  document.getElementById("ledgerFullTitle").textContent = run + " intervals in " + counted.length + " families, " + ex + " exclude zero, none of them among the 33 registered signal tests";
+  const chance = r => ["Registered", "Sensitivity", "Exploratory, after results"].includes(r.tier) ? (r.intervals_run * 0.1).toFixed(1) : "n/a";
+  let t = "<thead><tr><th>ID</th><th>Family</th><th class=num>Run</th><th class=num>Exclude zero</th><th class=num>Positive</th><th class=num>Negative</th><th class=num>Expected by chance</th></tr></thead><tbody>", tier = "";
+  L.forEach(r => {
+    if (r.tier !== tier) { tier = r.tier; t += `<tr><td colspan="7" style="color:var(--label);">${esc(tier)}</td></tr>`; }
+    t += `<tr><td>${esc(r.family_id)}</td><td>${esc(r.family)}</td><td class="num">${r.intervals_run}</td><td class="num">${r.exclude_zero}</td><td class="num">${r.exclude_zero_positive}</td><td class="num">${r.exclude_zero_negative}</td><td class="num">${chance(r)}</td></tr>`;
+  });
+  document.getElementById("ledgerFull").innerHTML = t + "</tbody>";
+  document.getElementById("ledgerFullCaption").textContent = "Every family of 90% intervals the study computed, by the tiers used in the ledger file. The descriptive family is listed but not counted in the title. Family S1 includes the tests of the true 12-1 Momentum signal, which have no page of their own (results/universe_study_signal_summary_momentum_skip_month.csv). The last column is ten percent of the intervals run. The families overlap heavily, so the counts show how much was tried and are not a significance level for the set.";
+})();
+
 const PAGE_TABS = [
   { key: "design", label: "Design and limits" },
   { key: "log", label: "Registration log" },
-  { key: "power", label: "Power" }
+  { key: "power", label: "Power" },
+  { key: "ledger", label: "Test ledger" }
 ];
 function showTab(key, fromClick) {
   if (!PAGE_TABS.some(t => t.key === key)) key = PAGE_TABS[0].key;

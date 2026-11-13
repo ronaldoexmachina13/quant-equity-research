@@ -25,6 +25,7 @@ HOLDINGS_OUT = Path("assets/universe_holdings_data.js")
 EXTRAS_OUT = Path("assets/universe_extras_data.js")
 CONTROLS_OUT = Path("assets/universe_controls_data.js")
 FACTOR4_OUT = Path("assets/universe_factor4_data.js")
+LEDGER_OUT = Path("assets/universe_ledger_data.js")
 
 
 def clean(value):
@@ -297,6 +298,19 @@ def write_factor4():
     write_js(FACTOR4_OUT, "UNIVERSE_FACTOR4", sens_rows(source, keys), "results/universe_study_alpha_factor4.csv")
 
 
+def write_ledger():
+    source = RESULTS / "universe_study_test_ledger.csv"
+    if LEDGER_OUT.exists():
+        print(f"{LEDGER_OUT} already exists, left unchanged.")
+        return
+    if not source.exists():
+        print(f"{source} is missing; run make_test_ledger.py first. Skipping {LEDGER_OUT}.")
+        return
+    keys = ["family_id", "tier", "family", "source_files", "basis", "intervals_run", "exclude_zero",
+            "exclude_zero_positive", "exclude_zero_negative"]
+    write_js(LEDGER_OUT, "UNIVERSE_LEDGER", sens_rows(source, keys), "results/universe_study_test_ledger.csv")
+
+
 def main():
     write_main()
     write_sens()
@@ -305,6 +319,7 @@ def main():
     write_extras()
     write_controls()
     write_factor4()
+    write_ledger()
 
 
 if __name__ == "__main__":

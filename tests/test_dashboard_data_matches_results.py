@@ -21,6 +21,7 @@ OUTPUT_FILES = {
     "EXTRAS_OUT": "universe_extras_data.js",
     "CONTROLS_OUT": "universe_controls_data.js",
     "FACTOR4_OUT": "universe_factor4_data.js",
+    "LEDGER_OUT": "universe_ledger_data.js",
 }
 
 
