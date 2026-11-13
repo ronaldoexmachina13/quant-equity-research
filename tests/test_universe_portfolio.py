@@ -157,10 +157,10 @@ def test_name_without_return_is_sold_at_its_last_weight_in_drift_turnover():
 # --- Period metrics and tests ---
 
 def test_max_drawdown_counts_a_first_month_loss_from_1():
-    """-10% then +5%: from 1.0 the trough is 0.9, a 10% drawdown. max_drawdown() starts at 0.9 and shows 0."""
+    """-10% then +5%: from 1.0 the trough is 0.9, a 10% drawdown. Both functions start the path at 1.0."""
     returns = pd.Series([-0.10, 0.05], index=[JAN, FEB])
     assert max_drawdown_from_start(returns) == pytest.approx(-0.10)
-    assert max_drawdown(returns) == pytest.approx(0.0)
+    assert max_drawdown(returns) == pytest.approx(-0.10)
 
 
 def test_period_metrics_at_constant_2pct_match_the_flat_sharpe():

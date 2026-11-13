@@ -42,7 +42,9 @@ def max_drawdown(returns: pd.Series) -> float:
     Largest peak-to-trough decline in cumulative value.
     Returns a negative number (e.g. -0.25 = a 25% drawdown).
     """
+    # Start the wealth path at 1.0 so a loss in the first month counts as a drawdown.
     cumulative = (1 + returns).cumprod()
+    cumulative = pd.concat([pd.Series([1.0]), cumulative.reset_index(drop=True)])
     running_max = cumulative.cummax()
     drawdown = (cumulative - running_max) / running_max
     return drawdown.min()

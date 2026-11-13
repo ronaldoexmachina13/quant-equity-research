@@ -500,7 +500,7 @@ def test_drawdown_series_hand_path():
     """
     +10%, -20%, +5%, +20% from 1.0: values 1.1, 0.88, 0.924, 1.1088; peak
     1.1 until the last month; drawdown 0, -20%, -16%, 0 (0 at the start
-    too). Its minimum equals max_drawdown() because month 1 is a gain.
+    too). Its minimum equals max_drawdown().
     """
     dates = pd.date_range("2021-01-31", periods=4, freq="ME")
     returns = pd.Series([0.10, -0.20, 0.05, 0.20], index=dates)
@@ -513,14 +513,14 @@ def test_drawdown_series_hand_path():
 def test_drawdown_series_counts_a_first_month_loss_from_the_start():
     """
     -10% then +5%: from the 1.0 start the path is 0.9, 0.945, so the
-    drawdown is -10% then -5.5%. max_drawdown() starts its peak at 0.9 and
-    reports 0. This documents the registered 1.0 starting point.
+    drawdown is -10% then -5.5%. max_drawdown() also starts its peak at
+    1.0, so both functions report the -10% first-month loss.
     """
     dates = pd.date_range("2021-01-31", periods=2, freq="ME")
     returns = pd.Series([-0.10, 0.05], index=dates)
     dd = drawdown_series(returns, "2020-12-31")
     assert list(dd["drawdown"]) == pytest.approx([0.0, -0.10, -0.055])
-    assert max_drawdown(returns) == pytest.approx(0.0)
+    assert max_drawdown(returns) == pytest.approx(-0.10)
 
 
 def test_drawdown_series_anchor_row_has_blank_monthly_return():
