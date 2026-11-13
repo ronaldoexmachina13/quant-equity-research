@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Portfolios | Equity Factor Research</title>
-<script src="assets/theme.js?v=18"></script>
-<link rel="stylesheet" href="assets/styles.css?v=18">
+<script src="assets/theme.js?v=19"></script>
+<link rel="stylesheet" href="assets/styles.css?v=19">
 </head>
 <body>
 <div id="chrome"></div>
@@ -34,6 +34,7 @@
         <tbody id="leadBody"></tbody>
       </table>
     </div>
+    <p class="tbl-key" id="leadKey"></p>
     <p class="caption" id="leadCaption"></p>
 <div class="formula"><span class="fname">Sharpe difference</span><math display="block" aria-label="Sharpe difference is the portfolio Sharpe ratio minus the benchmark Sharpe ratio; the Sharpe ratio is annualised return minus compounded risk-free return, over annualised volatility"><mi class="up">&#x394;SR</mi><mo>=</mo><msub><mi class="up">SR</mi><mi>p</mi></msub><mo>&#x2212;</mo><msub><mi class="up">SR</mi><mi>b</mi></msub><mspace width="2.2em"/><mi class="up">SR</mi><mo>=</mo><mfrac><mrow><msub><mi>R</mi><mi>a</mi></msub><mo>&#x2212;</mo><msub><mi>R</mi><mi>f</mi></msub></mrow><msub><mi>&#x3C3;</mi><mi>a</mi></msub></mfrac></math><p class="where">p is the portfolio and b its equal-weight benchmark. R<sub>a</sub> is the annualised return, R<sub>f</sub> the compounded Treasury bill return over the same months, and &sigma;<sub>a</sub> the annualised volatility (the monthly standard deviation times the square root of 12). The interval is a paired bootstrap of &#x394;SR.</p></div>
   </div>
@@ -60,7 +61,7 @@
         <tbody id="perfBody"></tbody>
       </table>
     </div>
-    <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is flagged (bold, with an asterisk) only when its 90% paired bootstrap interval excludes zero.</p>
+    <p class="caption">Sharpe ratios use the three-month Treasury bill as the risk-free rate. Turnover is the average share of the portfolio traded each month, including drift. After costs charges 10 bps on each one-way trade. A difference is marked (bold, with an asterisk) only when its 90% paired bootstrap interval excludes zero.</p>
   </div>
 
   </div>
@@ -152,7 +153,7 @@
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/universe_factor4_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=18"></script>
+<script src="assets/dashboard.js?v=19"></script>
 <script>
 renderChrome("portfolios.html", "Equal weight &middot; rebalanced monthly &middot; 10 bps one-way costs &middot; benchmark: equal-weight average of usable names");
 
@@ -183,10 +184,10 @@ function drawLead() {
   document.getElementById("leadTitle").textContent = hitG.length === 0 ? "No registered Sharpe difference has a 90% interval that excludes zero before costs"
     : hitG.length + " of " + cells.length + " registered Sharpe differences exclude zero before costs" + (dup.size === 1 && hitG.length > 1 ? ", both " + who : "") + "; after costs, " + hitN.length + " of " + cells.length;
   document.getElementById("leadCount").innerHTML = `<b>${hitG.length} of ${cells.length}</b> exclude zero before costs, against about ${(cells.length * 0.1).toFixed(1)} expected by chance<span> &middot; after 10 bps: ${hitN.length} of ${cells.length}</span>`;
-  document.getElementById("leadCaption").innerHTML = "The Sharpe difference is the portfolio's Sharpe ratio minus its own benchmark's, annualised; the interval is a paired bootstrap (5,000 resamples) at the 90% level, and * marks an interval that excludes zero. " +
-    (dup.size ? "\u2020 These flagged results are one signal in one period: the top quintile contains the top decile, so the two are one result counted twice. " : "") +
-    (hitG.length && hitG.every(c => c.g.diff < 0) ? "In each flagged case the portfolio trailed its benchmark. " : "") +
-    "After costs deducts 10 bps one way on drift-inclusive turnover. The comparisons overlap, so the expected count is a rough guide. The 2021 to 2026 months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.";
+  document.getElementById("leadKey").textContent = "* marks a Sharpe difference whose 90% paired bootstrap interval excludes zero." + (dup.size ? " \u2020 marks rows that are one result counted twice, because the top quintile contains the top decile." : "");
+  document.getElementById("leadCaption").innerHTML = "The Sharpe difference is the portfolio's Sharpe ratio minus its own benchmark's, annualised; the interval is a paired bootstrap (5,000 resamples) at the 90% level. " +
+    (hitG.length && hitG.every(c => c.g.diff < 0) ? "In each of those rows the portfolio trailed its benchmark. " : "") +
+    "After costs deducts 10 bps one way on drift-inclusive turnover. The comparisons overlap, so exclusions would cluster and the expected count is a guide, not a significance level. The 2021 to 2026 months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.";
 }
 
 function drawPortfolios() {
@@ -334,7 +335,7 @@ function drawAlpha() {
   document.getElementById("alphaCaption").innerHTML =
     "Matched-benchmark alpha is the intercept from regressing the portfolio's monthly return in excess of the Treasury bill rate on the same excess return of its equal-weight benchmark (built from the same usable names), with Newey-West 90% intervals, multiplied by 12 (Amendment 16). Beta is the slope: a value above 1 means the portfolio moved more than the benchmark. " +
     SIZE_LABEL[ctlSize] + ". The benchmark is " + (alphaBench === "spy" ? "SPY" : "the equal-weight benchmark the registered test uses for that signal") + ". Before costs. A filled marker means the interval excludes zero and a hollow marker that it includes zero. " +
-    "Momentum and Combined hold largely the same names, so positive alphas for both are not independent confirmations. This adds " + CTL.alpha.length + " regressions to the family of tests, and the registered Sharpe-difference test is unchanged.";
+    "Momentum and Combined hold largely the same names, so positive alphas for both are not independent confirmations. This adds " + CTL.alpha.filter(a => a.basis === "gross").length + " gross regressions to the family of tests (the after-cost rows repeat them), and the registered Sharpe-difference test is unchanged.";
 }
 function drawUniverse() {
   const c = CTL.counts, pct = v => (v * 100).toFixed(0) + "%";

@@ -476,7 +476,7 @@ details.fold:not([open]) > summary { margin-bottom: -1rem; border-bottom: none; 
 .timeline { display: block; width: 100%; height: auto; font-family: var(--sans); font-size: 11px; }
 .timeline .dim { fill: var(--muted); }
 .sq { display: inline-block; width: 8px; height: 8px; vertical-align: baseline; }
-.sq-pre { background: var(--amber); }
+.sq-pre { background: var(--text-strong); }
 .sq-post { background: transparent; border: 1.5px solid var(--text-strong); box-sizing: border-box; }
 .sq-os { background: var(--p1); }
 .legend-row i.sq-post { border: 1.5px solid var(--text-strong); background: transparent; box-sizing: border-box; }
@@ -500,7 +500,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
 .exh { display: flex; justify-content: flex-start; align-items: baseline; gap: 0.8rem; margin: 0; padding: 0; background: none; border: none; }
 .exh .exn { font-family: var(--sans); font-size: 0.78rem; font-weight: 500;   color: var(--text); }
 .exh .stamp { color: var(--muted); font-size: 0.78rem; }
-.exh .stamp-registered { color: var(--amber); }
+.exh .stamp-registered { color: var(--text-strong); }
 
 .panel > .exh + h2 { margin-top: 0.9rem; padding-top: 0; border-top: none; }
 
@@ -624,3 +624,12 @@ ul.contents .c-q { color: var(--text); font-size: 0.9rem; }
 .theme-toggle { border: none; border-bottom: 1px solid var(--line-strong); padding: 0.1rem 0.1rem; }
 .series-key { margin: 0 0 0.5rem; }
 @media (min-width: 700px) { .series-key { display: none; } }
+
+/* status key under the page heading; legend line under a table */
+.exh-key, .tbl-key { font-family: var(--sans); font-size: 0.78rem; line-height: 1.55; color: var(--muted); max-width: 60rem; margin: 0.6rem 0 1.2rem; }
+.tbl-key { margin: 0.5rem 0 0; }
+.exh-key a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+/* stat rows with only a value and a label (Universe): the label takes the two right-hand columns */
+@media (min-width: 701px) { .mini-stat > .ms-value:first-child + .ms-label { grid-column: 2 / -1; } }
+/* the stacked key-figure table on a phone loses its header row, so each cell names its column */
+@media (max-width: 600px) { .keyfig td[data-label]::before { content: attr(data-label) ": "; color: var(--muted); font-family: var(--sans); font-size: 0.78rem; } }

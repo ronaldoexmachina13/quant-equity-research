@@ -12,9 +12,11 @@ The work uses Python (pandas, NumPy, SciPy, statsmodels, matplotlib), SQLite and
 
 As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 19.
 
+Status: registered.
+
 ![Estimates and 90% bootstrap intervals for the 33 registered signal tests, one row each, in four blocks, drawn against zero.](docs/img/01-registered-tests.png)
 
-Above, the 33 registered signal tests are plotted. Each is an estimate with its 90% bootstrap interval. The tests cover Momentum, Value and Combined over 2012 to 2020, 2021 to 2026 and the full period. They are 9 rank IC tests, 9 quintile spreads, 9 Fama-MacBeth slopes for one signal and 6 slopes for Momentum and Value together. An interval that spans zero is read as no detectable effect. All 33 span zero, and so do the Newey-West and block-bootstrap versions of the same tests. The 2012 to 2020 test could detect a mean rank IC of about 0.055 for Momentum, 0.041 for Value and 0.052 for Combined at 80% power and a 10% two-sided level. An effect smaller than that would usually be missed, so the result is not evidence of no effect. If the tests were independent, about 3 would exclude zero by chance. They are not independent because the periods overlap and the signals share stocks, so 3 is a rough guide.
+Above, the 33 registered signal tests are plotted. Each is an estimate with its 90% bootstrap interval. The tests cover Momentum, Value and Combined over 2012 to 2020, 2021 to 2026 and the full period. They are 9 rank IC tests, 9 quintile spreads, 9 Fama-MacBeth slopes for one signal and 6 slopes for Momentum and Value together. An interval that spans zero is read as no detectable effect, and a filled marker would mean the interval excludes zero; none is filled. All 33 span zero, and so do the Newey-West and block-bootstrap versions of the same tests. The 2012 to 2020 test could detect a mean rank IC of about 0.055 for Momentum, 0.041 for Value and 0.052 for Combined at 80% power and a 10% two-sided level. An effect smaller than that would usually be missed, so the result is not evidence of no effect. On average, 33 tests at the 90% level would give about 3.3 exclusions of zero by chance, whether or not they overlap. They do overlap, because the periods share months and the signals share stocks, so exclusions would cluster and 3.3 is a guide, not a significance level.
 
 Source: `results/universe_study_signal_summary_momentum.csv`, `results/universe_study_signal_summary_value_combined.csv` and `results/universe_study_inference_robustness.csv`.
 
@@ -23,21 +25,29 @@ Source: `results/universe_study_signal_summary_momentum.csv`, `results/universe_
 | Question | Answer |
 |---|---|
 | **Do the rankings predict returns?** | Not detectably. In the six main tests (rank IC for each of three signals over two test periods) every interval includes zero. Another 27 tests ask the same question in other ways, so they are not independent evidence, and none of them excludes zero either. |
-| **Do the top-ranked portfolios beat the benchmark?** | On the registered Sharpe test, no: only 2 of 18 comparisons exclude zero, about what chance gives (1.8 if independent). Both are Value in 2012 to 2020 (the top decile and the top quintile, so the holdings overlap), and in both Value did worse than the benchmark on a risk-adjusted basis. A regression of each portfolio's return on its benchmark's, added after the results (Amendment 16), finds 11 of 18 alphas that exclude zero, against about 2 expected by chance if independent. Nine are positive (all Momentum or Combined, which are close to the same signal; the four full-period ones are +3.6% to +4.7% a year) and 2 are negative (Value, 2012 to 2020). A four-factor regression (Amendment 18) finds none of the 18 excluding zero. These later checks are exploratory. |
+| **Do the top-ranked portfolios beat the benchmark?** | On the registered Sharpe test, no: only 2 of 18 comparisons exclude zero, about what chance gives (1.8 on average). Both are Value in 2012 to 2020, where Value did worse than the benchmark on a risk-adjusted basis. A regression of each portfolio's return on its benchmark's, added after the results (Amendment 16), finds 11 of 18 alphas that exclude zero, against about 2 expected by chance on average. Nine are positive (all Momentum or Combined, which are close to the same signal; the four full-period ones are +3.6% to +4.7% a year) and 2 are negative (Value, 2012 to 2020). A four-factor regression (Amendment 18) finds none of the 18 excluding zero. These later checks are exploratory. |
 | **Could the test have found an effect?** | Only a large one. With 108 months it detects a mean rank IC of about 0.055 (80% power). Smaller effects would be missed, so this is "no evidence of an effect", not "proof of no effect". |
 | **Is the data good enough?** | For return levels, no. The data are free and survivor-biased: among names that have a price history, those later dropped from the index earned about 3% to 4% a year in this sample, against about 16% for names that stayed. The groups are formed with hindsight, so this is not an estimate of the bias. Differences between a portfolio and its benchmark are affected too, because the missing names are missing from both, in a direction that depends on the signal. |
 
 ### Reading guide
 
 - **Rank IC (information coefficient).** Each month, rank the stocks by the signal and by the return they earned next month, then take the correlation of the two rankings. +1 means the signal ordered returns perfectly, 0 means it told you nothing, and -1 means it was backwards. With 108 months, a mean Momentum rank IC of about 0.055 or more is detected 80% of the time, and smaller values are often missed (see Power in Hypotheses and method).
-- **90% interval.** The range of values the data are consistent with. If it contains zero, the result cannot be told apart from no effect.
+- **90% interval.** A range built so that, across repeated samples, about 90% of such ranges would contain the true value. If it contains zero, an effect of zero cannot be ruled out at the 10% level.
+- **Quintile spread.** The return of the top fifth of stocks by signal minus that of the bottom fifth in a month, averaged over months.
+- **Fama-MacBeth slope.** Each month, regress the next month's returns on the signal across stocks, then average the slope over months. The slope is in the signal's own units, so it is read against zero and not against other rows.
+- **Newey-West and block bootstrap.** Two ways of adjusting an interval for months that are correlated with their neighbours. The adjustment can narrow or widen it. Here they give the same reading: no interval excludes zero.
+- **Power.** The chance that a test finds an effect that is really there. The detectable effect is the smallest true mean rank IC that the test would find 80% of the time at a 10% two-sided level.
 - **Sharpe ratio.** Return above the risk-free rate per unit of volatility. A Sharpe difference compares a portfolio with its benchmark, and a negative value means the portfolio did worse.
 - **Benchmark.** The equal-weight average of the same usable names in the same month, not the S&P 500 index. Each portfolio is compared with the benchmark built from the names its own signal could use (Momentum, or Value and Combined), so a name missing from the data is missing from both sides. SPY is shown separately as a reference.
 - **Group (quintile).** One fifth of the stocks, ranked on the signal. Group 5 has the highest signal.
+- **Status labels.** Registered tests were written into the plan before their results existed and are counted in the registered totals. Exploratory results were added after the results, sensitivity results repeat a registered test under a changed assumption, and descriptive panels summarise the data. None of the last three is counted in the registered totals.
+
 
 ## Why a null result is worth reporting
 
 Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 452 published anomalies with methods that limit the weight of tiny stocks and found that 65% of them could not clear the usual significance hurdle, a t-statistic of 1.96 ([Review of Financial Studies, 2020](https://doi.org/10.1093/rfs/hhy131)). Large, liquid stocks such as the S&P 500 are expected to be a harder place to find a premium, because they are closely analysed and cheap to trade. That is a hypothesis, not something this study tests. A null here is a plausible and informative outcome. What matters is whether the test is reliable enough to trust that answer.
+
+Status: exploratory, added after the results (Amendment 14).
 
 ![Annualised return by signal fifth for Momentum, Value and Combined in two periods, with the top-minus-bottom spread and its 90% interval below each.](docs/img/06-return-by-group.png)
 
@@ -45,17 +55,21 @@ Return by group plots annualised return for each fifth of stocks ranked on the s
 
 Source: `results/universe_study_quintile_returns.csv`, `results/universe_study_signal_summary_momentum.csv` and `results/universe_study_signal_summary_value_combined.csv`.
 
-![Table of Sharpe ratio differences against the benchmark for 18 registered portfolio comparisons, before and after costs, with 90% intervals and the two Value 2012 to 2020 rows flagged.](docs/img/03-sharpe-differences.png)
+Status: registered before costs; the after-cost columns repeat the same comparisons.
 
-Sharpe differences against each portfolio's own benchmark are listed for all 18 registered comparisons (three signals, top decile and top quintile, three periods), with a 90% paired bootstrap interval, before and after 10 bps one-way costs. Two intervals exclude zero, both Value in 2012 to 2020 (-0.44 for the top decile, -0.40 for the top quintile). The top quintile contains the top decile, so these are one result counted twice, and the sign is the reverse of what a value premium predicts. In the table an asterisk marks an interval that excludes zero and a dagger marks that doubled result. Neither the 2021 to 2026 re-test (+0.17 for the top decile) nor the full period (-0.22) repeats it, and both intervals include zero. Chance would flag about 1.8 if the tests were independent. The other 16 intervals are wide, so they are not evidence of no effect. Costs lower the point estimates by at most about 0.06 and leave every flag unchanged.
+![Table of Sharpe ratio differences against the benchmark for 18 registered portfolio comparisons, before and after costs, with 90% intervals and the two Value 2012 to 2020 rows marked.](docs/img/03-sharpe-differences.png)
+
+Sharpe differences against each portfolio's own benchmark are listed for all 18 registered comparisons (three signals, top decile and top quintile, three periods), with a 90% paired bootstrap interval, before and after 10 bps one-way costs. Two intervals exclude zero, both Value in 2012 to 2020 (-0.44 for the top decile, -0.40 for the top quintile). The top quintile contains the top decile, so these are one result counted twice, and the sign is the reverse of what a value premium predicts. In the table an asterisk marks an interval that excludes zero and a dagger marks that doubled result. Neither the 2021 to 2026 re-test (+0.17 for the top decile) nor the full period (-0.22) repeats it, and both intervals include zero. On average, chance would give about 1.8 such exclusions in 18 comparisons. The other 16 intervals are wide, so they are not evidence of no effect. Costs lower the point estimates by at most about 0.06 and leave both exclusions in place and the other 16 intervals including zero.
 
 Source: `results/universe_study_portfolio_summary.csv`.
 
-The registered tests of the signal itself for the same period all include zero. In the three secondary sensitivities (winsorised price-to-book and two exclusion lists), 5 of 66 signal intervals exclude zero, against about 7 expected by chance if they were independent. All five are Value Fama-MacBeth slopes for 2012 to 2020, all with a negative slope whose interval stops just short of zero, and they share the same months and stocks.
+The registered tests of the signal itself for the same period all include zero. In the three secondary sensitivities (winsorised price-to-book and two exclusion lists), 5 of 66 signal intervals exclude zero, against about 7 expected by chance on average. All five are Value Fama-MacBeth slopes for 2012 to 2020, all negative with an upper bound just below zero, and they share the same months and stocks.
 
 No explanation has been tested.
 
 The 2021 to 2026 months were already known from an earlier 17-stock study, so they are a re-test and not out-of-sample evidence.
+
+Status: descriptive.
 
 ![Growth of one dollar on a log scale for the Value top decile, its equal-weight benchmark and SPY from 2012 to 2026, with drawdown below showing a 49% trough in March 2020.](docs/img/04-growth-and-drawdown.png)
 
@@ -65,12 +79,14 @@ Source: `results/universe_study_portfolio_returns.csv` and `results/universe_stu
 
 ## Safeguards in the design
 
-- **Pre-specified.** The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. They are dated Git commits made by the author, not entries in an independent registry. Post-hoc additions are labelled as such.
-- **No look-ahead.** A signal dated t uses only information available at the end of month t-1 and is held through month t. Book values enter on the date the filing became public.
-- **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
-- **Interval choice.** 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of false positives expected by chance is stated beside the result.
-- **Errors found and corrected.** These are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
-- **Tested and reproducible.** More than 570 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
+- The design, the reading rules and every later change are dated, append-only amendments in [`docs/LIMITATIONS_PLAN.md`](docs/LIMITATIONS_PLAN.md), committed before the code that depends on them. They are dated Git commits made by the author, not entries in an independent registry. Post-hoc additions are labelled as such, and Amendments 15 and 16 disclose a read-only look at results before they were written.
+- A signal dated t uses only information available at the end of month t-1 and is held through month t. Book values enter on the date the filing became public.
+- Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
+- Intervals are 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of exclusions expected by chance is stated beside the result.
+- Errors found and corrected are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
+- Many of the tests are hand-worked cases and run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
+
+Status: descriptive, a record and not a test.
 
 ![Timeline of 22 plan entries from October to November 2026, with the six written after every registered result existed shown as open squares.](docs/img/05-plan-log.png)
 
@@ -82,11 +98,10 @@ Source: `docs/LIMITATIONS_PLAN.md`.
 
 - **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them: acquired companies often earned a premium and bankrupt ones lost most of their value, and both are missing. Coverage is lowest from 2012 to 2015 (61% to 66% of index member-months usable for Value), so the early years of the 2012 to 2020 test rest on the weakest data.
 - **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.
-- **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, with no market impact or capacity analysis. A four-factor Fama-French regression and sector-neutral variants were added after the results (Amendments 16 to 18), so they are exploratory and not registered. In the four-factor regression, none of the 18 regressions of the registered portfolios (six portfolios, three periods) has an alpha interval that excludes zero, before costs. Of the 24 same-names and sector-neutral variant regressions, 8 have an interval that excludes zero, all with a positive alpha (Value or Combined), against about 2.4 expected by chance if they were independent.
+- **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, with no market impact or capacity analysis. A four-factor Fama-French regression and sector-neutral variants were added after the results (Amendments 16 to 18), so they are exploratory and not registered. In the four-factor regression, none of the 18 regressions of the registered portfolios (six portfolios, three periods) has an alpha interval that excludes zero, before costs. Of the 24 same-names and sector-neutral variant regressions, 8 have an interval that excludes zero, all with a positive alpha (Value or Combined), against about 2.4 expected by chance on average.
 - Value in 2012 to 2020 had higher volatility than its benchmark, with a beta of 1.55 to the benchmark (volatility, drawdown and returns are given under Growth and drawdown above). In those years 53.2% of its name-months are in Financials and 25.9% have no sector label. Sectors are one current label per stock, not a historical one.
 - Combined is mostly Momentum. Over 2012 to 2026 the monthly rank IC of Combined has a correlation of +0.98 with Momentum's. Of Combined's top-decile name-months, 85.8% are also in Momentum's top decile in the same month (73.5% the other way round; the two universes differ in size, with 353 to 499 usable names for Momentum and 295 to 426 for Combined). The overlap with Value is small: 6.9% of Combined's top-decile name-months are also in Value's, and 4.0% of Momentum's. The Combined results should therefore not be read as a separate test from Momentum's. The monthly rank ICs of Momentum and Value are correlated at -0.53.
 - **Sharpe convention.** The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. It was recomputed from the saved monthly returns after the results and is not saved in a result file or part of the registered tests. Of the 18 differences, 17 are smaller (15 of them by 5% to 25%) and one is about 19% larger (Momentum top decile, 2021 to 2026).
-- **Power.** With 108 months the test detects a mean rank IC of about 0.055 (80% power), so a smaller premium cannot be ruled out.
 - **Survivorship scenario and test ledger (Amendment 19, added after the results).** `results/universe_study_survivorship_scenario.csv` shows how large the missing-names problem would have to be to move the Momentum quintile spread away from zero. It replaces a share s of group 1 (10%, 20% or 30%) with names earning an assumed monthly return r (0%, -2% or -5%). With no adjustment the 90% interval includes zero in all three periods. Under the nine assumed adjustments the interval excludes zero in 4 of 9 rows for 2012 to 2020, 5 of 9 for 2021 to 2026 and 6 of 9 for the full period. The assumptions are illustrative and not estimated, no row is selected, and the rows are not counted as tests, so the table is not evidence that a Momentum effect exists. `results/universe_study_test_ledger.csv` counts every family of intervals by status: 507 intervals, of which 33 exclude zero across all families, 2 of them among the 51 registered intervals (the 33 registered signal tests contribute none), and lists 45 yearly descriptive intervals, 2 of which exclude zero, separately. The counts show how much was tried and are not a significance level for the set.
 
 ## Explore
@@ -106,7 +121,7 @@ The images in `docs/img/` are captured from the dashboard pages with `python scr
 <details>
 <summary><b>Hypotheses and method</b></summary>
 
-Momentum is the return from the close 12 months before the trade date to the close of the previous month. No month is skipped, so the most recent month, whose return tends to reverse, is part of the signal. A true 12-1 version, which does skip it, was run as a labelled sensitivity (Amendment 15, shown below) and changes no reading. Momentum was documented by Jegadeesh and Titman (Journal of Finance, 1993). Common explanations, which this study does not test, are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
+Momentum for month t is the price at the end of month t-1 divided by the price at the end of month t-12, minus 1, an 11-month return. No month is skipped, so the most recent month, whose return tends to reverse, is part of the signal. A true 12-1 version, which does skip it, was run as a labelled sensitivity (Amendment 15, shown below) and changes no reading. Momentum was documented by Jegadeesh and Titman (Journal of Finance, 1993). Common explanations, which this study does not test, are slow incorporation of news and investor under-reaction. Value is the negative price-to-book ratio, which may compensate for distress risk or reflect over-pessimism. Neither premium is expected to be large among liquid, heavily analysed large caps, so a null result is a plausible outcome. Combined is the average of the two cross-sectional z-scores, with the 50/50 weighting fixed before testing.
 
 1. **Timing.** A signal dated t uses only information available at the end of month t-1 and is held through month t.
 2. **Primary evidence.** Rank IC, quintile spread and Fama-MacBeth slopes (single and joint), each with a bootstrap interval.
@@ -172,11 +187,11 @@ The files are `results/universe_study_*_momentum_skip_month.csv` and `results/un
 
 | When | Defect | Effect |
 |---|---|---|
-| Sep 2026 | Value used the month-end price instead of the previous month-end, a one-month look-ahead. | Raised the 17-stock Value Sharpe from 0.75 to 0.85, before the split fix below. The bug had penalised Value. |
+| Sep 2026 | Value used the month-end price instead of the previous month-end, a one-month look-ahead. | Raised the 17-stock Value Sharpe from 0.75 to 0.85 (0.86 after the second correction below), before the split fix below. The bug had penalised Value. |
 | Sep 2026 | The first download missed 31 December 2024, because the `yfinance` end date is exclusive. | About 0.01 of Sharpe. |
 | Oct 2026 | Price-to-book was too low for stocks that split their shares (Walmart 2024, NextEra 2020): Yahoo rewrites old prices after a split and SEC book value per share does not change. | 17-stock in-sample Value Sharpe fell from 0.86 to about 0.61, below the benchmark's 0.81. Alpha moved from +2.9% (t = 0.62) to about -0.9% (t = -0.17). Out-of-sample results are essentially unchanged. See `results/value_split_*.csv` and Amendment 8. |
 | Oct 2026 | Some SEC filings report share counts under two tags that differ by more than 100 times (177 tag pairs in 155 filings, counted in `results/universe_study_bv_jumps.csv`), giving absurd price-to-book ratios. | Such filings carry no book value. Results were also run with winsorised P/B and with 24 and 37 names excluded. |
-| Nov 2026 | Momentum was described as 12-1, skipping the most recent month. The code uses the return from 12 months before the trade date to the end of the previous month, with no month skipped. | No reading changes. A true 12-1 version gives a similar rank IC (mean +0.005 against +0.008, monthly series correlation 0.97, no interval excluding zero). The description was corrected; see Amendment 15 and the `_momentum_skip_month` files. |
+| Nov 2026 | Momentum was described as 12-1, skipping the most recent month. The code uses the return from the end of month t-12 to the end of month t-1, an 11-month return, with no month skipped. | No reading changes. A true 12-1 version gives a similar rank IC (mean +0.005 against +0.008, monthly series correlation 0.97, no interval excluding zero). The description was corrected; see Amendment 15 and the `_momentum_skip_month` files. |
 
 </details>
 
@@ -204,7 +219,7 @@ python -m scripts.universe.run_universe_holdings        # holdings and per-stock
 python -m scripts.universe.run_universe_survivorship_scenario --write --registered 19   # scenario table (Amendment 19)
 python -m scripts.universe.make_test_ledger --write --registered 19                     # test ledger by family (Amendment 19)
 python -m scripts.universe.generate_universe_dashboard_data   # assets/universe_*_data.js (never overwrites)
-python -m pytest tests/ -q                              # more than 570 tests, no network needed
+python -m pytest tests/ -q                              # the test suite, no network needed
 ```
 
 Rerunning a result-writing script in a fresh clone stops at the first existing file. To regenerate a result, write it to a new folder or move the old file first.
@@ -246,7 +261,7 @@ CLAUDE.md                     standing rules for the AI coding assistant used on
 <details>
 <summary><b>Earlier study: 17 stocks</b></summary>
 
-A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-specified months it had not seen (January 2025 to August 2026). The benchmark had the highest out-of-sample Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum) and no strategy could be statistically distinguished from it. Value's in-sample edge does not survive the split correction. Some first-study scripts and result files, such as the robustness grid, keep the momentum labels 12-1, 9-1 and 6-1 as published; each is the return from 12, 9 or 6 months before the trade date to the end of the previous month, with no month skipped (Amendment 15). The write-up is in [`docs/STUDY_17_STOCKS.md`](docs/STUDY_17_STOCKS.md).
+A fixed set of 17 large caps, tested in sample (2021 to 2024) and on 20 pre-specified months it had not seen (January 2025 to August 2026). The benchmark had the highest out-of-sample Sharpe ratio (1.89, against 1.72 for Combined, 1.53 for Value and 1.05 for Momentum) and no strategy could be statistically distinguished from it. Value's apparent in-sample advantage does not survive the split correction. Some first-study scripts and result files, such as the robustness grid, keep the momentum labels 12-1, 9-1 and 6-1 as published; each is the return from 12, 9 or 6 months before the trade date to the end of the previous month, with no month skipped (Amendment 15). The write-up is in [`docs/STUDY_17_STOCKS.md`](docs/STUDY_17_STOCKS.md).
 
 </details>
 

@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<script src="assets/theme.js?v=18"></script>
-<link rel="stylesheet" href="assets/styles.css?v=18">
+<script src="assets/theme.js?v=19"></script>
+<link rel="stylesheet" href="assets/styles.css?v=19">
 </head>
 <body>
 <div id="chrome"></div>
@@ -123,7 +123,7 @@
 <script src="assets/universe_extras_data.js"></script>
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=18"></script>
+<script src="assets/dashboard.js?v=19"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;
@@ -197,7 +197,7 @@ drawSignalForest();
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + spct(i.parsed.y, 1) + " a year" } } },
-        scales: { y: { min: yMin, max: yMax, ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 6 } }, x: { grid: { display: false } } }
+        scales: { y: { min: yMin, max: yMax, ticks: { callback: v => tm((v * 100).toFixed(0) + "%"), maxTicksLimit: 6 } }, x: { grid: { display: false } } }
       }
     });
     const rows = spreads[si].map((r, i) => ({ sig, plain: true, label: PERIODS[i].label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, excl: r.excludes_zero }));

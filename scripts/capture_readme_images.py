@@ -19,11 +19,11 @@ CHROME = sys.argv[3] if len(sys.argv) > 3 else None
 ONLY = set(sys.argv[4].split(",")) if len(sys.argv) > 4 else None  # optional: only these file names
 
 # (file name, page, URL hash, heading text that identifies the panel)
-# Every image shows the exhibit only: title, subtitle, legend and chart or table. The dashboard's own
-# "Exhibit n" number, its caption paragraphs and its source line are hidden, because the README names
-# and explains each image in its own text and the dashboard numbers its panels per page. The status
-# word (Registered, Exploratory and so on) stays.
-HIDE = ".exh .exn, .src, .formula, .panel .caption"
+# Every image shows the chart or table only: title, subtitle, legend and the chart itself. The dashboard's own status strip
+# (its "Exhibit n" number and its status word), caption paragraphs, formula boxes and source line are hidden, because the
+# README names each image, gives its status in a line above it and explains it in its own text, and the dashboard numbers
+# its panels per page. The series key above the growth chart stays, because it says which line is solid, dashed and dotted.
+HIDE = ".exh, .exh-key, .src, .formula, .panel .caption:not(.series-key)"
 SHOTS = [
     ("01-registered-tests.png", "index.html", "", "No registered signal test"),
     ("03-sharpe-differences.png", "portfolios.html", "", "#leadTitle"),

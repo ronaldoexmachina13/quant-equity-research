@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Method | Equity Factor Research</title>
-<script src="assets/theme.js?v=18"></script>
-<link rel="stylesheet" href="assets/styles.css?v=18">
+<script src="assets/theme.js?v=19"></script>
+<link rel="stylesheet" href="assets/styles.css?v=19">
 </head>
 <body>
 <div id="chrome"></div>
@@ -46,11 +46,11 @@
     <h2>Design <span>in the order it was applied</span></h2>
     <ol class="step-list">
       <li><div><b>Question.</b> Do simple momentum and value signals rank large US stocks by next-month return, and do portfolios built from them beat an equal-weight benchmark?</div></li>
-      <li><div><b>Signals.</b> Momentum is the return from 12 months before the trade date to the end of the previous month, with no month skipped. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied to improve a result. A true 12-1 version was run afterwards as a labelled sensitivity (Amendment 15) and changes no reading.</div></li>
+      <li><div><b>Signals.</b> Momentum for month t is the price at the end of month t-1 divided by the price at the end of month t-12, minus 1, an 11-month return, with no month skipped. Value is the negative price-to-book ratio. Combined is the average of the two cross-sectional z-scores. Definitions were frozen from the 17-stock study. No lookback, weight or threshold was varied to improve a result. A true 12-1 version was run afterwards as a labelled sensitivity (Amendment 15) and changes no reading.</div></li>
       <li><div><b>Timing.</b> A signal dated t uses only information available at the end of month t-1 and is held through month t. Book value is aligned to the date each filing became public.</div></li>
       <li><div><b>Primary evidence.</b> Rank IC, quintile spread and Fama-MacBeth slopes, each with a 90% bootstrap interval (5,000 resamples, seed 42). Two test periods are reported separately, 2012 to 2020 and 2021 to 2026, plus the full sample.</div></li>
       <li><div><b>Secondary evidence.</b> Top-decile and top-quintile portfolios at equal weight, rebalanced monthly, with 10 bps one-way costs charged on drift-inclusive turnover. The Sharpe difference against the benchmark is tested with a paired bootstrap using the Treasury bill rate.</div></li>
-      <li><div><b>Reading rule.</b> A difference counts only if its 90% interval excludes zero, and portfolio results are read only next to the signal tests. The headline holds 18 intervals, so about two would exclude zero by chance.</div></li>
+      <li><div><b>Reading rule.</b> A difference counts only if its 90% interval excludes zero, and portfolio results are read only next to the signal tests. The headline holds 18 intervals, so about 1.8 would be expected to exclude zero by chance on average.</div></li>
     </ol>
   </div>
 
@@ -63,7 +63,7 @@
       <li><div><b>Universe.</b> Large, liquid S&amp;P 500 names are expected to be a harder place to find a factor premium, because they are closely analysed and cheap to trade. That is a hypothesis, not tested here.</div></li>
       <li><div><b>Signals.</b> Price-to-book is not sector-adjusted, Momentum is not volatility-scaled, and there is no quality factor.</div></li>
       <li><div><b>Costs.</b> A flat 10 bps one way, with no market impact or capacity analysis.</div></li>
-      <li><div><b>Multiplicity.</b> 18 headline portfolio intervals at the 90% level, so about two would exclude zero by chance.</div></li>
+      <li><div><b>Multiplicity.</b> 18 headline portfolio intervals at the 90% level, so about 1.8 would be expected to exclude zero by chance on average. The comparisons overlap, so exclusions would cluster.</div></li>
       <li><div><b>Sharpe convention.</b> The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. It was recomputed from the saved monthly returns after the results and is not saved in a result file or part of the registered tests. Of the 18 differences, 17 are smaller (15 of them by 5% to 25%) and one is about 19% larger (Momentum top decile, 2021 to 2026).</div></li>
       <li><div><b>Inference.</b> A four-factor Fama-French regression was added after the results (Amendment 18): none of the 18 portfolio-period regressions of the registered portfolios has an alpha interval that excludes zero, before costs. Newey-West and block-bootstrap intervals were added after the results (Amendment 14) and give the same result as the registered ones: none of the 33 signal tests excludes zero under any method.</div></li>
     </ol>
@@ -72,7 +72,7 @@
   <div class="section-label">Glossary <span>terms used on every page</span></div>
   <div class="panel">
     <dl class="def" id="glossary">
-      <dt>Registered, Exploratory, Sensitivity, Descriptive</dt><dd>Registered: specified before any result and counted toward the headline. Exploratory: added after the results and never counted toward the headline. Sensitivity: a registered test under a changed assumption. Descriptive: no test.</dd>
+      <dt>Registered, Exploratory, Sensitivity, Descriptive</dt><dd>Registered: written into the plan before the result it concerns existed, and counted in the registered totals. Exploratory: added after the results and not counted in the registered totals. Sensitivity: a registered test repeated under a changed assumption and counted separately. Descriptive: a summary of the data with no test.</dd>
       <dt>Rank IC</dt><dd>Each month, the Spearman rank correlation between the signal and the next month's stock returns across stocks, averaged over months.</dd>
       <dt>Quintile spread</dt><dd>Average return of the top fifth of stocks by signal minus that of the bottom fifth.</dd>
       <dt>Fama-MacBeth slope</dt><dd>Each month, the slope from a cross-sectional regression of next-month returns on the signal; the average slope over months.</dd>
@@ -94,7 +94,7 @@
 
   <div class="tabpane" id="pane-log" hidden>
     <div class="panel">
-      <h2 id="tlTitle">Registration log</h2>
+      <h2 id="tlTitle">Plan log</h2>
       <p class="caption" id="planLogLine" style="margin:-0.3rem 0 0.8rem;"></p>
       <div class="legend-row"><span><i class="sq-pre"></i>Written before any result it concerns</span><span><i class="sq-post"></i>Written after every registered result existed (exploratory)</span><span><i class="sq-os"></i>17-stock study plan</span></div>
       <svg class="timeline" id="timeline" role="img" aria-label="Dated entries of the pre-specification"></svg>
@@ -136,7 +136,7 @@
 <script src="assets/universe_data.js"></script>
 <script src="assets/meta_data.js"></script>
 <script src="assets/universe_ledger_data.js"></script>
-<script src="assets/dashboard.js?v=18"></script>
+<script src="assets/dashboard.js?v=19"></script>
 <script>
 renderChrome("method.html", "Pre-specified design &middot; frozen signals &middot; no tuning &middot; every variant reported");
 document.getElementById("planLogLine").textContent = planLogSentence();
@@ -155,12 +155,12 @@ document.getElementById("planLogLine").textContent = planLogSentence();
     t += `<tr><td>${esc(r.family_id)}</td><td>${esc(r.family)}</td><td class="num">${r.intervals_run}</td><td class="num">${r.exclude_zero}</td><td class="num">${r.exclude_zero_positive}</td><td class="num">${r.exclude_zero_negative}</td><td class="num">${chance(r)}</td></tr>`;
   });
   document.getElementById("ledgerFull").innerHTML = t + "</tbody>";
-  document.getElementById("ledgerFullCaption").textContent = "Every family of 90% intervals the study computed, by the tiers used in the ledger file. The descriptive family is listed but not counted in the title. Family S1 includes the tests of the true 12-1 Momentum signal, which have no page of their own (results/universe_study_signal_summary_momentum_skip_month.csv). The last column is ten percent of the intervals run. The families overlap heavily, so the counts show how much was tried and are not a significance level for the set.";
+  document.getElementById("ledgerFullCaption").textContent = "Every family of 90% intervals the study computed, by the tiers used in the ledger file. The descriptive family is listed but not counted in the title. Family S1 includes the tests of the true 12-1 Momentum signal, which have no page of their own (results/universe_study_signal_summary_momentum_skip_month.csv). The 12-1 tests were specified in Amendment 15, after every registered result existed and before their code was run. The last column is ten percent of the intervals run. The families overlap heavily, so the counts show how much was tried and are not a significance level for the set.";
 })();
 
 const PAGE_TABS = [
   { key: "design", label: "Design and limits" },
-  { key: "log", label: "Registration log" },
+  { key: "log", label: "Plan log" },
   { key: "power", label: "Power" },
   { key: "ledger", label: "Test ledger" }
 ];
@@ -174,7 +174,7 @@ function showTab(key, fromClick) {
   Object.values(Chart.instances).forEach(c => c.resize());
 }
 
-/* Registration log. Dates, headings and "written before" wording come from the plan file through meta_data.js.
+/* Plan log. Dates, headings and "written before" wording come from the plan file through meta_data.js.
    CONCERNS is the only hand-typed part: one short topic per entry. An entry missing from it shows a dash and warns in the console. */
 const OS_ENTRIES = [
   { id: "OS-A1", date: "2026-09-24", concerns: "Value look-ahead fix", note: "Before any data after 31 December 2024 was downloaded", kind: "os" },
@@ -204,7 +204,7 @@ document.getElementById("regBody").innerHTML = LOG.map(e =>
   let s = `<line x1="${left - 8}" x2="${W - right + 8}" y1="${axisY}" y2="${axisY}" stroke="${cssVar("--line-strong")}"/>`;
   LOG.forEach(e => {
     const k = seen[e.date] = (seen[e.date] || 0) + 1, cx = x(e.date), cy = axisY - 4 - k * step + 6;
-    const fill = e.kind === "pre" ? cssVar("--amber") : e.kind === "post" ? "none" : cssVar("--p1");
+    const fill = e.kind === "pre" ? cssVar("--text-strong") : e.kind === "post" ? "none" : cssVar("--p1");
     const stroke = e.kind === "post" ? cssVar("--text-strong") : "none";
     s += `<rect x="${cx - 5}" y="${cy - 5}" width="10" height="10" fill="${fill}" stroke="${stroke}" stroke-width="1.6"><title>${e.id}, ${e.date}: ${e.concerns}</title></rect>`;
   });

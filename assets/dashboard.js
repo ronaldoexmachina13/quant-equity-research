@@ -33,6 +33,7 @@ const SIGNALS = ["Momentum", "Value", "Combined"];
 const U = UNIVERSE;
 const MINUS = "−";
 
+const tm = s => String(s).replace(/-/g, MINUS);   /* true minus on axis labels, as in the values */
 function sgn(x, d) { return (x < 0 ? MINUS : "+") + Math.abs(x).toFixed(d); }
 function pct(x, d) { return (x * 100).toFixed(d).replace(/^-/, MINUS) + "%"; }
 function spct(x, d) { return (x < 0 ? MINUS : "+") + Math.abs(x * 100).toFixed(d) + "%"; }
@@ -68,7 +69,7 @@ function forest(svgId, rows, fmt, domain) {
   for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) {
     const tv = Math.abs(t) < step / 1000 ? 0 : t;
     s += `<line x1="${x(tv)}" x2="${x(tv)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--grid")}"/>` +
-         `<text class="muted" x="${x(tv)}" y="${H - bottom + 17}" text-anchor="middle">${fmt.axis(tv)}</text>`;
+         `<text class="muted" x="${x(tv)}" y="${H - bottom + 17}" text-anchor="middle">${tm(fmt.axis(tv))}</text>`;
   }
   s += `<line x1="${left}" x2="${W - right}" y1="${H - bottom}" y2="${H - bottom}" stroke="${cssVar("--line-strong")}"/>`;
   s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${H - bottom}" stroke="${cssVar("--text")}" stroke-width="1"/>`;
@@ -100,7 +101,7 @@ function forest(svgId, rows, fmt, domain) {
 function familyForest(svgId, blocks, opt) {
   opt = opt || {};
   const small = !!opt.small, compact = small || window.innerWidth < 640;
-  const W = small ? 360 : compact ? 390 : 860, Lw = small ? 84 : compact ? 150 : 215, Rw = small ? 22 : compact ? 6 : 192;
+  const W = small ? 360 : compact ? 390 : 860, Lw = small ? 84 : compact ? 150 : 215, Rw = small ? 22 : compact ? 18 : 208;
   const rowH = opt.rowH || 16, x0 = Lw, x1 = W - Rw, mid = (x0 + x1) / 2, half = (x1 - x0) / 2 - 4;
   const niceHalf = h => { const mag = Math.pow(10, Math.floor(Math.log10(h))), n = h / mag; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * mag; };
   let y = 2, s = "";
@@ -128,7 +129,7 @@ function familyForest(svgId, blocks, opt) {
     s += body;
     s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--text")}"/>` +
          `<line x1="${x0 - 4}" x2="${x1 + 4}" y1="${bottom}" y2="${bottom}" stroke="${cssVar("--line-strong")}"/>`;
-    [-h, 0, h].forEach(v => { s += `<text class="muted ax" x="${x(v)}" y="${bottom + 15}" text-anchor="middle">${b.fmt.axis(v)}</text>`; });
+    [-h, 0, h].forEach(v => { s += `<text class="muted ax" x="${x(v)}" y="${bottom + 15}" text-anchor="middle">${tm(b.fmt.axis(v))}</text>`; });
     y = bottom + 30;
   });
   const svg = document.getElementById(svgId);
@@ -244,7 +245,7 @@ function lineChart(canvasId, datasets, yTick, tipFmt, withSplit, splitAtBottom, 
       responsive: true, maintainAspectRatio: false, layout: { padding: { right: endLabelPad(datasets) } },
       interaction: { mode: "index", intersect: false },
       plugins: { legend: { display: false }, endLabels: { enabled: WIDE() }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + tipFmt(i.parsed.y) } } },
-      scales: { y: { ticks: { callback: yTick, maxTicksLimit: 7 } }, x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: window.innerWidth < 600 ? 5 : 8 }, grid: { display: false } } }
+      scales: { y: { ticks: { callback: v => tm(yTick(v)), maxTicksLimit: 7 } }, x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: window.innerWidth < 600 ? 5 : 8 }, grid: { display: false } } }
     },
     plugins: withSplit ? [makeSplitLine(!!splitAtBottom, noSplitLabels)] : []
   });
@@ -372,6 +373,19 @@ function renderChrome(active, subtitle) {
 /* Exhibit labels: every .panel with a data-src attribute is numbered in page order, gets a strip with its status
    (from data-stamp) and a source line naming the committed CSVs. Only attributes are read; no numbers are made here. */
 const STATUS_LABEL = { registered: "Registered", exploratory: "Exploratory", sensitivity: "Sensitivity", descriptive: "Descriptive" };
+/* One plain-language definition per status. STATUS_GLOSS is the tooltip on the stamp and the glossary wording; STATUS_KEY is the sentence in the one-line key under each page's lede. */
+const STATUS_GLOSS = {
+  registered: "Written into the plan before the result it concerns existed, and counted in the registered totals.",
+  exploratory: "Added after the results and not counted in the registered totals.",
+  sensitivity: "A registered test repeated under a changed assumption and counted separately.",
+  descriptive: "A summary of the data with no test."
+};
+const STATUS_KEY = {
+  registered: "Registered panels were written into the plan before their results existed and are counted in the registered totals.",
+  exploratory: "Exploratory panels were added after the results and are not counted.",
+  sensitivity: "Sensitivity panels repeat a registered test under a changed assumption and are counted separately.",
+  descriptive: "Descriptive panels summarise the data and test nothing."
+};
 function renderExhibits() {
   const last = ymLabel(U.dates[U.dates.length - 1]);
   let n = 0;
@@ -380,13 +394,20 @@ function renderExhibits() {
     const st = panel.dataset.stamp;
     const head = document.createElement("div");
     head.className = "exh";
-    head.innerHTML = `<span class="exn">Exhibit ${n}</span>` + (STATUS_LABEL[st] ? `<span class="stamp stamp-${st}">${STATUS_LABEL[st]}</span>` : "");
+    head.innerHTML = `<span class="exn">Exhibit ${n}</span>` + (STATUS_LABEL[st] ? `<span class="stamp stamp-${st}" title="${STATUS_GLOSS[st]}">${STATUS_LABEL[st]}</span>` : "");
     panel.insertBefore(head, panel.firstChild);
     const src = document.createElement("p");
     src.className = "src";
     src.innerHTML = `<b>Source</b>${panel.dataset.src} &middot; data through ${last}`;
     panel.appendChild(src);
   });
+  /* one-line status key under the page lede, listing only the statuses that occur on this page */
+  const lede = document.querySelector(".hero .lede");
+  if (lede && !document.querySelector(".exh-key")) {
+    const present = Object.keys(STATUS_KEY).filter(k => document.querySelector('.panel[data-stamp="' + k + '"]'));
+    const text = document.getElementById("glossary") ? "Status labels are defined in the glossary below." : present.map(k => STATUS_KEY[k]).join(" ");
+    if (text) { const key = document.createElement("p"); key.className = "exh-key"; key.textContent = text; lede.insertAdjacentElement("afterend", key); }
+  }
 }
 /* Amendment log: the newest dated entries of the pre-specification, read from assets/meta_data.js */
 function renderTape(containerId, count) {
@@ -453,7 +474,7 @@ function defList(body) {
 }
 const DEFINITIONS = {
   Momentum: {
-    body: "<p><b>Construction.</b> The signal is the return from 12 months before the trade date to the end of the previous month. No month is skipped, so the latest month's return, which tends to reverse, is included. Each month the stocks with usable prices are ranked. The top decile (about 40 names) or top quintile (about 80) is held at equal weight until the next month.</p><p><b>Hypothesis.</b> Candidate explanations are slow incorporation of news and investor under-reaction, so recent winners may keep outperforming for a while.</p><p><b>Failure modes.</b> Momentum is exposed to sharp reversals at market turning points, and its holdings turn over quickly, so costs matter.</p>",
+    body: "<p><b>Construction.</b> The signal for month t is the price at the end of month t-1 divided by the price at the end of month t-12, minus 1, an 11-month return. No month is skipped, so the latest month's return, which tends to reverse, is included. Each month the stocks with usable prices are ranked. The top decile (36 to 50 names, 44 on average) or top quintile (71 to 100 names, 88 on average) is held at equal weight until the next month.</p><p><b>Hypothesis.</b> Candidate explanations are slow incorporation of news and investor under-reaction, so recent winners may keep outperforming for a while.</p><p><b>Failure modes.</b> Momentum is exposed to sharp reversals at market turning points, and its holdings turn over quickly, so costs matter.</p>",
     note: "Momentum uses prices only, so the book-value sensitivities do not apply to it."
   },
   Value: {
