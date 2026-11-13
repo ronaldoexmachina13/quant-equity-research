@@ -7,6 +7,7 @@ from src.database import load_book_value
 from src.portfolio import build_portfolio
 from src.backtest import calculate_monthly_returns, run_backtest, calculate_benchmark_returns
 from src.risk import bootstrap_sharpe_diff, sharpe_ratio, alpha_regression
+from src.output_guard import refuse_to_overwrite
 
 
 def compute_all_scores(prices: pd.DataFrame, book_value: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -22,7 +23,11 @@ def backtest_strategy(score_df: pd.DataFrame, monthly_returns: pd.DataFrame, top
     return run_backtest(weights, monthly_returns).loc[valid_dates]
 
 
+OUTPUT_FILES = ["results/significance_test.csv", "results/alpha_significance.csv"]
+
+
 if __name__ == "__main__":
+    refuse_to_overwrite(OUTPUT_FILES)
     prices = load_prices()
     book_value = load_book_value()
     monthly_returns = calculate_monthly_returns(prices)

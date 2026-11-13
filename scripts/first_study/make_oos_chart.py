@@ -11,6 +11,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
+from src.output_guard import refuse_to_overwrite
 
 ORDER = ["Momentum", "Value", "Combined", "Benchmark"]
 COLORS = {"Momentum": "#3ED88A", "Value": "#29B6F6", "Combined": "#FFB000", "Benchmark": "#FFFFFF"}
@@ -19,6 +20,7 @@ BG, TEXT, MUTED, GRID = "#000000", "#E8E8E8", "#8A8A8A", "#2A2A2A"
 plt.rcParams["font.family"] = "monospace"
 plt.rcParams["font.monospace"] = ["DejaVu Sans Mono", "Consolas", "Menlo"]
 
+refuse_to_overwrite(["results/oos_growth.png"])
 returns = pd.read_csv("results/oos_monthly_returns.csv", index_col="date", parse_dates=True)[ORDER]
 
 # Growth of 1 invested at the end of the month before the first return

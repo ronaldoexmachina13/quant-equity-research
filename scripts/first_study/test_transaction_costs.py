@@ -7,6 +7,7 @@ from src.database import load_book_value
 from src.portfolio import build_portfolio
 from src.backtest import calculate_monthly_returns, run_backtest, calculate_benchmark_returns, calculate_turnover, apply_transaction_costs
 from src.risk import summarize_risk
+from src.output_guard import refuse_to_overwrite
 
 COST_BPS = 10  # one-way, in basis points -- see README for the reasoning
 
@@ -18,7 +19,11 @@ def compute_all_scores(prices: pd.DataFrame, book_value: pd.DataFrame) -> dict[s
     return {"Momentum": momentum, "Value": value, "Combined": combined}
 
 
+OUTPUT_FILES = ["results/transaction_cost_impact.csv"]
+
+
 if __name__ == "__main__":
+    refuse_to_overwrite(OUTPUT_FILES)
     prices = load_prices()
     book_value = load_book_value()
     monthly_returns = calculate_monthly_returns(prices)

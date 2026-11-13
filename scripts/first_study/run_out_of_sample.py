@@ -23,6 +23,7 @@ from src.backtest import (
 )
 from src.risk import summarize_risk, alpha_regression, bootstrap_sharpe_diff, sharpe_ratio
 from scripts.first_study.run_strategy_comparison import compute_all_scores, backtest_strategy_with_weights, compare_within_period
+from src.output_guard import refuse_to_overwrite
 
 COST_BPS = 10          # same one-way cost as test_transaction_costs.py
 TOP_N = 5              # frozen portfolio size
@@ -44,7 +45,11 @@ OOS_YEARS = {
 }
 
 
+OUTPUT_FILES = ["results/oos_summary.csv", "results/oos_monthly_returns.csv", "results/oos_by_year.csv"]
+
+
 def main():
+    refuse_to_overwrite(OUTPUT_FILES)
     prices = load_prices()
     book_value = load_book_value()
     monthly_returns = calculate_monthly_returns(prices)

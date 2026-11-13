@@ -13,6 +13,7 @@ from src.database import load_book_value, save_portfolio_weights, save_performan
 from src.portfolio import build_portfolio
 from src.backtest import calculate_monthly_returns, run_backtest, calculate_benchmark_returns
 from src.risk import summarize_risk
+from src.output_guard import refuse_to_overwrite
 
 
 def compute_all_scores(prices: pd.DataFrame, book_value: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -160,7 +161,17 @@ def build_performance_long_df(strategy_returns: dict, benchmark_returns: pd.Seri
     return df
 
 
+OUTPUT_FILES = [
+    "results/backtest_metadata.json",
+    "results/strategy_comparison_full_period.csv",
+    "results/strategy_comparison_2021_2022.csv",
+    "results/strategy_comparison_2023_2024.csv",
+    "results/strategy_comparison_concentration.csv",
+]
+
+
 if __name__ == "__main__":
+    refuse_to_overwrite(OUTPUT_FILES)
     prices = load_prices()
     book_value = load_book_value()
     monthly_returns = calculate_monthly_returns(prices)
