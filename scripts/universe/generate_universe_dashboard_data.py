@@ -199,7 +199,7 @@ def write_stocks():
             "months_held_momentum", "contribution_momentum", "months_held_value", "contribution_value",
             "months_held_combined", "contribution_combined"]
     rows = [[clean(r[c]) for c in cols] for _, r in frame.iterrows()]
-    write_js(STOCKS_OUT, "UNIVERSE_STOCKS", {"columns": cols, "rows": rows}, str(source))
+    write_js(STOCKS_OUT, "UNIVERSE_STOCKS", {"columns": cols, "rows": rows}, source.as_posix())
 
 
 def write_holdings():
@@ -216,11 +216,13 @@ def write_holdings():
     holdings = {}
     for strategy, part in frame.groupby("strategy"):
         by_month = [[] for _ in months]
-        for r in part.itertuples():
-            by_month[index[r.date]].append([r.ticker, round(r._6, 4), round(r.score, 3)])
+        # Columns are read by name. itertuples() renames "return" (a Python keyword) to a position-based
+        # name, which would silently point at another column if the file's column order changed.
+        for date, ticker, held_return, score in zip(part["date"], part["ticker"], part["return"], part["score"]):
+            by_month[index[date]].append([ticker, round(held_return, 4), round(score, 3)])
         holdings[strategy] = by_month
     write_js(HOLDINGS_OUT, "UNIVERSE_HOLDINGS", {"months": months, "columns": ["ticker", "return", "score"],
-                                                  "holdings": holdings}, str(source))
+                                                  "holdings": holdings}, source.as_posix())
 
 
 def write_extras():
