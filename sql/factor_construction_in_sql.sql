@@ -85,7 +85,10 @@ SELECT
 FROM monthly_prices p
 JOIN book_value b
     ON b.ticker = p.ticker
-    AND b.date = p.date
+    -- Prices are dated on the last trading day and book values on the calendar month
+    -- end, so the two are matched by calendar month. Matching on the exact date would
+    -- drop every month that ends on a weekend.
+    AND strftime('%Y-%m', b.date) = strftime('%Y-%m', p.date)
 ORDER BY p.ticker, p.date;
 
 

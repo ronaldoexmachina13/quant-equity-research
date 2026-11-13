@@ -13,27 +13,37 @@
 
 -- ----------------------------------------------------------------------------
 -- 1. Monthly turnover by strategy.
--- A ticker held last month and still held this month contributes 0 to
--- turnover; a ticker entering or exiting contributes 1. Matches the README's
--- definition: "a stock that stays held doesn't get charged again."
+-- A ticker held at the previous rebalance date and still held now contributes 0 to
+-- turnover; a ticker that was not held at the previous date contributes 1. A ticker
+-- that leaves and comes back counts as an entry when it comes back. The previous date
+-- is the previous date of the same strategy, not the previous row of the ticker.
+-- Matches the README's definition: "a stock that stays held doesn't get charged again."
 -- ----------------------------------------------------------------------------
-WITH membership AS (
+WITH rebalance_dates AS (
     SELECT
         strategy,
-        ticker,
         date,
-        1 AS held,
-        LAG(1, 1, 0) OVER (
-            PARTITION BY strategy, ticker ORDER BY date
-        ) AS held_prev_month
-    FROM portfolio_weights
+        LAG(date) OVER (PARTITION BY strategy ORDER BY date) AS prev_date
+    FROM (SELECT DISTINCT strategy, date FROM portfolio_weights)
+),
+membership AS (
+    SELECT
+        w.strategy,
+        w.ticker,
+        w.date,
+        CASE WHEN p.ticker IS NULL THEN 1 ELSE 0 END AS is_entry
+    FROM portfolio_weights AS w
+    JOIN rebalance_dates AS d
+        ON d.strategy = w.strategy AND d.date = w.date
+    LEFT JOIN portfolio_weights AS p
+        ON p.strategy = w.strategy AND p.ticker = w.ticker AND p.date = d.prev_date
 ),
 changes AS (
     SELECT
         strategy,
         date,
-        SUM(CASE WHEN held_prev_month = 0 THEN 1 ELSE 0 END) AS entries,
-        COUNT(*)                                              AS total_held
+        SUM(is_entry)  AS entries,
+        COUNT(*)       AS total_held
     FROM membership
     GROUP BY strategy, date
 )
