@@ -353,7 +353,7 @@ const DEFINITIONS = {
     note: ""
   },
   Combined: {
-    body: "<p><b>Construction.</b> The average of the Momentum and Value z-scores, each standardised across stocks every month. The 50/50 weighting was fixed before testing and was not tuned.</p><p><b>Hypothesis.</b> The two signals are typically weakly correlated, so the average may rank more stably than either alone.</p><p><b>Failure modes.</b> It inherits the weaknesses of both signals, and it exists only for stocks with both a price history and a book value.</p>",
+    body: "<p><b>Construction.</b> The average of the Momentum and Value z-scores, each standardised across stocks every month. The 50/50 weighting was fixed before testing and was not tuned.</p><p><b>Hypothesis.</b> If the two signals carry different information, averaging them may rank more stably than either alone. Their monthly rank ICs are negatively correlated (-0.53 over 2012 to 2026).</p><p><b>Failure modes.</b> It inherits the weaknesses of both signals, and it exists only for stocks with both a price history and a book value. In practice Combined is mostly Momentum: over 2012 to 2026 its monthly rank IC has a correlation of +0.98 with Momentum's, and 85.8% of its top-decile name-months are also in Momentum's top decile (73.5% the other way round).</p>",
     note: ""
   }
 };

@@ -74,7 +74,7 @@
         <tbody id="survBody"></tbody>
       </table>
     </div>
-    <p class="caption">Names per month and annualised mean return. Descriptive only, not a correction. Names later removed that still had a price history earned a lower average return than names that stayed, Neither the direction nor the size of the effect of the missing names can be measured without delisting data, since acquired companies often earned a premium and bankrupt ones lost most of their value.</p>
+    <p class="caption">Names per month and annualised mean return. Descriptive only, not a correction. Names later removed that still had a price history earned a lower average return than names that stayed. The groups are formed with hindsight, which is why this is not an estimate of the bias. Neither the direction nor the size of the effect of the missing names can be measured without delisting data, since acquired companies often earned a premium and bankrupt ones lost most of their value.</p>
   </div>
 
   <div class="panel">
@@ -253,7 +253,7 @@ lineChart("covChart", [
     `<tr><td>${ymLabel(U.dates[r.k])}</td><td><span class="swatch" style="background:${COLORS[r.sig]};margin-right:0.4rem"></span>${r.sig}</td><td title="${esc(COMPANY[r.t] || r.t)}"><b>${esc(r.t)}</b></td>` +
     `<td class="num ${r.r < 0 ? "neg" : ""}">${spct(r.r, 0)}</td><td class="num">${spct(r.add, 1)}</td><td class="num">${spct(r.port, 1)}</td></tr>`).join("");
   document.getElementById("outCaption").textContent =
-    "A held name with a single-month return of +100% or more, or -50% or less, listed by how many percentage points it added to its portfolio that month (" + up + " gains and " + (rows.length - up) + " losses). None has been checked against a second price source, and none was removed or altered. A move this size is either a real event or a data error, so a reader should confirm the largest ones before relying on the months they sit in. The March 2020 rows are the market crash in oil, travel and retail names.";
+    "A held name with a single-month return of +100% or more, or -50% or less, listed by how many percentage points it added to its portfolio that month (" + up + " gains and " + (rows.length - up) + " losses). None has been checked against a second price source, and none was removed or altered. A move this size is either a real event or a data error, so a reader should confirm the largest ones before relying on the months they sit in. The March 2020 rows are consistent with the market crash in oil, travel and retail names.";
 })();
 
 /* 1. contributors */

@@ -284,7 +284,7 @@ drawRobust(); drawSens();
   const umd = refs.find(r => r.startsWith("UMD")), hml = refs.find(r => r.startsWith("HML"));
   document.getElementById("frenchCaption").innerHTML =
     "Pearson correlation over the months in each period, with a Fisher 90% interval that treats months as independent and is only indicative. Over the full period the Momentum spread has a correlation of " + sgn(get("Momentum", umd).pearson, 2) +
-    " with UMD, and the Value spread " + sgn(get("Value", hml).pearson, 2) + " with HML. The study uses about 500 current and former index members with equal weights, while French's factors use all US stocks with value weights, so a high correlation is not expected, and the sign and rough size are the check. " +
+    " with UMD, and the Value spread " + sgn(get("Value", hml).pearson, 2) + " with HML. The study uses about 500 current and former index members with equal weights, while French's factors use all US stocks with value weights, so an exact match is not expected, and the sign and rough size are the check. The expectation recorded in Amendment 16 was that the correlation would not be high. The correlations above are high, so that expectation did not hold. " +
     "It is a test of the pipeline, not of the strategy. Factor data: Kenneth French's data library, CRSP database of 202609, stored unchanged for 2011 onward in data/external/french/. Added after the results (Amendment 16).";
 })();
 showTab((location.hash || "").slice(1), false);

@@ -352,11 +352,13 @@ function drawFactor4() {
   document.getElementById("f4Table").innerHTML = t + "</tbody>";
   const mine = F.filter(x => x.variant === f4Variant && x.size === ctlSize && x.basis === "gross");
   const nEx = mine.filter(x => x.alpha_excludes_zero).length;
-  const all = F.length, allEx = F.filter(x => x.alpha_excludes_zero).length;
+  const G = F.filter(x => x.basis === "gross"), all = G.length, allEx = G.filter(x => x.alpha_excludes_zero).length;
+  const allPos = G.filter(x => x.alpha_excludes_zero && x.alpha_annual > 0).length;
+  const reg = G.filter(x => x.variant === "published"), regEx = reg.filter(x => x.alpha_excludes_zero).length;
   document.getElementById("f4Caption").innerHTML =
     "<b>" + F4_LABEL[f4Variant] + ", " + SIZE_LABEL[ctlSize].toLowerCase() + ":</b> " + nEx + " of " + mine.length + " alpha intervals here exclude zero. Alpha is the intercept of the portfolio's excess return over Treasury bills on Kenneth French's market, size (SMB), value (HML) and momentum (Mom) factors, times 12, with Newey-West 90% intervals, before costs. " +
     "The columns are the loadings: how much of each factor the portfolio carried. Loadings are descriptive. French's factors use all US stocks, this study about 500 index members, so they show similarity, not an exact decomposition. " +
-    "Across all " + all + " four-factor regressions (every variant, size, basis and period, which overlap heavily), " + allEx + " intervals exclude zero, against about " + (all * 0.1).toFixed(0) + " expected by chance at the 90% level if they were independent. " +
+    "Across the " + all + " gross four-factor regressions (every variant, size and period, which overlap heavily; the net-of-cost rows repeat them), " + allEx + " intervals exclude zero (" + allPos + " with a positive alpha), against about " + (all * 0.1).toFixed(0) + " expected by chance at the 90% level if they were independent. Of the " + reg.length + " registered portfolios, " + regEx + " exclude zero. " +
     "They join the family of tests, as exploratory, and a single interval that excludes zero is not read on its own. Added after the results (Amendment 18).";
 }
 buttons("f4Variant", Object.keys(F4_LABEL).map(k => ({ key: k, label: F4_LABEL[k] })), f4Variant, k => { f4Variant = k; drawFactor4(); });

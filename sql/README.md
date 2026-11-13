@@ -8,6 +8,8 @@ The SQLite database stores the raw inputs (`prices`, `book_value`) and the backt
 - `factor_construction_in_sql.sql`: Momentum (return from 12 months ago to the previous month-end, no month skipped, so an 11-month return) and Price-to-Book computed from `prices` and `book_value` with window functions and a join, plus a data-coverage diagnostic. Output matches `src/factors.py` (for example, AAPL momentum at the end of December 2024: 0.2387 in SQL, 0.23873 in pandas).
 - `portfolio_and_regime_queries.sql`: monthly turnover by strategy, regime-split (2021–2022 vs 2023–2024) Sharpe ratio and maximum drawdown, and month-by-month holdings overlap between Momentum and Value.
 
+The 500-stock pipeline runs two other SQL files, `universe_at_date.sql` and `universe_coverage.sql`, through `src/universe.py`, and a test checks the first against the Python membership rule. The three files above serve the 17-stock study only.
+
 ## How to run
 
 Run the pipeline first (see "Reproducing this project end-to-end" in the main README). `scripts/first_study/run_strategy_comparison.py` populates `portfolio_weights` (720 rows: 48 months × 5 holdings × 3 strategies) and `performance` (192 rows: 48 months × 4 series). Then run any query file against `database/quant_research.db`, for example with the `sqlite3` command-line tool or DB Browser for SQLite.
