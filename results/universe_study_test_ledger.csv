@@ -1,0 +1,16 @@
+family_id,tier,family,source_files,basis,intervals_run,exclude_zero,exclude_zero_positive,exclude_zero_negative
+R1,Registered,"Signal tests (rank IC, quintile spread, Fama-MacBeth)",signal_summary_momentum; signal_summary_value_combined,not applicable,33,0,0,0
+R2,Registered,"Headline Sharpe differences, gross, against the equal-weight benchmark",portfolio_summary,gross,18,2,0,2
+S1,Sensitivity,"Signal tests: winsorised P/B, two exclusion lists, true 12-1","signal_summary_*_winsorised_pb, _excl_24, _excl_37, _momentum_skip_month",not applicable,96,5,0,5
+S2,Sensitivity,"Sharpe differences: two exclusion lists, true 12-1","portfolio_summary_excl_24, _excl_37, _momentum_skip_month",gross,36,4,0,4
+E1,"Exploratory, after results",Sector-neutral and same-names signal tests,sector_neutral_signal_summary,not applicable,36,0,0,0
+E2,"Exploratory, after results",Sector-neutral and same-names Sharpe differences,sector_neutral_portfolio_summary,gross,24,2,0,2
+E3,"Exploratory, after results","Alpha against the matched equal-weight benchmark, gross",alpha_regression,gross,18,11,9,2
+E4,"Exploratory, after results","Alpha against SPY, gross",alpha_regression,gross,18,1,1,0
+E5,"Exploratory, after results","Four-factor alpha, registered portfolios, gross",alpha_factor4 (published),gross,18,0,0,0
+E6,"Exploratory, after results","Four-factor alpha, same-names Value and Combined, gross",alpha_factor4 (control_same_names),gross,12,4,4,0
+E7,"Exploratory, after results","Four-factor alpha, sector-neutral Value and Combined, gross",alpha_factor4 (sector_neutral),gross,12,4,4,0
+V1,Inference variants,Newey-West and block intervals on the 33 registered signal tests,inference_robustness,not applicable,66,0,0,0
+V2,Inference variants,Newey-West and block intervals on the true 12-1 signal tests,inference_robustness_momentum_skip_month,not applicable,48,0,0,0
+V3,Inference variants,Newey-West and block intervals on the sector-neutral and same-names tests,sector_neutral_inference_robustness,not applicable,72,0,0,0
+D1,"Descriptive, not a test family",Yearly Sharpe-difference intervals on 8 to 12 months,survivorship_by_year,gross,45,2,1,1
