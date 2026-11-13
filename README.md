@@ -10,7 +10,7 @@ The hypothesis is that momentum and value earn a premium among US large caps. Ne
 
 The work uses Python (pandas, NumPy, SciPy, statsmodels, matplotlib), SQLite and SQL for the index-membership and coverage queries and the 17-stock cross-checks, and a static HTML and Chart.js dashboard.
 
-As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 18.
+As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 19.
 
 ![Exhibit 1: rank IC by signal](results/exhibit_1_rank_ic.png)
 
@@ -54,7 +54,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - **No tuning.** Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
 - **Interval choice.** 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of false positives expected by chance is stated beside the result.
 - **Errors found and corrected.** These are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
-- **Tested and reproducible.** More than 400 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
+- **Tested and reproducible.** More than 570 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
 ## Limits
 
@@ -65,6 +65,7 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - Combined is mostly Momentum. Over 2012 to 2026 the monthly rank IC of Combined has a correlation of +0.98 with Momentum's. Of Combined's top-decile name-months, 85.8% are also in Momentum's top decile in the same month (73.5% the other way round; the two universes differ in size, with 353 to 499 usable names for Momentum and 295 to 426 for Combined). The overlap with Value is small: 6.9% of Combined's top-decile name-months are also in Value's, and 4.0% of Momentum's. The Combined results should therefore not be read as a separate test from Momentum's. The monthly rank ICs of Momentum and Value are correlated at -0.53.
 - **Sharpe convention.** The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. It was recomputed from the saved monthly returns after the results and is not saved in a result file or part of the registered tests. Of the 18 differences, 17 are smaller (15 of them by 5% to 25%) and one is about 19% larger (Momentum top decile, 2021 to 2026).
 - **Power.** With 108 months the test detects a mean rank IC of about 0.055 (80% power), so a smaller premium cannot be ruled out.
+- **Survivorship scenario and test ledger (Amendment 19, added after the results).** `results/universe_study_survivorship_scenario.csv` shows how large the missing-names problem would have to be to move the Momentum quintile spread away from zero. It replaces a share s of group 1 (10%, 20% or 30%) with names earning an assumed monthly return r (0%, -2% or -5%). With no adjustment the 90% interval includes zero in all three periods. Under the nine assumed adjustments the interval excludes zero in 4 of 9 rows for 2012 to 2020, 5 of 9 for 2021 to 2026 and 6 of 9 for the full period. The assumptions are illustrative and not estimated, no row is selected, and the rows are not counted as tests, so the table is not evidence that a Momentum effect exists. `results/universe_study_test_ledger.csv` counts every family of intervals by status: 507 intervals, of which 33 exclude zero across all families, 2 of them among the 51 registered intervals (the 33 registered signal tests contribute none), and lists 45 yearly descriptive intervals, 2 of which exclude zero, separately. The counts show how much was tried and are not a significance level for the set.
 
 ## Explore
 
@@ -75,6 +76,8 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 | Portfolios | Do top-ranked stocks beat the benchmark? |
 | Universe | Can the data be trusted, and which names drove the results? |
 | Method | What was done, in what order? |
+
+The pages are dark by default, with a light theme switch in the header; the choice is saved in the browser.
 
 <details>
 <summary><b>Hypotheses and method</b></summary>
@@ -174,8 +177,10 @@ python -m scripts.universe.run_universe_skip_month --write   # true 12-1 sensiti
 python -m scripts.universe.make_data_manifest           # checksums of the raw-data cache; add --verify to compare later
 python -m scripts.universe.make_universe_charts         # the charts and table on this page
 python -m scripts.universe.run_universe_holdings        # holdings and per-stock summary, checked against committed returns
+python -m scripts.universe.run_universe_survivorship_scenario --write --registered 19   # scenario table (Amendment 19)
+python -m scripts.universe.make_test_ledger --write --registered 19                     # test ledger by family (Amendment 19)
 python -m scripts.universe.generate_universe_dashboard_data   # assets/universe_*_data.js (never overwrites)
-python -m pytest tests/ -q                              # more than 400 tests, no network needed
+python -m pytest tests/ -q                              # more than 570 tests, no network needed
 ```
 
 Rerunning a result-writing script in a fresh clone stops at the first existing file. To regenerate a result, write it to a new folder or move the old file first.
