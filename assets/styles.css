@@ -633,3 +633,10 @@ ul.contents .c-q { color: var(--text); font-size: 0.9rem; }
 @media (min-width: 701px) { .mini-stat > .ms-value:first-child + .ms-label { grid-column: 2 / -1; } }
 /* the stacked key-figure table on a phone loses its header row, so each cell names its column */
 @media (max-width: 600px) { .keyfig td[data-label]::before { content: attr(data-label) ": "; color: var(--muted); font-family: var(--sans); font-size: 0.78rem; } }
+
+/* Wide screens: the page was capped at 1160 px with 15 px text, which looks small on a large monitor. Scale type and width together above 1700 px. */
+@media (min-width: 1700px) {
+  html { font-size: 19px; }
+  body { font-size: 18px; }
+  .wrap, .topnav .topnav-inner, .statusbar .statusbar-inner, .subtitle-bar { max-width: 1440px; }
+}
