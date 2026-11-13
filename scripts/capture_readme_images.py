@@ -29,7 +29,7 @@ SHOTS = [
     ("03-sharpe-differences.png", "portfolios.html", "", "#leadTitle"),
     ("04-growth-and-drawdown.png", "portfolios.html", "", "#growthTitle"),
     ("05-plan-log.png", "method.html", "#log", "#tlTitle"),
-    ("06-return-by-group.png", "signals.html", "", "Is the relation monotonic?"),
+    ("06-return-by-group.png", "signals.html", "", "Do returns rise from the lowest signal fifth to the highest?"),
 ]
 
 

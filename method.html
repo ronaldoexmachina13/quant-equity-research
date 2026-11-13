@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Method | Equity Factor Research</title>
-<script src="assets/theme.js?v=22"></script>
-<link rel="stylesheet" href="assets/styles.css?v=22">
+<script src="assets/theme.js?v=23"></script>
+<link rel="stylesheet" href="assets/styles.css?v=23">
 </head>
 <body>
 <div id="chrome"></div>
@@ -136,7 +136,7 @@
 <script src="assets/universe_data.js"></script>
 <script src="assets/meta_data.js"></script>
 <script src="assets/universe_ledger_data.js"></script>
-<script src="assets/dashboard.js?v=22"></script>
+<script src="assets/dashboard.js?v=23"></script>
 <script>
 renderChrome("method.html", "Pre-specified design &middot; frozen signals &middot; no tuning &middot; every variant reported");
 document.getElementById("planLogLine").textContent = planLogSentence();
@@ -147,7 +147,7 @@ document.getElementById("planLogLine").textContent = planLogSentence();
   const counted = L.filter(r => !descriptive(r));
   const run = counted.reduce((a, r) => a + r.intervals_run, 0), ex = counted.reduce((a, r) => a + r.exclude_zero, 0);
   const esc = v => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  document.getElementById("ledgerFullTitle").textContent = run + " intervals in " + counted.length + " families, " + ex + " exclude zero, none of them among the 33 registered signal tests";
+  document.getElementById("ledgerFullTitle").textContent = run + " intervals in " + counted.length + " families; " + ex + " exclude zero, none of them a registered signal test";
   const chance = r => ["Registered", "Sensitivity", "Exploratory, after results"].includes(r.tier) ? (r.intervals_run * 0.1).toFixed(1) : "n/a";
   let t = "<thead><tr><th>ID</th><th>Family</th><th class=num>Run</th><th class=num>Exclude zero</th><th class=num>Positive</th><th class=num>Negative</th><th class=num>Expected by chance</th></tr></thead><tbody>", tier = "";
   L.forEach(r => {
@@ -219,7 +219,7 @@ document.getElementById("regBody").innerHTML = LOG.map(e =>
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.innerHTML = s;
   const post = LOG.filter(e => e.kind === "post").length;
-  document.getElementById("tlTitle").textContent = META.entries.length + " plan entries: " + (META.entries.length - post) + " written before the results they concern, " + post + " after every registered result existed";
+  document.getElementById("tlTitle").textContent = META.entries.length + " plan entries: " + (META.entries.length - post) + " written before the results they concern, " + post + " after every registered result existed (the timeline below also marks the 2 entries of the 17-stock study plan)";
 })();
 
 /* power: (z_alpha + z_power) * sd / sqrt(n), with z_alpha = 1.645 (90% two-sided) and z_power = 0.842 (80%) */

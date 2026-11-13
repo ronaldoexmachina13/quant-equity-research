@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<script src="assets/theme.js?v=22"></script>
-<link rel="stylesheet" href="assets/styles.css?v=22">
+<script src="assets/theme.js?v=23"></script>
+<link rel="stylesheet" href="assets/styles.css?v=23">
 </head>
 <body>
 <div id="chrome"></div>
@@ -41,7 +41,7 @@
     </div>
 
     <div class="panel" data-stamp="exploratory" data-src="results/universe_study_quintile_returns.csv">
-      <h2>Is the relation monotonic? <span>annualised return by signal group, with the Q5 minus Q1 spread and its 90% interval below; one scale for all three signals</span></h2>
+      <h2>Do returns rise from the lowest signal fifth to the highest? <span>annualised return by signal group, with the Q5 minus Q1 spread and its 90% interval below; one scale for all three signals</span></h2>
       <div class="legend-row"><span><i class="ghost-solid"></i>2012 to 2020, new test</span><span><i class="ghost-light"></i>2021 to 2026, re-test</span></div>
       <div class="grp-grid">
         <div><div class="grp-title"><b style="color:var(--momentum-text)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum" role="img" aria-label="Bar chart. Annualised return of the five Momentum signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div><svg class="forest spread" id="qspMomentum" role="img" aria-label="Q5 minus Q1 spread for Momentum: estimate and 90% interval for 2012 to 2020 and 2021 to 2026, against zero, on a scale shared by the three signals"></svg><div class="spread-text" id="qtMomentum"></div></div>
@@ -123,7 +123,7 @@
 <script src="assets/universe_extras_data.js"></script>
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=22"></script>
+<script src="assets/dashboard.js?v=23"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;
