@@ -7,6 +7,7 @@ Chart.defaults.scale.grid.color = "#1B2027";
 Chart.defaults.scale.grid.drawTicks = false;
 Chart.defaults.scale.ticks.padding = 6;
 Chart.defaults.scale.border.display = false;
+Chart.defaults.animation = false;
 Chart.defaults.elements.line.borderWidth = 1.6;
 Chart.defaults.elements.bar.borderRadius = 0;
 Object.assign(Chart.defaults.plugins.tooltip, {
@@ -14,7 +15,7 @@ Object.assign(Chart.defaults.plugins.tooltip, {
   titleColor: "#F2F3F5", bodyColor: "#D9DCE1", titleFont: { weight: "500", size: 10 }, bodyFont: { size: 10 }, boxPadding: 3
 });
 
-const COLORS = { Momentum: "#45B8A6", Value: "#6F9FE6", Combined: "#E3AB42", Benchmark: "#F2F3F5", SPY: "#7B828E" };
+const COLORS = { Momentum: "#45B8A6", Value: "#6F9FE6", Combined: "#D27047", Benchmark: "#F2F3F5", SPY: "#7B828E" };
 const PERIODS = [
   { key: "New test (2012-2020)", label: "2012–2020" },
   { key: "Re-test (2021-2026)", label: "2021–2026" },

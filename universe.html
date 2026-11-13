@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Universe | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=13">
+<link rel="stylesheet" href="assets/styles.css?v=14">
 </head>
 <body>
 <div id="chrome"></div>
@@ -51,7 +51,7 @@
       <span><i style="background:var(--momentum)"></i>Usable for Momentum</span>
       <span><i style="background:var(--value)"></i>Usable for Value and Combined</span>
     </div>
-    <div style="position:relative; height:260px;"><canvas id="covChart"></canvas></div>
+    <div style="position:relative; height:260px;"><canvas id="covChart" role="img" aria-label="Line chart. Index members by month, and how many were usable for Momentum and for Value and Combined."></canvas></div>
     <p class="caption">A name is usable when it has the price history (and, for Value, the book value) the signal needs. Companies that were acquired or went bankrupt mostly have no free price history, so the gap is largest in the early years. Membership is approximate early on: up to about 12 names may be overstated in 2012.</p>
   </div>
 
@@ -133,7 +133,7 @@
       <span><i style="background:var(--combined)"></i>Combined</span>
       <span><i style="background:#F2F3F5"></i>Equal-weight benchmark (Value and Combined usable)</span>
     </div>
-    <div style="position:relative; height:260px;"><canvas id="growthChart"></canvas></div>
+    <div style="position:relative; height:260px;"><canvas id="growthChart" role="img" aria-label="Line chart. Growth of $1 for the top-decile Momentum, Value and Combined portfolios and the equal-weight benchmark, monthly."></canvas></div>
     <p class="caption">Holdings for month t use data up to the end of month t-1 and earn month t's return, so no holding is chosen with knowledge of its own return. Names with no price history, which include most delisted companies, cannot appear, so the list is survivor-biased. Pick a year and month above, click the chart, or use the left and right arrow keys.</p>
   </div>
   <div class="grid3" id="cols"></div>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Portfolios | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=13">
+<link rel="stylesheet" href="assets/styles.css?v=14">
 </head>
 <body>
 <div id="chrome"></div>
@@ -30,7 +30,7 @@
   <div class="panel">
     <h2 id="growthTitle">Growth of $1</h2>
     <div class="legend-row" id="portLegend"></div>
-    <div style="position:relative; height:340px;"><canvas id="growthChart"></canvas></div>
+    <div style="position:relative; height:340px;"><canvas id="growthChart" role="img" aria-label="Line chart, log scale. Growth of $1 for the selected portfolio, its equal-weight benchmark and SPY, monthly."></canvas></div>
     <p class="caption">Log scale, so equal slopes are equal percentage growth. The benchmark is the equal-weight average of every name with usable data for that signal, which isolates the signal from the universe. The two test periods are chained for display and reported separately in the table. Levels are inflated by survivorship, and differences are also affected, so read both with the coverage on the Universe page.</p>
 
   </div>
@@ -51,13 +51,13 @@
   <div class="tabpane" id="pane-risk" hidden>
   <div class="panel">
     <h2 id="ddTitle">Drawdown</h2>
-    <div style="position:relative; height:220px;"><canvas id="ddChart"></canvas></div>
+    <div style="position:relative; height:220px;"><canvas id="ddChart" role="img" aria-label="Line chart. Percentage below the previous high for the selected portfolio, its benchmark and SPY, monthly."></canvas></div>
     <p class="caption">Percentage below each series' previous high, from monthly data, which understates intramonth drawdowns.</p>
   </div>
 
   <div class="panel">
     <h2 id="rollTitle">Rolling 36-month excess return</h2>
-    <div style="position:relative; height:260px;"><canvas id="rollChart"></canvas></div>
+    <div style="position:relative; height:260px;"><canvas id="rollChart" role="img" aria-label="Line chart. Rolling 36-month excess return of the selected portfolio over its benchmark."></canvas></div>
     <p class="caption">Each point is the annualised geometric return of the portfolio minus that of its benchmark over the trailing 36 months. A persistent signal would sit mostly above zero. Sign changes across windows indicate period dependence, which is what an interval that includes zero reflects.</p>
   </div>
 

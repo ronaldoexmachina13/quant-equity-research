@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Method | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=13">
+<link rel="stylesheet" href="assets/styles.css?v=14">
 </head>
 <body>
 <div id="chrome"></div>
@@ -69,7 +69,7 @@
   <div class="panel">
     <h2>Minimum detectable mean rank IC <span>90% two-sided interval, 80% power</span></h2>
     <div class="legend-row" id="powerLegend"></div>
-    <div style="position:relative; height:280px;"><canvas id="powerChart"></canvas></div>
+    <div style="position:relative; height:280px;"><canvas id="powerChart" role="img" aria-label="Line chart. Minimum detectable mean rank IC against months of data, for the highest and lowest standard deviation of monthly rank IC."></canvas></div>
     <p class="caption" id="powerCaption"></p>
   </div>
 
@@ -154,8 +154,8 @@ document.getElementById("regBody").innerHTML = LOG.map(e =>
   const months = []; for (let n = 24; n <= 240; n += 4) months.push(n);
   const curve = sd => months.map(n => Z * sd / Math.sqrt(n));
   const sets = [
-    { label: `SD ${hi.sd.toFixed(2)} (${hi.s}, 2012 to 2020)`, data: curve(hi.sd), borderColor: "#E3AB42", backgroundColor: "#E3AB42" },
-    { label: `SD ${lo.sd.toFixed(2)} (${lo.s}, 2012 to 2020)`, data: curve(lo.sd), borderColor: "#6F9FE6", backgroundColor: "#6F9FE6" }
+    { label: `SD ${hi.sd.toFixed(2)} (${hi.s}, 2012 to 2020)`, data: curve(hi.sd), borderColor: COLORS[hi.s], backgroundColor: COLORS[hi.s] },
+    { label: `SD ${lo.sd.toFixed(2)} (${lo.s}, 2012 to 2020)`, data: curve(lo.sd), borderColor: COLORS[lo.s], backgroundColor: COLORS[lo.s] }
   ];
   document.getElementById("powerLegend").innerHTML = sets.map(s => `<span><i style="background:${s.borderColor}"></i>${s.label}</span>`).join("");
   const marks = { id: "marks", afterDraw(chart) {

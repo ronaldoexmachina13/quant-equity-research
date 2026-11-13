@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=13">
+<link rel="stylesheet" href="assets/styles.css?v=14">
 </head>
 <body>
 <div id="chrome"></div>
@@ -36,9 +36,9 @@
       <h2>Return by group <span>does return rise step by step with the signal? annualised, equal-weighted</span></h2>
       <div class="legend-row"><span><i class="ghost-solid"></i>2012 to 2020, new test</span><span><i class="ghost-light"></i>2021 to 2026, re-test</span></div>
       <div class="grp-grid">
-        <div><div class="grp-title"><b style="color:var(--momentum)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum"></canvas></div></div>
-        <div><div class="grp-title"><b style="color:var(--value)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue"></canvas></div></div>
-        <div><div class="grp-title"><b style="color:var(--combined)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined"></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--momentum)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum" role="img" aria-label="Bar chart. Annualised return of the five Momentum signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--value)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue" role="img" aria-label="Bar chart. Annualised return of the five Value signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--combined)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined" role="img" aria-label="Bar chart. Annualised return of the five Combined signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
       </div>
       <p class="caption">Mean return of each fifth of stocks, ranked on the signal at the start of the month. Group 5 minus group 1 is the quintile spread, shown above each chart with its 90% interval for the 2012 to 2020 test. A working signal rises from left to right. Five bars are descriptive only; the spread and its interval are the test.</p>
     </div>
@@ -53,7 +53,7 @@
         <span><i style="background:var(--value)"></i>Value</span>
         <span><i style="background:var(--combined)"></i>Combined</span>
       </div>
-      <div style="position:relative; height:260px;"><canvas id="icChart"></canvas></div>
+      <div style="position:relative; height:260px;"><canvas id="icChart" role="img" aria-label="Line chart. Running sum of the monthly rank IC for Momentum, Value and Combined."></canvas></div>
       <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
     </div>
 
@@ -64,7 +64,7 @@
         <span><i style="background:var(--value)"></i>Value</span>
         <span><i style="background:var(--combined)"></i>Combined</span>
       </div>
-      <div style="position:relative; height:240px;"><canvas id="icRollChart"></canvas></div>
+      <div style="position:relative; height:240px;"><canvas id="icRollChart" role="img" aria-label="Line chart. Rolling 36-month mean rank IC for Momentum, Value and Combined."></canvas></div>
       <p class="caption" id="icRollCaption"></p>
     </div>
 
