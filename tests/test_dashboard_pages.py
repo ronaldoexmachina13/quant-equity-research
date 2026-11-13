@@ -56,6 +56,19 @@ def test_no_em_dashes(name):
     assert EM_DASH not in read(name)
 
 
+def test_stylesheet_and_dashboard_script_carry_one_cache_version_on_every_page():
+    # The version in ?v= makes returning visitors fetch a changed file instead of a cached copy.
+    # The stylesheet and the shared script change together, so every page must ask for the same version of both.
+    versions = {}
+    for page in PAGES:
+        html = read(page + ".html")
+        css = re.findall(r'href="assets/styles\.css\?v=(\d+)"', html)
+        js = re.findall(r'src="assets/dashboard\.js\?v=(\d+)"', html)
+        assert len(css) == 1 and len(js) == 1, f"{page}.html: stylesheet {css}, dashboard.js {js}"
+        versions[page] = (css[0], js[0])
+    assert len({v for pair in versions.values() for v in pair}) == 1, versions
+
+
 def test_type_floor_is_eleven_pixels():
     css = read("assets/styles.css")
     for value, unit in re.findall(r"font-size:\s*([0-9.]+)(px|rem)", css):
