@@ -12,7 +12,7 @@ Chart.defaults.scale.grid.drawTicks = false;
 Chart.defaults.scale.ticks.padding = 6;
 Chart.defaults.scale.border.display = false;
 Chart.defaults.animation = false;
-Chart.defaults.elements.line.borderWidth = 1.6;
+Chart.defaults.elements.line.borderWidth = 1.3;
 Chart.defaults.elements.bar.borderRadius = 0;
 Object.assign(Chart.defaults.plugins.tooltip, {
   backgroundColor: cssVar("--tip-bg"), borderColor: cssVar("--tip-border"), borderWidth: 1, cornerRadius: 0, padding: 8,
@@ -22,8 +22,7 @@ Object.assign(Chart.defaults.plugins.tooltip, {
 const COLORS = { Momentum: cssVar("--momentum"), Value: cssVar("--value"), Combined: cssVar("--combined"), Benchmark: cssVar("--benchmark"), SPY: cssVar("--p1") };
 const TEXTC = { Momentum: cssVar("--momentum-text"), Value: cssVar("--value-text"), Combined: cssVar("--combined-text") };
 const textFor = c => { const k = Object.keys(COLORS).find(n => COLORS[n] === c); return (k && TEXTC[k]) || c; };
-// colours are read once at load; a change of system theme reloads the page so charts pick up the other palette
-if (window.matchMedia) matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => location.reload());
+// colours are read once at load, so the theme toggle (renderChrome) saves the choice and reloads the page
 const PERIODS = [
   { key: "New test (2012-2020)", label: "2012 to 2020" },
   { key: "Re-test (2021-2026)", label: "2021 to 2026" },
@@ -100,6 +99,50 @@ function forest(svgId, rows, fmt, domain, band) {
   svg.innerHTML = s;
 }
 
+/* ---------- family forest: many tests in one SVG ----------
+   One block per unit (rank IC, quintile spread, Sharpe difference and so on). Each block has a symmetric scale of its own, so zero
+   sits at the same horizontal position in every block and in every family; a filled marker means the 90% interval excludes zero.
+   Rows: { label, sig, rest, mean, lo, hi, excl } or { header } for a sub-heading. Block: { title, fmt, rows, band }. */
+function familyForest(svgId, blocks, opt) {
+  opt = opt || {};
+  const small = !!opt.small, compact = small || window.innerWidth < 640;
+  const W = small ? 360 : compact ? 390 : 860, Lw = small ? 84 : compact ? 150 : 215, Rw = small ? 22 : compact ? 6 : 192;
+  const rowH = opt.rowH || 16, x0 = Lw, x1 = W - Rw, mid = (x0 + x1) / 2, half = (x1 - x0) / 2 - 4;
+  const niceHalf = h => { const mag = Math.pow(10, Math.floor(Math.log10(h))), n = h / mag; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * mag; };
+  let y = 2, s = "";
+  blocks.forEach(b => {
+    const data = b.rows.filter(r => !r.header);
+    const h = b.h ? niceHalf(b.h) : niceHalf(Math.max(...data.map(r => Math.max(Math.abs(r.lo), Math.abs(r.hi))), b.band || 0));
+    const x = v => mid + v / h * half;
+    if (b.title) { s += `<text class="blk" x="0" y="${y + 12}">${b.title}</text>`; y += 22; }
+    const top = y;
+    let body = "";
+    b.rows.forEach(r => {
+      if (r.header) { body += `<text class="sub" x="0" y="${y + rowH - 4}">${r.header}</text>`; y += rowH; return; }
+      const yc = y + rowH / 2, c = COLORS[r.sig] || cssVar("--text"), label = r.sig && !r.plain ? `<tspan fill="${TEXTC[r.sig]}">${r.sig}</tspan>${esc(r.rest)}` : esc(r.label);
+      const txt = `${b.fmt.val(r.mean)} [${b.fmt.val(r.lo)}, ${b.fmt.val(r.hi)}]${r.excl ? " *" : ""}`;
+      body += `<g><title>${esc((r.sig || "") + (r.rest || r.label || ""))}: ${txt}</title><rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>` +
+        `<text x="0" y="${yc + 4}">${label}</text>` +
+        `<line x1="${x(r.lo)}" x2="${x(r.hi)}" y1="${yc}" y2="${yc}" stroke="${c}" stroke-width="1.3"/>` +
+        `<line x1="${x(r.lo)}" x2="${x(r.lo)}" y1="${yc - 3}" y2="${yc + 3}" stroke="${c}"/><line x1="${x(r.hi)}" x2="${x(r.hi)}" y1="${yc - 3}" y2="${yc + 3}" stroke="${c}"/>` +
+        `<circle cx="${x(r.mean)}" cy="${yc}" r="3.3" fill="${r.excl ? c : cssVar("--bg")}" stroke="${c}" stroke-width="1.3"/>` +
+        (compact ? "" : `<text class="val${r.excl ? " flag" : ""}" x="${x1 + 12}" y="${yc + 4}">${txt}</text>`) + `</g>`;
+      y += rowH;
+    });
+    const bottom = y;
+    if (b.band) s += `<rect x="${x(-b.band)}" y="${top}" width="${x(b.band) - x(-b.band)}" height="${bottom - top}" fill="${cssVar("--zero")}" fill-opacity="0.12"/>`;
+    [-h, -h / 2, h / 2, h].forEach(v => { s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--grid")}"/>`; });
+    s += body;
+    s += `<line x1="${x(0)}" x2="${x(0)}" y1="${top}" y2="${bottom}" stroke="${cssVar("--text")}"/>` +
+         `<line x1="${x0 - 4}" x2="${x1 + 4}" y1="${bottom}" y2="${bottom}" stroke="${cssVar("--line-strong")}"/>`;
+    [-h, 0, h].forEach(v => { s += `<text class="muted ax" x="${x(v)}" y="${bottom + 15}" text-anchor="middle">${b.fmt.axis(v)}</text>`; });
+    y = bottom + 30;
+  });
+  const svg = document.getElementById(svgId);
+  svg.setAttribute("viewBox", `0 0 ${W} ${y}`);
+  svg.innerHTML = s;
+}
+
 /* ---------- 1. signal tests ---------- */
 const TESTS = [
   { key: "rank_ic", label: "Rank IC", fmt: { axis: v => v.toFixed(2), val: v => sgn(v, 3) },
@@ -112,7 +155,7 @@ const TESTS = [
     text: "The same regression with Momentum and Value entered together, so each slope is net of the other." }
 ];
 /* ---------- shared chart helpers ---------- */
-function makeSplitLine(atBottom) { return {
+function makeSplitLine(atBottom, noLabels) { return {
   id: "splitLine",
   beforeDatasetsDraw(chart) {
     const x = chart.scales.x.getPixelForValue(U.split);
@@ -128,7 +171,9 @@ function makeSplitLine(atBottom) { return {
     ctx.save();
     ctx.strokeStyle = cssVar("--ref"); ctx.setLineDash([3, 3]); ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle = cssVar("--muted"); ctx.font = "500 11px " + Chart.defaults.font.family;
+    ctx.setLineDash([]);
+    if (noLabels) { ctx.restore(); return; }
+    ctx.fillStyle = cssVar("--muted"); ctx.font = "500 11px " + Chart.defaults.font.family;
     const y = atBottom ? chartArea.bottom - 6 : chartArea.top + 12;
     const narrow = chartArea.right - chartArea.left < 420;
     ctx.textAlign = "right"; ctx.fillText(narrow ? "New test" : "2012 to 2020 · new test", x - 6, y);
@@ -184,17 +229,31 @@ Chart.register({
     ctx.restore();
   }
 });
-function lineChart(canvasId, datasets, yTick, tipFmt, withSplit, splitAtBottom) {
+/* Underwater plots: writes the depth and month of the first series' deepest point beside that point. Enabled per chart: plugins.troughLabel.enabled. */
+Chart.register({
+  id: "troughLabel",
+  afterDatasetsDraw(chart, args, opts) {
+    if (!opts || !opts.enabled) return;
+    const ds = chart.data.datasets[0], { ctx, chartArea } = chart;
+    let k = 0; ds.data.forEach((v, i) => { if (v !== null && v < ds.data[k]) k = i; });
+    const pt = chart.getDatasetMeta(0).data[k], txt = "Deepest " + pct(ds.data[k], 1) + ", " + ymLabel(U.dates[k]);
+    ctx.save(); ctx.font = "500 11px " + Chart.defaults.font.family; ctx.fillStyle = textFor(ds.borderColor); ctx.textBaseline = "middle";
+    const right = pt.x + 8 + ctx.measureText(txt).width > chartArea.right;
+    ctx.textAlign = right ? "right" : "left"; ctx.fillText(txt, pt.x + (right ? -8 : 8), Math.min(pt.y, chartArea.bottom - 8));
+    ctx.restore();
+  }
+});
+function lineChart(canvasId, datasets, yTick, tipFmt, withSplit, splitAtBottom, noSplitLabels) {
   const chart = new Chart(document.getElementById(canvasId), {
     type: "line",
-    data: { labels: U.dates, datasets: datasets.map(d => Object.assign({ pointRadius: 0, fill: false, tension: 0.1, borderWidth: 2 }, d)) },
+    data: { labels: U.dates, datasets: datasets.map(d => Object.assign({ pointRadius: 0, fill: false, tension: 0.1, borderWidth: 1.4 }, d)) },
     options: {
       responsive: true, maintainAspectRatio: false, layout: { padding: { right: endLabelPad(datasets) } },
       interaction: { mode: "index", intersect: false },
       plugins: { legend: { display: false }, endLabels: { enabled: WIDE() }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + tipFmt(i.parsed.y) } } },
       scales: { y: { ticks: { callback: yTick, maxTicksLimit: 7 } }, x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: window.innerWidth < 600 ? 5 : 8 }, grid: { display: false } } }
     },
-    plugins: withSplit ? [makeSplitLine(!!splitAtBottom)] : []
+    plugins: withSplit ? [makeSplitLine(!!splitAtBottom, noSplitLabels)] : []
   });
   hideLegendWhenLabelled(canvasId);
   return chart;
@@ -213,7 +272,7 @@ function summaryRow(period, strategy, sz, b) {
          U.summary.find(r => r.period === period && r.strategy === strategy && (r.size || null) === (sz || null) && r.basis === "gross");
 }
 
-/* ---------- reading aids for quant readers: drawdown episodes, monthly heatmap, IC statistics ---------- */
+/* ---------- reading aids for quant readers: drawdown episodes and IC statistics ---------- */
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function ymLabel(ym) { return MONTH_NAMES[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4); }
 
@@ -244,33 +303,6 @@ function drawdownTable(bodyId, returns, count) {
            `<td>${e.recovery === null ? "Not recovered" : ymLabel(U.dates[e.recovery])}</td>` +
            `<td class="num">${pct(e.depth, 1)}</td><td class="num">${e.trough - e.peak}</td><td class="num">${under}${e.recovery === null ? "+" : ""}</td></tr>`;
   }).join("");
-}
-
-/* Year by month grid. With a benchmark it shows the active return (strategy minus benchmark) month by month. */
-function monthlyHeatmap(containerId, returns, bench, scale) {
-  const years = [...new Set(U.dates.map(d => d.slice(0, 4)))];
-  const cell = v => {
-    if (v === null) return `<td class="hm-empty"></td>`;
-    const a = 0.07 + 0.5 * Math.min(Math.abs(v) / scale, 1);
-    const bg = `rgba(var(--hm-rgb),${a.toFixed(2)})`;
-    const r1 = Math.abs(v * 100).toFixed(1);
-    const txt = r1 === "0.0" ? "0.0" : (v < 0 ? MINUS : "+") + r1;
-    return `<td class="hm-cell" style="background:${bg}">${txt}</td>`;
-  };
-  let html = `<table class="heatmap"><thead><tr><th></th>${MONTH_NAMES.map(m => `<th>${m}</th>`).join("")}<th class="hm-year">Year</th></tr></thead><tbody>`;
-  years.forEach(y => {
-    const row = Array(12).fill(null);
-    let compS = 1, compB = 1, n = 0;
-    U.dates.forEach((d, i) => {
-      if (d.slice(0, 4) !== y) return;
-      const v = bench ? returns[i] - bench[i] : returns[i];
-      row[+d.slice(5, 7) - 1] = v;
-      compS *= 1 + returns[i]; if (bench) compB *= 1 + bench[i]; n++;
-    });
-    const total = bench ? compS - compB : compS - 1;
-    html += `<tr><th>${y}</th>${row.map(cell).join("")}${cell(total).replace("hm-cell", "hm-cell hm-year")}</tr>`;
-  });
-  document.getElementById(containerId).innerHTML = html + "</tbody></table>";
 }
 
 /* Mean, dispersion and hit rate of the monthly rank IC for one signal over one slice of months. */
@@ -310,32 +342,34 @@ const PAGES = [
   { href: "method.html", label: "Method" }
 ];
 const REPO_URL = "https://github.com/ronaldoexmachina13/quant-equity-research";
+/* One sentence on the plan log, derived from assets/meta_data.js: entry counts and any gap in the amendment numbering. Shown on the Method page. */
+function planLogSentence() {
+  if (typeof META === "undefined") return "";
+  const nums = META.entries.filter(e => e.id[0] === "A").map(e => +e.id.slice(1));
+  const gaps = []; for (let k = 1; k <= Math.max(...nums); k++) if (!nums.includes(k)) gaps.push(k);
+  const ds = META.entries.filter(e => e.id.startsWith("PH")).length;
+  return "The plan log has " + META.entries.length + " entries: " + nums.length + " numbered amendments and " + ds + " design entries." +
+    (gaps.length === 1 ? " The numbering has no Amendment " + gaps[0] + "." : "");
+}
 function renderChrome(active, subtitle) {
-  const meta = typeof META !== "undefined" ? META : null;
   const cov = U.coverage;
   const members = cov && cov.members ? cov.members[cov.members.length - 1] : null;
-  let planLog = null;
-  if (meta) {
-    const nums = meta.entries.filter(e => e.id[0] === "A").map(e => +e.id.slice(1));
-    const gaps = []; for (let k = 1; k <= Math.max(...nums); k++) if (!nums.includes(k)) gaps.push(k);
-    const ds = meta.entries.filter(e => e.id.startsWith("PH")).length;
-    planLog = "The plan log has " + meta.entries.length + " entries: " + nums.length + " numbered amendments and " + ds + " design entries." +
-      (gaps.length === 1 ? " The numbering has no Amendment " + gaps[0] + "." : "");
-  }
   const facts = [
     ["Data through", ymLabel(U.dates[U.dates.length - 1]), true],
     ["Sample", U.dates.length + " months from " + ymLabel(U.dates[0])],
     ["Universe", members ? members + " S&amp;P 500 members" : "S&amp;P 500 members"],
-    ["", planLog],
     ["Status", "Pre-specified, free data"]
   ].filter(f => f[1] !== null);
   document.getElementById("chrome").innerHTML =
     `<a class="skip" href="#main">Skip to content</a><nav class="topnav" aria-label="Pages"><div class="topnav-inner"><a class="brand" href="index.html"><svg class="logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" stroke-width="1.5"/><g stroke="currentColor" stroke-width="2"><line x1="5" y1="6" x2="17" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></g><g fill="currentColor"><polygon points="11,3.2 13.8,6 11,8.8 8.2,6"/><polygon points="14.5,9.2 17.3,12 14.5,14.8 11.7,12"/><polygon points="8.5,15.2 11.3,18 8.5,20.8 5.7,18"/></g></svg>Quant Equity Research</a><div class="links">` +
     PAGES.map(p => `<a href="${p.href}"${p.href === active ? ' class="active" aria-current="page"' : ""}>${p.label}</a>`).join("") +
-    `</div></div></nav>` +
+    `</div><button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch between dark and light theme"></button></div></nav>` +
     `<div class="statusbar"><div class="statusbar-inner">` + facts.map(f => `<span class="st${f[2] ? " live" : ""}">${f[0] ? `<i>${f[0]}</i>` : ""}<b>${f[1]}</b></span>`).join("") + `</div></div>` +
     `<div class="subtitle-bar">${subtitle}</div>`;
   const wrap = document.querySelector(".wrap"); if (wrap) wrap.id = "main";
+  const tt = document.getElementById("themeToggle"), now = document.documentElement.getAttribute("data-theme") || "dark";
+  tt.textContent = now === "dark" ? "Light" : "Dark";
+  tt.onclick = () => { try { localStorage.setItem("qer-theme", now === "dark" ? "light" : "dark"); } catch (e) { /* ignore */ } location.reload(); };
   renderExhibits();
   document.getElementById("foot").innerHTML =
     `<footer><div class="facts"><span>About 500 S&amp;P 500 members</span><span>${ymLabel(U.dates[0])} to ${ymLabel(U.dates[U.dates.length - 1])}</span><span>Free data, survivor-biased</span></div>` +

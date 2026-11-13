@@ -11,7 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Universe | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=15">
+<script src="assets/theme.js?v=16"></script>
+<link rel="stylesheet" href="assets/styles.css?v=16">
 </head>
 <body>
 <div id="chrome"></div>
@@ -81,6 +82,7 @@
       </table>
     </div>
     <p class="caption">Names per month and annualised mean return. Descriptive only, not a correction. Names later removed that still had a price history earned a lower average return than names that stayed. The groups are formed with hindsight, which is why this is not an estimate of the bias. Neither the direction nor the size of the effect of the missing names can be measured without delisting data, since acquired companies often earned a premium and bankrupt ones lost most of their value.</p>
+<div class="formula"><span class="fname">Survivorship scenario adjustment</span><math display="block" aria-label="Survivorship scenario: group 1 is replaced by a mix of the saved group 1 and an assumed return for missing names; the spread is group 5 minus the adjusted group 1"><msub><mover accent="true"><mi>r</mi><mo>&#xAF;</mo></mover><mrow><mn>1</mn><mo>,</mo><mi>t</mi></mrow></msub><mo>=</mo><mo>(</mo><mn>1</mn><mo>&#x2212;</mo><mi>s</mi><mo>)</mo><msub><mover accent="true"><mi>r</mi><mo>&#xAF;</mo></mover><mrow><mn>1</mn><mo>,</mo><mi>t</mi></mrow></msub><mo>+</mo><mi>s</mi><mi>r</mi><mspace width="2.2em"/><msub><mover accent="true"><mi>S</mi><mo>&#x2dc;</mo></mover><mi>t</mi></msub><mo>=</mo><msub><mover accent="true"><mi>r</mi><mo>&#xAF;</mo></mover><mrow><mn>5</mn><mo>,</mo><mi>t</mi></mrow></msub><mo>&#x2212;</mo><mrow><msub><mover accent="true"><mi>r</mi><mo>&#x2dc;</mo></mover><mrow><mn>1</mn><mo>,</mo><mi>t</mi></mrow></msub></mrow></math><p class="where">s is the assumed share of the true group 1 that is missing from the price data and r the assumed monthly return of those names. Both are illustrative assumptions, not estimates (Amendment 19). Group 5 is left as saved. The scenario table is in results/universe_study_survivorship_scenario.csv.</p></div>
   </div>
 
   <div class="panel">
@@ -176,7 +178,7 @@
 <script src="assets/universe_stocks_data.js"></script>
 <script src="assets/universe_holdings_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=15"></script>
+<script src="assets/dashboard.js?v=16"></script>
 <script>
 renderChrome("universe.html", "Free data &middot; survivor-biased &middot; top-decile portfolios, equal weight, rebalanced monthly &middot; every ticker that was in the index");
 const H = UNIVERSE_HOLDINGS;

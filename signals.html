@@ -11,7 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<link rel="stylesheet" href="assets/styles.css?v=15">
+<script src="assets/theme.js?v=16"></script>
+<link rel="stylesheet" href="assets/styles.css?v=16">
 </head>
 <body>
 <div id="chrome"></div>
@@ -40,14 +41,15 @@
     </div>
 
     <div class="panel" data-stamp="exploratory" data-src="results/universe_study_quintile_returns.csv">
-      <h2>Is the relation monotonic? <span>annualised return by signal group, equal weight; 2012 to 2020 and 2021 to 2026</span></h2>
+      <h2>Is the relation monotonic? <span>annualised return by signal group, with the Q5 minus Q1 spread and its 90% interval below; one scale for all three signals</span></h2>
       <div class="legend-row"><span><i class="ghost-solid"></i>2012 to 2020, new test</span><span><i class="ghost-light"></i>2021 to 2026, re-test</span></div>
       <div class="grp-grid">
-        <div><div class="grp-title"><b style="color:var(--momentum-text)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum" role="img" aria-label="Bar chart. Annualised return of the five Momentum signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
-        <div><div class="grp-title"><b style="color:var(--value-text)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue" role="img" aria-label="Bar chart. Annualised return of the five Value signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
-        <div><div class="grp-title"><b style="color:var(--combined-text)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined" role="img" aria-label="Bar chart. Annualised return of the five Combined signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div></div>
+        <div><div class="grp-title"><b style="color:var(--momentum-text)">Momentum</b><span id="qsMomentum"></span></div><div class="grp-canvas"><canvas id="qMomentum" role="img" aria-label="Bar chart. Annualised return of the five Momentum signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div><svg class="forest spread" id="qspMomentum" role="img" aria-label="Q5 minus Q1 spread for Momentum: estimate and 90% interval for 2012 to 2020 and 2021 to 2026, against zero, on a scale shared by the three signals"></svg><div class="spread-text" id="qtMomentum"></div></div>
+        <div><div class="grp-title"><b style="color:var(--value-text)">Value</b><span id="qsValue"></span></div><div class="grp-canvas"><canvas id="qValue" role="img" aria-label="Bar chart. Annualised return of the five Value signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div><svg class="forest spread" id="qspValue" role="img" aria-label="Q5 minus Q1 spread for Value: estimate and 90% interval for 2012 to 2020 and 2021 to 2026, against zero, on a scale shared by the three signals"></svg><div class="spread-text" id="qtValue"></div></div>
+        <div><div class="grp-title"><b style="color:var(--combined-text)">Combined</b><span id="qsCombined"></span></div><div class="grp-canvas"><canvas id="qCombined" role="img" aria-label="Bar chart. Annualised return of the five Combined signal groups, lowest to highest, for 2012 to 2020 and 2021 to 2026."></canvas></div><svg class="forest spread" id="qspCombined" role="img" aria-label="Q5 minus Q1 spread for Combined: estimate and 90% interval for 2012 to 2020 and 2021 to 2026, against zero, on a scale shared by the three signals"></svg><div class="spread-text" id="qtCombined"></div></div>
       </div>
-      <p class="caption">Mean return of each fifth of stocks, ranked on the signal at the start of the month. Group 5 minus group 1 is the quintile spread, shown above each chart with its 90% interval for the 2012 to 2020 test. A working signal rises from left to right. Five bars are descriptive only; the spread and its interval are the test. Added after the results (Amendment 14).</p>
+      <p class="caption">Mean return of each fifth of stocks, ranked on the signal at the start of the month. Group 5 minus group 1 (Q5 minus Q1) is the quintile spread, in percent a month, drawn under each ladder with its 90% interval against zero; the three ladders share one vertical scale and the three spread strips share one horizontal scale. A working signal rises from left to right. Five bars are descriptive only; the spread and its interval are the test. Added after the results (Amendment 14).</p>
+<div class="formula"><span class="fname">Quintile spread</span><math display="block" aria-label="Quintile spread is the mean return of the top fifth minus the bottom fifth in month t"><msub><mi>S</mi><mi>t</mi></msub><mo>=</mo><msub><mover accent="true"><mi>r</mi><mo>&#xAF;</mo></mover><mrow><mn>5</mn><mo>,</mo><mi>t</mi></mrow></msub><mo>&#x2212;</mo><msub><mover accent="true"><mi>r</mi><mo>&#xAF;</mo></mover><mrow><mn>1</mn><mo>,</mo><mi>t</mi></mrow></msub></math><p class="where">The equal-weighted mean return in month t of the fifth of stocks with the highest signal at t&#x2212;1 (group 5) minus that of the lowest fifth (group 1), averaged over months.</p></div>
     </div>
   </div>
 
@@ -121,7 +123,7 @@
 <script src="assets/universe_extras_data.js"></script>
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=15"></script>
+<script src="assets/dashboard.js?v=16"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;
@@ -178,24 +180,31 @@ function drawSignalForest() {
 buttons("testTabs", TESTS, testKey, k => { testKey = k; drawSignalForest(); });
 drawSignalForest();
 
-/* 1b. return by group, three small multiples */
+/* 1b. return by group: three ladders on one vertical scale, each with its Q5 minus Q1 spread beneath on one horizontal scale */
 (function groups() {
-  SIGNALS.forEach(sig => {
+  const means = (sig, p) => [1, 2, 3, 4, 5].map(q => { const r = X.quintiles.find(x => x.signal === sig && x.period === p.key && x.quintile === q); return r ? r.mean_annualised : null; });
+  const all = SIGNALS.flatMap(sig => PERIODS.slice(0, 2).flatMap(p => means(sig, p))).filter(v => v !== null);
+  const yMin = Math.floor(Math.min(0, ...all) * 20) / 20, yMax = Math.ceil(Math.max(0, ...all) * 20) / 20;
+  const spreads = SIGNALS.map(sig => PERIODS.slice(0, 2).map(p => U.signalTests.find(t => t.test === "quintile_spread" && t.signal === sig && t.period === p.key)));
+  const half = Math.max(...spreads.flat().map(r => Math.max(Math.abs(r.ci_90_lower), Math.abs(r.ci_90_upper))));
+  SIGNALS.forEach((sig, si) => {
     const sets = PERIODS.slice(0, 2).map((p, i) => ({
-      label: p.label, backgroundColor: COLORS[sig] + (i === 0 ? "FF" : "66"), maxBarThickness: 26,
-      data: [1, 2, 3, 4, 5].map(q => { const r = X.quintiles.find(x => x.signal === sig && x.period === p.key && x.quintile === q); return r ? r.mean_annualised : null; })
+      label: p.label, backgroundColor: COLORS[sig] + (i === 0 ? "FF" : "66"), maxBarThickness: 26, data: means(sig, p)
     }));
-    const sp = U.signalTests.find(t => t.test === "quintile_spread" && t.signal === sig && t.period === PERIODS[0].key);
-    document.getElementById("qs" + sig).textContent = "group 5 minus 1: " + spct(sp.mean, 2) + " a month [" + spct(sp.ci_90_lower, 2) + ", " + spct(sp.ci_90_upper, 2) + "]" + (sp.excludes_zero ? " *" : "");
+    document.getElementById("qs" + sig).textContent = "annualised return by fifth";
     new Chart(document.getElementById("q" + sig), {
       type: "bar",
       data: { labels: ["1 low", "2", "3", "4", "5 high"], datasets: sets },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: i => i.dataset.label + ": " + spct(i.parsed.y, 1) + " a year" } } },
-        scales: { y: { ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 6 } }, x: { grid: { display: false } } }
+        scales: { y: { min: yMin, max: yMax, ticks: { callback: v => (v * 100).toFixed(0) + "%", maxTicksLimit: 6 } }, x: { grid: { display: false } } }
       }
     });
+    const rows = spreads[si].map((r, i) => ({ sig, plain: true, label: PERIODS[i].label, mean: r.mean, lo: r.ci_90_lower, hi: r.ci_90_upper, excl: r.excludes_zero }));
+    familyForest("qsp" + sig, [{ title: "", fmt: { axis: v => (v * 100).toFixed(1) + "%", val: v => spct(v, 2) }, rows, h: half }], { small: true, rowH: 18 });
+    document.getElementById("qt" + sig).innerHTML = "<b>Q5 minus Q1, % a month</b>" + spreads[si].map((r, i) =>
+      `<div>${PERIODS[i].label}: ${spct(r.mean, 2)} [${spct(r.ci_90_lower, 2)}, ${spct(r.ci_90_upper, 2)}]${r.excludes_zero ? " *" : ""}</div>`).join("");
   });
 })();
 
