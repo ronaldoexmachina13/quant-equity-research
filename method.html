@@ -171,20 +171,22 @@ document.getElementById("regBody").innerHTML = LOG.map(e =>
   const days = d => Date.parse(d + "T00:00:00Z") / 86400000;
   const t0 = days(LOG[0].date), t1 = days(LOG[LOG.length - 1].date);
   const W = 860, left = 24, right = 24, step = 15, maxStack = Math.max(...Object.values(LOG.reduce((a, e) => (a[e.date] = (a[e.date] || 0) + 1, a), {})));
-  const H = 28 + maxStack * step + 50;
+  const H = 28 + maxStack * step + 62, axisY = H - 48;  /* room for three rows of date labels under the axis */
   const x = d => left + (days(d) - t0) / (t1 - t0) * (W - left - right);
   const seen = {};
-  let s = `<line x1="${left - 8}" x2="${W - right + 8}" y1="${H - 30}" y2="${H - 30}" stroke="${cssVar("--line-strong")}"/>`;
+  let s = `<line x1="${left - 8}" x2="${W - right + 8}" y1="${axisY}" y2="${axisY}" stroke="${cssVar("--line-strong")}"/>`;
   LOG.forEach(e => {
-    const k = seen[e.date] = (seen[e.date] || 0) + 1, cx = x(e.date), cy = H - 30 - 4 - k * step + 6;
+    const k = seen[e.date] = (seen[e.date] || 0) + 1, cx = x(e.date), cy = axisY - 4 - k * step + 6;
     const fill = e.kind === "pre" ? cssVar("--amber") : e.kind === "post" ? "none" : cssVar("--p1");
     const stroke = e.kind === "post" ? cssVar("--text-strong") : "none";
     s += `<rect x="${cx - 5}" y="${cy - 5}" width="10" height="10" fill="${fill}" stroke="${stroke}" stroke-width="1.6"><title>${e.id}, ${e.date}: ${e.concerns}</title></rect>`;
   });
-  let lastX = -99, lane = 0;
+  const laneEnd = [-99, -99, -99];  /* right edge of the last label in each of three rows, so close dates never overprint */
   Object.keys(seen).forEach(dt => {
-    lane = x(dt) - lastX < 44 ? 1 - lane : 0; lastX = x(dt);
-    s += `<line x1="${x(dt)}" x2="${x(dt)}" y1="${H - 30}" y2="${H - 25}" stroke="${cssVar("--ref")}"/><text x="${x(dt)}" y="${H - 13 + (lane ? 12 : 0)}" text-anchor="middle" class="dim">${ymLabel(dt.slice(0, 7)).slice(0, 3)} ${+dt.slice(8, 10)}</text>`;
+    let lane = laneEnd.findIndex(end => x(dt) - end >= 46);
+    if (lane < 0) lane = laneEnd.indexOf(Math.min(...laneEnd));
+    laneEnd[lane] = x(dt);
+    s += `<line x1="${x(dt)}" x2="${x(dt)}" y1="${axisY}" y2="${axisY + 5}" stroke="${cssVar("--ref")}"/><text x="${x(dt)}" y="${axisY + 17 + lane * 12}" text-anchor="middle" class="dim">${ymLabel(dt.slice(0, 7)).slice(0, 3)} ${+dt.slice(8, 10)}</text>`;
   });
   const svg = document.getElementById("timeline");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
