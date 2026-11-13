@@ -8,6 +8,9 @@ import pandas as pd
 _CONTACT = os.environ.get("SEC_CONTACT_EMAIL", "contact-not-set")
 HEADERS = {"User-Agent": f"quant-equity-research {_CONTACT}"}
 
+# Seconds to wait for the SEC before giving up. Without a timeout a stalled connection hangs the run for ever.
+REQUEST_TIMEOUT_SECONDS = 60
+
 # Ticker -> CIK mapping, fetched once and reused
 _TICKER_CIK_MAP = None
 
@@ -25,7 +28,8 @@ def _load_ticker_cik_map() -> dict:
     global _TICKER_CIK_MAP
     if _TICKER_CIK_MAP is None:
         url = "https://www.sec.gov/files/company_tickers.json"
-        response = requests.get(url, headers=HEADERS)
+        response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT_SECONDS)
+        response.raise_for_status()  # a 403 or 429 page must stop here, not be read as data
         data = response.json()
         _TICKER_CIK_MAP = {
             entry["ticker"]: str(entry["cik_str"]).zfill(10)
@@ -46,7 +50,8 @@ def get_company_facts(ticker: str) -> dict:
     """Fetch the full XBRL company facts JSON for a ticker."""
     cik = get_cik(ticker)
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-    response = requests.get(url, headers=HEADERS)
+    response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT_SECONDS)
+    response.raise_for_status()
     return response.json()
 
 
