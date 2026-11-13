@@ -18,12 +18,14 @@ OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "docs" / "img"
 CHROME = sys.argv[3] if len(sys.argv) > 3 else None
 ONLY = set(sys.argv[4].split(",")) if len(sys.argv) > 4 else None  # optional: only these file names
 
-# (file name, page, URL hash, heading text that identifies the panel[, extra CSS for that image])
-# The first image shows the chart only: the page's caption paragraph and source line are hidden,
-# because the README explains the exhibit in its own text.
+# (file name, page, URL hash, heading text that identifies the panel)
+# Every image shows the exhibit only: title, subtitle, legend and chart or table. The dashboard's own
+# "Exhibit n" number, its caption paragraphs and its source line are hidden, because the README names
+# and explains each image in its own text and the dashboard numbers its panels per page. The status
+# word (Registered, Exploratory and so on) stays.
+HIDE = ".exh .exn, .src, .formula, .panel .caption"
 SHOTS = [
-    ("01-registered-tests.png", "index.html", "", "No registered signal test", "#f1Caption, .src { display: none !important; }"),
-    ("02-detectable-effect.png", "index.html", "", "What could the test have detected?"),
+    ("01-registered-tests.png", "index.html", "", "No registered signal test"),
     ("03-sharpe-differences.png", "portfolios.html", "", "#leadTitle"),
     ("04-growth-and-drawdown.png", "portfolios.html", "", "#growthTitle"),
     ("05-plan-log.png", "method.html", "#log", "#tlTitle"),
@@ -50,7 +52,7 @@ def main():
         ctx = browser.new_context(viewport={"width": 1280, "height": 900}, device_scale_factor=2)
         # The site defaults to dark; set it explicitly so a saved choice cannot change the output.
         ctx.add_init_script("try { localStorage.setItem('qer-theme', 'dark'); } catch (e) {}")
-        for name, html, frag, heading, *extra in SHOTS:
+        for name, html, frag, heading in SHOTS:
             if ONLY and name not in ONLY:
                 continue
             page = ctx.new_page()
@@ -61,8 +63,8 @@ def main():
             panel = panel_for(page, heading)
             panel.scroll_into_view_if_needed()
             page.wait_for_timeout(600)
-            # The README pictures leave out the formula boxes (the page keeps them) and add a margin of the page ground colour.
-            page.add_style_tag(content=".formula { display: none !important; }" + (extra[0] if extra else ""))
+            # The README pictures leave out the items listed in HIDE (the page keeps them) and add a margin of the page ground colour.
+            page.add_style_tag(content=HIDE + " { display: none !important; }")
             page.wait_for_timeout(300)
             page.evaluate("window.scrollTo(0, 0)")  # sticky bars then sit at the top of the page, not over the panel
             page.wait_for_timeout(300)

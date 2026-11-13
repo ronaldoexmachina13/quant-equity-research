@@ -12,9 +12,9 @@ The work uses Python (pandas, NumPy, SciPy, statsmodels, matplotlib), SQLite and
 
 As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 19.
 
-![Exhibit 1: the 33 registered signal tests, one row each, in four blocks. Each row shows the estimate and its 90% bootstrap interval against zero.](docs/img/01-registered-tests.png)
+![Estimates and 90% bootstrap intervals for the 33 registered signal tests, one row each, in four blocks, drawn against zero.](docs/img/01-registered-tests.png)
 
-Exhibit 1 plots the 33 registered signal tests. Each is an estimate with its 90% bootstrap interval. The tests cover Momentum, Value and Combined over 2012 to 2020, 2021 to 2026 and the full period. They are 9 rank IC tests, 9 quintile spreads, 9 Fama-MacBeth slopes for one signal and 6 slopes for Momentum and Value together. An interval that spans zero is read as no detectable effect. All 33 span zero, and so do the Newey-West and block-bootstrap versions of the same tests. The 2012 to 2020 test could detect a mean rank IC of about 0.055 for Momentum, 0.041 for Value and 0.052 for Combined at 80% power and a 10% two-sided level. An effect smaller than that would usually be missed, so the result is not evidence of no effect. If the tests were independent, about 3 would exclude zero by chance. They are not independent because the periods overlap and the signals share stocks, so 3 is a rough guide.
+Above, the 33 registered signal tests are plotted. Each is an estimate with its 90% bootstrap interval. The tests cover Momentum, Value and Combined over 2012 to 2020, 2021 to 2026 and the full period. They are 9 rank IC tests, 9 quintile spreads, 9 Fama-MacBeth slopes for one signal and 6 slopes for Momentum and Value together. An interval that spans zero is read as no detectable effect. All 33 span zero, and so do the Newey-West and block-bootstrap versions of the same tests. The 2012 to 2020 test could detect a mean rank IC of about 0.055 for Momentum, 0.041 for Value and 0.052 for Combined at 80% power and a 10% two-sided level. An effect smaller than that would usually be missed, so the result is not evidence of no effect. If the tests were independent, about 3 would exclude zero by chance. They are not independent because the periods overlap and the signals share stocks, so 3 is a rough guide.
 
 Source: `results/universe_study_signal_summary_momentum.csv`, `results/universe_study_signal_summary_value_combined.csv` and `results/universe_study_inference_robustness.csv`.
 
@@ -39,17 +39,29 @@ Source: `results/universe_study_signal_summary_momentum.csv`, `results/universe_
 
 Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 452 published anomalies with methods that limit the weight of tiny stocks and found that 65% of them could not clear the usual significance hurdle, a t-statistic of 1.96 ([Review of Financial Studies, 2020](https://doi.org/10.1093/rfs/hhy131)). Large, liquid stocks such as the S&P 500 are expected to be a harder place to find a premium, because they are closely analysed and cheap to trade. That is a hypothesis, not something this study tests. A null here is a plausible and informative outcome. What matters is whether the test is reliable enough to trust that answer.
 
-![Exhibit 2: annualised return by signal group for Momentum, Value and Combined, with the top-minus-bottom spread and its 90% interval below each.](docs/img/06-return-by-group.png)
+![Annualised return by signal fifth for Momentum, Value and Combined in two periods, with the top-minus-bottom spread and its 90% interval below each.](docs/img/06-return-by-group.png)
 
-If a signal worked, the five groups would earn more in steps from left to right. Momentum's top group is the best in every period, but the groups below it are not ordered. For Value in 2012 to 2020 the most expensive fifth earned the most (18.2% a year, against 14.2% for the cheapest fifth), and no interval is reported for that gap.
+Return by group plots annualised return for each fifth of stocks ranked on the signal, with the top-minus-bottom spread and its 90% interval beneath. A signal that ranks returns would give bars that rise from left to right and a spread interval clear of zero. Momentum's top fifth earns the most in both periods (16.1% a year in 2012 to 2020, 15.8% in 2021 to 2026), yet its 2012 to 2020 spread is +0.07% a month with an interval of -0.74% to +0.87%. For Value in 2012 to 2020 the most expensive fifth earned 18.2% against 14.2% for the cheapest, a spread of -0.33% a month ([-0.95%, +0.27%]). All six intervals include zero, and with 108 and 68 months that is not evidence of no effect. Amendment 14 added this view after the results, so it is exploratory.
 
-![Exhibit 3: Sharpe difference against the benchmark for all 18 registered portfolio comparisons, before and after 10 bps costs.](docs/img/03-sharpe-differences.png)
+Source: `results/universe_study_quintile_returns.csv`, `results/universe_study_signal_summary_momentum.csv` and `results/universe_study_signal_summary_value_combined.csv`.
 
-The one interval that stands out is Value in 2012 to 2020, measured twice (top decile and top quintile). It is absent from the re-test and from the full period, and it points the wrong way for a value premium. The registered tests of the signal itself for the same period all include zero. In the three secondary sensitivities (winsorised price-to-book and two exclusion lists), 5 of 66 signal intervals exclude zero, against about 7 expected by chance if they were independent. All five are Value Fama-MacBeth slopes for 2012 to 2020, all with a negative slope whose interval stops just short of zero, and they share the same months and stocks.
+![Table of Sharpe ratio differences against the benchmark for 18 registered portfolio comparisons, before and after costs, with 90% intervals and the two Value 2012 to 2020 rows flagged.](docs/img/03-sharpe-differences.png)
 
-Costs of 10 bps one way change none of these readings. No explanation has been tested.
+Sharpe differences against each portfolio's own benchmark are listed for all 18 registered comparisons (three signals, top decile and top quintile, three periods), with a 90% paired bootstrap interval, before and after 10 bps one-way costs. Two intervals exclude zero, both Value in 2012 to 2020 (-0.44 for the top decile, -0.40 for the top quintile). The top quintile contains the top decile, so these are one result counted twice, and the sign is the reverse of what a value premium predicts. In the table an asterisk marks an interval that excludes zero and a dagger marks that doubled result. Neither the 2021 to 2026 re-test (+0.17 for the top decile) nor the full period (-0.22) repeats it, and both intervals include zero. Chance would flag about 1.8 if the tests were independent. The other 16 intervals are wide, so they are not evidence of no effect. Costs lower the point estimates by at most about 0.06 and leave every flag unchanged.
+
+Source: `results/universe_study_portfolio_summary.csv`.
+
+The registered tests of the signal itself for the same period all include zero. In the three secondary sensitivities (winsorised price-to-book and two exclusion lists), 5 of 66 signal intervals exclude zero, against about 7 expected by chance if they were independent. All five are Value Fama-MacBeth slopes for 2012 to 2020, all with a negative slope whose interval stops just short of zero, and they share the same months and stocks.
+
+No explanation has been tested.
 
 The 2021 to 2026 months were already known from an earlier 17-stock study, so they are a re-test and not out-of-sample evidence.
+
+![Growth of one dollar on a log scale for the Value top decile, its equal-weight benchmark and SPY from 2012 to 2026, with drawdown below showing a 49% trough in March 2020.](docs/img/04-growth-and-drawdown.png)
+
+Growth and drawdown for the Value top decile are shown against its benchmark and SPY before costs, with $1 on a log scale above and the fall from each series' previous high below, on monthly data. Over 2012 to 2020 Value returned 13.4% a year against 14.7% for the benchmark, with volatility of 25.4% against 15.0% and a maximum drawdown of 49.0% in March 2020 against 27.0%. In 2021 to 2026 it returned 19.6% against 12.8%, a Sharpe difference of +0.17 whose interval of -0.24 to +0.61 is compatible with no difference. The chart chains the two test periods and its levels are inflated by survivorship (see Limits), so Value's ending $8.59 against $6.81 for the benchmark cannot be read as outperformance.
+
+Source: `results/universe_study_portfolio_returns.csv` and `results/universe_study_portfolio_summary.csv`.
 
 ## Safeguards in the design
 
@@ -60,14 +72,18 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - **Errors found and corrected.** These are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
 - **Tested and reproducible.** More than 570 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
-## Limits
+![Timeline of 22 plan entries from October to November 2026, with the six written after every registered result existed shown as open squares.](docs/img/05-plan-log.png)
 
-![What the test could detect: the smallest mean rank IC found at 80% power is about 0.055 for Momentum, 0.041 for Value and 0.052 for Combined.](docs/img/02-detectable-effect.png)
+The plan log holds 22 dated entries: 18 numbered amendments and 4 design entries (there is no Amendment 4). Sixteen were written before any result they concern. The six from Amendment 14 onward, dated 7 to 13 November, came after every registered result existed and are labelled exploratory. Two further entries, from the 17-stock study plan, are drawn separately, so the timeline shows 24 squares against 22 counted entries.
+
+Source: `docs/LIMITATIONS_PLAN.md`.
+
+## Limits
 
 - **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them: acquired companies often earned a premium and bankrupt ones lost most of their value, and both are missing. Coverage is lowest from 2012 to 2015 (61% to 66% of index member-months usable for Value), so the early years of the 2012 to 2020 test rest on the weakest data.
 - **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.
 - **Scope.** Large caps only. P/B is not sector-adjusted, Momentum is not volatility-scaled, there is no quality factor, costs are a flat 10 bps one way, with no market impact or capacity analysis. A four-factor Fama-French regression and sector-neutral variants were added after the results (Amendments 16 to 18), so they are exploratory and not registered. In the four-factor regression, none of the 18 regressions of the registered portfolios (six portfolios, three periods) has an alpha interval that excludes zero, before costs. Of the 24 same-names and sector-neutral variant regressions, 8 have an interval that excludes zero, all with a positive alpha (Value or Combined), against about 2.4 expected by chance if they were independent.
-- Value in 2012 to 2020 had higher volatility than its benchmark: 25.4% a year against 15.0% for the top decile, a beta of 1.55 to the benchmark and a maximum drawdown of 49.0% against 27.0% (before costs). Its return was 13.4% a year against 14.7%. In those years 53.2% of its name-months are in Financials and 25.9% have no sector label. Sectors are one current label per stock, not a historical one.
+- Value in 2012 to 2020 had higher volatility than its benchmark, with a beta of 1.55 to the benchmark (volatility, drawdown and returns are given under Growth and drawdown above). In those years 53.2% of its name-months are in Financials and 25.9% have no sector label. Sectors are one current label per stock, not a historical one.
 - Combined is mostly Momentum. Over 2012 to 2026 the monthly rank IC of Combined has a correlation of +0.98 with Momentum's. Of Combined's top-decile name-months, 85.8% are also in Momentum's top decile in the same month (73.5% the other way round; the two universes differ in size, with 353 to 499 usable names for Momentum and 295 to 426 for Combined). The overlap with Value is small: 6.9% of Combined's top-decile name-months are also in Value's, and 4.0% of Momentum's. The Combined results should therefore not be read as a separate test from Momentum's. The monthly rank ICs of Momentum and Value are correlated at -0.53.
 - **Sharpe convention.** The Sharpe ratio is the annualised return minus the compounded risk-free return, divided by annualised volatility. The arithmetic version, mean monthly excess return over volatility, gives differences that are mostly 5% to 25% smaller across the 18 gross portfolio comparisons and changes no sign. It was recomputed from the saved monthly returns after the results and is not saved in a result file or part of the registered tests. Of the 18 differences, 17 are smaller (15 of them by 5% to 25%) and one is about 19% larger (Momentum top decile, 2021 to 2026).
 - **Power.** With 108 months the test detects a mean rank IC of about 0.055 (80% power), so a smaller premium cannot be ruled out.
@@ -84,10 +100,6 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 | Method | What was done, in what order? |
 
 The pages are dark by default, with a light theme switch in the header; the choice is saved in the browser.
-
-![Growth of $1 on a log scale for the Value top decile, its benchmark and SPY, with drawdown below.](docs/img/04-growth-and-drawdown.png)
-
-![The plan log: dated entries, with those written after every registered result existed marked.](docs/img/05-plan-log.png)
 
 The images in `docs/img/` are captured from the dashboard pages with `python scripts/capture_readme_images.py` (needs Playwright), so they match the live site.
 
