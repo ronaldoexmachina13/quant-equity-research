@@ -12,7 +12,7 @@ The work uses Python (pandas, NumPy, SciPy, statsmodels, matplotlib), SQLite and
 
 As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 19.
 
-![Exhibit 1: rank IC by signal](results/exhibit_1_rank_ic.png)
+![Exhibit 1: the 33 registered signal tests. Each row is one test with its 90% interval against zero; no interval excludes zero.](docs/img/01-registered-tests.png)
 
 ## Findings
 
@@ -35,11 +35,11 @@ As of 13 November 2026. Prices run to August 2026, and the pre-specification inc
 
 Published factors often weaken when tested carefully. Hou, Xue and Zhang re-tested 452 published anomalies with methods that limit the weight of tiny stocks and found that 65% of them could not clear the usual significance hurdle, a t-statistic of 1.96 ([Review of Financial Studies, 2020](https://doi.org/10.1093/rfs/hhy131)). Large, liquid stocks such as the S&P 500 are expected to be a harder place to find a premium, because they are closely analysed and cheap to trade. That is a hypothesis, not something this study tests. A null here is a plausible and informative outcome. What matters is whether the test is reliable enough to trust that answer.
 
-![Exhibit 2: return by group](results/exhibit_2_return_by_group.png)
+![Exhibit 2: annualised return by signal group for Momentum, Value and Combined, with the top-minus-bottom spread and its 90% interval below each.](docs/img/06-return-by-group.png)
 
 If a signal worked, the five groups would earn more in steps from left to right. Momentum's top group is the best in every period, but the groups below it are not ordered. For Value in 2012 to 2020 the most expensive fifth earned the most (18.2% a year, against 14.2% for the cheapest fifth), and no interval is reported for that gap.
 
-![Exhibit 3: portfolio Sharpe differences](results/exhibit_3_sharpe_difference.png)
+![Exhibit 3: Sharpe difference against the benchmark for all 18 registered portfolio comparisons, before and after 10 bps costs.](docs/img/03-sharpe-differences.png)
 
 The one interval that stands out is Value in 2012 to 2020, measured twice (top decile and top quintile). It is absent from the re-test and from the full period, and it points the wrong way for a value premium. The registered tests of the signal itself for the same period all include zero. In the three secondary sensitivities (winsorised price-to-book and two exclusion lists), 5 of 66 signal intervals exclude zero, against about 7 expected by chance if they were independent. All five are Value Fama-MacBeth slopes for 2012 to 2020, all with a negative slope whose interval stops just short of zero, and they share the same months and stocks.
 
@@ -57,6 +57,8 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 - **Tested and reproducible.** More than 570 tests, many of them hand-worked cases, run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
 ## Limits
+
+![What the test could detect: the smallest mean rank IC found at 80% power is about 0.055 for Momentum, 0.041 for Value and 0.052 for Combined.](docs/img/02-detectable-effect.png)
 
 - **Survivorship.** Acquired and bankrupt companies mostly lack free price history. A delisting-aware source such as CRSP is the real fix. Which way the bias runs for each strategy is not tested here and need not be the same for all of them: acquired companies often earned a premium and bankrupt ones lost most of their value, and both are missing. Coverage is lowest from 2012 to 2015 (61% to 66% of index member-months usable for Value), so the early years of the 2012 to 2020 test rest on the weakest data.
 - **Data quality.** Wikipedia membership is approximate early on, and some book values rest on share counts that may carry unit errors the rule cannot detect. Filings that show negative book equity are dropped, so those companies keep an older positive book value for up to six months or leave the Value and Combined tests.
@@ -78,6 +80,12 @@ The 2021 to 2026 months were already known from an earlier 17-stock study, so th
 | Method | What was done, in what order? |
 
 The pages are dark by default, with a light theme switch in the header; the choice is saved in the browser.
+
+![Growth of $1 on a log scale for the Value top decile, its benchmark and SPY, with drawdown below.](docs/img/04-growth-and-drawdown.png)
+
+![The plan log: dated entries, with those written after every registered result existed marked.](docs/img/05-plan-log.png)
+
+The images in `docs/img/` are captured from the dashboard pages with `python scripts/capture_readme_images.py` (needs Playwright), so they match the live site.
 
 <details>
 <summary><b>Hypotheses and method</b></summary>
