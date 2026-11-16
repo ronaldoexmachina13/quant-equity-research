@@ -95,7 +95,7 @@ ORDER BY p.ticker, p.date;
 -- ----------------------------------------------------------------------------
 -- 3. Coverage diagnostic: for each ticker, how many month-end dates have a
 --    price but no matching book_value row. This is the SQL-native version of
---    the coverage table in the README (HD at 47/60, V at 0/60, etc.). Compare
+--    the coverage table in docs/STUDY_17_STOCKS.md (HD at 47/60, V at 0/60, etc.). Compare
 --    the counts from this query with that table as a correctness check.
 -- ----------------------------------------------------------------------------
 WITH month_end_prices AS (

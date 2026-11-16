@@ -17,7 +17,8 @@
 -- turnover; a ticker that was not held at the previous date contributes 1. A ticker
 -- that leaves and comes back counts as an entry when it comes back. The previous date
 -- is the previous date of the same strategy, not the previous row of the ticker.
--- Matches the README's definition: "a stock that stays held doesn't get charged again."
+-- Matches the definition in docs/STUDY_17_STOCKS.md: a stock held from one month to the
+-- next is not charged again.
 -- ----------------------------------------------------------------------------
 WITH rebalance_dates AS (
     SELECT
@@ -135,9 +136,8 @@ ORDER BY strategy, regime;
 
 -- ----------------------------------------------------------------------------
 -- 4. Momentum vs Value holdings overlap, by month.
--- Backs the README's claim: "momentum and value overlapped on 3 of their 5
--- holdings" for December 2024. This generalizes that one spot-check to every
--- month in the backtest.
+-- Supports the holdings overlap discussed in docs/STUDY_17_STOCKS.md, month by
+-- month over the backtest. A month with no shared holding returns no row.
 -- ----------------------------------------------------------------------------
 SELECT
     m.date,

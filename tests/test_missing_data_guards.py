@@ -1,9 +1,9 @@
 """
-Tests for three small fixes, all built by hand.
+Tests for three guards against missing data, all built by hand.
 
-C2  annualized_return drops missing months before it compounds and counts months.
-C4  run_backtest refuses a held name with no return instead of counting it as 0%.
-C12 get_price_history_multi raises when the vendor returns nothing for a ticker.
+- annualized_return drops missing months before it compounds and counts months.
+- run_backtest refuses a held name with no return instead of counting it as 0%.
+- get_price_history_multi raises when the vendor returns nothing for a ticker.
 """
 import importlib
 import sys

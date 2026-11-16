@@ -49,7 +49,7 @@ Every file carries a universe_note column, and the sensitivity files a
 sensitivity column.
 
 Run after run_universe_spy.py:
-  python run_universe_portfolios.py
+  python -m scripts.universe.run_universe_portfolios
 """
 import os
 import sqlite3

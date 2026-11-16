@@ -1,10 +1,11 @@
+"""Book value per share from SEC EDGAR company facts, dated by filing date."""
 import os
 
 import requests
 import pandas as pd
 
 # SEC EDGAR and Wikipedia ask automated clients to identify themselves with a contact address.
-# Set SEC_CONTACT_EMAIL in your environment. No address is stored in the repository.
+# Set SEC_CONTACT_EMAIL in your environment. No address is stored in the current files.
 _CONTACT = os.environ.get("SEC_CONTACT_EMAIL", "contact-not-set")
 HEADERS = {"User-Agent": f"quant-equity-research {_CONTACT}"}
 

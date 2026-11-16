@@ -9,7 +9,7 @@ from src.backtest import calculate_monthly_returns, run_backtest, calculate_benc
 from src.risk import summarize_risk
 from src.output_guard import refuse_to_overwrite
 
-COST_BPS = 10  # one-way, in basis points -- see README for the reasoning
+COST_BPS = 10  # one-way, in basis points -- see docs/STUDY_17_STOCKS.md for the reasoning
 
 
 def compute_all_scores(prices: pd.DataFrame, book_value: pd.DataFrame) -> dict[str, pd.DataFrame]:
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     print(f"Benchmark (for reference, costs not modeled -- see note below): "
           f"Sharpe {benchmark_stats['sharpe_ratio']:.2f}, total return {benchmark_stats['total_return']:.1%}")
     print("Note: the benchmark's own monthly rebalancing back to equal weight isn't cost-modeled here,")
-    print("since it wasn't part of this project's original scope (see README) -- its turnover from price")
+    print("since it wasn't part of this project's original scope (see docs/STUDY_17_STOCKS.md) -- its turnover from price")
     print("drift alone each month is real but structurally much smaller than the active strategies' full")
     print("stock-swapping turnover, so this is a reasonable, disclosed simplification, not an oversight.")
 

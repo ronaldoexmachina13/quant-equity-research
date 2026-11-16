@@ -1,5 +1,5 @@
 """
-The three exhibits of the README, in the same style as the dashboard.
+The three exhibit charts in results/, in the same style as the dashboard.
 
 Reads only saved result files and writes three NEW files (never overwritten):
   results/exhibit_1_rank_ic.png            rank IC with 90% intervals, by signal and period

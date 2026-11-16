@@ -1,6 +1,7 @@
 """
-Tests added after mutation testing of the S29, S31 and S39 code. Each one pins a behaviour that a deliberate
-bug could change without any existing test noticing. All inputs are small and worked by hand.
+Tests added after mutation testing of the guard code: the survivorship scenario table and its gate, the
+family ledger, the dry-run target check and the price download check. Each one pins a behaviour that a
+deliberate bug could change without any existing test noticing. All inputs are small and worked by hand.
 """
 import importlib
 import sys

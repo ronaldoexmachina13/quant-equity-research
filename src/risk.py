@@ -1,3 +1,4 @@
+"""Risk and performance measures on monthly returns, with bootstrap intervals."""
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -8,7 +9,7 @@ TRADING_PERIODS_PER_YEAR = 12  # we're working in monthly returns
 
 def total_return(returns: pd.Series) -> float:
     """
-    Compound return over the whole period, uncompounded to a yearly rate.
+    Compound return over the whole period, not annualised.
     E.g. 0.477 means the strategy grew by 47.7% from start to end of the
     period, regardless of how many months that took.
     """
@@ -462,10 +463,7 @@ def drawdown_series(returns: pd.Series, start_date) -> pd.DataFrame:
     minus 1, month by month, with a starting value of 1.0 at start_date
     (the month-end before the first return).
 
-    Same formula as max_drawdown() above. The only difference is the 1.0
-    starting point: max_drawdown() starts its running maximum at the value
-    after the first month, so a first-month loss that is never recovered
-    before the deepest trough would make this series' minimum deeper.
+    Same formula and same 1.0 starting point as max_drawdown() above.
 
     The monthly_return column holds the input returns and is blank (NaN) on
     the starting row, which is a starting value, not a month of return.

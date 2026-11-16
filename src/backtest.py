@@ -1,6 +1,6 @@
+"""Monthly returns, the backtest, turnover and transaction costs."""
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.optimize import brentq
 
 from src.factors import load_prices, calculate_momentum
@@ -78,6 +78,10 @@ def apply_transaction_costs(returns: pd.Series, turnover: pd.Series, cost_bps: f
     (except the special first-month case), so the cost is applied
     twice per unit of turnover -- once for the selling leg, once for
     the buying leg.
+
+    The first month, a purchase from cash, is therefore charged twice the
+    one-way rate on the initial investment. This is conservative and applies
+    equally to any benchmark costed with this function.
     """
     cost_rate = cost_bps / 10000
     cost_drag = turnover * cost_rate * 2
@@ -181,7 +185,7 @@ def hold_between_refreshes(target_weights: pd.DataFrame, asset_returns: pd.DataF
     - Other months: the previous month's held weights, grown by the previous
       month's returns and renormalised, w_t = w_{t-1}(1 + r_{t-1}) / sum.
       This is buy-and-hold over the quarter. Missing returns count as 0, as
-      in calculate_turnover_with_drift() and run_backtest().
+      in calculate_turnover_with_drift().
 
     Feeding the result to run_backtest() gives the returns, and to
     calculate_turnover_with_drift() gives turnover that is exactly zero in
@@ -226,7 +230,6 @@ if __name__ == "__main__":
     print(f"Strategy total return:  {strategy_cum.iloc[-1]:.1%}")
     print(f"Benchmark total return: {benchmark_cum.iloc[-1]:.1%}")
 
-    plt.figure(figsize=(10, 5))
     strategy_stats = summarize_risk(strategy_returns, "Momentum Strategy")
     benchmark_stats = summarize_risk(benchmark_returns, "Equal-Weight Benchmark")
 
@@ -237,4 +240,3 @@ if __name__ == "__main__":
         print(f"  Annualized Volatility: {stats['annualized_volatility']:.1%}")
         print(f"  Sharpe Ratio:          {stats['sharpe_ratio']:.2f}")
         print(f"  Max Drawdown:          {stats['max_drawdown']:.1%}")
-    

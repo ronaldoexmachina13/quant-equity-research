@@ -1,3 +1,4 @@
+"""The SQLite database of the 17-stock study: its tables and the functions that write and read them."""
 import sqlite3
 import pandas as pd
 

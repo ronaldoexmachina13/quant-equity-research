@@ -14,8 +14,8 @@ This script only downloads. It computes no return and writes nothing to
 results/. run_universe_portfolios.py reads the cached file and checks it
 against results/spy_reference_monthly_returns.csv over 2021 to 2026.
 
-Run on the PC (it downloads from Yahoo Finance):
-  python run_universe_spy.py
+Needs network access (it downloads from Yahoo Finance):
+  python -m scripts.universe.run_universe_spy
 """
 import gzip
 

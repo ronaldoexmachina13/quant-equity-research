@@ -1,3 +1,4 @@
+"""Equal-weight portfolio of the top-ranked stocks at each date."""
 import pandas as pd
 from src.factors import load_prices, calculate_momentum
 

@@ -17,8 +17,8 @@ Output goes to two NEW files and nothing is overwritten:
   results/spy_reference_summary.csv
 If either already exists the script stops.
 
-Run on the PC (it downloads from Yahoo Finance):
-  python run_spy_reference.py
+Needs network access (it downloads from Yahoo Finance):
+  python -m scripts.first_study.run_spy_reference
 """
 import os
 

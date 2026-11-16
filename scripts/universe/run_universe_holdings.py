@@ -13,7 +13,7 @@ Outputs are new files, never overwritten (mode "x"):
   results/universe_study_stock_summary.csv   one row per ticker ever in the index
 
 Run after run_universe_portfolios.py:
-  python run_universe_holdings.py
+  python -m scripts.universe.run_universe_holdings
 """
 import sqlite3
 

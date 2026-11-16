@@ -13,7 +13,7 @@ tables must equal the committed results/universe_membership.csv and results/univ
 text for text. Any difference stops the script with a non-zero exit code.
 
 Run after the three Phase 3 steps, with the cache folder set:
-  $env:UNIVERSE_CACHE_DIR='C:\\Dev\\quant-cache\\universe'; python rebuild_feasibility_db.py
+  $env:UNIVERSE_CACHE_DIR='<cache folder>'; python -m scripts.universe.rebuild_feasibility_db
 """
 import sqlite3
 

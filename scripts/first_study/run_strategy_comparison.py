@@ -242,7 +242,7 @@ if __name__ == "__main__":
     print(period_2.round(3))
     period_2.to_csv("results/strategy_comparison_2023_2024.csv")
 
-    # --- Persist portfolio weights and performance to the database (Tier B) ---
+    # --- Persist portfolio weights and performance to the database ---
     # Only the headline top-5 run is persisted here. The top-8 concentration
     # check further below is a separate what-if scenario -- not what the rest
     # of the dashboard (or the SQL turnover/regime queries) report on -- so

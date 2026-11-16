@@ -1,3 +1,4 @@
+"""Adjusted close prices from Yahoo Finance, downloaded with yfinance."""
 import yfinance as yf
 import pandas as pd
 

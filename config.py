@@ -7,8 +7,8 @@ run_data_pipeline.py, and fundamentals.py.
 """
 
 # 17 large, liquid, sector-diverse US companies. Chosen for size and
-# liquidity, not for known historical performance -- see README for the
-# reasoning, and for the known coverage gaps in this universe (V, HD, DIS).
+# liquidity, not for known historical performance -- see docs/STUDY_17_STOCKS.md
+# for the reasoning, and for the known coverage gaps in this universe (V, HD, DIS).
 UNIVERSE = [
     "AAPL", "MSFT", "JPM", "JNJ", "XOM",
     "PG", "KO", "WMT", "HD", "UNH",

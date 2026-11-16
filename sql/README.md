@@ -12,7 +12,7 @@ The 500-stock pipeline runs two other SQL files, `universe_at_date.sql` and `uni
 
 ## How to run
 
-Run the pipeline first (see "Reproducing this project end-to-end" in the main README). `scripts/first_study/run_strategy_comparison.py` populates `portfolio_weights` (720 rows: 48 months × 5 holdings × 3 strategies) and `performance` (192 rows: 48 months × 4 series). Then run any query file against `database/quant_research.db`, for example with the `sqlite3` command-line tool or DB Browser for SQLite.
+Run the pipeline first (see "Reproducing this project end-to-end" in `docs/STUDY_17_STOCKS.md`). `scripts/first_study/run_strategy_comparison.py` populates `portfolio_weights` (720 rows: 48 months × 5 holdings × 3 strategies) and `performance` (192 rows: 48 months × 4 series). Then run any query file against `database/quant_research.db`, for example with the `sqlite3` command-line tool or DB Browser for SQLite.
 
 ## Design choices
 

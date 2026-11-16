@@ -1,4 +1,4 @@
-"""Draw the out-of-sample growth chart used at the top of the README.
+"""Draw the out-of-sample growth chart used in docs/STUDY_17_STOCKS.md.
 
 Reads results/oos_monthly_returns.csv (written by run_out_of_sample.py) and
 saves results/oos_growth.png in the same palette as the dashboard.

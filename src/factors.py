@@ -1,3 +1,4 @@
+"""Momentum, Value and Combined scores, and the price loader that feeds them."""
 import pandas as pd
 from src.database import get_connection
 
