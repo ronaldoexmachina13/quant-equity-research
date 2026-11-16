@@ -140,7 +140,7 @@ Momentum for month t is the price at the end of month t-1 divided by the price a
 | Item | Source and treatment |
 |---|---|
 | Universe | S&P 500 membership rebuilt month by month from Wikipedia. Between 353 and 499 names are usable for Momentum each month and between 295 and 426 for Value and Combined (from `results/universe_study_monthly_counts_momentum.csv` and `_value_combined.csv`). |
-| Prices | Yahoo Finance via `yfinance`, adjusted close. |
+| Prices | Yahoo Finance via `yfinance`. Adjusted close for returns and Momentum; split-adjusted close, not adjusted for dividends, for price-to-book. |
 | Book value | SEC EDGAR filings, aligned to the filing date. Book value per share is restated for later splits. |
 | Risk-free rate | Three-month Treasury bill, FRED. |
 
@@ -214,8 +214,11 @@ python -m scripts.universe.run_universe_portfolios      # portfolio tests and se
 python -m scripts.universe.run_universe_extras          # quintile returns and Newey-West and block-bootstrap intervals (Amendment 14)
 python -m scripts.universe.run_universe_skip_month --write   # true 12-1 sensitivity and survivorship by year (Amendment 15); --dry-run writes nothing
 python -m scripts.universe.make_data_manifest           # checksums of the raw-data cache; add --verify to compare later
-python -m scripts.universe.make_universe_charts         # the charts and table on this page
+python -m scripts.universe.make_universe_charts         # three exhibit charts in results/ (not shown on this page or the dashboard)
 python -m scripts.universe.run_universe_holdings        # holdings and per-stock summary, checked against committed returns
+python -m scripts.universe.run_universe_alpha_french --write     # benchmark regression and French factor correlations (Amendment 16)
+python -m scripts.universe.run_universe_sector_neutral --write   # sector-neutral Value and Combined with a same-names control (Amendments 16 and 17)
+python -m scripts.universe.run_universe_alpha_factor4 --write    # four-factor alpha regression (Amendment 18)
 python -m scripts.universe.run_universe_survivorship_scenario --write --registered 19   # scenario table (Amendment 19)
 python -m scripts.universe.make_test_ledger --write --registered 19                     # test ledger by family (Amendment 19)
 python -m scripts.universe.generate_universe_dashboard_data   # assets/universe_*_data.js (never overwrites)
@@ -223,6 +226,8 @@ python -m pytest tests/ -q                              # the test suite, no net
 ```
 
 Rerunning a result-writing script in a fresh clone stops at the first existing file. To regenerate a result, write it to a new folder or move the old file first.
+
+The membership, coverage and exclusion files in `results/` were written by `run_universe_coverage`. It is not in the list because `rebuild_feasibility_db` does the same database work and checks it against those committed files.
 
 </details>
 
