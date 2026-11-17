@@ -8,7 +8,11 @@
 
 The hypothesis is that momentum and value earn a premium among US large caps. Neither premium is expected to be large among liquid, heavily analysed companies, so a null result is a plausible outcome.
 
-The work uses Python (pandas, NumPy, SciPy, statsmodels, matplotlib), SQLite and SQL for the index-membership and coverage queries and the 17-stock cross-checks, and a static HTML and Chart.js dashboard.
+Python (pandas, NumPy, SciPy, statsmodels, matplotlib) builds the signals and portfolios and runs the tests: rank correlations, bootstrap intervals and regressions. statsmodels is used for the alpha regressions in the earlier 17-stock study, and matplotlib draws the static exhibits in `results/`.
+
+SQL handles index membership and data coverage. A SQLite database holds the reconstructed S&P 500 membership, and SQL queries return which stocks were in the index at each month-end and how many of them had usable prices and book values. A test checks the membership query against the Python rule. For the 17-stock study, SQL queries recompute momentum and price-to-book as an independent check on the Python code, and report turnover, Sharpe ratio and maximum drawdown.
+
+The dashboard is static HTML, with Chart.js for the line charts.
 
 As of 13 November 2026. Prices run to August 2026, and the pre-specification includes amendments up to Amendment 19.
 
