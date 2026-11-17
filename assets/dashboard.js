@@ -486,3 +486,11 @@ const DEFINITIONS = {
     note: ""
   }
 };
+
+/* The phone-width note "Scroll sideways for more columns" (styles.css) shows only on a table wider than its frame.
+   Checked again whenever the page changes size, which covers tab switches and tables drawn after load. */
+function markScrollingTables() {
+  document.querySelectorAll(".timeline-table-wrap").forEach(w => w.classList.toggle("scrolls", w.scrollWidth > w.clientWidth + 1));
+}
+new ResizeObserver(markScrollingTables).observe(document.body);
+window.addEventListener("resize", markScrollingTables);

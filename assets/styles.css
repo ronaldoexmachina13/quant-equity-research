@@ -335,6 +335,8 @@ footer a:hover { color: var(--text-strong); }
 .stocks-table td.name { max-width: 128px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--sans); }
 .stocks-table { font-size: 0.72rem; }
 .stocks-table th, .stocks-table td { padding-left: 0.45rem; padding-right: 0.45rem; white-space: nowrap; }
+/* header cells may wrap, so the ten columns fit the page between 960 and 1,090 px wide */
+.stocks-table thead th { padding-left: 0.45rem; padding-right: 0.45rem; white-space: normal; vertical-align: bottom; }
 .tag { display: inline-block; border: 1px solid var(--line); padding: 0 0.4rem; font-family: var(--sans); font-size: 0.78rem;   color: var(--muted); }
 .tag.warn { color: var(--neg); border-color: var(--neg); }
 .bar-row { display: grid; grid-template-columns: 62px 1fr 64px; gap: 0.6rem; align-items: center; font-family: var(--sans); font-size: 0.72rem; margin: 0.28rem 0; }
@@ -505,8 +507,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
 .panel > .exh + h2 { margin-top: 0.9rem; padding-top: 0; border-top: none; }
 
 .caption + .src, .legend-row + .src { margin-top: 0.7rem; }
-/* tables: figures right-aligned, header and group rows in small caps; on narrow screens a note says the table scrolls sideways */
-@media (max-width: 600px) { .timeline-table-wrap { overflow-x: auto; } .timeline-table-wrap::before { content: "Scroll sideways for more columns"; display: block; font-size: 0.69rem; color: var(--dim); margin-bottom: 0.3rem; } }
+/* tables: figures right-aligned, header and group rows in small caps; on narrow screens a note says the table scrolls sideways, on the tables that do (dashboard.js sets "scrolls") */
+@media (max-width: 600px) { .timeline-table-wrap { overflow-x: auto; } .timeline-table-wrap.scrolls::before { content: "Scroll sideways for more columns"; display: block; font-size: 0.69rem; color: var(--dim); margin-bottom: 0.3rem; } }
 @media (max-width: 600px) {
   .timeline-table td:first-child, .timeline-table th:first-child { position: sticky; left: 0; z-index: 2; background: var(--surface); }
   .timeline-table tr.tbl-group td:first-child { background: var(--bg); }
@@ -605,7 +607,7 @@ ul.contents .c-q { color: var(--text); font-size: 0.9rem; }
 .mini-stat:last-child { border-bottom: none; }
 .mini-stat .ms-head { margin: 0; }
 .mini-stat .ms-value { font-family: var(--mono); font-size: 1.25rem; font-weight: 500; letter-spacing: 0; }
-.mini-stat .ms-label { margin: 0; font-family: var(--serif); font-size: 0.98rem; }
+.mini-stat .ms-label { margin: 0; font-family: var(--serif); font-size: 0.98rem; text-wrap: pretty; }
 @media (max-width: 700px) { .mini-stat { grid-template-columns: 1fr auto; } .mini-stat .ms-label { grid-column: 1 / -1; } .mini-stats { margin-top: 1rem; } .mini-stat:nth-child(n) { border-bottom: 1px solid var(--rule); } .hero h1 { font-size: 1.9rem; } .lede { font-size: 1.15rem; } .section-label { font-size: 1.3rem; } }
 /* chalk strokes on the forest plots */
 .forest .blk { font-weight: 600; font-size: 14px; }
