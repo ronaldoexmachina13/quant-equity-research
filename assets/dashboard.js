@@ -368,7 +368,7 @@ function renderChrome(active, subtitle) {
   document.getElementById("foot").innerHTML =
     `<footer><div class="facts"><span>About 500 S&amp;P 500 members</span><span>${ymLabel(U.dates[0])} to ${ymLabel(U.dates[U.dates.length - 1])}</span><span>Free data, survivor-biased</span></div>` +
     `<div class="lineage">Lineage: results/*.csv &rarr; scripts/universe/generate_universe_dashboard_data.py &rarr; assets/universe_*.js &rarr; this page</div>` +
-    `<div class="repo">Quant Equity Research &middot; <a href="${REPO_URL}" target="_blank">github.com/ronaldoexmachina13/quant-equity-research</a></div></footer>`;
+    `<div class="repo">Ronaldo Silva &middot; Built in Python and SQL &middot; <a href="${REPO_URL}" target="_blank" rel="noopener">github.com/ronaldoexmachina13/quant-equity-research</a> &middot; <a href="https://www.linkedin.com/in/ronaldo-duarte-rodrigues-silva" target="_blank" rel="noopener">LinkedIn</a></div></footer>`;
 }
 /* Exhibit labels: every .panel with a data-src attribute is numbered in page order, gets a strip with its status
    (from data-stamp) and a source line naming the committed CSVs. Only attributes are read; no numbers are made here. */

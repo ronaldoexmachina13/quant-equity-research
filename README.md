@@ -4,7 +4,7 @@
 
 **Short answer: not detectably.** This is a pre-specified test of two of the best-known stock factors, momentum (the return over the 11 months to the end of the previous month) and price-to-book value, and their average, on about 500 large US companies from January 2012 to August 2026. None of them can be shown to rank next-month returns better than chance. The sections below show how the test was built to avoid look-ahead and tuning, and where it still falls short.
 
-[**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-specification](docs/LIMITATIONS_PLAN.md)
+[**Open the dashboard**](https://ronaldoexmachina13.github.io/quant-equity-research/) &nbsp;|&nbsp; [Method and pre-specification](docs/LIMITATIONS_PLAN.md) &nbsp;|&nbsp; Author: [Ronaldo Silva](https://www.linkedin.com/in/ronaldo-duarte-rodrigues-silva)
 
 The hypothesis is that momentum and value earn a premium among US large caps. Neither premium is expected to be large among liquid, heavily analysed companies, so a null result is a plausible outcome.
 
