@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Portfolios | Equity Factor Research</title>
-<script src="assets/theme.js?v=25"></script>
-<link rel="stylesheet" href="assets/styles.css?v=25">
+<script src="assets/theme.js?v=26"></script>
+<link rel="stylesheet" href="assets/styles.css?v=26">
 </head>
 <body>
 <div id="chrome"></div>
@@ -20,7 +20,7 @@
 
   <section class="hero">
     <h1>Portfolios</h1>
-    <p class="lede">Do top-ranked stocks beat the benchmark? Secondary evidence. Each month the highest-ranked names are held at equal weight against an equal-weight benchmark of every name with usable data for that signal. Results are read next to the signal tests, not instead of them.</p>
+    <p class="lede">Do top-ranked stocks beat the benchmark? Secondary evidence. Each month the highest-ranked names are held at equal weight against an equal-weight benchmark of every name with usable data for that signal. Results are read together with the signal tests.</p>
   </section>
 
   <div class="section-label">Sharpe difference against the benchmark <span>all 18 registered comparisons, before and after 10 bps costs</span></div>
@@ -153,7 +153,7 @@
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/universe_factor4_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=25"></script>
+<script src="assets/dashboard.js?v=26"></script>
 <script>
 renderChrome("portfolios.html", "Equal weight &middot; rebalanced monthly &middot; 10 bps one-way costs &middot; benchmark: equal-weight average of usable names");
 
@@ -194,7 +194,7 @@ function drawLead() {
   document.getElementById("leadKey").textContent = "* marks a Sharpe difference whose 90% paired bootstrap interval excludes zero." + (dup.size ? " \u2020 marks rows that are one result counted twice, because the top quintile contains the top decile." : "");
   document.getElementById("leadCaption").innerHTML = "The Sharpe difference is the portfolio's Sharpe ratio minus its own benchmark's, annualised; the interval is a paired bootstrap (5,000 resamples) at the 90% level. " +
     (hitG.length && hitG.every(c => c.g.diff < 0) ? "In each of those rows the portfolio trailed its benchmark. " : "") +
-    "After costs deducts 10 bps one way on drift-inclusive turnover. The comparisons overlap, so exclusions would cluster and the expected count is a guide, not a significance level. The 2021 to 2026 months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.";
+    "After costs deducts 10 bps one way on drift-inclusive turnover. The comparisons overlap, so exclusions would cluster and the expected count is only a rough guide. The 2021 to 2026 months were already known from the 17-stock study, so those months are treated as a re-test.";
 }
 
 function drawPortfolios() {
@@ -349,7 +349,7 @@ function drawUniverse() {
   const total = Object.values(CTL.signal_tests).reduce((a, b) => a + b.tests, 0), excl = Object.values(CTL.signal_tests).reduce((a, b) => a + b.exclude_zero, 0);
   document.getElementById("universeCaption").textContent =
     "Each month " + c.scored_mean.toFixed(0) + " names on average have a Value score. " + c.no_sector_mean.toFixed(0) + " have no sector and " + c.small_sector_mean.toFixed(0) +
-    " sit in a sector with fewer than 10 scored names, leaving " + c.kept_mean.toFixed(0) + " (never fewer than " + c.kept_min + "). The sector is one current label per stock, not a historical one. " +
+    " sit in a sector with fewer than 10 scored names, leaving " + c.kept_mean.toFixed(0) + " (never fewer than " + c.kept_min + "). Each stock has one sector label, taken today, so sector changes over time are not captured. " +
     "Names with no sector are mostly names that left the index: " + pct(c.no_sector_first_year) + " of scored names in 2012 and " + pct(c.no_sector_last_year) + " in 2026. " +
     "The sector-neutral universe therefore leans toward names that stayed, and survivorship affects levels and differences alike. " +
     (excl === 0 ? "None of the " + total + " new signal tests excludes zero." : excl + " of the " + total + " new signal tests exclude zero under the registered interval.");
@@ -383,7 +383,7 @@ function drawFactor4() {
   const reg = G.filter(x => x.variant === "published"), regEx = reg.filter(x => x.alpha_excludes_zero).length;
   document.getElementById("f4Caption").innerHTML =
     "<b>" + F4_LABEL[f4Variant] + ", " + SIZE_LABEL[ctlSize].toLowerCase() + ":</b> " + nEx + " of " + mine.length + " alpha intervals here exclude zero. Alpha is the intercept of the portfolio's excess return over Treasury bills on Kenneth French's market, size (SMB), value (HML) and momentum (Mom) factors, times 12, with Newey-West 90% intervals, before costs. " +
-    "The columns are the loadings: how much of each factor the portfolio carried. Loadings are descriptive. French's factors use all US stocks, this study about 500 index members, so they show similarity, not an exact decomposition. " +
+    "The columns are the loadings: how much of each factor the portfolio carried. Loadings are descriptive. French's factors use all US stocks, this study about 500 index members, so the loadings show similarity only. " +
     "Across the " + all + " gross four-factor regressions (every variant, size and period, which overlap heavily; the net-of-cost rows repeat them), " + allEx + " intervals exclude zero (" + allPos + " with a positive alpha), against about " + (all * 0.1).toFixed(0) + " expected by chance at the 90% level if they were independent. Of the " + reg.length + " registered portfolios, " + regEx + " exclude zero. " +
     "They join the family of tests, as exploratory, and a single interval that excludes zero is not read on its own. Added after the results (Amendment 18).";
 }

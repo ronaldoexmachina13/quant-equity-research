@@ -11,8 +11,8 @@
 <meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Signals | Equity Factor Research</title>
-<script src="assets/theme.js?v=25"></script>
-<link rel="stylesheet" href="assets/styles.css?v=25">
+<script src="assets/theme.js?v=26"></script>
+<link rel="stylesheet" href="assets/styles.css?v=26">
 </head>
 <body>
 <div id="chrome"></div>
@@ -63,7 +63,7 @@
         <span><i style="background:var(--combined)"></i>Combined</span>
       </div>
       <div style="position:relative; height:260px;"><canvas id="icChart" role="img" aria-label="Line chart. Running sum of the monthly rank IC for Momentum, Value and Combined."></canvas></div>
-      <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so they are a re-test, not out-of-sample evidence.</p>
+      <p class="caption">A signal with a stable positive mean IC trends upward; these paths do not. The dashed line marks the end of the first test period (December 2020). Later months were already known from the 17-stock study, so those months are treated as a re-test.</p>
     </div>
 
     <div class="panel" data-stamp="descriptive" data-src="results/universe_study_ic_monthly_momentum.csv; results/universe_study_ic_monthly_value_combined.csv">
@@ -123,7 +123,7 @@
 <script src="assets/universe_extras_data.js"></script>
 <script src="assets/universe_controls_data.js"></script>
 <script src="assets/meta_data.js"></script>
-<script src="assets/dashboard.js?v=25"></script>
+<script src="assets/dashboard.js?v=26"></script>
 <script>
 renderChrome("signals.html", "Rank IC &middot; quintile spread &middot; Fama-MacBeth &middot; 90% bootstrap intervals (5,000 resamples)");
 const S = UNIVERSE_SENS;

@@ -93,6 +93,6 @@ def test_summary_page_no_longer_shades_bands_and_points_to_the_detectable_effect
     index = (ROOT / "index.html").read_text(encoding="utf-8")
     assert "bands:" not in index and "bands shaded" not in index
     assert "Detectable effect table below" in index
-    assert "not evidence of no effect" in index
+    assert "consistent with no effect and with a small one" in index
     dashboard = (ROOT / "assets" / "dashboard.js").read_text(encoding="utf-8")
     assert "bandRuns" not in dashboard
