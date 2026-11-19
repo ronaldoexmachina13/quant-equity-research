@@ -610,3 +610,23 @@ Before this entry was written, a dry run of the draft scripts was made by the AI
 ### What this does not do
 
 It does not estimate the survivorship bias, add the missing names, change the group boundaries that the missing names would move, or model missing names in group 5. It does not say which scenario is realistic. It does not add power to the registered sample or turn any exploratory result into a registered one.
+
+## Amendment 20 (2026-11-19, after every registered result existed, after Amendment 19 and its results, before any code for this addition was written or run)
+
+The Amendment 19 scenario assumes that the names missing from Momentum group 1 earned 0%, -2% or -5% a month. Every one of those returns is below the saved group 1 mean, so the adjustment can only widen the spread. Missing names were not only failures: many left the index because they were acquired, often at a premium. A review of the finished study on 19 November 2026 pointed out that the table covers one direction only. This entry adds the other direction. It is exploratory and post hoc, and it changes no registered rule, headline, published figure or existing result file.
+
+### Disclosure of what is known before the run
+
+No code for this entry has been written or run, and no value of the new rows has been computed. The direction is known from the formula of Amendment 19, decision 1: the adjusted spread equals the saved spread plus s times (saved group 1 minus r). For r above the saved group 1 mean the spread falls. The saved Momentum group 1 mean for 2012 to 2020 was read from the existing scenario inputs during the review (about 1.3% a month).
+
+### Decisions
+
+1. **Positive returns for the missing names.** The rule, the periods, the bootstrap (5,000 resamples, seed 42, 90% intervals) and the shares s of 10%, 20% and 30% are those of Amendment 19, decision 1. The assumed monthly return r of the missing names takes the values +2% and +5% a month, every combination with s, plus the unadjusted spread. Both values are assumptions chosen for illustration, to stand for names acquired at a premium. They are not estimated from any data and no combination is preferred.
+2. **Check before anything is written.** The unadjusted rows must reproduce the saved Momentum quintile-spread mean and interval in results/universe_study_signal_summary_momentum.csv to 1e-9, as in Amendment 19, decision 4. A difference stops the run.
+3. **Output.** One new file, results/universe_study_survivorship_scenario_positive.csv, mode x, with the same columns as results/universe_study_survivorship_scenario.csv. The script stops if the file exists. The Amendment 19 file is not changed.
+4. **Reading rule.** As in Amendment 19, decision 6: the rows are a sensitivity of the Momentum spread to an assumption, not tests and not estimates, and are not counted in the ledger. No row is read as evidence for or against a Momentum effect, and no row is selected. If either table is quoted, both are quoted for the same period.
+5. **Text.** The README and dashboard sentences that describe the scenario are updated to cover both files, with every number taken from the files. The text is drafted with the AI assistant and approved by Ronaldo before it is committed.
+
+### What this does not do
+
+It does not estimate which names were acquired or what they earned, change the group boundaries, model missing names in group 5, or say which direction is more likely. It does not add power to the registered sample or turn any exploratory result into a registered one.
