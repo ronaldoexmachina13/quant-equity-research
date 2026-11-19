@@ -7,6 +7,9 @@ left the index, mostly acquired or bankrupt, are largely absent. If failed past 
 missing names, group 1 (the lowest Momentum quintile) is too good in the saved data and the spread
 (group 5 minus group 1) is too small.
 
+Amendment 20 adds the other direction: missing names that were acquired at a premium, with r above the saved
+group 1 mean, which lowers the spread. The rule is the same; only the assumed returns differ.
+
 Scenario rule, applied month by month to the saved group returns:
 
     group 1 adjusted = (1 - s) * group 1 saved + s * r_miss
@@ -27,7 +30,8 @@ import pandas as pd
 from src.signal_eval import series_summary
 
 SHARES_MISSING = [0.10, 0.20, 0.30]          # assumed share of the true group 1 that is missing
-MISSING_RETURNS = [0.0, -0.02, -0.05]        # assumed monthly return of the missing names
+MISSING_RETURNS = [0.0, -0.02, -0.05]        # assumed monthly return of the missing names (Amendment 19)
+MISSING_RETURNS_POSITIVE = [0.02, 0.05]      # assumed returns for names acquired at a premium (Amendment 20)
 NEW_TEST_END = pd.Timestamp("2020-12-31")
 N_SIMS, SEED = 5000, 42                      # same as the registered bootstrap
 NOTE = ("Scenario under stated assumptions, not an estimate and not a test. The assumed share and return of "
@@ -55,8 +59,12 @@ def reference_share_missing(coverage, mask):
     return float(coverage.loc[mask, "members_no_price_t1"].sum() / coverage.loc[mask, "members"].sum())
 
 
-def scenario_table(quintiles: pd.DataFrame, coverage: pd.DataFrame) -> pd.DataFrame:
-    """One row per period and scenario. `quintiles` and `coverage` are the saved CSVs, already read."""
+def scenario_table(quintiles: pd.DataFrame, coverage: pd.DataFrame, missing_returns=None) -> pd.DataFrame:
+    """
+    One row per period and scenario. `quintiles` and `coverage` are the saved CSVs, already read.
+    `missing_returns` defaults to the Amendment 19 grid; Amendment 20 passes MISSING_RETURNS_POSITIVE.
+    """
+    returns = MISSING_RETURNS if missing_returns is None else list(missing_returns)
     q = quintiles.copy()
     q["date"] = pd.to_datetime(q["date"])
     q = q[q["signal"] == "Momentum"].set_index("date").sort_index()
@@ -67,7 +75,7 @@ def scenario_table(quintiles: pd.DataFrame, coverage: pd.DataFrame) -> pd.DataFr
     for period, mask in period_months(q.index).items():
         g1, g5 = q.loc[mask, "q1"], q.loc[mask, "q5"]
         reference = reference_share_missing(cov, mask)
-        cases = [(0.0, np.nan)] + [(s, r) for s in SHARES_MISSING for r in MISSING_RETURNS]
+        cases = [(0.0, np.nan)] + [(s, r) for s in SHARES_MISSING for r in returns]
         for share, ret in cases:
             spread = adjusted_spread(g1, g5, share, 0.0 if np.isnan(ret) else ret)
             summary = series_summary(spread, n_sims=N_SIMS, seed=SEED)

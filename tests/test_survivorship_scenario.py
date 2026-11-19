@@ -67,3 +67,30 @@ def test_gate_failures_is_empty_for_matching_summary_and_names_a_changed_value()
     saved.loc[saved.index[0], "mean"] += 0.001
     failures = gate_failures(table, saved)
     assert len(failures) == 1 and "spread_mean_monthly" in failures[0]
+
+
+# Amendment 20: positive returns for the missing names
+
+
+def test_positive_missing_return_lowers_the_spread_hand_worked():
+    # group 1 = 1%, group 5 = 2%, 20% of the true group 1 missing at +5% a month:
+    # group 1 adjusted = 0.8 x 0.01 + 0.2 x 0.05 = 0.018, so the spread is 0.02 - 0.018 = 0.002, below the saved 0.01.
+    spread = adjusted_spread(pd.Series([0.01]), pd.Series([0.02]), 0.20, 0.05)
+    assert spread.iloc[0] == pytest.approx(0.002)
+
+
+def test_positive_grid_has_seven_rows_per_period_and_keeps_the_unadjusted_row():
+    from src.survivorship_scenario import MISSING_RETURNS_POSITIVE
+    quintiles, coverage = _monthly_inputs()
+    table = scenario_table(quintiles, coverage, missing_returns=MISSING_RETURNS_POSITIVE)
+    assert len(table) == 21                      # 3 periods x (1 unadjusted + 3 shares x 2 returns)
+    assert sorted(table["assumed_monthly_return_missing"].dropna().unique().tolist()) == [0.02, 0.05]
+    base19 = scenario_table(quintiles, coverage)
+    pick = lambda t: t[t["assumed_share_missing_in_group1"] == 0.0]["spread_mean_monthly"].tolist()
+    assert pick(table) == pytest.approx(pick(base19))
+
+
+def test_default_grid_is_unchanged_by_amendment_20():
+    quintiles, coverage = _monthly_inputs()
+    table = scenario_table(quintiles, coverage)
+    assert sorted(table["assumed_monthly_return_missing"].dropna().unique().tolist()) == [-0.05, -0.02, 0.0]
