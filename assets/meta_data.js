@@ -133,6 +133,12 @@ const META = {
    "date": "2026-11-13",
    "title": "Amendment 19",
    "note": "After every registered result existed, after Amendments 16 to 18 and their results, after a dry run of draft code outside the repository, before any result was written to results/"
+  },
+  {
+   "id": "A20",
+   "date": "2026-11-19",
+   "title": "Amendment 20",
+   "note": "After every registered result existed, after Amendment 19 and its results, before any code for this addition was written or run"
   }
  ]
 };
