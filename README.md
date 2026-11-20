@@ -87,7 +87,7 @@ Source: `results/universe_study_portfolio_returns.csv` and `results/universe_stu
 - A signal dated t uses only information available at the end of month t-1 and is held through month t. Book values enter on the date the filing became public.
 - Signal definitions were frozen from the earlier study. No lookback, weight or threshold was varied to improve a result.
 - Intervals are 90% bootstrap intervals, cross-checked with Newey-West and block-bootstrap intervals. Every test is counted, and the number of exclusions expected by chance is stated beside the result.
-- Errors found and corrected are logged below: a one-month look-ahead in the Value signal, a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
+- Errors found and corrected are logged below: a one-month look-ahead in the Value signal, a first download that missed 31 December 2024 (the `yfinance` end date is exclusive), a split-adjustment bug that had flattered Value (its 17-stock Sharpe fell from 0.86 to about 0.61 once fixed), unit errors in SEC share counts that produced absurd price-to-book ratios, and a Momentum label that described an 11-month return as 12-1.
 - Many of the tests are hand-worked cases and run on every push. Seeds are fixed, and the raw-data cache is checksummed in `results/data_manifest.csv`.
 
 Status: descriptive record.
